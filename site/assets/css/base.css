@@ -2,6 +2,12 @@
 @font-face{font-family:"Staple Raleway";src:url("../fonts/raleway-600.woff2") format("woff2");font-style:normal;font-weight:600;font-display:swap}
 @font-face{font-family:"Staple Raleway";src:url("../fonts/raleway-700.woff2") format("woff2");font-style:normal;font-weight:700;font-display:swap}
 
+@view-transition{navigation:auto}
+@keyframes staplePageOut{to{opacity:.985}}
+@keyframes staplePageIn{from{opacity:.985}}
+::view-transition-old(root){animation:var(--motion-fast) ease both staplePageOut}
+::view-transition-new(root){animation:var(--motion-page) ease both staplePageIn}
+
 *,*::before,*::after{box-sizing:border-box}
 html{background:#000;scroll-behavior:smooth}
 body{
@@ -37,6 +43,10 @@ h1,h2,h3,h4{
 }
 h1{letter-spacing:-.025em}
 strong,b{font-weight:700}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{
+  outline:2px solid var(--focus-ring);
+  outline-offset:3px;
+}
 ::selection{background:rgba(79,133,255,.36);color:#fff}
 
 .skip-link{
@@ -85,13 +95,13 @@ strong,b{font-weight:700}
   color:#EEF2F8;
   font-size:14px;font-weight:600;
   cursor:pointer;
-  transition:border-color .18s ease,background-color .18s ease,box-shadow .18s ease,color .18s ease;
+  transition:transform var(--motion-base) var(--ease),border-color var(--motion-base) ease,background-color var(--motion-base) ease,box-shadow var(--motion-base) ease,color var(--motion-base) ease;
 }
-.button:hover,.button:focus-visible{
-  outline:none;
-  border-color:rgba(255,255,255,.25);
+.button:focus-visible{
+  border-color:rgba(255,255,255,.28);
   background:rgba(255,255,255,.07);
 }
+.button:active{transform:scale(.985)}
 .button.primary{
   border-color:rgba(79,133,255,.58);
   background:linear-gradient(180deg,#538AFF,#1D4ED8);
@@ -105,6 +115,15 @@ strong,b{font-weight:700}
   color:#041108;
 }
 
+@media(hover:hover){
+  .button:hover{
+    transform:translateY(-1px);
+    border-color:rgba(255,255,255,.25);
+    background:rgba(255,255,255,.07);
+  }
+  .button.primary:hover{background:linear-gradient(180deg,#6092ff,#2457df)}
+  .button.support-primary:hover{background:linear-gradient(180deg,#59e47f,#25c25d)}
+}
 @media(max-width:700px){
   :root{--page:min(100% - 28px,1220px)}
   .section{padding:64px 0}
@@ -113,4 +132,5 @@ strong,b{font-weight:700}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition:none!important}
+  ::view-transition-old(root),::view-transition-new(root){animation:none!important}
 }

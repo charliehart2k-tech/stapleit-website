@@ -35,5 +35,9 @@
   --font-display:"Staple Raleway","Raleway","Segoe UI",Arial,sans-serif;
   --font-body:"Staple Raleway","Raleway","Segoe UI",Arial,sans-serif;
 
+  --focus-ring:rgba(255,255,255,.82);
+  --motion-fast:140ms;
+  --motion-base:180ms;
+  --motion-page:220ms;
   --ease:cubic-bezier(.22,.75,.2,1);
 }
