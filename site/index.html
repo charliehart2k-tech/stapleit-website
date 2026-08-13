@@ -13,6 +13,20 @@
 <link href="assets/css/nav.css" rel="stylesheet"/>
 <link href="assets/css/reset-shell.css" rel="stylesheet"/>
 <link href="assets/css/home-hero.css" rel="stylesheet"/>
+<style>
+.site-footer{margin-top:30px;border-top:1px solid var(--line-soft);background:#000}
+.footer-main{width:var(--page);margin:auto;padding:54px 0 38px;display:grid;grid-template-columns:.9fr 1.1fr;gap:72px}
+.footer-brand p{max-width:390px;margin:16px 0 0;color:#747D89;font-size:13px}
+.footer-wordmark{font-family:var(--font-display);font-size:2.15rem;font-weight:700;letter-spacing:-.045em;color:#f7f8fb}
+.footer-links{display:grid;grid-template-columns:1fr;gap:28px}
+.footer-links h3{font-size:13px;letter-spacing:.01em}
+.footer-links a{display:block;padding:4px 0;color:#7E8793;font-size:13px}
+.footer-links a:hover{color:#fff}
+.footer-legal{width:var(--page);margin:auto;padding:20px 0 30px;border-top:1px solid var(--line-soft);color:#5D6672;font-size:11px}
+.footer-legal p{margin:3px 0}
+@media(max-width:800px){.footer-main{grid-template-columns:1fr;gap:40px}}
+@media(max-width:560px){.footer-links{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
@@ -83,6 +97,13 @@
 </div>
 </section>
 </main>
+<footer class="site-footer">
+<div class="footer-main">
+<div class="footer-brand"><a class="footer-wordmark" href="index.html">Staple.<span class="it-accent it-blue">IT</span></a><p>Surrey's trusted IT support provider for businesses, charities and individuals.</p></div>
+<div class="footer-links"><div><h3>Explore</h3><a href="index.html">Home</a><a href="it-services/it-support/index.html">IT Support</a><a href="#intro">About Staple IT</a><a href="#contact">Get in touch</a></div></div>
+</div>
+<div class="footer-legal"><p><strong>Hart Corporate Ltd, trading as Staple IT</strong> · 88 Eastdean Avenue, Epsom, KT18 7SN</p><p>Registered in England and Wales · Company number 17274041 · VAT number 522399484</p><p>© 2026 Staple IT. All rights reserved.</p></div>
+</footer>
 <script src="assets/js/app.js"></script>
 </body>
 </html>
