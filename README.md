@@ -11,7 +11,10 @@ The active rebuild currently includes:
 - Homepage hero restored from the approved historical build, including the liquid-wave background and functional support-status widget.
 - Homepage two-card content row started with the About Staple IT card.
 - Global four-column liquid-glass footer applied across the active route shells.
-- Responsive navigation now switches to the menu layout for tablet widths rather than squeezing the desktop controls.
+- Responsive navigation switches to the menu layout for tablet widths rather than squeezing the desktop controls.
+- Shared focus, touch and motion behaviour is standardised in the active CSS.
+- Progressive cross-page view transitions are enabled where the browser supports them and disabled for reduced-motion users.
+- Homepage content cards use restrained interaction feedback and container-aware responsive behaviour.
 
 The approved navigation structure must not be redesigned unless explicitly requested.
 
@@ -23,38 +26,31 @@ Before rebuilding any route, inspect its relevant original scrape/reference file
 
 Do not replace original content with generic marketing copy simply because it is easier to write something new.
 
-## Design reference
+## Governing documents
 
-`DESIGN-SYSTEM.md` is the active visual and engineering reference for new work.
+Use these together:
 
-It documents:
+- `DESIGN-SYSTEM.md` — visual language, typography, glass material, responsive behaviour, accessibility, security and performance baseline.
+- `SEO-AEO-SCHEMA.md` — SEO, AEO/GEO, local search, crawl/indexing and structured-data rules.
+- `RELEASE-CHECKLIST.md` — the nine quality gates that every completed page must pass before release.
 
-- typography;
-- black liquid-glass material rules;
-- approved navigation/footer behaviour;
-- responsive breakpoints and test viewports;
-- accessibility expectations;
-- performance budgets;
-- security requirements; and
-- the standard page-build workflow.
+If an approved design, engineering or search decision changes, update the relevant governing document in the same change.
 
-If the approved design direction changes, update `DESIGN-SYSTEM.md` in the same change.
+## Nine quality gates
 
-## SEO, AEO/GEO and structured data
+A route is not complete until it has passed:
 
-`SEO-AEO-SCHEMA.md` is the active search-discovery standard for the rebuild.
+1. Content accuracy.
+2. Design.
+3. Responsive and accessibility.
+4. Security.
+5. Performance.
+6. SEO, AEO and schema.
+7. Conversion and usability.
+8. Browser and device QA.
+9. Release and deployment.
 
-It defines:
-
-- page titles, descriptions, canonicals and heading rules;
-- local-search principles for a Surrey-focused IT provider;
-- AEO/GEO/AI-discovery content principles;
-- the JSON-LD and schema model for the organisation, services, breadcrumbs and blog articles;
-- crawl/index controls, sitemap and robots rules;
-- Google Search Console and Bing Webmaster launch checks; and
-- the per-page search checklist.
-
-Search optimisation must describe the real visible content. Do not add schema to blank route shells, invent reviews, create doorway location pages or write FAQ content purely for rich-result bait.
+The detailed checklist lives in `RELEASE-CHECKLIST.md`.
 
 ## Build rules
 
@@ -69,6 +65,24 @@ Search optimisation must describe the real visible content. Do not add schema to
 - Reuse shared code only when it is genuinely shared; do not dump page-specific CSS into global files.
 - Remove obsolete assets and code once they are no longer referenced by the active build.
 - Complete the SEO/AEO/schema checklist as each route becomes launch-ready.
+- Motion must add depth, hierarchy, feedback or continuity; decorative motion without a purpose should be removed.
+
+## Motion and CSS polish baseline
+
+Approved progressive enhancements include:
+
+- `clamp()`-based responsive typography/spacing;
+- balanced heading wrapping;
+- visible `:focus-visible` states;
+- 44px-or-larger practical touch targets;
+- subtle button compression/hover feedback;
+- container queries where component width matters more than viewport width;
+- `content-visibility` for suitable long below-the-fold sections;
+- progressive same-origin page view transitions;
+- reduced blur/filter cost on small screens; and
+- full `prefers-reduced-motion` fallbacks.
+
+Avoid scroll-jacking, custom cursors, excessive parallax, floating decorative blobs, 3D tilt cards, repeated autoplay video and animation that delays navigation or reading.
 
 ## Responsive requirement
 
@@ -102,6 +116,20 @@ Key rules:
 - respect `prefers-reduced-motion`.
 
 See `DESIGN-SYSTEM.md` for the recommended production header policy and working asset budgets.
+
+## SEO, AEO/GEO and structured data
+
+`SEO-AEO-SCHEMA.md` defines:
+
+- page titles, descriptions, canonicals and heading rules;
+- local-search principles for a Surrey-focused IT provider;
+- AEO/GEO/AI-discovery content principles;
+- the JSON-LD and schema model for the organisation, services, breadcrumbs and blog articles;
+- crawl/index controls, sitemap and robots rules;
+- Google Search Console and Bing Webmaster launch checks; and
+- the per-page search checklist.
+
+Search optimisation must describe the real visible content. Do not add schema to blank route shells, invent reviews, create doorway location pages or write FAQ content purely for rich-result bait.
 
 ## Local staging
 
