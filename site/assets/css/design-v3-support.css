@@ -1,0 +1,9 @@
+/* SUPPORT BLACK GLASS V3 — 2026-08-13 */
+.support-hero-shell{border-radius:42px;background:url("../../media/liquid-wave-poster.webp") center/cover no-repeat #010204;box-shadow:0 42px 105px rgba(0,0,0,.50)}
+.support-hero-shell>.liquid-motion{opacity:.46;filter:saturate(1.25) contrast(1.08) brightness(.66)}
+.support-hero-shell>.support-liquid-shade{background:radial-gradient(560px 320px at 82% 45%,rgba(34,197,94,.11),transparent 70%),linear-gradient(90deg,rgba(0,0,0,.94),rgba(0,0,0,.78) 48%,rgba(0,0,0,.35) 78%,rgba(0,0,0,.25))}
+.support-hero-gl{border:1px solid transparent;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.55)) padding-box,linear-gradient(135deg,rgba(255,255,255,.29),rgba(34,197,94,.16),rgba(255,255,255,.05)) border-box!important}
+.support-hero-gl-content{z-index:10}
+.support-feature,.tier-card,.extra-card,.support-contact-panel{border:1px solid transparent;background:linear-gradient(180deg,rgba(255,255,255,.013),rgba(2,3,6,.67) 24%,rgba(0,0,0,.83)) padding-box,linear-gradient(135deg,rgba(255,255,255,.18),rgba(34,197,94,.07) 32%,rgba(255,255,255,.03),rgba(79,133,255,.04)) border-box!important}
+.tier-card{background:radial-gradient(430px 180px at 50% -12%,color-mix(in srgb,var(--tier) 10%,transparent),transparent 67%),linear-gradient(180deg,rgba(255,255,255,.014),rgba(0,0,0,.76)) padding-box,linear-gradient(135deg,rgba(255,255,255,.18),color-mix(in srgb,var(--tier) 18%,transparent),rgba(255,255,255,.035)) border-box!important}
+.support-direct a,.support-form input,.support-form textarea{background:linear-gradient(180deg,rgba(255,255,255,.013),rgba(0,0,0,.48))!important;border-color:rgba(255,255,255,.09)}
