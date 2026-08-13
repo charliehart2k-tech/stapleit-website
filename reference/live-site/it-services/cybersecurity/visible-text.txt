@@ -1,0 +1,108 @@
+Don't wait until it's too late.
+According to the UK Government's Cyber Security Breaches Survey 2025, 43% of UK businesses experienced a cyber attack or breach in the last 12 months — and a third of UK charities were also affected.
+Phishing remains the most common threat, and ransomware attacks doubled year on year. The question isn't whether your business could be targeted — it's whether you're protected when it is.
+Source: UK Government Cyber Security Breaches Survey 2025, DSIT & Home Office
+Hit by a cyber attack
+43% of UK businesses experienced a cyber breach or attack in the last 12 months.
+Gov UK Cyber Security Breaches Survey 2025
+Start with phishing
+85% of cyber attacks on UK businesses begin with a phishing email targeting staff.
+Gov UK Cyber Security Breaches Survey 2025
+Charities under attack
+Nearly a third of UK charities reported a cyber breach or attack in the past year.
+Gov UK Cyber Security Breaches Survey 2025
+Click each card to read more into each cybersecurity statistic.
+These are the
+facts.
+£27bn
+Cost to the UK economy
+Cybercrime costs the UK economy an estimated £27 billion every year — making it one of the most significant threats facing British businesses today.
+Source: DSIT Economic Impact of Cyber Attacks, Gov.UK →
+✓ Read
+£3,550
+Real cost of a breach
+When a cyber breach has a direct financial impact, the average cost to a UK business jumps to £3,550 — before accounting for lost productivity, reputational damage and staff time.
+Source: Gov UK Cyber Security Breaches Survey 2025 →
+✓ Read
+30x
+Repeat attacks per year
+Businesses that fall victim to cybercrime experience an average of 30 cyber crimes per year. Once attackers find a weakness, they come back — again and again.
+Source: Gov UK Cyber Security Breaches Survey 2025 →
+✓ Read
+16%
+Suffered a negative outcome
+16% of UK businesses that experienced a breach suffered a tangible negative outcome — including loss of files, money stolen or services taken offline. This figure is rising year on year.
+Source: Gov UK Cyber Security Breaches Survey 2025 →
+✓ Read
+14%
+Check their supply chain
+Only 14% of UK businesses formally reviewed the cyber security risks posed by their suppliers — leaving the vast majority exposed to attacks that enter through third parties.
+Source: Gov UK Cyber Security Breaches Survey 2025 →
+✓ Read
+62%
+Small businesses insured
+62% of small businesses now have cyber insurance — up from just 49% in 2024. Awareness is growing, but nearly 4 in 10 small businesses still have no financial protection if the worst happens.
+Source: Gov UK Cyber Security Breaches Survey 2025 →
+✓ Read
+What threats face UK businesses and charities today?
+Cyber threats are evolving faster than ever. Here's what your business is up against — and why the right protection matters.
+Phishing & email fraud
+Fake emails designed to trick your staff into handing over passwords, clicking dangerous links or transferring money. The most common attack method targeting UK businesses — and getting more convincing with AI.
+Ransomware
+Malicious software that locks your files and demands payment to restore access. Ransomware attacks on UK businesses doubled in 2025 and can bring your entire operation to a standstill within minutes.
+Business email compromise
+Attackers impersonate your CEO, a supplier or a trusted contact to trick staff into making fraudulent payments or sharing sensitive information. One of the most financially damaging threats facing small businesses.
+Malware & viruses
+Malicious software that infects your devices, steals data, monitors activity or disrupts your systems. Often installed without anyone realising — through a dodgy download, a USB drive or a compromised website.
+Data breaches
+Unauthorised access to your customer records, financial data or confidential files. A data breach can result in significant fines under GDPR, lasting reputational damage and loss of client trust.
+Weak passwords & credential theft
+Stolen or guessed passwords are one of the easiest ways into a business. Without multi-factor authentication, a single compromised password can give attackers access to your entire environment.
+Unpatched devices & software
+Outdated operating systems and applications are full of known vulnerabilities that attackers actively exploit. Regular patching is one of the most effective ways to keep your business protected.
+Social engineering
+Manipulating people rather than systems — phone calls, fake IT support, impersonation and psychological pressure to get staff to hand over access or information. No technical knowledge required from the attacker.
+How we protect you and what's important.
+From endpoint protection and email security to Cyber Essentials certification and ongoing monitoring.
+We put the right layers of protection in place so you can focus on running your business.
+Endpoint detection & response (EDR)
+Industry-leading EDR deployed and managed across all your devices — detecting, containing and responding to threats in real time before they cause damage to your business.
+Email security & anti-phishing
+Advanced email filtering that stops malicious messages before they reach your inbox — blocking phishing attempts, malware, impersonation attacks and spam at the source.
+Multi-factor authentication
+An essential extra layer of protection ensuring a stolen password alone is never enough to access your systems, email or cloud environment.
+Device hardening & configuration
+We lock down your devices to industry best practice — disabling unnecessary features, enforcing security policies and making sure every endpoint is configured to reduce your attack surface.
+Managed detection & response (MDR)
+Around-the-clock monitoring of your environment — our tools watch for suspicious activity, unusual behaviour and active threats so we can respond fast before anything escalates.
+Cyber Essentials certification
+We guide you through the entire Cyber Essentials and Cyber Essentials Plus certification process — helping you meet government-backed security standards and demonstrate your commitment to protecting your business.
+Identity & access management
+We make sure the right people have access to the right systems — and nothing more. Using Entra ID and modern identity tools, we protect your business from identity-based attacks and insider threats.
+Security awareness & guidance
+Your people are your first line of defence. We provide clear, practical security guidance to help your team spot threats, stay vigilant and know exactly what to do if something doesn't look right.
+Security is a staple.
+Protecting your business isn't an optional extra — it's a fundamental part of keeping it running. At Staple, we make enterprise-grade security accessible, affordable and straightforward for businesses of every size.
+Let's talk IT Security.
+Whether you're concerned about your current security setup, want to understand your risks or are ready to put proper protection in place, we'd love to hear from you. Fill in the form and one of our team will get back to you as soon as possible — usually within the same working day.
+What is your full name?
+*
+This field is mandatory
+What is the name of your business?
+*
+This field is mandatory
+What is your Email address?
+*
+This field is mandatory
+The e-mail address is invalid
+What is your contact telephone number?
+Please briefly outline what IT security aspects you would like to discuss.
+*
+This field is mandatory
+I hereby agree that this data will be stored and processed for the purpose of establishing contact. I am aware that I can revoke my consent at any time.
+*
+This field is mandatory
+* Indicates required fields
+Send my enquiry
+There was an error submitting your message. Please try again.
+Thank you! We will get back to you as soon as possible.

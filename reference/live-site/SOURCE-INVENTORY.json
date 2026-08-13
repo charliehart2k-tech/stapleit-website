@@ -1,0 +1,18 @@
+{
+  "archive": "reference/source-archives/www.stapleit.co.uk-full-scrape.zip",
+  "archive_file_count": 684,
+  "service_pages": [
+    "home",
+    "it-support",
+    "it-solutions",
+    "it-consultancy",
+    "cybersecurity",
+    "ai-integrations"
+  ],
+  "support_tier_colours": {
+    "basic": "#F82822",
+    "standard": "#004AAD",
+    "premium": "#5E17EB",
+    "support-logo": "#004AAD"
+  }
+}

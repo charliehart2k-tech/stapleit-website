@@ -1,0 +1,59 @@
+{
+  "features": [
+    [
+      "Unlimited remote support",
+      "Raise a ticket or pick up the phone \u2014 we'll sort it fast with no call limits and no hidden charges."
+    ],
+    [
+      "Proactive monitoring",
+      "We watch your devices around the clock and deal with issues before they become problems."
+    ],
+    [
+      "Automated OS patching",
+      "Windows, Mac and server updates applied automatically \u2014 keeping your devices secure and up to date."
+    ],
+    [
+      "Third-party application patching",
+      "We patch your software too \u2014 not just the operating system \u2014 so nothing gets left vulnerable."
+    ],
+    [
+      "Endpoint security",
+      "Industry-leading antivirus and threat detection deployed and managed across all your devices."
+    ],
+    [
+      "Remote device management",
+      "We manage your entire device estate remotely \u2014 no need for an on-site visit for the majority of issues."
+    ],
+    [
+      "Microsoft 365 support",
+      "Email, Teams, OneDrive and the full Microsoft 365 suite \u2014 we keep it running and sort any issues quickly."
+    ],
+    [
+      "New user & device setup",
+      "New member of staff? We'll get them set up and ready to go \u2014 laptop, email, access and all."
+    ],
+    [
+      "No long-term contracts",
+      "We start on simple monthly rolling agreements \u2014 no lock-in, no lengthy commitments."
+    ],
+    [
+      "Fixed monthly pricing",
+      "One simple price per user per month \u2014 no surprise bills, no call-out charges, no hidden costs."
+    ]
+  ],
+  "tier_colours": {
+    "basic": "#F82822",
+    "standard": "#004AAD",
+    "premium": "#5E17EB"
+  },
+  "source_index_pages": 32,
+  "full_scrape_sha256": "3fb3d93c167bea52bb6b3bc66aa9cb42bb81bae15306ba9e4612baaa29a4fc87",
+  "it_services_v1_source": "Full Staple IT website scrape supplied by user; exact public copy used for first IT Services dropdown pages.",
+  "completed_service_routes": [
+    "/it-services/it-support/",
+    "/it-services/it-solutions/",
+    "/it-services/it-consultancy/",
+    "/it-services/cybersecurity/",
+    "/it-services/ai-integrations/"
+  ]
+}

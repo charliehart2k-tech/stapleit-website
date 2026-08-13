@@ -1,0 +1,67 @@
+Solutions built around your business.
+From Microsoft to Google to Apple — we do it all. Deploy, manage and optimise so it works exactly the way your business needs to.
+Talk to us about IT Solutions
+We recommend getting in touch as this is a snippet of what we cover.
+What we can do for you.
+Microsoft 365
+From tenant setup and licence management to Intune, Entra ID, security policies and compliance — we administer and optimise your entire Microsoft 365 environment so it's secure, organised and working the way your business needs it to.
+Google Workspace
+Whether you're migrating from another platform or need ongoing administration, we manage your entire Google Workspace environment — users, groups, security settings and everything in between — keeping your team connected and productive.
+Cloud storage
+Secure, accessible and properly organised cloud storage for your business — whether that's OneDrive, SharePoint, Google Drive or another platform. We set it up, migrate your existing data and make sure the right people have the right access.
+Hosted & virtual desktops
+Work from anywhere with Windows 365 Cloud PCs or Azure Virtual Desktop — fully managed, secure and ready to use on any device. We handle the deployment, configuration and ongoing management so your team can work flexibly without compromising on performance or security.
+Managed software solutions
+Running business-critical software like Sage 50, IRIS or Brightpay? We make sure these applications are properly hosted, maintained and supported — so your finance, payroll and accounting tools are always available and running without disruption.
+Mobile device management
+Keep every phone, tablet and laptop in your business secure and compliant using Intune. We enrol, configure and manage your devices remotely — enforcing security policies, ensuring compliance and giving you the ability to remotely wipe a lost or stolen device instantly.
+Apple Business
+We manage and secure your Apple devices using Apple Business Manager — enrolling iPhones, iPads and Macs into your environment, managing Apple IDs and making sure every device is locked down, compliant and ready to use straight out of the box.
+SharePoint & collaboration
+We design, build and manage SharePoint environments that actually work for your business — from intranet pages and document libraries to team sites and automated workflows. A properly built SharePoint saves time, reduces email and keeps your team on the same page.
+Cloud migrations
+Moving to the cloud for the first time or switching platforms? We plan and manage your migration from start to finish — minimising downtime, protecting your data and making sure everything lands in the right place without disruption to your business.
+Licence reviews & cost optimisation
+Are you paying for licences your team aren't using? We audit your entire Microsoft and cloud licence estate, identify waste and make sure you're only paying for what you actually need — often saving businesses a significant amount every month.
+Getting the right solution first time.
+Too many businesses end up with a cloud setup that was rushed, poorly configured or simply not right for how they work.
+We bring the knowledge and accreditation to make sure that never happens to you.
+We take the time to understand your business before we recommend anything, and we won't stop until everything is working exactly as it should.
+No shortcuts, no unnecessary complexity — just the right solution, done properly.
+We don't believe in guesswork.
+Every solution we recommend starts with getting to know your business properly.
+The first step is taking advantage of our free IT audit. We'll take the time to understand your business, your current setup and where we might be able to help — completely free of charge and with no obligation whatsoever.
+Once we understand where we can add value, we'll design a solution built around your business — not around what's easiest for us. We'll then walk you through our proposal, explain exactly why we're recommending it and what it will do for your business, in language you actually speak.
+We take care of everything from implementation through to aftercare and ongoing support. Our job isn't done when the solution goes live — we're with you every step of the way to make sure everything works exactly as it should.
+Why choose Staple for solutions?
+Our team have spent years deploying and managing solutions for a broad range of audiences and continue to do so every day. We enjoy helping our customers thrive and take advantage of modern technology and what it can do for their business. We will never put something in place we don't believe in, and we won't try to sell you something you simply don't need — that's the difference with Staple. Read more about us by clicking the button below.
+Find out more about us
+Considering Ai?
+From Microsoft Copilot embedded in your Microsoft 365 environment to ChatGPT Enterprise and Claude for business, we help you identify where AI can genuinely add value and get it working for you safely and securely.
+Find out more about AI integration
+Considering Cloud?
+Do you have equipment on-premises that you are looking to move to the cloud? Or perhaps you want to consider a secure cloud working environment for your staff — we can help. Get in touch with us today.
+Book a free IT audit today
+Let's talk IT Solutions.
+Whether you're ready to sign up, want to find out more about our packages or just have a question, we'd love to hear from you. Fill in the form and one of our team will get back to you as soon as possible — usually within the same working day.
+What is your full name?
+*
+This field is mandatory
+What is the name of your business?
+*
+This field is mandatory
+What is your Email address?
+*
+This field is mandatory
+The e-mail address is invalid
+What is your contact telephone number?
+Please briefly outline the types of IT solutions you would like to discuss.
+*
+This field is mandatory
+I hereby agree that this data will be stored and processed for the purpose of establishing contact. I am aware that I can revoke my consent at any time.
+*
+This field is mandatory
+* Indicates required fields
+Send my enquiry
+There was an error submitting your message. Please try again.
+Thank you! We will get back to you as soon as possible.

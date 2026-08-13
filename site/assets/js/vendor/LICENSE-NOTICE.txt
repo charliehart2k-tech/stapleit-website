@@ -1,0 +1,6 @@
+liquidGL is third-party software by NaughtyDuk, distributed under the MIT License.
+Pinned integration version: 2.0.1
+npm package: liquid-gl
+
+The vendor JavaScript is retained unmodified from the supplied official npm
+registry distribution artifact. See the project/package for the full licence.

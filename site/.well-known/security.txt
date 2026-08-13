@@ -1,0 +1,4 @@
+Contact: mailto:hello@stapleit.co.uk
+Expires: 2027-08-13T00:00:00Z
+Canonical: https://stapleit.co.uk/.well-known/security.txt
+Preferred-Languages: en

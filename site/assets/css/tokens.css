@@ -1,0 +1,39 @@
+:root {
+  color-scheme: dark;
+
+  --black:#000000;
+  --black-soft:#030406;
+  --white:#FFFFFF;
+  --text:#F7F9FC;
+  --text-soft:#D0D6DF;
+  --muted:#949DAA;
+  --muted-2:#68717E;
+
+  --blue:#1D4ED8;
+  --blue-bright:#4F85FF;
+  --red:#E62B2B;
+
+  --support:#22C55E;
+  --solutions:#F97316;
+  --consultancy:#EAB308;
+  --security:#A855F7;
+
+  --tier-basic:#F82822;
+  --tier-standard:#004AAD;
+  --tier-premium:#5E17EB;
+
+  --page:min(1220px,calc(100vw - 44px));
+
+  --radius-xxl:38px;
+  --radius-xl:30px;
+  --radius-lg:24px;
+  --radius-md:17px;
+
+  --line:rgba(255,255,255,.14);
+  --line-soft:rgba(255,255,255,.075);
+
+  --font-display:"Staple Raleway","Raleway","Segoe UI",Arial,sans-serif;
+  --font-body:"Staple Roboto","Roboto","Segoe UI",Arial,sans-serif;
+
+  --ease:cubic-bezier(.22,.75,.2,1);
+}

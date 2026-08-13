@@ -1,0 +1,112 @@
+Liquid Glass Effect, Performance & Security — Build Notes
+Consolidated technical brief for whoever (or whatever) is building `stapleit-master-live-v2` next. Covers how to do the glass effect properly, what's already right in the current CSS, and the performance/security items to close out before this goes live.
+---
+1. The liquid glass effect
+What Apple's version actually does
+Apple's Liquid Glass (introduced at WWDC 2025) isn't just a blurred panel. It's a real-time rendered material that does three things a flat `backdrop-filter: blur()` can't:
+Refraction — it bends the pixels of whatever is behind the glass, like an actual lens, not just softens them.
+Dynamic specular highlights — bright edges shift as the "light source" or content changes.
+Adaptive tinting — the material lightens or darkens depending on what's under it.
+That's rendered natively by the OS compositor. On the web, none of this comes for free — every part of it has to be faked, and one part of it (true refraction) currently can't be faked reliably across browsers.
+Tier 1 — the safe, universal approximation (do this everywhere)
+This is blur + saturation + layered highlights, and it's genuinely most of the visual effect. It works in every modern browser and is cheap enough to use on a handful of large panels.
+```css
+.glass {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.14);
+
+  /* tint + depth, not just a flat translucent fill */
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
+
+  /* the part people usually forget: saturate() is doing as much
+     work as blur() — without it the glass looks grey and dead */
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%); /* older Safari */
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),   /* top-edge catch light */
+    inset 0 -18px 30px rgba(0,0,0,.18),    /* base shadow, gives it volume */
+    0 30px 78px rgba(0,0,0,.4);            /* drop shadow, lifts it off the page */
+}
+
+/* fallback for browsers with no backdrop-filter support at all */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass { background: rgba(18,18,22,.86); }
+}
+```
+A cheap addition that's currently missing and worth adding: a very faint noise/grain layer. Pure blur reads as plastic; a couple of percent of grain is what makes frosted glass look like glass rather than a translucent PNG. Keep it under ~3% opacity so it's subliminal, not textured:
+```css
+.glass::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: .025;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+```
+Tier 2 — real refraction (optional, Chromium-only, low priority)
+Genuine background distortion is possible on the web via an SVG `<feDisplacementMap>` filter referenced from `backdrop-filter: url(#filter-id)`. It produces the actual "bends the content behind it" look Apple's version has. The catch: this only works in Chromium-based browsers today — not Safari, not Firefox — so it has to be a progressive enhancement layered on top of Tier 1, never a replacement for it:
+```css
+.glass {
+  backdrop-filter: url(#liquid-distort) blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%); /* Safari ignores the url(), gets the safe version */
+}
+```
+```html
+<svg width="0" height="0" style="position:absolute">
+  <filter id="liquid-distort">
+    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="7" result="noise"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+```
+Given this site's audience is mostly going to be on Safari (iOS/Mac) and mixed desktop browsers, skip this unless there's spare time — it's real polish, but it's Chromium-only eye candy on a B2B services site, not something to prioritize over the items below.
+What's already correctly done in `glass.css` — don't "fix" this
+Worth flagging explicitly so whoever builds the next page doesn't second-guess it:
+`backdrop-filter` is already scoped to `.liquid-glass` (nav, hero, major panels) only — `.glass-card` (the repeated cards) deliberately has no blur at all, exactly matching the stated performance budget.
+The gradient border (`background: … padding-box, … border-box`) is a real, correctly-executed technique for a gradient border with rounded corners — no extra wrapper element needed.
+`-webkit-backdrop-filter` is already included alongside the unprefixed property.
+`blur(18px) saturate(155%)` — saturate is already there. Good instinct, don't remove it.
+One thing to resolve, not ignore: `docs/DESIGN-SYSTEM.md`, `DESIGN-SYSTEM-V2.md`, and `PERFORMANCE-V2.md` all explicitly say "no card lift/translate on hover." The actual code — `.glass-card:hover { transform: translateY(-3px); }` — does exactly that. Someone needs to pick a side: either update the docs to say a subtle 3px lift is intentional, or remove the transform. Leaving it contradictory means it'll get "fixed" back and forth by whoever edits next.
+Performance rules specific to `backdrop-filter`
+This is the single most expensive CSS property in common use, so:
+Keep it on a small, fixed number of large panels (nav, hero, 2–3 major CTAs) — never on repeated cards. Already followed here; keep following it as more pages get built.
+Never animate the blur radius (on scroll or hover). Re-blurring every frame is a guaranteed jank source, especially on mid-range Android and older iPhones.
+Avoid stacking `border-radius` + `overflow:hidden` + `backdrop-filter` on more than a few elements per screen — that combination forces extra compositing passes and is the classic cause of scroll jank on iOS Safari specifically.
+`will-change: backdrop-filter` only on the couple of elements that actually need it, never applied broadly — it reserves GPU memory persistently.
+Test on an actual mid-range iPhone in Safari before shipping, not just desktop Chrome — backdrop-filter performance on iOS Safari has historically been the least predictable of any major browser.
+---
+2. Performance — outstanding items
+In priority order:
+Favicon is 1024×1024 / 580KB. It's being served as a browser tab icon and is heavier than every font file on the site combined. Resize to a proper icon set (32×32, 180×180 for `apple-touch-icon`) or ship it as SVG. This is the single biggest win available on the site right now.
+Add `loading="lazy"` and explicit `width`/`height` to the three tier-pricing images on the IT Support page (`basic.png`, `standard.png`, `premium.png`) — they're below the fold and currently load eagerly with no reserved dimensions.
+Combine/minify the 6 separate `<link rel="stylesheet">` requests per page for production (tokens/base/glass/nav/footer/page-css) — fine during staging, worth bundling before launch.
+Everything else already checked out well: `font-display: swap` on all `@font-face` rules, `content-visibility: auto` correctly paired with `contain-intrinsic-size` on `.section`, only 2 fonts preloaded, no third-party scripts anywhere.
+---
+3. Security — pre-launch checklist
+None of this is urgent for local staging, but it needs to land before the site is public:
+No security headers are set anywhere yet (nothing sets them at the static-file level, and hosting isn't decided). Whatever host this lands on, configure:
+`Content-Security-Policy` — `default-src 'self'; frame-src https://www.google.com; script-src 'self'; style-src 'self'` (adjust once the SVG-filter enhancement, if used, is added — inline `<svg><filter>` markup is fine, but any inline `<script>` needs to move out first, see below)
+`X-Content-Type-Options: nosniff`
+`X-Frame-Options: DENY` (or `frame-ancestors 'none'`) — nothing on this site needs to be embedded elsewhere
+`Referrer-Policy: strict-origin-when-cross-origin`
+`Strict-Transport-Security` once served over HTTPS
+Move the inline `<script>` on the IT Support page (the form-validation block) into an external file alongside `app.js`. It works fine as-is, but an inline script is the one thing that'll conflict with a `script-src 'self'` CSP the moment one gets added — easier to move it now than to retrofit a nonce later.
+Contact form, before it's wired to a real endpoint: client-side email regex is UX, not security — the eventual backend needs its own server-side validation, plus basic spam protection (a honeypot field is enough to start). Also worth linking the consent checkbox text directly to `/about-us/privacy-policy/` rather than only describing data use inline.
+Keep `reference/` out of whatever gets deployed. It currently holds the confidential MSA and a 32MB scrape archive, and it's correctly excluded from `site/` already — just make sure the publish step points at `site/` specifically, not the project root, so this never ends up on the public host by accident.
+`tools/dev_server.py` must never become the production server. It's a single-purpose local dev tool (loopback-only, no hardening, dev-grade `SimpleHTTPRequestHandler`) — production needs a real static host or CDN.
+No third-party scripts or trackers exist anywhere on the site currently — that's a genuine security positive (no supply-chain risk from a third-party CDN), worth preserving rather than adding an analytics snippet without thinking through the CSP implications first.
+---
+Priority order if only tackling a few of these
+Resize the favicon (5-minute fix, biggest single performance win)
+Resolve the card-hover-lift contradiction between the docs and `glass.css` (5-minute fix, prevents future back-and-forth edits)
+Move the inline IT Support form script into an external file
+Add the noise-grain layer to `.glass` (cheap, visible upgrade to the existing effect)
+Set the baseline security headers once hosting is decided
+Lazy-load + size the tier images
+Consider the SVG refraction enhancement only if there's spare time — it's real polish, not a requirement

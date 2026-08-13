@@ -1,0 +1,45 @@
+# Example Staple IT nginx site. Replace the server_name values if required.
+# Production files are served through /var/www/stapleit/current, a symlink to
+# a timestamped release directory.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name stapleit.co.uk www.stapleit.co.uk;
+
+    # Keep HTTP available for the ACME challenge. Certbot may manage this block.
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 301 https://stapleit.co.uk$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name stapleit.co.uk www.stapleit.co.uk;
+
+    root /var/www/stapleit/current;
+    index index.html;
+
+    # Let Certbot populate/maintain the certificate paths before enabling HSTS.
+    ssl_certificate /etc/letsencrypt/live/stapleit.co.uk/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/stapleit.co.uk/privkey.pem;
+
+    include /etc/nginx/snippets/stapleit-security-headers.conf;
+
+    error_page 404 /404.html;
+    location = /404.html { internal; }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~* \.(?:css|js|woff2|webp|png|jpg|jpeg|svg|mp4)$ {
+        expires 7d;
+        try_files $uri =404;
+    }
+}
