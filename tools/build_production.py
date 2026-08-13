@@ -53,13 +53,9 @@ def minify_assets(dist: Path):
         before, after = minify_file(css)
         stats.append((css.relative_to(dist).as_posix(), before, after))
     for js in sorted((dist / 'assets/js').glob('*.js')):
-        # The pinned third-party vendor is under vendor/ and is deliberately
-        # not rewritten, preserving its verified upstream SHA-256.
         before, after = minify_file(js)
         stats.append((js.relative_to(dist).as_posix(), before, after))
 
-    # Optional extra syntax gate where Node happens to exist. The production
-    # builder does not require Node; it remains fully offline/Python-driven.
     node = shutil.which('node')
     if node:
         for js in sorted((dist / 'assets/js').glob('*.js')):
@@ -105,27 +101,35 @@ def deployment_gates(dist: Path):
         fail('liquid-enhance.js must load exactly on pages that contain a liquidGL target.')
 
     combined = '\n'.join(p.read_text(encoding='utf-8') for p in pages)
-    for token in ('js-liquid-nav', 'js-liquid-nav-shell', 'nav-shell-lens', 'nav-pill-lens'):
-        if token in combined:
-            fail(f'Forbidden nav liquidGL token remains: {token}')
-    if re.search(r'class=[\"\'][^\"\']*(?:home|support|service)-hero-(?:shell|stage)[^\"\']*js-liquid', combined):
+    if re.search(r'class=["\'][^"\']*(?:home|support|service)-hero-(?:shell|stage)[^"\']*js-liquid', combined):
         fail('A hero shell/stage itself must never be a liquidGL target.')
 
+    if len(target_pages) != 2:
+        fail('liquidGL must be limited to the Homepage and IT Support during the page-by-page rebuild.')
+
+    nav_targets = 0
     for page in target_pages:
         text = page.read_text(encoding='utf-8')
         surface_count = text.count('js-liquid-surface')
         if not (1 <= surface_count <= 3):
-            fail(f'Each liquidGL page must contain one to three contained targets: {page}')
-        if 'data-liquid-snapshot=' not in text:
-            fail(f'liquidGL target is missing an explicit local snapshot region: {page}')
+            fail(f'Each liquidGL page must contain one to three controlled targets: {page}')
+        if 'data-liquid-snapshot="body"' not in text:
+            fail(f'liquidGL surfaces must use the shared page-level body snapshot: {page}')
+        nav_targets += text.count('nav-gl-surface js-liquid-surface')
+    if nav_targets != 2:
+        fail('The full navigation bar must be a liquidGL surface on both active pages.')
 
     loader = (dist / 'assets/js/liquid-enhance.js').read_text(encoding='utf-8')
     if any(token in loader for token in ('cdn.jsdelivr', 'unpkg', 'poc.js')):
         fail('liquid loader contains a CDN/POC fallback.')
     if "params.get('liquid')||'on'" not in loader:
-        fail('Contained liquidGL surfaces are expected to be enabled by default.')
-    if 'specular:false' not in loader:
-        fail('Persistent liquidGL target must use specular:false.')
+        fail('liquidGL surfaces are expected to be enabled by default.')
+    if "document.querySelectorAll('.js-liquid-surface')" not in loader:
+        fail('liquid loader must discover all liquidGL targets rather than use a hardcoded first-match selector.')
+    if 'slice(0,3)' not in loader:
+        fail('liquid loader must cap active surfaces to three per page.')
+    if 'specular:bool' not in loader:
+        fail('liquid loader must support per-surface specular configuration.')
     if not (dist / '.well-known/security.txt').exists():
         fail('.well-known/security.txt is missing from production output.')
 
@@ -143,7 +147,6 @@ def main():
 
     verify_liquid_vendor(src)
 
-    # Clean build: never overlay on stale output.
     if dist.exists():
         shutil.rmtree(dist)
     shutil.copytree(src, dist, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '*.pyo'))
