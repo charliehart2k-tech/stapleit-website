@@ -1,24 +1,13 @@
-# Current build
+# Staple IT Website
 
-**Design Drop 02 — 13 August 2026**
+Master reset baseline.
 
-When `Start-Staging.ps1` starts, confirm the console prints:
+The approved navigation is the only designed frontend component currently retained. Active pages are intentionally blank shells so the site can be rebuilt page by page from the original scrapes and reference assets.
 
-`[BUILD] Design Drop 02 · 2026-08-13`
+Rules for this baseline:
+- Keep the approved navigation unchanged unless explicitly requested.
+- No liquidGL is active or shipped in the frontend.
+- No active-site imagery is retained except `site/assets/images/brand/staple-it-logo-transparent.webp`.
+- Original scraped pages and reference material remain under `reference/` for reconstruction.
 
-If it does not, you are running an older extracted framework.
-
-# Staple IT framework
-
-Canonical local development and production-build framework for the Staple IT
-website.
-
-```powershell
-.\Start-Staging.ps1
-```
-
-Use `doctor` in the interactive shell (or `tools\Doctor.ps1`) before any ZIP or
-deployment leaves the project. Production output is generated into `dist\` and
-only `dist\` is uploaded to the VPS.
-
-See `docs\README-FIRST.md` and `docs\DEPLOYMENT.md`.
+Legacy snapshot: `legacy-nav-approved-2026-08-13`.
