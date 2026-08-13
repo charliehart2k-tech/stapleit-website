@@ -76,16 +76,38 @@
 .status-message{margin:10px 0 0;color:#a6afba;font-size:14px}
 .status-hours{display:grid;gap:4px;margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,.09)}
 .status-hours span{color:#727c89;font-size:12px}
-.status-hours strong{color:#d3d8df;font-size:13px;font-weight:500}
+.status-hours strong{color:#d3d8df;font-size:13px;font-weight:600}
+
+.home-intro{width:var(--page);margin:0 auto;padding:12px 0 34px}
+.home-intro-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.home-info-card{
+  min-height:360px;
+  padding:42px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:32px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.034),rgba(255,255,255,.010) 34%,rgba(0,0,0,.20) 100%),
+    rgba(0,0,0,.56);
+  box-shadow:0 24px 64px rgba(0,0,0,.28);
+  backdrop-filter:blur(22px) saturate(125%);
+  -webkit-backdrop-filter:blur(22px) saturate(125%);
+}
+.home-info-card h2{font-size:clamp(2.5rem,4.4vw,4rem)}
+.home-info-card p{max-width:640px;margin:20px 0 0;color:#a7afba;font-size:16px;line-height:1.72}
+.home-info-card .button{margin-top:28px}
+.home-info-card-empty{min-height:360px}
 
 @media(max-width:980px){
   .home-hero-shell{min-height:auto;grid-template-columns:1fr}
   .status-panel{margin:0 28px 28px}
+  .home-intro-grid{grid-template-columns:1fr}
 }
 @media(max-width:640px){
   .home-hero{padding-top:30px}
   .home-hero-copy{padding:48px 24px}
   .home-hero h1{font-size:clamp(3.1rem,15vw,4.7rem)}
   .status-panel{margin:0 20px 24px}
+  .home-info-card{min-height:300px;padding:30px 24px;border-radius:26px}
+  .home-info-card-empty{min-height:300px}
 }
 @media(prefers-reduced-motion:reduce){.status-ring{animation:none}.hero-liquid-motion{display:none}}
