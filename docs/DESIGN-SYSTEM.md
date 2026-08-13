@@ -1,23 +1,36 @@
 # Design system
 
-Staple IT uses a solid black foundation with highly transparent liquid-glass
-surfaces, strong brand accents and restrained Aero-style refraction. Raleway is
-the display family; Roboto is used for body and UI copy.
+Staple IT uses a solid-black foundation, deep glossy black glass, local colour reflections and restrained Aero-style movement. Raleway is the display family; Roboto is used for body and UI copy.
 
-The navigation and hero use CSS glass only. Their highlight/refraction treatment may include restrained CSS specular "peel" layers, but liquidGL is not permitted on the nav, nav pills or hero shells. Interactive nav pills retain a short CSS micro-animation. The homepage hero is video-first: the liquid-wave poster is a loading fallback, not a second composited background.
+## Current page scope
 
-Repeated cards use lightweight layered transparency rather than WebGL or heavy backdrop blur. The homepage trust section may sit inside one restrained CSS-glass parent plane to vary page rhythm without blurring every card. The Free IT Audit CTA is the only approved liquidGL experiment, and it remains default-off.
+The public build is intentionally page-by-page. Only these content routes are active:
 
-Spacing is aligned to the shared `--page` container. Bubbled/glass sections and
-plain sections should share the same horizontal boundaries unless a deliberate
-full-bleed treatment is documented.
+- Homepage — `/`
+- IT Support — `/it-services/it-support/`
 
-Browser policy is defined in `BROWSER-SUPPORT.md`: latest two stable Chromium
-and Firefox releases plus Safari 16+, with no legacy IE support. Decorative
-features must progressively enhance rather than gate content or navigation.
+Other site pages are removed from `site/` until they are designed and reviewed individually. Source snapshots remain under `reference/` for later rebuilds.
 
+## Navigation
 
-## Current navigation treatment
+The desktop navigation is one continuous liquid surface. The optical material comes from the pinned liquidGL renderer, not from CSS blur/gradient imitation. `nav.css` is limited to layout, interaction and a plain black fallback.
 
-The primary navigation is intentionally near-transparent black glass rather than a grey panel. The glass is created with a low-opacity black fill, backdrop blur/saturation, a restrained static top peel and a subtle gradient edge. Standard pills remain quiet; Remote Support (green) and The Staple Blog (purple) are the two deliberate high-colour anchors. The brand mark sits in a small contained CSS-glass capsule. The nav shell and nav pills are not liquidGL WebGL targets.
+The brand is not wrapped in a second glass pill. It is one mark + wordmark sitting directly on the liquid navigation surface.
 
+## IT accent rule
+
+The letters `IT` are treated as a deliberate visual signature:
+
+- `Staple.IT` — Staple blue.
+- IT Support — support green.
+- IT Solutions — orange when referenced on the Homepage.
+- IT Consultancy — yellow when referenced on the Homepage.
+- Other section-specific IT labels inherit that section's accent where appropriate.
+
+The accent is applied to the letters themselves rather than washing entire cards in colour.
+
+## Black glossy material
+
+Major panels use near-black transparency, sharp white edge reflections, deep inset shadow and small local colour caustics. Repeated cards stay lighter-weight than hero surfaces. Large flat grey or blue panel fills are not part of the design language.
+
+The Homepage status card remains CSS-only by design; it uses reflected liquid imagery but is not a liquidGL target.
