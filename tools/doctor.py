@@ -6,7 +6,7 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 import argparse, hashlib, json, os, re, shutil, subprocess, sys, time
 
-sys.dont_writebytecode=True
+sys.dont_write_bytecode=True
 TOOLS=Path(__file__).resolve().parent
 VENDOR_PY=TOOLS/'vendor'/'python'
 if str(VENDOR_PY) not in sys.path: sys.path.insert(0,str(VENDOR_PY))
