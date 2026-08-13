@@ -33,7 +33,7 @@
   --line-soft:rgba(255,255,255,.075);
 
   --font-display:"Staple Raleway","Raleway","Segoe UI",Arial,sans-serif;
-  --font-body:"Staple Roboto","Roboto","Segoe UI",Arial,sans-serif;
+  --font-body:"Staple Raleway","Raleway","Segoe UI",Arial,sans-serif;
 
   --ease:cubic-bezier(.22,.75,.2,1);
 }
