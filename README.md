@@ -40,6 +40,22 @@ It documents:
 
 If the approved design direction changes, update `DESIGN-SYSTEM.md` in the same change.
 
+## SEO, AEO/GEO and structured data
+
+`SEO-AEO-SCHEMA.md` is the active search-discovery standard for the rebuild.
+
+It defines:
+
+- page titles, descriptions, canonicals and heading rules;
+- local-search principles for a Surrey-focused IT provider;
+- AEO/GEO/AI-discovery content principles;
+- the JSON-LD and schema model for the organisation, services, breadcrumbs and blog articles;
+- crawl/index controls, sitemap and robots rules;
+- Google Search Console and Bing Webmaster launch checks; and
+- the per-page search checklist.
+
+Search optimisation must describe the real visible content. Do not add schema to blank route shells, invent reviews, create doorway location pages or write FAQ content purely for rich-result bait.
+
 ## Build rules
 
 - Rebuild one page/section at a time.
@@ -52,6 +68,7 @@ If the approved design direction changes, update `DESIGN-SYSTEM.md` in the same 
 - Do not add internal glass shelf/highlight effects to cards or nav buttons.
 - Reuse shared code only when it is genuinely shared; do not dump page-specific CSS into global files.
 - Remove obsolete assets and code once they are no longer referenced by the active build.
+- Complete the SEO/AEO/schema checklist as each route becomes launch-ready.
 
 ## Responsive requirement
 
