@@ -1,0 +1,29 @@
+# Runtime / generated output
+staging/runtime/
+staging/backups/
+dist/
+
+# Build packages and archives
+*.zip
+
+# Python cache
+**/__pycache__/
+*.pyc
+*.pyo
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local deployment secrets / overrides
+.env
+.env.*
+!/.env.example
+*.local
+
+# Temporary files
+*.tmp
+*.bak
+*~
