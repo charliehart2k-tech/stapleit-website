@@ -1,13 +1,9 @@
 # Staple IT Website
 
-Master reset baseline.
+Clean master baseline for the page-by-page rebuild.
 
-The approved navigation is the only designed frontend component currently retained. Active pages are intentionally blank shells so the site can be rebuilt page by page from the original scrapes and reference assets.
+The approved navigation is frozen as the first signed-off component. The active site contains blank route shells only, with no liquidGL and no active imagery except the original Staple IT logo.
 
-Rules for this baseline:
-- Keep the approved navigation unchanged unless explicitly requested.
-- No liquidGL is active or shipped in the frontend.
-- No active-site imagery is retained except `site/assets/images/brand/staple-it-logo-transparent.webp`.
-- Original scraped pages and reference material remain under `reference/` for reconstruction.
+The original scraped site and source reference material are retained under `reference/` and must be used when rebuilding each page.
 
-Legacy snapshot: `legacy-nav-approved-2026-08-13`.
+Legacy copy: `legacy-nav-approved-2026-08-13`.
