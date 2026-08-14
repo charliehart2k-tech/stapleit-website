@@ -16,4 +16,3 @@
 @media(max-width:1080px){.nav-shell{border-radius:26px;padding-left:14px;gap:12px}.brand img{width:158px}.primary-nav{overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.primary-nav::-webkit-scrollbar{display:none}}
 @media(max-width:920px){.site-header{padding-top:8px}.nav-shell{min-height:64px;padding:7px 8px 7px 13px;border-radius:23px}.brand img{width:148px}.primary-nav{display:none}.menu-toggle{display:inline-flex;z-index:4}}
 @media(max-width:520px){.brand img{width:138px}.nav-shell{gap:8px}.nav-pill{padding-inline:14px}}
-@media(prefers-reduced-motion:reduce){.nav-pill,.brand,.nav-menu{transition:none!important;animation:none!important}}
