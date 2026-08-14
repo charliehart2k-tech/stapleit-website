@@ -13,7 +13,8 @@ SECURITY_HEADERS = {
         "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
         "form-action 'self'; img-src 'self' data:; media-src 'self'; "
         "font-src 'self' https://fonts.gstatic.com; "
-        "style-src 'self' https://fonts.googleapis.com; script-src 'self'; connect-src 'self'"
+        "style-src 'self' https://fonts.googleapis.com; script-src 'self'; connect-src 'self'; "
+        "frame-src https://www.google.com"
     ),
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
