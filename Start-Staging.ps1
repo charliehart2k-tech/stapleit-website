@@ -93,13 +93,23 @@ function Find-Python{
   throw 'Python 3 was not found. Install it from python.org or run: winget install Python.Python.3'
 }
 
+function Quote-ProcessArgument([string]$Value){
+  if($Value.Contains('"')){ throw "Cannot launch a path containing a double quote: $Value" }
+  return '"' + $Value + '"'
+}
+
 function Start-Server{
   if(-not (Test-Path $Server)){ throw "Dev server script not found: $Server" }
   if(Test-Path $PortFile){ Remove-Item $PortFile -Force }
   New-Item $Runtime -ItemType Directory -Force | Out-Null
 
   $py = Find-Python
-  $procArgs = @() + $py.Args + @($Server,'--root',$Site,'--runtime',$Runtime,'--port',$Port)
+  $procArgs = @() + $py.Args + @(
+    (Quote-ProcessArgument $Server),
+    '--root',(Quote-ProcessArgument $Site),
+    '--runtime',(Quote-ProcessArgument $Runtime),
+    '--port',"$Port"
+  )
   $script:Proc = Start-Process -FilePath $py.Path -ArgumentList $procArgs -PassThru -WindowStyle Hidden `
     -RedirectStandardOutput $StdOut -RedirectStandardError $StdErr
 
