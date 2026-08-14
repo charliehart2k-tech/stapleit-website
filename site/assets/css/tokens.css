@@ -1,22 +1,35 @@
 :root {
   color-scheme: dark;
 
+  /* Canonical Staple IT brand palette */
+  --brand-blue:#1D4ED8;
+  --brand-red:#E62B2B;
+  --brand-near-black:#111111;
+  --brand-white:#FFFFFF;
+  --brand-pale-blue:#D0D9F0;
+  --brand-off-white:#F5F6FA;
+  --brand-support:#22C55E;
+  --brand-solutions:#F97316;
+  --brand-consultancy:#EAB308;
+  --brand-security:#A855F7;
+
+  /* Approved dark-site surfaces and text */
   --black:#000000;
   --black-soft:#030406;
-  --white:#FFFFFF;
+  --white:var(--brand-white);
   --text:#F7F9FC;
   --text-soft:#D0D6DF;
   --muted:#949DAA;
   --muted-2:#68717E;
 
-  --blue:#1D4ED8;
+  --blue:var(--brand-blue);
   --blue-bright:#4F85FF;
-  --red:#E62B2B;
+  --red:var(--brand-red);
 
-  --support:#22C55E;
-  --solutions:#F97316;
-  --consultancy:#EAB308;
-  --security:#A855F7;
+  --support:var(--brand-support);
+  --solutions:var(--brand-solutions);
+  --consultancy:var(--brand-consultancy);
+  --security:var(--brand-security);
 
   --tier-basic:#F82822;
   --tier-standard:#004AAD;
