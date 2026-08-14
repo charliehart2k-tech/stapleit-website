@@ -204,4 +204,17 @@
 
   setupReveal({ id: 'who-we-support', timeout: 1400 });
   setupReveal({ id: 'trust', timeout: 1900, threshold: .12, rootMargin: '0px 0px -10% 0px' });
+  setupReveal({ id: 'free-it-audit', timeout: 1800, threshold: .10, rootMargin: '0px 0px -8% 0px' });
+})();
+
+(() => {
+  const form = document.querySelector('[data-audit-form]');
+  const status = form?.querySelector('[data-audit-form-status]');
+  if (!form || !status) return;
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    status.hidden = false;
+    status.textContent = 'This staging form is not connected to a mail endpoint yet. Please email hello@stapleit.co.uk or call 01372 309 707 for now.';
+  });
 })();
