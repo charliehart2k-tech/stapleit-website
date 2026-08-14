@@ -218,3 +218,71 @@
     status.textContent = 'This staging form is not connected to a mail endpoint yet. Please email hello@stapleit.co.uk or call 01372 309 707 for now.';
   });
 })();
+
+(() => {
+  const panel = document.querySelector('.audit-direct');
+  const links = panel?.querySelector('.audit-direct-links');
+  if (!panel || !links) return;
+
+  const makeDetail = ({ label, href, value, external = false }) => {
+    const row = document.createElement('div');
+    row.className = 'audit-contact-detail';
+
+    const caption = document.createElement('span');
+    caption.className = 'audit-contact-label';
+    caption.textContent = label;
+    row.append(caption);
+
+    if (href) {
+      const link = document.createElement('a');
+      link.className = 'audit-direct-link';
+      link.href = href;
+      link.textContent = value;
+      if (external) {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      }
+      row.append(link);
+    } else {
+      const text = document.createElement('span');
+      text.className = 'audit-contact-value';
+      text.textContent = value;
+      row.append(text);
+    }
+
+    return row;
+  };
+
+  links.replaceChildren(
+    makeDetail({ label: 'Call us', href: 'tel:+441372309707', value: '01372 309 707' }),
+    makeDetail({ label: 'WhatsApp Business', href: 'https://wa.me/+441372309707', value: 'Click to chat', external: true }),
+    makeDetail({ label: 'Email', href: 'mailto:hello@stapleit.co.uk', value: 'hello@stapleit.co.uk' }),
+    makeDetail({ label: 'Hours', value: 'Monday to Friday, 9am–5pm' })
+  );
+
+  panel.querySelector('.audit-direct-hours')?.remove();
+
+  const map = document.createElement('div');
+  map.className = 'audit-map';
+
+  const load = document.createElement('button');
+  load.className = 'button audit-map-load';
+  load.type = 'button';
+  load.textContent = 'Load Google Maps';
+
+  const frame = document.createElement('iframe');
+  frame.title = 'Staple IT location in Epsom';
+  frame.loading = 'lazy';
+  frame.referrerPolicy = 'no-referrer-when-downgrade';
+  frame.hidden = true;
+
+  load.addEventListener('click', () => {
+    frame.src = 'https://www.google.com/maps?q=51.3351004,-0.2637125&z=15&output=embed';
+    frame.hidden = false;
+    map.classList.add('is-loaded');
+    load.remove();
+  }, { once: true });
+
+  map.append(load, frame);
+  panel.append(map);
+})();
