@@ -22,16 +22,16 @@ The approved navigation is a signed-off component. Its structure must not be red
 
 ## 2. Typography
 
-The active site uses Raleway throughout.
+The active site uses Manrope throughout.
 
-- Body copy: Raleway 400.
-- Labels, controls and small emphasis: Raleway 600.
-- Navigation and headings: Raleway 700.
+- Body copy: Manrope 400.
+- Labels, controls and small emphasis: Manrope 600.
+- Navigation and headings: Manrope 700.
 - Do not introduce a second font family without an explicit design decision.
 - Headings use tight negative tracking and short line lengths.
 - Body copy should remain comfortably readable; do not make text tiny to force a layout to fit.
 
-Font assets are self-hosted under `site/assets/fonts/`.
+Manrope is currently delivered through Google Fonts while the rebuild is in progress. The approved family/weights are 400, 600 and 700. If the font binary is vendored into the repository later, keep the same family and weights and remove the external font dependency in the same change.
 
 ## 3. Glass material
 
@@ -54,7 +54,7 @@ Repeated cards should use less blur than large hero surfaces. Backdrop filters a
 - Sticky black liquid-glass shell.
 - Individual black liquid-glass buttons.
 - No chevrons/downward arrows.
-- Raleway 700.
+- Manrope 700.
 - Minimum interactive height: 44px.
 - Desktop navigation is shown only when there is enough room; tablet/mobile uses the menu control rather than horizontally squeezing the approved desktop layout.
 
@@ -124,7 +124,9 @@ The site should remain lightweight and dependency-free unless there is a compell
 Rules:
 
 - No framework for static content that plain HTML/CSS/JS can handle.
-- Self-host fonts and core media.
+- Self-host core media and site assets.
+- Manrope via Google Fonts is the current approved external font dependency; do not add additional font services or families.
+- Prefer vendoring Manrope into `site/assets/fonts/` once the binary can be imported cleanly, then remove the external dependency.
 - Do not add external runtime libraries casually.
 - Avoid duplicate image/video assets.
 - Use `preload` only for genuinely critical resources.
@@ -156,17 +158,17 @@ Rules:
 - Keep `.well-known/security.txt` current.
 - Use HTTPS only in production.
 
-Recommended production response headers:
+Recommended production response headers while Manrope is delivered through Google Fonts:
 
 ```text
-Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'
+Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; script-src 'self'; connect-src 'self'
 X-Content-Type-Options: nosniff
 Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
 
-Deployment-specific headers should be configured at the hosting/CDN layer rather than copied into HTML meta tags where possible.
+When Manrope is self-hosted, return `font-src` and `style-src` to `'self'` only. Deployment-specific headers should be configured at the hosting/CDN layer rather than copied into HTML meta tags where possible.
 
 ## 9. Page build template
 
