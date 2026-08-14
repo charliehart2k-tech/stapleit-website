@@ -1,0 +1,126 @@
+/* Homepage audit refinements: continuous orange water-light and auto-opening explainer. */
+.audit-form::before{
+  left:-28%;
+  top:-42%;
+  width:156%;
+  height:190%;
+  border-radius:48%;
+  background:
+    radial-gradient(ellipse at center,rgba(255,176,92,.34) 0%,rgba(249,115,22,.17) 22%,rgba(249,115,22,.055) 44%,transparent 68%),
+    radial-gradient(ellipse at center,rgba(255,104,18,.24) 0%,rgba(249,115,22,.10) 27%,transparent 64%),
+    radial-gradient(circle at center,rgba(255,239,220,.16) 0 3%,rgba(255,170,86,.065) 8%,transparent 20%);
+  background-repeat:no-repeat;
+  background-size:48% 58%,56% 64%,25% 32%;
+  background-position:-4% 22%,82% 72%,38% 30%;
+  filter:blur(42px) saturate(130%);
+  mix-blend-mode:screen;
+  opacity:.22;
+  transform:translate3d(0,0,0);
+  animation:auditWaterFlow 15s ease-in-out infinite;
+  will-change:background-position,transform;
+}
+.audit-form::after{
+  width:270px;
+  right:8%;
+  opacity:.42;
+  animation:auditWaterEdge 12s ease-in-out infinite;
+}
+@keyframes auditWaterFlow{
+  0%{
+    background-position:-4% 22%,82% 72%,38% 30%;
+    transform:translate3d(-1.5%,-1%,0) rotate(-.7deg) scale(1.01);
+  }
+  24%{
+    background-position:24% 8%,58% 84%,63% 48%;
+    transform:translate3d(1%,1.5%,0) rotate(.5deg) scale(1.025);
+  }
+  49%{
+    background-position:64% 26%,18% 58%,78% 20%;
+    transform:translate3d(2%,-.5%,0) rotate(-.25deg) scale(1.015);
+  }
+  74%{
+    background-position:82% 68%,38% 12%,42% 70%;
+    transform:translate3d(-.5%,1%,0) rotate(.65deg) scale(1.03);
+  }
+  100%{
+    background-position:12% 76%,72% 34%,20% 46%;
+    transform:translate3d(-1.5%,-1%,0) rotate(-.6deg) scale(1.01);
+  }
+}
+@keyframes auditWaterEdge{
+  0%{transform:translateX(-30%);opacity:.24;filter:brightness(.85)}
+  38%{transform:translateX(12%);opacity:.5;filter:brightness(1.12)}
+  72%{transform:translateX(34%);opacity:.31;filter:brightness(.94)}
+  100%{transform:translateX(-12%);opacity:.42;filter:brightness(1.04)}
+}
+
+.audit-explainer{
+  margin-top:34px;
+  overflow:hidden;
+  border:1px solid rgba(249,115,22,.18);
+  border-radius:19px;
+  background:rgba(249,115,22,.025);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.audit-explainer-toggle{
+  width:100%;
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:15px 17px;
+  border:0;
+  background:transparent;
+  color:#f2f4f7;
+  font:inherit;
+  font-size:15px;
+  font-weight:700;
+  text-align:left;
+  cursor:pointer;
+}
+.audit-explainer-toggle:hover,.audit-explainer-toggle:focus-visible{background:rgba(249,115,22,.035)}
+.audit-explainer-toggle:focus-visible{outline:2px solid rgba(249,115,22,.72);outline-offset:-2px}
+.audit-explainer-icon{
+  flex:0 0 auto;
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  color:var(--solutions);
+  font-size:19px;
+  font-weight:400;
+  line-height:1;
+  transition:transform 420ms var(--ease),border-color 180ms ease,background 180ms ease;
+}
+.audit-explainer.is-open .audit-explainer-icon{transform:rotate(45deg);border-color:rgba(249,115,22,.32);background:rgba(249,115,22,.06)}
+.audit-explainer-body{
+  display:grid;
+  grid-template-rows:0fr;
+  opacity:0;
+  transition:grid-template-rows 520ms var(--ease),opacity 360ms ease;
+}
+.audit-explainer-copy{overflow:hidden}
+.audit-explainer-copy p{
+  margin:0;
+  padding:0 17px 17px;
+  color:#aeb6c0;
+  font-size:14px;
+  line-height:1.62;
+}
+.audit-explainer.is-open .audit-explainer-body{grid-template-rows:1fr;opacity:1}
+
+@media(min-width:981px){
+  .audit-form-heading{display:flex;flex-direction:column;align-self:stretch}
+  .audit-explainer{margin-top:32px;max-width:350px}
+}
+@media(max-width:980px){
+  .audit-explainer{max-width:580px;margin-top:24px}
+}
+@media(max-width:640px){
+  .audit-explainer{margin-top:20px;border-radius:17px}
+  .audit-explainer-toggle{min-height:54px;padding:13px 15px;font-size:14px}
+  .audit-explainer-copy p{padding:0 15px 15px;font-size:13px}
+}
