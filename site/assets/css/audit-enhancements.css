@@ -158,7 +158,7 @@
   line-height:1.62;
 }
 .audit-explainer-copy::after{
-  content:"Our free IT audit covers:\A ✓  Devices, servers and cloud services\A ✓  Microsoft 365, software and licensing\A ✓  Internet, Wi-Fi, networking and VoIP\A ✓  Cyber security, backups and recovery\A ✓  Email, collaboration and business systems\A ✓  IT support, suppliers, contracts and recurring costs\A ✓  Lifecycle risks, improvements and opportunities to simplify or reduce spend";
+  content:"Our free IT audit covers:\A ✓  Devices, servers and cloud services\A ✓  Microsoft 365, email, software and licensing\A ✓  Internet, Wi-Fi, networks and business phones\A ✓  Cyber security, backups and disaster recovery\A ✓  IT support, suppliers, contracts and recurring costs\A ✓  Lifecycle risks and opportunities to simplify and reduce costs";
   display:block;
   margin:0 17px 17px;
   padding-top:14px;
@@ -170,28 +170,110 @@
 }
 .audit-explainer.is-open .audit-explainer-body{grid-template-rows:1fr;opacity:1}
 
-/* Contact heading: white at rest, with a narrow rainbow light band sweeping through "you". */
+/* Contact heading: white at rest with the approved Staple palette sweeping through "you". */
 #contact-title .accent-orange{
   display:inline-block!important;
   color:#fff!important;
-  background:linear-gradient(108deg,#fff 0%,#fff 38%,#ff5b5b 44%,#ff9f43 47%,#ffe66d 50%,#55ef8b 53%,#55c7ff 56%,#8c7cff 59%,#ff74cf 62%,#fff 68%,#fff 100%);
+  background:linear-gradient(
+    108deg,
+    #fff 0%,
+    #fff 36%,
+    var(--brand-blue) 42%,
+    var(--brand-red) 46%,
+    var(--brand-solutions) 50%,
+    var(--brand-consultancy) 54%,
+    var(--brand-support) 58%,
+    var(--brand-security) 62%,
+    #fff 69%,
+    #fff 100%
+  );
   background-size:340% 100%;
   background-position:100% 50%;
   -webkit-background-clip:text;
   background-clip:text;
   -webkit-text-fill-color:transparent;
-  animation:contactRainbowShimmer 7s linear infinite;
+  animation:contactStapleShimmer 7.5s linear infinite;
   will-change:background-position;
 }
-@keyframes contactRainbowShimmer{
-  0%,14%{background-position:100% 50%}
-  62%,100%{background-position:-28% 50%}
+@keyframes contactStapleShimmer{
+  0%,16%{background-position:100% 50%}
+  64%,100%{background-position:-30% 50%}
 }
 
+/* Desktop audit composition: compact form above, full-width explainer drawer below. */
 @media(min-width:981px){
-  .audit-form-heading{display:flex;flex-direction:column;align-self:stretch}
-  .audit-explainer{margin-top:32px;max-width:360px}
+  .audit-form{
+    grid-template-columns:minmax(320px,.72fr) minmax(0,1.28fr);
+    grid-template-rows:auto auto auto auto auto;
+    column-gap:54px;
+    row-gap:18px;
+  }
+  .audit-form-heading{display:contents}
+  .audit-form-heading h3{
+    grid-column:1;
+    grid-row:1 / span 3;
+    align-self:start;
+    max-width:360px;
+    margin:0;
+    padding-top:4px;
+  }
+  .audit-fields{grid-column:2;grid-row:1}
+  .audit-consent{grid-column:2;grid-row:2}
+  .audit-submit{grid-column:2;grid-row:3}
+  .audit-form-status{grid-column:2;grid-row:5;margin-top:0}
+  .audit-explainer{
+    grid-column:1 / -1;
+    grid-row:4;
+    width:100%;
+    max-width:none;
+    margin:12px 0 0;
+    border-radius:22px;
+  }
+  .audit-explainer-toggle{
+    min-height:60px;
+    padding:16px 20px;
+    font-size:16px;
+  }
+  .audit-explainer-copy{
+    display:grid;
+    grid-template-columns:minmax(240px,.65fr) minmax(0,1.35fr);
+    grid-template-rows:auto 1fr;
+    gap:8px 34px;
+    padding:2px 20px 20px;
+  }
+  .audit-explainer-copy p{
+    grid-column:1;
+    grid-row:1 / span 2;
+    padding:4px 24px 0 0;
+    border-right:1px solid rgba(255,255,255,.08);
+    font-size:14px;
+    line-height:1.65;
+  }
+  .audit-explainer-copy::before{
+    content:"Our free IT audit covers:";
+    grid-column:2;
+    grid-row:1;
+    display:block;
+    color:#f2f4f7;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.4;
+  }
+  .audit-explainer-copy::after{
+    grid-column:2;
+    grid-row:2;
+    margin:0;
+    padding:0;
+    border-top:0;
+    content:"✓  Devices, servers and cloud services\A ✓  Microsoft 365, email, software and licensing\A ✓  Internet, Wi-Fi, networks and business phones\A ✓  Cyber security, backups and disaster recovery\A ✓  IT support, suppliers, contracts and recurring costs\A ✓  Lifecycle risks and opportunities to simplify and reduce costs";
+    columns:2;
+    column-gap:30px;
+    column-rule:1px solid rgba(255,255,255,.055);
+    font-size:13px;
+    line-height:1.7;
+  }
 }
+
 @media(max-width:980px){
   .audit-explainer{max-width:620px;margin-top:24px}
 }
