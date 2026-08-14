@@ -7,15 +7,14 @@ Page-by-page rebuild of `stapleit.co.uk` from the clean approved baseline.
 The active rebuild currently includes:
 
 - Approved monochrome black liquid-glass navigation.
-- Manrope typography standardised across the active site using 400/600/700 weights.
+- Manrope typography standardised across the active site.
 - Homepage hero restored from the approved historical build, including the liquid-wave background and functional support-status widget.
-- Homepage statement card: `Small enough to care. Experienced enough to deliver.` with approved Staple red accents.
-- Homepage rotating service card for IT Support, IT Solutions, IT Consultancy and Cyber Security using the canonical service colours.
+- Homepage statement and service carousel with brand-colour service states.
+- Homepage "Who do we support?" editorial chapter using the original audience positioning without the old stock-photo card layout.
+- Global Client Portal navigation entry; the interim internal route is intentionally `noindex` until the production portal destination is supplied.
 - Global four-column liquid-glass footer applied across the active route shells.
-- Responsive navigation switches to the menu layout for tablet widths rather than squeezing the desktop controls.
+- Responsive navigation switches to the menu layout at 1080px and below rather than squeezing the desktop controls.
 - Shared focus, touch and motion behaviour is standardised in the active CSS.
-- Progressive cross-page view transitions are enabled where supported.
-- Homepage content cards use restrained interaction feedback and container-aware responsive behaviour.
 
 The approved navigation structure must not be redesigned unless explicitly requested.
 
@@ -32,7 +31,6 @@ Do not replace original content with generic marketing copy simply because it is
 Use these together:
 
 - `DESIGN-SYSTEM.md` — visual language, typography, glass material, responsive behaviour, accessibility, security and performance baseline.
-- `BRAND-PALETTE.md` — canonical Staple IT brand and service colours.
 - `SEO-AEO-SCHEMA.md` — SEO, AEO/GEO, local search, crawl/indexing and structured-data rules.
 - `RELEASE-CHECKLIST.md` — the nine quality gates that every completed page must pass before release.
 
@@ -69,21 +67,15 @@ The detailed checklist lives in `RELEASE-CHECKLIST.md`.
 - Complete the SEO/AEO/schema checklist as each route becomes launch-ready.
 - Motion must add depth, hierarchy, feedback or continuity; decorative motion without a purpose should be removed.
 
-## Motion and CSS polish baseline
+## Typography
 
-Approved progressive enhancements include:
+The active design uses **Manrope** throughout:
 
-- `clamp()`-based responsive typography/spacing;
-- balanced heading wrapping;
-- visible `:focus-visible` states;
-- 44px-or-larger practical touch targets;
-- subtle button compression/hover feedback;
-- container queries where component width matters more than viewport width;
-- `content-visibility` for suitable long below-the-fold sections;
-- progressive same-origin page view transitions; and
-- reduced blur/filter cost on small screens.
+- 400 — body copy.
+- 600 — UI, supporting text and controls.
+- 700 — navigation, headings and hero typography.
 
-Avoid scroll-jacking, custom cursors, excessive parallax, floating decorative blobs, 3D tilt cards, repeated autoplay video and animation that delays navigation or reading.
+The current staging implementation loads Manrope 400/600/700 from Google Fonts. If the production deployment requires fully self-hosted fonts, replace that delivery with a locally hosted Manrope webfont and restore `font-src 'self'` in the production CSP.
 
 ## Responsive requirement
 
@@ -106,33 +98,15 @@ The active site is intentionally static and dependency-light.
 
 Key rules:
 
-- self-host core media and site assets;
-- Manrope via Google Fonts is currently the single approved external font dependency while the rebuild is in progress;
 - no credentials/secrets in the repository;
 - no third-party runtime scripts by default;
 - no inline JavaScript without a documented reason;
 - keep `.well-known/security.txt` current;
 - configure CSP and standard security headers at the production hosting/CDN layer;
-- keep autoplay video exceptional rather than repeating it throughout the site; and
+- keep autoplay video exceptional rather than repeating it throughout the site;
 - prefer CSS over JavaScript for visual effects.
 
-When the Manrope binary is vendored locally, remove the Google Fonts dependency and return the font/style CSP directives to `'self'` only.
-
-See `DESIGN-SYSTEM.md` for the recommended production header policy and working asset budgets.
-
-## SEO, AEO/GEO and structured data
-
-`SEO-AEO-SCHEMA.md` defines:
-
-- page titles, descriptions, canonicals and heading rules;
-- local-search principles for a Surrey-focused IT provider;
-- AEO/GEO/AI-discovery content principles;
-- the JSON-LD and schema model for the organisation, services, breadcrumbs and blog articles;
-- crawl/index controls, sitemap and robots rules;
-- Google Search Console and Bing Webmaster launch checks; and
-- the per-page search checklist.
-
-Search optimisation must describe the real visible content. Do not add schema to blank route shells, invent reviews, create doorway location pages or write FAQ content purely for rich-result bait.
+Manrope is currently the only intentional third-party asset delivery and is CSS/font-only, not a runtime script dependency.
 
 ## Local staging
 

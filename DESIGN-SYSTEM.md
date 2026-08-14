@@ -17,6 +17,7 @@ The site is dark, clean and deliberately restrained.
 - Avoid coloured glows, RGB effects, spotlight effects and excessive animation.
 - Avoid internal glass shelves, inset secondary bubbles or layered highlight bars inside controls.
 - One component should read as one pane of glass.
+- Major homepage chapters do not all need to be boxed. Full-width editorial sections may use atmosphere, typography and fine dividers to create contrast from glass-card sections.
 
 The approved navigation is a signed-off component. Its structure must not be redesigned unless explicitly requested.
 
@@ -31,7 +32,7 @@ The active site uses Manrope throughout.
 - Headings use tight negative tracking and short line lengths.
 - Body copy should remain comfortably readable; do not make text tiny to force a layout to fit.
 
-Manrope is currently delivered through Google Fonts while the rebuild is in progress. The approved family/weights are 400, 600 and 700. If the font binary is vendored into the repository later, keep the same family and weights and remove the external font dependency in the same change.
+Current staging delivery uses Google Fonts for Manrope 400/600/700. Production may move to a self-hosted Manrope webfont if required.
 
 ## 3. Glass material
 
@@ -57,6 +58,7 @@ Repeated cards should use less blur than large hero surfaces. Backdrop filters a
 - Manrope 700.
 - Minimum interactive height: 44px.
 - Desktop navigation is shown only when there is enough room; tablet/mobile uses the menu control rather than horizontally squeezing the approved desktop layout.
+- Current desktop-to-menu breakpoint: 1080px.
 
 ### Hero
 
@@ -72,6 +74,13 @@ Repeated cards should use less blur than large hero surfaces. Backdrop filters a
 - Collapse to one column before content becomes cramped.
 - Use consistent outer radius and spacing.
 - No decorative filler solely to occupy space.
+
+### Editorial chapters
+
+- Use when the page needs a deliberate visual change of pace rather than another glass card.
+- May span the viewport while keeping readable content inside `--page`.
+- Transition with subtle atmosphere, fine lines and typography rather than a hard boxed edge.
+- Keep the content hierarchy obvious and avoid stock imagery unless it adds genuine meaning.
 
 ### Footer
 
@@ -91,13 +100,13 @@ Target checks for every completed page:
 | Small phone | 360 x 800 | Single-column content, readable heading scale, no horizontal overflow |
 | Large phone | 430 x 932 | Single-column content, comfortable card padding |
 | Small tablet | 768 x 1024 | Mobile/tablet navigation, stacked hero/status where needed |
-| Large tablet | 1024 x 1366 | Layout may use desktop content grids but must not squeeze navigation |
+| Large tablet | 1024 x 1366 | Menu navigation; content grids only where they remain comfortable |
 | Laptop | 1366 x 768 | Full desktop navigation and primary content layout |
 | Desktop | 1920 x 1080 | Page remains centred; content does not stretch indefinitely |
 
 Current breakpoint principles:
 
-- Navigation changes to the menu layout at 920px and below.
+- Navigation changes to the menu layout at 1080px and below.
 - Homepage hero/content cards stack at 980px and below.
 - Footer progressively collapses from desktop columns to two columns and then one column.
 
@@ -124,9 +133,6 @@ The site should remain lightweight and dependency-free unless there is a compell
 Rules:
 
 - No framework for static content that plain HTML/CSS/JS can handle.
-- Self-host core media and site assets.
-- Manrope via Google Fonts is the current approved external font dependency; do not add additional font services or families.
-- Prefer vendoring Manrope into `site/assets/fonts/` once the binary can be imported cleanly, then remove the external dependency.
 - Do not add external runtime libraries casually.
 - Avoid duplicate image/video assets.
 - Use `preload` only for genuinely critical resources.
@@ -158,7 +164,9 @@ Rules:
 - Keep `.well-known/security.txt` current.
 - Use HTTPS only in production.
 
-Recommended production response headers while Manrope is delivered through Google Fonts:
+Current staging loads Manrope from Google Fonts, so production CSP must permit that delivery unless the font is self-hosted first.
+
+Recommended production response headers while Google Fonts is in use:
 
 ```text
 Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; script-src 'self'; connect-src 'self'
@@ -168,7 +176,7 @@ Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
 
-When Manrope is self-hosted, return `font-src` and `style-src` to `'self'` only. Deployment-specific headers should be configured at the hosting/CDN layer rather than copied into HTML meta tags where possible.
+Deployment-specific headers should be configured at the hosting/CDN layer rather than copied into HTML meta tags where possible.
 
 ## 9. Page build template
 
