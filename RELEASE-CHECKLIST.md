@@ -14,7 +14,7 @@ Use these gates for every rebuilt route.
 ## Gate 2 — Design
 
 - Approved navigation and footer are preserved.
-- Raleway typography follows the 400/600/700 system.
+- Manrope typography follows the 400/600/700 system.
 - Glass remains monochrome unless colour communicates a real state or approved brand accent.
 - No internal glass shelf, coloured glow, spotlight effect or decorative clutter has crept back in.
 - Spacing, radius and card hierarchy match `DESIGN-SYSTEM.md`.
