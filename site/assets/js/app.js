@@ -220,9 +220,11 @@
 })();
 
 (() => {
-  const panel = document.querySelector('.audit-direct');
+  const section = document.querySelector('.audit-section');
+  const shell = section?.querySelector('.audit-contact-shell');
+  const panel = section?.querySelector('.audit-direct');
   const links = panel?.querySelector('.audit-direct-links');
-  if (!panel || !links) return;
+  if (!section || !shell || !panel || !links) return;
 
   const makeDetail = ({ label, href, value, external = false }) => {
     const row = document.createElement('div');
@@ -254,8 +256,8 @@
   };
 
   links.replaceChildren(
-    makeDetail({ label: 'Call us', href: 'tel:+441372309707', value: '01372 309 707' }),
-    makeDetail({ label: 'WhatsApp Business', href: 'https://wa.me/+441372309707', value: 'Click to chat', external: true }),
+    makeDetail({ label: 'Phone', href: 'tel:+441372309707', value: '01372 309 707' }),
+    makeDetail({ label: 'WhatsApp', href: 'https://wa.me/+441372309707', value: 'Click to chat', external: true }),
     makeDetail({ label: 'Email', href: 'mailto:hello@stapleit.co.uk', value: 'hello@stapleit.co.uk' }),
     makeDetail({ label: 'Hours', value: 'Monday to Friday, 9am–5pm' })
   );
@@ -268,7 +270,7 @@
   const load = document.createElement('button');
   load.className = 'button audit-map-load';
   load.type = 'button';
-  load.textContent = 'Load Google Maps';
+  load.textContent = 'View Google Maps';
 
   const frame = document.createElement('iframe');
   frame.title = 'Staple IT location in Epsom';
@@ -284,5 +286,5 @@
   }, { once: true });
 
   map.append(load, frame);
-  panel.append(map);
+  shell.insertAdjacentElement('afterend', map);
 })();
