@@ -1,8 +1,8 @@
 # Staple IT Quality Gates and Release Checklist
 
-No page is considered complete because it merely looks finished on a desktop browser.
+No page is complete because it merely looks finished on a desktop browser.
 
-Use these gates for every rebuilt route.
+Use these gates for every rebuilt route and at major homepage milestones.
 
 ## Gate 1 — Content accuracy
 
@@ -10,14 +10,16 @@ Use these gates for every rebuilt route.
 - Claims, support hours, prices, service details and legal information are current and truthful.
 - No generic filler copy has replaced source-of-truth content without an explicit decision.
 - Links and calls to action point to the intended route.
+- Placeholder routes/content are clearly identified and excluded from indexing where appropriate.
 
 ## Gate 2 — Design
 
 - Approved navigation and footer are preserved.
-- Manrope typography follows the 400/600/700 system.
-- Glass remains monochrome unless colour communicates a real state or approved brand accent.
-- No internal glass shelf, coloured glow, spotlight effect or decorative clutter has crept back in.
-- Spacing, radius and card hierarchy match `DESIGN-SYSTEM.md`.
+- Manrope follows the 400/600/700 system.
+- Glass remains monochrome unless colour communicates state or is an explicitly approved brand treatment.
+- No internal glass shelf, unapproved coloured glow, spotlight effect or decorative clutter has crept back in.
+- Approved palette-glow exceptions follow `DESIGN-SYSTEM.md`; do not generalise them to unrelated cards.
+- Spacing, radius and card hierarchy match the current design system.
 
 ## Gate 3 — Responsive and accessibility
 
@@ -38,26 +40,30 @@ Confirm:
 - logical document/heading structure;
 - keyboard navigation and visible focus states;
 - sensible 44px touch targets;
-- useful alt text and accessible labels.
+- useful alt text and accessible labels;
+- interaction remains understandable without relying on colour alone.
 
 ## Gate 4 — Security
 
 - No secrets, tokens, credentials or connection strings are present.
-- No unexpected inline or third-party JavaScript has been introduced.
-- Forms or future integrations validate untrusted input at the server boundary.
+- No unexpected inline/event-handler JavaScript has been introduced.
+- No unexpected third-party runtime script has been introduced.
+- Forms/future integrations validate untrusted input at the server boundary.
 - `.well-known/security.txt` is current.
-- Production headers match the security policy in `DESIGN-SYSTEM.md`.
+- Production headers match `DESIGN-SYSTEM.md`.
 - Production is HTTPS-only.
+- Local staging runs cleanly under the development CSP/security headers.
 
 ## Gate 5 — Performance
 
 - No unnecessary framework or external runtime dependency has been introduced.
 - New images are compressed and appropriately sized.
 - Below-the-fold imagery is lazy-loaded.
-- Media dimensions are declared to reduce layout shift.
+- Media dimensions are declared where relevant to reduce layout shift.
 - Repeated glass surfaces use restrained blur, especially on phones/tablets.
 - Autoplay video remains exceptional.
 - New JS/CSS is scoped and small.
+- `tools/audit-site.py` has no blocking errors.
 - Core Web Vitals are checked before production launch.
 
 Production targets:
@@ -87,7 +93,8 @@ At minimum:
 - The primary next action is obvious without being aggressive.
 - Contact/support paths are easy to find.
 - Buttons use clear labels rather than vague `click here` text.
-- No animation or visual effect gets in the way of reading, navigation or conversion.
+- No animation/effect gets in the way of reading, navigation or conversion.
+- Empty space is deliberate rather than caused by missing hierarchy/content.
 
 ## Gate 8 — Browser and device QA
 
@@ -98,12 +105,13 @@ At minimum test current versions of:
 - Firefox desktop;
 - Android/Chromium where available.
 
-Progressive enhancements such as view transitions or scroll-driven animations must fail cleanly when unsupported.
+Progressive enhancements such as cross-document View Transitions must fail cleanly when unsupported. Viewport-triggered reveals must not leave content permanently hidden if the observer/API is unavailable.
 
 ## Gate 9 — Release and deployment
 
 Before production:
 
+- run `py -3 .\tools\audit-site.py --root .\site` and resolve blocking errors;
 - canonical domain is correct;
 - redirects are intentional and tested;
 - custom 404 works;
@@ -124,4 +132,4 @@ Motion is allowed only when it adds one of these:
 - interaction feedback;
 - continuity between pages/components.
 
-If an animation exists merely because it looks clever, remove it.
+Prefer the simplest mechanism that reliably creates the intended result. If an animation exists merely because it looks clever, remove it.

@@ -8,6 +8,20 @@ import time
 import urllib.parse
 
 
+SECURITY_HEADERS = {
+    'Content-Security-Policy': (
+        "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
+        "form-action 'self'; img-src 'self' data:; media-src 'self'; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "style-src 'self' https://fonts.googleapis.com; script-src 'self'; connect-src 'self'"
+    ),
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+}
+
+
 class Stamp:
     def __init__(self, root: Path):
         self.root = root
@@ -61,27 +75,6 @@ def make_handler(root: Path, stamp: Stamp):
         def log_message(self, fmt, *args):
             print(time.strftime('%H:%M:%S'), '-', fmt % args, flush=True)
 
-        def _send_bytes(self, status: int, content_type: str, body: bytes, cache='no-store'):
-            self.send_response(status)
-            self.send_header('Content-Type', content_type)
-            self.send_header('Cache-Control', cache)
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Expires', '0')
-            self.send_header('Content-Length', str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-
-        def end_headers(self):
-            # Static CSS/JS/media served through SimpleHTTPRequestHandler must
-            # never be allowed to leave the browser showing an older design
-            # after a new framework is extracted.
-            if not any(k.lower() == 'cache-control' for k, _ in self._headers_buffer_pairs()):
-                self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-                self.send_header('Pragma', 'no-cache')
-                self.send_header('Expires', '0')
-            self.send_header('X-Staple-Staging', '1')
-            super().end_headers()
-
         def _headers_buffer_pairs(self):
             pairs = []
             for raw in getattr(self, '_headers_buffer', []):
@@ -94,6 +87,34 @@ def make_handler(root: Path, stamp: Stamp):
                     pairs.append((k.strip(), v.strip()))
             return pairs
 
+        def _send_bytes(self, status: int, content_type: str, body: bytes, cache='no-store'):
+            self.send_response(status)
+            self.send_header('Content-Type', content_type)
+            self.send_header('Cache-Control', cache)
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def end_headers(self):
+            # Keep local staging deliberately uncached so design changes cannot
+            # be masked by a stale asset in the browser.
+            existing = {k.lower() for k, _ in self._headers_buffer_pairs()}
+            if 'cache-control' not in existing:
+                self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                self.send_header('Pragma', 'no-cache')
+                self.send_header('Expires', '0')
+
+            # Mirror the production security baseline during development. HSTS
+            # is intentionally omitted because staging is local HTTP.
+            for name, value in SECURITY_HEADERS.items():
+                if name.lower() not in existing:
+                    self.send_header(name, value)
+
+            self.send_header('X-Staple-Staging', '1')
+            super().end_headers()
+
         def _send_404_page(self):
             if not_found.exists():
                 self._send_bytes(404, 'text/html; charset=utf-8', inject(not_found.read_bytes()))
@@ -104,8 +125,7 @@ def make_handler(root: Path, stamp: Stamp):
             path = urllib.parse.urlsplit(self.path).path
 
             # Reject Windows-style path traversal syntax explicitly. The server
-            # is local-only, but keeping this invariant makes the dev path less
-            # surprising and mirrors the production expectation.
+            # is local-only, but keeping this invariant mirrors production.
             if '\\' in path:
                 self.send_error(400, 'Backslashes are not valid URL path separators')
                 return

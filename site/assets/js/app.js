@@ -1,7 +1,202 @@
-(()=>{const t=document.getElementById('menu-toggle');const m=document.getElementById('mobile-menu');const d=[...document.querySelectorAll('.nav-details')];const close=()=>{if(t&&m){m.hidden=true;t.setAttribute('aria-expanded','false')}};t?.addEventListener('click',()=>{const o=t.getAttribute('aria-expanded')==='true';m.hidden=o;t.setAttribute('aria-expanded',String(!o))});m?.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));d.forEach(x=>x.addEventListener('toggle',()=>{if(x.open)d.forEach(y=>{if(y!==x)y.open=false})}));document.addEventListener('pointerdown',e=>{if(!e.target.closest('.nav-details'))d.forEach(x=>x.open=false)});document.addEventListener('keydown',e=>{if(e.key==='Escape'){d.forEach(x=>x.open=false);close()}});})();
+(() => {
+  const toggle = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const details = [...document.querySelectorAll('.nav-details')];
 
-(()=>{const hol=new Set(['2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28','2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28']);function parts(){const a=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',weekday:'short',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hour12:false}).formatToParts(new Date()),o=Object.fromEntries(a.map(p=>[p.type,p.value]));return{w:o.weekday,d:`${o.year}-${o.month}-${o.day}`,h:+o.hour}}function name(s){return new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',weekday:'long'}).format(new Date(s+'T12:00:00Z'))}function next(s){let d=new Date(s+'T12:00:00Z');for(let i=1;i<10;i++){d.setUTCDate(d.getUTCDate()+1);const x=d.toISOString().slice(0,10),n=name(x);if(n!=='Saturday'&&n!=='Sunday'&&!hol.has(x))return{i,n}}}function status(){const p=document.getElementById('support-status'),a=document.getElementById('status-title'),b=document.getElementById('status-message');if(!p||!a||!b)return;const x=parts(),wd=['Mon','Tue','Wed','Thu','Fri'].includes(x.w),on=wd&&!hol.has(x.d)&&x.h>=9&&x.h<17;p.classList.toggle('offline',!on);a.textContent=on?'Support is open':'Support is closed';if(on)b.textContent='Our support team is available until 5pm today.';else if(wd&&!hol.has(x.d)&&x.h<9)b.textContent='Our support team is available from 9am today.';else{const n=next(x.d);b.textContent=n?(n.i===1?'Support reopens tomorrow at 9am.':`Support reopens ${n.n} at 9am.`):'Support will reopen during our next support window.'}}status();setInterval(status,60000)})();
+  const closeMobile = () => {
+    if (!toggle || !mobileMenu) return;
+    mobileMenu.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+  };
 
-(()=>{const card=document.querySelector('[data-service-carousel]');if(!card)return;const slides=[...card.querySelectorAll('[data-service-slide]')],dots=[...card.querySelectorAll('.service-indicator button')];if(slides.length<2)return;const desktop=window.matchMedia('(min-width: 981px)');let index=0,timer=null,wheelLock=0,wheelTotal=0;const paint=next=>{index=(next+slides.length)%slides.length;slides.forEach((slide,i)=>{slide.classList.toggle('is-active',i===index);slide.classList.toggle('is-before',i<index);slide.classList.toggle('is-after',i>index);slide.setAttribute('aria-hidden',String(i!==index))});card.dataset.activeService=slides[index].dataset.service||'';dots.forEach((dot,i)=>{if(i===index)dot.setAttribute('aria-current','true');else dot.removeAttribute('aria-current')})};const arm=()=>{window.clearInterval(timer);timer=null;if(document.hidden)return;timer=window.setInterval(()=>paint(index+1),15000)};const go=next=>{paint(next);arm()};dots.forEach((dot,i)=>dot.addEventListener('click',()=>go(i)));card.addEventListener('keydown',e=>{if(['ArrowDown','ArrowRight','PageDown'].includes(e.key)){e.preventDefault();go(index+1)}else if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(index-1)}});card.addEventListener('wheel',e=>{if(!desktop.matches)return;wheelTotal+=e.deltaY;if(Math.abs(wheelTotal)<35)return;const direction=wheelTotal>0?1:-1;wheelTotal=0;const target=index+direction;if(target<0||target>=slides.length)return;const now=performance.now();e.preventDefault();if(now<wheelLock)return;wheelLock=now+650;go(target)},{passive:false});document.addEventListener('visibilitychange',arm);paint(0);arm()})();
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    mobileMenu.hidden = open;
+    toggle.setAttribute('aria-expanded', String(!open));
+  });
 
-(()=>{const section=document.getElementById('who-we-support');if(!section)return;section.classList.add('reveal-ready');const reveal=()=>{if(section.classList.contains('is-visible'))return;section.classList.add('is-visible');window.setTimeout(()=>section.classList.remove('reveal-ready'),1400)};if(!('IntersectionObserver'in window)){reveal();return}const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){reveal();observer.disconnect();break}}},{threshold:.15,rootMargin:'0px 0px -8% 0px'});observer.observe(section)})();
+  mobileMenu?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobile));
+  details.forEach(item => item.addEventListener('toggle', () => {
+    if (item.open) details.forEach(other => { if (other !== item) other.open = false; });
+  }));
+
+  document.addEventListener('pointerdown', event => {
+    if (!event.target.closest('.nav-details')) details.forEach(item => { item.open = false; });
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    details.forEach(item => { item.open = false; });
+    closeMobile();
+  });
+})();
+
+(() => {
+  const holidays = new Set([
+    '2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28',
+    '2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28'
+  ]);
+
+  const londonParts = () => {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/London',
+      weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', hour12: false
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return {
+      weekday: values.weekday,
+      date: `${values.year}-${values.month}-${values.day}`,
+      hour: Number(values.hour)
+    };
+  };
+
+  const weekdayName = date => new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/London', weekday: 'long'
+  }).format(new Date(`${date}T12:00:00Z`));
+
+  const nextWorkingDay = date => {
+    const cursor = new Date(`${date}T12:00:00Z`);
+    for (let offset = 1; offset < 10; offset += 1) {
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
+      const nextDate = cursor.toISOString().slice(0, 10);
+      const name = weekdayName(nextDate);
+      if (name !== 'Saturday' && name !== 'Sunday' && !holidays.has(nextDate)) {
+        return { offset, name };
+      }
+    }
+    return null;
+  };
+
+  const updateSupportStatus = () => {
+    const panel = document.getElementById('support-status');
+    const title = document.getElementById('status-title');
+    const message = document.getElementById('status-message');
+    if (!panel || !title || !message) return;
+
+    const now = londonParts();
+    const weekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].includes(now.weekday);
+    const open = weekday && !holidays.has(now.date) && now.hour >= 9 && now.hour < 17;
+
+    panel.classList.toggle('offline', !open);
+    title.textContent = open ? 'Support is open' : 'Support is closed';
+
+    if (open) {
+      message.textContent = 'Our support team is available until 5pm today.';
+    } else if (weekday && !holidays.has(now.date) && now.hour < 9) {
+      message.textContent = 'Our support team is available from 9am today.';
+    } else {
+      const next = nextWorkingDay(now.date);
+      message.textContent = next
+        ? (next.offset === 1 ? 'Support reopens tomorrow at 9am.' : `Support reopens ${next.name} at 9am.`)
+        : 'Support will reopen during our next support window.';
+    }
+  };
+
+  updateSupportStatus();
+  window.setInterval(updateSupportStatus, 60000);
+})();
+
+(() => {
+  const card = document.querySelector('[data-service-carousel]');
+  if (!card) return;
+
+  const slides = [...card.querySelectorAll('[data-service-slide]')];
+  const indicators = [...card.querySelectorAll('.service-indicator button')];
+  if (slides.length < 2) return;
+
+  const desktop = window.matchMedia('(min-width: 981px)');
+  let index = 0;
+  let timer = null;
+  let wheelLock = 0;
+  let wheelTotal = 0;
+
+  const paint = next => {
+    index = (next + slides.length) % slides.length;
+    slides.forEach((slide, slideIndex) => {
+      const active = slideIndex === index;
+      slide.classList.toggle('is-active', active);
+      slide.setAttribute('aria-hidden', String(!active));
+    });
+    card.dataset.activeService = slides[index].dataset.service || '';
+    indicators.forEach((indicator, indicatorIndex) => {
+      if (indicatorIndex === index) indicator.setAttribute('aria-current', 'true');
+      else indicator.removeAttribute('aria-current');
+    });
+  };
+
+  const arm = () => {
+    window.clearInterval(timer);
+    timer = null;
+    if (document.hidden) return;
+    timer = window.setInterval(() => paint(index + 1), 15000);
+  };
+
+  const go = next => {
+    paint(next);
+    arm();
+  };
+
+  indicators.forEach((indicator, indicatorIndex) => {
+    indicator.addEventListener('click', () => go(indicatorIndex));
+  });
+
+  card.addEventListener('keydown', event => {
+    if (['ArrowDown', 'ArrowRight', 'PageDown'].includes(event.key)) {
+      event.preventDefault();
+      go(index + 1);
+    } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(event.key)) {
+      event.preventDefault();
+      go(index - 1);
+    }
+  });
+
+  card.addEventListener('wheel', event => {
+    if (!desktop.matches) return;
+    wheelTotal += event.deltaY;
+    if (Math.abs(wheelTotal) < 35) return;
+
+    const direction = wheelTotal > 0 ? 1 : -1;
+    wheelTotal = 0;
+    const target = index + direction;
+    if (target < 0 || target >= slides.length) return;
+
+    const now = performance.now();
+    event.preventDefault();
+    if (now < wheelLock) return;
+    wheelLock = now + 650;
+    go(target);
+  }, { passive: false });
+
+  document.addEventListener('visibilitychange', arm);
+  paint(0);
+  arm();
+})();
+
+(() => {
+  const section = document.getElementById('who-we-support');
+  if (!section) return;
+
+  section.classList.add('reveal-ready');
+  const reveal = () => {
+    if (section.classList.contains('is-visible')) return;
+    section.classList.add('is-visible');
+    window.setTimeout(() => section.classList.remove('reveal-ready'), 1400);
+  };
+
+  if (!('IntersectionObserver' in window)) {
+    reveal();
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      reveal();
+      observer.disconnect();
+      break;
+    }
+  }, { threshold: .15, rootMargin: '0px 0px -8% 0px' });
+
+  observer.observe(section);
+})();

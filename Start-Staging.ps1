@@ -1,80 +1,59 @@
-﻿<#
+<#
 .SYNOPSIS
-    Runs a local live-staging server for the site and opens an interactive
-    console for editing, patching, and inspecting the live copy.
+    Runs the Staple IT site locally with live reload and a small staging console.
 
 .DESCRIPTION
-    Start-Staging.ps1 launches the Python dev server (tools\dev\_server.py)
-    against the `site` folder, opens it in the browser, then hands control
-    to an interactive "staple>" prompt. From there you can open pages, edit
-    live files, replace file contents from the clipboard, inject external
-    files into the master copy, and apply packaged updates - all with
-    automatic timestamped backups before anything destructive happens.
+    Launches tools\dev\_server.py against the site\ folder, opens the local
+    site, and provides a few safe helper commands for opening pages, editing
+    files, replacing text from the clipboard, injecting local assets, running
+    the static-site audit, and inspecting server logs.
 
-    A single bad command (bad path, empty clipboard, a failing external
-    script, etc.) is caught and reported without ending the session, so you
-    don't lose the server and have to restart the whole tool.
-
-.PARAMETER Port
-    TCP port for the dev server. Defaults to 0, which lets the OS choose a
-    free port automatically (the real port is read back from
-    staging\runtime\port.txt).
-
-.PARAMETER NoBrowser
-    Don't automatically open the site in the browser on startup. The server
-    still starts normally; use the 'open' command whenever you want it.
-
-.EXAMPLE
-    .\Start-Staging.ps1
-
-.EXAMPLE
-    .\Start-Staging.ps1 -Port 8080 -NoBrowser
+    The server binds only to 127.0.0.1. Commands that write files refuse paths
+    outside the repository and make timestamped backups before replacement.
 #>
 [CmdletBinding()]
 param(
   [ValidateRange(0,65535)]
   [int]$Port = 0,
-
   [switch]$NoBrowser
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$Master   = $PSScriptRoot
-$Site     = Join-Path $Master 'site'
-$Tools    = Join-Path $Master 'tools'
-$Runtime  = Join-Path $Master 'staging\runtime'
-$PortFile = Join-Path $Runtime 'port.txt'
-$StdOut   = Join-Path $Runtime 'server.log'
-$StdErr   = Join-Path $Runtime 'server-error.log'
-$Server   = Join-Path $Tools 'dev\_server.py'
+$Master    = $PSScriptRoot
+$Site      = Join-Path $Master 'site'
+$Tools     = Join-Path $Master 'tools'
+$Runtime   = Join-Path $Master 'staging\runtime'
+$PortFile  = Join-Path $Runtime 'port.txt'
+$StdOut    = Join-Path $Runtime 'server.log'
+$StdErr    = Join-Path $Runtime 'server-error.log'
+$Server    = Join-Path $Tools 'dev\_server.py'
+$Audit     = Join-Path $Tools 'audit-site.py'
 $BuildFile = Join-Path $Master 'BUILD-ID.txt'
-$BuildId = if(Test-Path $BuildFile){ ((Get-Content $BuildFile -Raw).Trim() -replace "`r?`n", ' · ') } else { 'unlabelled build' }
-$Proc = $null
-$Url  = $null
+$BuildId   = if(Test-Path $BuildFile){ ((Get-Content $BuildFile -Raw).Trim() -replace "`r?`n", ' · ') } else { 'unlabelled build' }
+$Proc      = $null
+$Url       = $null
 
 $Aliases = @{
-  'home'       = 'site\index.html'
-  'support'    = 'site\it-services\it-support\index.html'
-  'solutions'  = 'site\it-services\it-solutions\index.html'
-  'consultancy'= 'site\it-services\it-consultancy\index.html'
-  'security'   = 'site\it-services\cybersecurity\index.html'
-  'ai'         = 'site\it-services\ai-integrations\index.html'
-  'homecss'    = 'site\assets\css\pages\home.css'
-  'supportcss' = 'site\assets\css\pages\it-support.css'
-  'servicecss' = 'site\assets\css\pages\service-v1.css'
-  'tokens'     = 'site\assets\css\tokens.css'
-  'glass'      = 'site\assets\css\glass.css'
-  'nav'        = 'site\assets\css\nav.css'
-  'footer'     = 'site\assets\css\footer.css'
-  'appjs'      = 'site\assets\js\app.js'
-  'liquidjs'   = 'site\assets\js\liquid-enhance.js'
+  'home'        = 'site\index.html'
+  'support'     = 'site\it-services\it-support\index.html'
+  'solutions'   = 'site\it-services\it-solutions\index.html'
+  'consultancy' = 'site\it-services\it-consultancy\index.html'
+  'security'    = 'site\it-services\cybersecurity\index.html'
+  'ai'          = 'site\it-services\ai-integrations\index.html'
+  'portal'      = 'site\client-portal\index.html'
+  'homecss'     = 'site\assets\css\home-hero.css'
+  'base'        = 'site\assets\css\base.css'
+  'tokens'      = 'site\assets\css\tokens.css'
+  'glass'       = 'site\assets\css\glass.css'
+  'nav'         = 'site\assets\css\nav.css'
+  'shell'       = 'site\assets\css\reset-shell.css'
+  'appjs'       = 'site\assets\js\app.js'
+  'server'      = 'tools\dev\_server.py'
+  'audittool'   = 'tools\audit-site.py'
 }
 
-# ----------------------------------------------------------------------------
-# Output helpers
-# ----------------------------------------------------------------------------
 function Write-Info([string]$Message){ Write-Host $Message -ForegroundColor Cyan }
 function Write-Ok([string]$Message){ Write-Host $Message -ForegroundColor Green }
 function Write-Warn([string]$Message){ Write-Host "[WARN] $Message" -ForegroundColor Yellow }
@@ -85,38 +64,34 @@ function Write-Field([string]$Tag,[string]$Value){
 }
 
 function Get-RelativePath([string]$Base,[string]$Target){
-  $BaseFull = [IO.Path]::GetFullPath($Base).TrimEnd('\') + '\'
-  $TargetFull = [IO.Path]::GetFullPath($Target)
-  $BaseUri = New-Object System.Uri($BaseFull)
-  $TargetUri = New-Object System.Uri($TargetFull)
-  return [Uri]::UnescapeDataString($BaseUri.MakeRelativeUri($TargetUri).ToString()).Replace('/','\')
+  $baseFull = [IO.Path]::GetFullPath($Base).TrimEnd('\') + '\'
+  $targetFull = [IO.Path]::GetFullPath($Target)
+  $baseUri = New-Object System.Uri($baseFull)
+  $targetUri = New-Object System.Uri($targetFull)
+  return [Uri]::UnescapeDataString($baseUri.MakeRelativeUri($targetUri).ToString()).Replace('/','\')
 }
 
 function Test-PathWithinMaster([string]$Path){
-  # Comparing with a trailing separator prevents prefix collisions such as
-  # C:\Site accidentally matching a sibling such as C:\SiteEvil.
   $full = [IO.Path]::GetFullPath($Path)
   $rootPath = [IO.Path]::GetFullPath($Master).TrimEnd('\') + '\'
-  return $full.StartsWith($rootPath, [StringComparison]::OrdinalIgnoreCase)
+  return $full.StartsWith($rootPath,[StringComparison]::OrdinalIgnoreCase)
 }
 
 function Find-Python{
-  # Prefer the official Windows py launcher, then fall back to python.
   $py = Get-Command py -ErrorAction SilentlyContinue
   if($py){
     & $py.Source -3 --version *> $null
-    if($LASTEXITCODE -eq 0){ return [pscustomobject]@{ Path = $py.Source; Args = @('-3') } }
+    if($LASTEXITCODE -eq 0){ return [pscustomobject]@{ Path=$py.Source; Args=@('-3') } }
   }
 
   $python = Get-Command python -ErrorAction SilentlyContinue
   if($python -and $python.Source -notlike '*\WindowsApps\python*.exe'){
     & $python.Source --version *> $null
-    if($LASTEXITCODE -eq 0){ return [pscustomobject]@{ Path = $python.Source; Args = @() } }
+    if($LASTEXITCODE -eq 0){ return [pscustomobject]@{ Path=$python.Source; Args=@() } }
   }
 
   throw 'Python 3 was not found. Install it from python.org or run: winget install Python.Python.3'
 }
-
 
 function Start-Server{
   if(-not (Test-Path $Server)){ throw "Dev server script not found: $Server" }
@@ -140,9 +115,7 @@ function Start-Server{
 
   $portText = (Get-Content $PortFile -Raw).Trim()
   $parsedPort = 0
-  if(-not [int]::TryParse($portText,[ref]$parsedPort)){
-    throw "Dev server wrote an invalid port value: '$portText'"
-  }
+  if(-not [int]::TryParse($portText,[ref]$parsedPort)){ throw "Invalid staging port: '$portText'" }
   $script:Url = "http://127.0.0.1:$parsedPort/"
 }
 
@@ -161,16 +134,14 @@ function Resolve-Target([string]$Value){
 
 function Backup-Target([string]$Target){
   if(-not (Test-Path -LiteralPath $Target)){ return $null }
-  $Relative = Get-RelativePath $Master $Target
-  $Backup = Join-Path $Master ('staging\backups\manual-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '\' + $Relative)
-  New-Item (Split-Path $Backup -Parent) -ItemType Directory -Force | Out-Null
-  Copy-Item -LiteralPath $Target -Destination $Backup -Force
-  return $Backup
+  $relative = Get-RelativePath $Master $Target
+  $backup = Join-Path $Master ('staging\backups\manual-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '\' + $relative)
+  New-Item (Split-Path $backup -Parent) -ItemType Directory -Force | Out-Null
+  Copy-Item -LiteralPath $Target -Destination $backup -Force
+  return $backup
 }
 
 function Tokenize([string]$InputLine){
-  # Do not use $matches here: variable names are case-insensitive and
-  # $Matches is PowerShell's automatic regex result variable.
   $tokenMatches = [regex]::Matches($InputLine,'("[^"]*"|''[^'']*''|\S+)')
   $out = @()
   foreach($m in $tokenMatches){
@@ -195,29 +166,30 @@ function Open-Editor([string]$Target){
   }
 }
 
+function Run-Audit{
+  if(-not (Test-Path $Audit)){ throw "Audit script not found: $Audit" }
+  $py = Find-Python
+  & $py.Path @($py.Args + @($Audit,'--root',$Site))
+  if($LASTEXITCODE -eq 0){ Write-Ok '[OK] Static site audit passed.' }
+  else{ Write-Warn "Static site audit returned exit code $LASTEXITCODE." }
+}
+
 function Help{
   Write-Host ''
   Write-Host 'Commands:'
-  Write-Host '  home / support             Open those live pages'
-  Write-Host '  solutions / consultancy    Open the new service pages'
-  Write-Host '  security / ai              Open the new service pages'
-  Write-Host '  liquid                     Open homepage with liquidGL enabled'
-  Write-Host '  liquidaudit                Open homepage at the audit liquidGL surface'
-  Write-Host '  liquidoff                  Open CSS-only comparison'
-  Write-Host '  liquiddebug                Open homepage liquidGL with status overlay'
-  Write-Host '  install-liquid             Verify the self-hosted liquidGL vendor hash'
-  Write-Host '  doctor                     Run framework acceptance checks'
-  Write-Host '  open                       Open homepage'
-  Write-Host '  edit <alias>               Edit a live file'
-  Write-Host '  paste <alias>              Replace live HTML/CSS/JS from clipboard (backup first)'
-  Write-Host '  inject <src> <target>      Copy an asset/file into the master (backup first)'
-  Write-Host '  apply <zip|folder>         Apply a ChatGPT update package'
-  Write-Host '  aliases / paths / status   Show working information'
-  Write-Host '  version                    Show the exact build you are running'
-  Write-Host '  backups                    List recent manual backups'
-  Write-Host '  log / errors               Diagnostics'
-  Write-Host '  restart                    Restart local server'
-  Write-Host '  clear                      Clear the screen'
+  Write-Host '  open / home                 Open homepage'
+  Write-Host '  who                         Open homepage at Who do we support?'
+  Write-Host '  support / solutions         Open service routes'
+  Write-Host '  consultancy / security / ai Open service routes'
+  Write-Host '  portal                      Open Client Portal placeholder'
+  Write-Host '  audit                       Run static-site integrity/security checks'
+  Write-Host '  edit <alias>                Edit a repository file'
+  Write-Host '  paste <alias>               Replace text file from clipboard (backup first)'
+  Write-Host '  inject <src> <target>       Copy a file into the repository (backup first)'
+  Write-Host '  aliases / paths / status    Show working information'
+  Write-Host '  version / backups           Show build or recent backups'
+  Write-Host '  log / errors                Show staging server diagnostics'
+  Write-Host '  restart / clear             Restart server or clear console'
   Write-Host '  help / quit'
   Write-Host ''
 }
@@ -225,51 +197,42 @@ function Help{
 try{
   if(-not (Test-Path (Join-Path $Site 'index.html'))){ throw "Site root is incomplete: $Site" }
   Start-Server
+
   Write-Host ''
   Write-Host '====================================================' -ForegroundColor DarkGray
-  Write-Host ' Staple IT Live Staging - Framework' -ForegroundColor White
+  Write-Host ' Staple IT Live Staging' -ForegroundColor White
   Write-Host '====================================================' -ForegroundColor DarkGray
   Write-Field 'BUILD' $BuildId
-  Write-Field 'URL'  $Url
+  Write-Field 'URL' $Url
   Write-Field 'LIVE' $Site
   Write-Info '[AUTO] Browser refreshes after live file changes.'
-  Write-Info '[SAFE] paste/inject/apply make backups first.'
+  Write-Info '[SAFE] paste/inject make timestamped backups first.'
+  Write-Info "[CHECK] Type 'audit' to run the static-site audit."
 
-  if($NoBrowser){
-    Write-Info "[INFO] Browser auto-open skipped (-NoBrowser). Use 'open' to launch it."
-  }else{
-    Start-Process $Url
-  }
+  if($NoBrowser){ Write-Info "[INFO] Browser auto-open skipped. Use 'open' to launch it." }
+  else{ Start-Process $Url }
   Help
 
   :StagingLoop while($true){
     $line = (Read-Host 'staple').Trim()
     if(-not $line){ continue }
 
-    # Command parsing lives inside the per-command try/catch. PowerShell
-    # unwraps one-item arrays returned from functions, so force @() here:
-    # without this, a one-word command such as `liquid` becomes a String and
-    # indexing [0] returns a System.Char. That was the cause of the
-    # `System.Char ... ToLowerInvariant` crash.
     try{
       $tokens = @(Tokenize $line)
       if($tokens.Count -eq 0){ continue }
       $cmd = ([string]$tokens[0]).ToLowerInvariant()
 
       switch($cmd){
-        'open'    { Start-Process $Url }
-        'home'    { Start-Process $Url }
-        'support' { Start-Process ($Url + 'it-services/it-support/') }
-        'solutions' { Start-Process ($Url + 'it-services/it-solutions/') }
+        'open'        { Start-Process $Url }
+        'home'        { Start-Process $Url }
+        'who'         { Start-Process ($Url + '#who-we-support') }
+        'support'     { Start-Process ($Url + 'it-services/it-support/') }
+        'solutions'   { Start-Process ($Url + 'it-services/it-solutions/') }
         'consultancy' { Start-Process ($Url + 'it-services/it-consultancy/') }
-        'security' { Start-Process ($Url + 'it-services/cybersecurity/') }
-        'ai' { Start-Process ($Url + 'it-services/ai-integrations/') }
-        'liquid' { Start-Process ($Url + '?liquid=on') }
-        'liquidaudit' { Start-Process ($Url + '?liquid=on#audit') }
-        'liquidoff' { Start-Process ($Url + '?liquid=off#audit') }
-        'liquiddebug' { Start-Process ($Url + '?liquid=on&liquiddebug=1#audit') }
-        'install-liquid' { & (Join-Path $Tools 'Install-LiquidGL.ps1') }
-        'doctor' { & (Join-Path $Tools 'Doctor.ps1') }
+        'security'    { Start-Process ($Url + 'it-services/cybersecurity/') }
+        'ai'          { Start-Process ($Url + 'it-services/ai-integrations/') }
+        'portal'      { Start-Process ($Url + 'client-portal/') }
+        'audit'       { Run-Audit }
         'aliases' {
           $Aliases.GetEnumerator() | Sort-Object Name | ForEach-Object {
             Write-Host ("  {0,-12} {1}" -f $_.Name,$_.Value)
@@ -278,12 +241,11 @@ try{
         'paths' {
           Write-Field 'SITE'      $Site
           Write-Field 'HOME'      (Join-Path $Site 'index.html')
-          Write-Field 'SUPPORT'   (Join-Path $Site 'it-services\it-support\index.html')
           Write-Field 'CSS'       (Join-Path $Site 'assets\css')
           Write-Field 'JS'        (Join-Path $Site 'assets\js')
-          Write-Field 'IMAGES'    (Join-Path $Site 'assets\images')
-          Write-Field 'INBOX'     (Join-Path $Master 'staging\inbox')
+          Write-Field 'MEDIA'     (Join-Path $Site 'assets\media')
           Write-Field 'REFERENCE' (Join-Path $Master 'reference')
+          Write-Field 'TOOLS'     $Tools
         }
         'version' { Write-Field 'BUILD' $BuildId; Write-Field 'ROOT' $Master }
         'status' {
@@ -298,9 +260,8 @@ try{
         }
         'backups' {
           $backupRoot = Join-Path $Master 'staging\backups'
-          if(-not (Test-Path $backupRoot)){
-            Write-Info 'No backups yet.'
-          }else{
+          if(-not (Test-Path $backupRoot)){ Write-Info 'No backups yet.' }
+          else{
             Get-ChildItem $backupRoot -Directory |
               Sort-Object LastWriteTime -Descending |
               Select-Object -First 15 |
@@ -308,16 +269,16 @@ try{
           }
         }
         'edit' {
-          if($tokens.Count -lt 2){ Write-Warn 'Usage: edit home | support | homecss | supportcss | tokens | glass | nav'; continue }
+          if($tokens.Count -lt 2){ Write-Warn 'Usage: edit <alias-or-relative-path>'; continue }
           $target = Resolve-Target $tokens[1]
-          if(-not (Test-PathWithinMaster $target)){ throw "Refusing to open a path outside the master folder: $target" }
+          if(-not (Test-PathWithinMaster $target)){ throw "Refusing to open a path outside the repository: $target" }
           Open-Editor $target
           Write-Field 'EDIT' $target
         }
         'paste' {
-          if($tokens.Count -lt 2){ Write-Warn 'Usage: paste home | support | homecss | supportcss | tokens | glass | nav'; continue }
+          if($tokens.Count -lt 2){ Write-Warn 'Usage: paste <alias-or-relative-path>'; continue }
           $target = Resolve-Target $tokens[1]
-          if(-not (Test-PathWithinMaster $target)){ throw "Refusing to write outside the master folder: $target" }
+          if(-not (Test-PathWithinMaster $target)){ throw "Refusing to write outside the repository: $target" }
           $content = Get-Clipboard -Raw -ErrorAction SilentlyContinue
           if([string]::IsNullOrWhiteSpace($content)){ Write-Warn 'Clipboard is empty.'; continue }
           $backup = Backup-Target $target
@@ -327,21 +288,15 @@ try{
           if($backup){ Write-Field 'BACKUP' $backup }
         }
         'inject' {
-          if($tokens.Count -lt 3){ Write-Warn 'Usage: inject "C:\path\file.png" "site\assets\images\file.png"'; continue }
+          if($tokens.Count -lt 3){ Write-Warn 'Usage: inject "C:\path\file" "site\assets\..."'; continue }
           $src = (Resolve-Path -LiteralPath $tokens[1]).Path
           $target = Resolve-Target $tokens[2]
-          if(-not (Test-PathWithinMaster $target)){ throw "Refusing to write outside the master folder: $target" }
+          if(-not (Test-PathWithinMaster $target)){ throw "Refusing to write outside the repository: $target" }
           $backup = Backup-Target $target
           New-Item (Split-Path $target -Parent) -ItemType Directory -Force | Out-Null
           Copy-Item -LiteralPath $src -Destination $target -Force
           Write-Field 'INJECTED' $target
           if($backup){ Write-Field 'BACKUP' $backup }
-        }
-        'apply' {
-          if($tokens.Count -lt 2){ Write-Warn 'Usage: apply .\staging\inbox\update.zip'; continue }
-          $updater = Join-Path $Tools 'Apply-Update.ps1'
-          if(-not (Test-Path $updater)){ throw "Updater script not found: $updater" }
-          & $updater -Package $tokens[1]
         }
         'log'     { if(Test-Path $StdOut){ Get-Content $StdOut -Tail 24 } else { Write-Info 'No request log yet.' } }
         'errors'  { if(Test-Path $StdErr){ Get-Content $StdErr -Tail 40 } else { Write-Info 'No error log yet.' } }
