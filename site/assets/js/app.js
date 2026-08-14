@@ -174,29 +174,34 @@
 })();
 
 (() => {
-  const section = document.getElementById('who-we-support');
-  if (!section) return;
+  const setupReveal = ({ id, timeout = 1400, threshold = .15, rootMargin = '0px 0px -8% 0px' }) => {
+    const section = document.getElementById(id);
+    if (!section) return;
 
-  section.classList.add('reveal-ready');
-  const reveal = () => {
-    if (section.classList.contains('is-visible')) return;
-    section.classList.add('is-visible');
-    window.setTimeout(() => section.classList.remove('reveal-ready'), 1400);
+    section.classList.add('reveal-ready');
+    const reveal = () => {
+      if (section.classList.contains('is-visible')) return;
+      section.classList.add('is-visible');
+      window.setTimeout(() => section.classList.remove('reveal-ready'), timeout);
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      reveal();
+      return;
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        reveal();
+        observer.disconnect();
+        break;
+      }
+    }, { threshold, rootMargin });
+
+    observer.observe(section);
   };
 
-  if (!('IntersectionObserver' in window)) {
-    reveal();
-    return;
-  }
-
-  const observer = new IntersectionObserver(entries => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      reveal();
-      observer.disconnect();
-      break;
-    }
-  }, { threshold: .15, rootMargin: '0px 0px -8% 0px' });
-
-  observer.observe(section);
+  setupReveal({ id: 'who-we-support', timeout: 1400 });
+  setupReveal({ id: 'trust', timeout: 1900, threshold: .12, rootMargin: '0px 0px -10% 0px' });
 })();
