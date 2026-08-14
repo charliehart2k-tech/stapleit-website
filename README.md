@@ -7,13 +7,14 @@ Page-by-page rebuild of `stapleit.co.uk` from the clean approved baseline.
 The active rebuild currently includes:
 
 - Approved monochrome black liquid-glass navigation.
-- Raleway typography standardised across the active site.
+- Manrope typography standardised across the active site using 400/600/700 weights.
 - Homepage hero restored from the approved historical build, including the liquid-wave background and functional support-status widget.
-- Homepage two-card content row started with the About Staple IT card.
+- Homepage statement card: `Small enough to care. Experienced enough to deliver.` with approved Staple red accents.
+- Homepage rotating service card for IT Support, IT Solutions, IT Consultancy and Cyber Security using the canonical service colours.
 - Global four-column liquid-glass footer applied across the active route shells.
 - Responsive navigation switches to the menu layout for tablet widths rather than squeezing the desktop controls.
 - Shared focus, touch and motion behaviour is standardised in the active CSS.
-- Progressive cross-page view transitions are enabled where the browser supports them and disabled for reduced-motion users.
+- Progressive cross-page view transitions are enabled where supported.
 - Homepage content cards use restrained interaction feedback and container-aware responsive behaviour.
 
 The approved navigation structure must not be redesigned unless explicitly requested.
@@ -31,6 +32,7 @@ Do not replace original content with generic marketing copy simply because it is
 Use these together:
 
 - `DESIGN-SYSTEM.md` — visual language, typography, glass material, responsive behaviour, accessibility, security and performance baseline.
+- `BRAND-PALETTE.md` — canonical Staple IT brand and service colours.
 - `SEO-AEO-SCHEMA.md` — SEO, AEO/GEO, local search, crawl/indexing and structured-data rules.
 - `RELEASE-CHECKLIST.md` — the nine quality gates that every completed page must pass before release.
 
@@ -78,9 +80,8 @@ Approved progressive enhancements include:
 - subtle button compression/hover feedback;
 - container queries where component width matters more than viewport width;
 - `content-visibility` for suitable long below-the-fold sections;
-- progressive same-origin page view transitions;
-- reduced blur/filter cost on small screens; and
-- full `prefers-reduced-motion` fallbacks.
+- progressive same-origin page view transitions; and
+- reduced blur/filter cost on small screens.
 
 Avoid scroll-jacking, custom cursors, excessive parallax, floating decorative blobs, 3D tilt cards, repeated autoplay video and animation that delays navigation or reading.
 
@@ -105,15 +106,17 @@ The active site is intentionally static and dependency-light.
 
 Key rules:
 
-- self-host core assets;
+- self-host core media and site assets;
+- Manrope via Google Fonts is currently the single approved external font dependency while the rebuild is in progress;
 - no credentials/secrets in the repository;
 - no third-party runtime scripts by default;
 - no inline JavaScript without a documented reason;
 - keep `.well-known/security.txt` current;
 - configure CSP and standard security headers at the production hosting/CDN layer;
-- keep autoplay video exceptional rather than repeating it throughout the site;
-- prefer CSS over JavaScript for visual effects; and
-- respect `prefers-reduced-motion`.
+- keep autoplay video exceptional rather than repeating it throughout the site; and
+- prefer CSS over JavaScript for visual effects.
+
+When the Manrope binary is vendored locally, remove the Google Fonts dependency and return the font/style CSP directives to `'self'` only.
 
 See `DESIGN-SYSTEM.md` for the recommended production header policy and working asset budgets.
 
