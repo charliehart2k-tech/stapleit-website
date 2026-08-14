@@ -61,9 +61,7 @@
       cursor.setUTCDate(cursor.getUTCDate() + 1);
       const nextDate = cursor.toISOString().slice(0, 10);
       const name = weekdayName(nextDate);
-      if (name !== 'Saturday' && name !== 'Sunday' && !holidays.has(nextDate)) {
-        return { offset, name };
-      }
+      if (name !== 'Saturday' && name !== 'Sunday' && !holidays.has(nextDate)) return { offset, name };
     }
     return null;
   };
@@ -81,11 +79,9 @@
     panel.classList.toggle('offline', !open);
     title.textContent = open ? 'Support is open' : 'Support is closed';
 
-    if (open) {
-      message.textContent = 'Our support team is available until 5pm today.';
-    } else if (weekday && !holidays.has(now.date) && now.hour < 9) {
-      message.textContent = 'Our support team is available from 9am today.';
-    } else {
+    if (open) message.textContent = 'Our support team is available until 5pm today.';
+    else if (weekday && !holidays.has(now.date) && now.hour < 9) message.textContent = 'Our support team is available from 9am today.';
+    else {
       const next = nextWorkingDay(now.date);
       message.textContent = next
         ? (next.offset === 1 ? 'Support reopens tomorrow at 9am.' : `Support reopens ${next.name} at 9am.`)
@@ -220,71 +216,64 @@
 })();
 
 (() => {
-  const section = document.querySelector('.audit-section');
-  const shell = section?.querySelector('.audit-contact-shell');
-  const panel = section?.querySelector('.audit-direct');
-  const links = panel?.querySelector('.audit-direct-links');
-  if (!section || !shell || !panel || !links) return;
+  const audit = document.querySelector('.audit-section');
+  const shell = audit?.querySelector('.audit-contact-shell');
+  const oldPanel = audit?.querySelector('.audit-direct');
+  if (!audit || !shell || !oldPanel) return;
 
-  const makeDetail = ({ label, href, value, external = false }) => {
-    const row = document.createElement('div');
-    row.className = 'audit-contact-detail';
+  oldPanel.remove();
 
-    const caption = document.createElement('span');
-    caption.className = 'audit-contact-label';
-    caption.textContent = label;
-    row.append(caption);
+  const contact = document.createElement('section');
+  contact.className = 'contact-section';
+  contact.id = 'contact';
+  contact.setAttribute('aria-labelledby', 'contact-title');
 
-    if (href) {
-      const link = document.createElement('a');
-      link.className = 'audit-direct-link';
-      link.href = href;
-      link.textContent = value;
-      if (external) {
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-      }
-      row.append(link);
-    } else {
-      const text = document.createElement('span');
-      text.className = 'audit-contact-value';
-      text.textContent = value;
-      row.append(text);
-    }
+  contact.innerHTML = `
+    <div class="contact-inner">
+      <header class="contact-hero">
+        <h2 id="contact-title">We’re here when you need us.</h2>
+      </header>
+      <div class="contact-grid">
+        <section class="contact-panel" aria-labelledby="contact-panel-title">
+          <h3 id="contact-panel-title">Speak to Staple IT</h3>
+          <p class="contact-panel-intro">Monday to Friday, 9am–5pm.</p>
+          <dl class="contact-list">
+            <div class="contact-row"><dt>Call us</dt><dd><a href="tel:+441372309707">01372 309 707</a></dd></div>
+            <div class="contact-row"><dt>WhatsApp Business</dt><dd><a class="contact-whatsapp" href="https://wa.me/+441372309707" rel="noopener noreferrer" target="_blank">Click to chat</a></dd></div>
+            <div class="contact-row"><dt>Email</dt><dd><a href="mailto:hello@stapleit.co.uk">hello@stapleit.co.uk</a></dd></div>
+            <div class="contact-row"><dt>Hours</dt><dd>Monday to Friday, 9am–5pm</dd></div>
+            <div class="contact-row contact-address"><dt>Address</dt><dd>88 Eastdean Avenue, Epsom, KT18 7SN</dd></div>
+          </dl>
+        </section>
+        <section class="contact-map-card" aria-label="Staple IT location">
+          <div class="contact-map-shell" data-contact-map>
+            <div class="contact-map-placeholder" data-contact-map-placeholder>
+              <strong>Epsom, Surrey</strong>
+              <span>88 Eastdean Avenue, Epsom, KT18 7SN</span>
+              <button class="button contact-map-load" data-contact-map-load type="button">Load Google Maps</button>
+            </div>
+            <iframe data-contact-map-frame hidden loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Staple IT location in Epsom"></iframe>
+          </div>
+          <div class="contact-map-footer">
+            <span>Epsom, Surrey</span>
+            <a href="https://www.google.com/maps/search/?api=1&query=88+Eastdean+Avenue,+Epsom,+KT18+7SN" rel="noopener noreferrer" target="_blank">Open in Google Maps ↗</a>
+          </div>
+        </section>
+      </div>
+    </div>`;
 
-    return row;
-  };
+  audit.insertAdjacentElement('afterend', contact);
 
-  links.replaceChildren(
-    makeDetail({ label: 'Phone', href: 'tel:+441372309707', value: '01372 309 707' }),
-    makeDetail({ label: 'WhatsApp', href: 'https://wa.me/+441372309707', value: 'Click to chat', external: true }),
-    makeDetail({ label: 'Email', href: 'mailto:hello@stapleit.co.uk', value: 'hello@stapleit.co.uk' }),
-    makeDetail({ label: 'Hours', value: 'Monday to Friday, 9am–5pm' })
-  );
-
-  panel.querySelector('.audit-direct-hours')?.remove();
-
-  const map = document.createElement('div');
-  map.className = 'audit-map';
-
-  const load = document.createElement('button');
-  load.className = 'button audit-map-load';
-  load.type = 'button';
-  load.textContent = 'View Google Maps';
-
-  const frame = document.createElement('iframe');
-  frame.title = 'Staple IT location in Epsom';
-  frame.loading = 'lazy';
-  frame.referrerPolicy = 'no-referrer-when-downgrade';
-  frame.hidden = true;
+  const map = contact.querySelector('[data-contact-map]');
+  const placeholder = contact.querySelector('[data-contact-map-placeholder]');
+  const load = contact.querySelector('[data-contact-map-load]');
+  const frame = contact.querySelector('[data-contact-map-frame]');
+  if (!map || !placeholder || !load || !frame) return;
 
   load.addEventListener('click', () => {
     frame.src = 'https://www.google.com/maps?q=51.3351004,-0.2637125&z=15&output=embed';
     frame.hidden = false;
+    placeholder.remove();
     map.classList.add('is-loaded');
-    load.remove();
   }, { once: true });
-
-  map.append(load, frame);
-  shell.insertAdjacentElement('afterend', map);
 })();
