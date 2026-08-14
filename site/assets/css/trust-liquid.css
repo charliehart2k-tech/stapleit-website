@@ -57,9 +57,12 @@
   100%{background-position:148% 88%,-32% 8%,-44% 86%,100% 50%;filter:saturate(1.12) brightness(1.02)}
 }
 
-/* Trust proof rows stay black. The palette aura is intentionally larger than
-   each row and allowed to bleed across the separators, so there are no hard
-   rectangular colour cut-offs. */
+/* The proof list is the visual containment boundary. Individual row auras can
+   bleed into neighbouring rows, but never into the page gutters or trust title. */
+.trust-proof-list{position:relative;isolation:isolate;overflow:clip}
+
+/* Trust proof rows stay black. Colour exists only as a blurred moving aura
+   behind the content. */
 .trust-proof{
   --trust-glow:var(--blue-bright);
   isolation:isolate;
@@ -73,20 +76,20 @@
   content:"";
   position:absolute;
   z-index:0;
-  top:-92%;
-  bottom:-92%;
-  left:-38%;
-  width:112%;
+  top:-88%;
+  bottom:-88%;
+  left:-22%;
+  width:92%;
   pointer-events:none;
   border-radius:50%;
   background:
     radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--trust-glow) 32%,transparent) 0%,color-mix(in srgb,var(--trust-glow) 13%,transparent) 28%,transparent 69%),
     radial-gradient(circle at 58% 38%,rgba(255,255,255,.065),transparent 29%);
-  -webkit-mask-image:radial-gradient(ellipse 68% 72% at 50% 50%,#000 0 44%,rgba(0,0,0,.84) 59%,rgba(0,0,0,.30) 78%,transparent 100%);
-  mask-image:radial-gradient(ellipse 68% 72% at 50% 50%,#000 0 44%,rgba(0,0,0,.84) 59%,rgba(0,0,0,.30) 78%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 68% 72% at 50% 50%,#000 0 42%,rgba(0,0,0,.80) 57%,rgba(0,0,0,.24) 75%,transparent 100%);
+  mask-image:radial-gradient(ellipse 68% 72% at 50% 50%,#000 0 42%,rgba(0,0,0,.80) 57%,rgba(0,0,0,.24) 75%,transparent 100%);
   filter:blur(52px) saturate(118%);
   opacity:.31;
-  transform:translate3d(-24%,0,0) scale(.82);
+  transform:translate3d(-12%,0,0) scale(.82);
   transform-origin:center;
   animation:trustProofAuraIdle 8.8s ease-in-out infinite alternate;
 }
@@ -97,10 +100,10 @@
 .trust-proof::after{z-index:2}
 
 @keyframes trustProofAuraIdle{
-  0%{left:-38%;opacity:.20;transform:translate3d(-24%,-6%,0) scale(.76)}
-  35%{left:-5%;opacity:.34;transform:translate3d(-2%,8%,0) scale(.98)}
-  68%{left:31%;opacity:.27;transform:translate3d(10%,-7%,0) scale(.90)}
-  100%{left:61%;opacity:.37;transform:translate3d(22%,6%,0) scale(1.06)}
+  0%{left:-22%;opacity:.20;transform:translate3d(-12%,-6%,0) scale(.76)}
+  35%{left:-2%;opacity:.34;transform:translate3d(-2%,8%,0) scale(.98)}
+  68%{left:16%;opacity:.27;transform:translate3d(5%,-7%,0) scale(.90)}
+  100%{left:30%;opacity:.35;transform:translate3d(10%,6%,0) scale(1.02)}
 }
 
 @supports (animation-timeline:view()){
@@ -117,9 +120,9 @@
 }
 
 @keyframes trustProofAuraScroll{
-  0%{left:-46%;opacity:.12;transform:translate3d(-28%,-9%,0) scale(.70)}
-  24%{left:-12%;opacity:.30;transform:translate3d(-8%,7%,0) scale(.92)}
-  50%{left:20%;opacity:.39;transform:translate3d(5%,-4%,0) scale(1.08)}
-  76%{left:51%;opacity:.29;transform:translate3d(15%,8%,0) scale(.96)}
-  100%{left:78%;opacity:.13;transform:translate3d(28%,-6%,0) scale(.74)}
+  0%{left:-24%;opacity:.12;transform:translate3d(-14%,-9%,0) scale(.70)}
+  24%{left:-6%;opacity:.30;transform:translate3d(-5%,7%,0) scale(.92)}
+  50%{left:10%;opacity:.39;transform:translate3d(2%,-4%,0) scale(1.04)}
+  76%{left:24%;opacity:.29;transform:translate3d(6%,8%,0) scale(.94)}
+  100%{left:34%;opacity:.13;transform:translate3d(10%,-6%,0) scale(.74)}
 }
