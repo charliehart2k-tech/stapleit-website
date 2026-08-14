@@ -220,19 +220,79 @@
 })();
 
 (() => {
+  const audit = document.querySelector('.audit-section');
+  if (!audit) return;
+
+  if (!document.querySelector('link[data-audit-enhancements]')) {
+    const enhancements = document.createElement('link');
+    enhancements.rel = 'stylesheet';
+    enhancements.href = '/assets/css/audit-enhancements.css';
+    enhancements.dataset.auditEnhancements = 'true';
+    document.head.append(enhancements);
+  }
+
   const auditTitle = document.getElementById('audit-title');
-  const formTitle = document.querySelector('.audit-form-heading h3');
+  const formTitle = audit.querySelector('.audit-form-heading h3');
+  const formHeading = formTitle?.parentElement;
   if (auditTitle) {
     auditTitle.innerHTML = 'Let us look over <span class="accent-orange">your</span> IT. <span>Completely free.</span>';
   }
   if (formTitle) {
-    formTitle.innerHTML = 'Request <span class="accent-orange">your</span> free audit';
+    formTitle.innerHTML = 'Request <span class="accent-orange">your</span><br/>free audit';
   }
 
-  const audit = document.querySelector('.audit-section');
-  const shell = audit?.querySelector('.audit-contact-shell');
-  const oldPanel = audit?.querySelector('.audit-direct');
-  if (!audit || !shell || !oldPanel) return;
+  if (formHeading && !formHeading.querySelector('.audit-explainer')) {
+    const explainer = document.createElement('div');
+    explainer.className = 'audit-explainer';
+    explainer.innerHTML = `
+      <button class="audit-explainer-toggle" type="button" aria-expanded="false">
+        <span>What is an IT Audit?</span>
+        <span class="audit-explainer-icon" aria-hidden="true">+</span>
+      </button>
+      <div class="audit-explainer-body" aria-hidden="true">
+        <div class="audit-explainer-copy">
+          <p>A quick review of your IT setup, security, Microsoft 365, devices and support arrangements — highlighting risks, quick wins and where you may be overspending.</p>
+        </div>
+      </div>`;
+    formHeading.append(explainer);
+
+    const toggle = explainer.querySelector('.audit-explainer-toggle');
+    const body = explainer.querySelector('.audit-explainer-body');
+    let userToggled = false;
+
+    const setOpen = open => {
+      explainer.classList.toggle('is-open', open);
+      toggle?.setAttribute('aria-expanded', String(open));
+      body?.setAttribute('aria-hidden', String(!open));
+    };
+
+    toggle?.addEventListener('click', () => {
+      userToggled = true;
+      setOpen(!explainer.classList.contains('is-open'));
+    });
+
+    const autoOpen = () => {
+      if (userToggled) return;
+      window.setTimeout(() => {
+        if (!userToggled) setOpen(true);
+      }, 520);
+    };
+
+    if ('IntersectionObserver' in window) {
+      const explainerObserver = new IntersectionObserver(entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        autoOpen();
+        explainerObserver.disconnect();
+      }, { threshold: .18, rootMargin: '0px 0px -8% 0px' });
+      explainerObserver.observe(audit);
+    } else {
+      autoOpen();
+    }
+  }
+
+  const shell = audit.querySelector('.audit-contact-shell');
+  const oldPanel = audit.querySelector('.audit-direct');
+  if (!shell || !oldPanel) return;
 
   oldPanel.remove();
 
