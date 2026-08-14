@@ -1,10 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap");
 
 @view-transition{navigation:auto}
-@keyframes staplePageOut{to{opacity:.985}}
-@keyframes staplePageIn{from{opacity:.985}}
-::view-transition-old(root){animation:var(--motion-fast) ease both staplePageOut}
-::view-transition-new(root){animation:var(--motion-page) ease both staplePageIn}
+@keyframes staplePageOut{to{opacity:.28;transform:scale(.992);filter:brightness(.72)}}
+@keyframes staplePageIn{from{opacity:.18;transform:translateY(18px) scale(.992);filter:brightness(.70);clip-path:inset(7% 0 0 round 30px)}to{opacity:1;transform:none;filter:none;clip-path:inset(0)}}
+::view-transition-group(root){background:#000}
+::view-transition-old(root){animation:220ms cubic-bezier(.4,0,.8,.2) both staplePageOut}
+::view-transition-new(root){animation:430ms cubic-bezier(.16,1,.3,1) both staplePageIn}
 
 *,*::before,*::after{box-sizing:border-box}
 html{background:#000;scroll-behavior:smooth}
