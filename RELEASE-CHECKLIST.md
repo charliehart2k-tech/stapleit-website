@@ -38,7 +38,6 @@ Confirm:
 - logical document/heading structure;
 - keyboard navigation and visible focus states;
 - sensible 44px touch targets;
-- reduced-motion behaviour;
 - useful alt text and accessible labels.
 
 ## Gate 4 — Security
