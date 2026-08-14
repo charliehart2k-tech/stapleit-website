@@ -61,7 +61,9 @@
       cursor.setUTCDate(cursor.getUTCDate() + 1);
       const nextDate = cursor.toISOString().slice(0, 10);
       const name = weekdayName(nextDate);
-      if (name !== 'Saturday' && name !== 'Sunday' && !holidays.has(nextDate)) return { offset, name };
+      if (name !== 'Saturday' && name !== 'Sunday' && !holidays.has(nextDate)) {
+        return { offset, name };
+      }
     }
     return null;
   };
@@ -79,9 +81,11 @@
     panel.classList.toggle('offline', !open);
     title.textContent = open ? 'Support is open' : 'Support is closed';
 
-    if (open) message.textContent = 'Our support team is available until 5pm today.';
-    else if (weekday && !holidays.has(now.date) && now.hour < 9) message.textContent = 'Our support team is available from 9am today.';
-    else {
+    if (open) {
+      message.textContent = 'Our support team is available until 5pm today.';
+    } else if (weekday && !holidays.has(now.date) && now.hour < 9) {
+      message.textContent = 'Our support team is available from 9am today.';
+    } else {
       const next = nextWorkingDay(now.date);
       message.textContent = next
         ? (next.offset === 1 ? 'Support reopens tomorrow at 9am.' : `Support reopens ${next.name} at 9am.`)
@@ -216,6 +220,15 @@
 })();
 
 (() => {
+  const auditTitle = document.getElementById('audit-title');
+  const formTitle = document.querySelector('.audit-form-heading h3');
+  if (auditTitle) {
+    auditTitle.innerHTML = 'Let us look over <span class="accent-orange">your</span> IT. <span>Completely free.</span>';
+  }
+  if (formTitle) {
+    formTitle.innerHTML = 'Request <span class="accent-orange">your</span> free audit';
+  }
+
   const audit = document.querySelector('.audit-section');
   const shell = audit?.querySelector('.audit-contact-shell');
   const oldPanel = audit?.querySelector('.audit-direct');
@@ -231,7 +244,7 @@
   contact.innerHTML = `
     <div class="contact-inner">
       <header class="contact-hero">
-        <h2 id="contact-title">We’re here when you need us.</h2>
+        <h2 id="contact-title">We’re here when <span class="accent-orange">you</span> need us.</h2>
       </header>
       <div class="contact-grid">
         <section class="contact-panel" aria-labelledby="contact-panel-title">
@@ -246,13 +259,8 @@
           </dl>
         </section>
         <section class="contact-map-card" aria-label="Staple IT location">
-          <div class="contact-map-shell" data-contact-map>
-            <div class="contact-map-placeholder" data-contact-map-placeholder>
-              <strong>Epsom, Surrey</strong>
-              <span>88 Eastdean Avenue, Epsom, KT18 7SN</span>
-              <button class="button contact-map-load" data-contact-map-load type="button">Load Google Maps</button>
-            </div>
-            <iframe data-contact-map-frame hidden loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Staple IT location in Epsom"></iframe>
+          <div class="contact-map-shell is-loaded" data-contact-map>
+            <iframe data-contact-map-frame loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=51.3351004,-0.2637125&z=15&output=embed" title="Staple IT location in Epsom"></iframe>
           </div>
           <div class="contact-map-footer">
             <span>Epsom, Surrey</span>
@@ -264,16 +272,22 @@
 
   audit.insertAdjacentElement('afterend', contact);
 
-  const map = contact.querySelector('[data-contact-map]');
-  const placeholder = contact.querySelector('[data-contact-map-placeholder]');
-  const load = contact.querySelector('[data-contact-map-load]');
-  const frame = contact.querySelector('[data-contact-map-frame]');
-  if (!map || !placeholder || !load || !frame) return;
+  contact.classList.add('reveal-ready');
+  const reveal = () => {
+    contact.classList.add('is-visible');
+    window.setTimeout(() => contact.classList.remove('reveal-ready'), 1200);
+  };
 
-  load.addEventListener('click', () => {
-    frame.src = 'https://www.google.com/maps?q=51.3351004,-0.2637125&z=15&output=embed';
-    frame.hidden = false;
-    placeholder.remove();
-    map.classList.add('is-loaded');
-  }, { once: true });
+  if (!('IntersectionObserver' in window)) {
+    reveal();
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    reveal();
+    observer.disconnect();
+  }, { threshold: .08, rootMargin: '0px 0px -6% 0px' });
+
+  observer.observe(contact);
 })();
