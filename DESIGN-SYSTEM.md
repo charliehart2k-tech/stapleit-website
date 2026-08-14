@@ -112,7 +112,6 @@ Every page must retain:
 - Visible keyboard focus states.
 - 44px minimum interactive targets where practical.
 - Meaningful alt text for informative images; decorative media should be hidden from assistive technology.
-- Reduced-motion handling for animation.
 - Sufficient contrast against the black/glass backgrounds.
 - Logical heading order.
 
@@ -134,7 +133,6 @@ Rules:
 - Prefer CSS glass over JavaScript/WebGL glass.
 - LiquidGL or similar effects are opt-in only and must be explicitly requested.
 - Keep repeated backdrop-filter surfaces modest, especially on phones/tablets.
-- Respect `prefers-reduced-motion`.
 
 Suggested working budgets before production optimisation:
 
@@ -180,7 +178,7 @@ Before editing a route:
 4. Reuse the approved nav/footer and shared tokens.
 5. Add only the page-specific CSS needed for the page.
 6. Test desktop, tablet and mobile layouts.
-7. Check keyboard navigation and reduced motion.
+7. Check keyboard navigation and interaction timing.
 8. Check that no unused media/dependency was introduced.
 9. Keep the diff scoped to the page being rebuilt.
 
