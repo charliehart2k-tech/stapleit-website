@@ -57,32 +57,51 @@
   100%{background-position:148% 88%,-32% 8%,-44% 86%,100% 50%;filter:saturate(1.12) brightness(1.02)}
 }
 
-/* Trust proof rows keep the editorial layout while their palette aura travels
-   through each row. The motion is always present; hover is not the trigger. */
+/* Trust proof rows stay black. Colour exists only as a blurred moving aura
+   behind the content, so the row never reads as a solid coloured strip. */
 .trust-proof{
   --trust-glow:var(--blue-bright);
-  background-image:
-    radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--trust-glow) 16%,transparent),transparent 64%),
-    radial-gradient(circle at 72% 36%,rgba(255,255,255,.045),transparent 27%);
-  background-repeat:no-repeat;
-  background-size:175% 195%,125% 145%;
-  background-position:-68% 18%,118% 72%;
-  animation:trustProofGlowIdle 8.5s ease-in-out infinite alternate;
+  isolation:isolate;
+  background:none!important;
 }
-.trust-proof:nth-child(2){--trust-glow:var(--support);animation-duration:9.6s;animation-delay:-2.1s}
-.trust-proof:nth-child(3){--trust-glow:var(--solutions);animation-duration:8.9s;animation-delay:-4.4s}
-.trust-proof:nth-child(4){--trust-glow:var(--security);animation-duration:10.2s;animation-delay:-6.2s}
+.trust-proof:nth-child(2){--trust-glow:var(--support)}
+.trust-proof:nth-child(3){--trust-glow:var(--solutions)}
+.trust-proof:nth-child(4){--trust-glow:var(--security)}
+.trust-proof::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:-48%;
+  bottom:-48%;
+  left:-24%;
+  width:74%;
+  pointer-events:none;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--trust-glow) 34%,transparent) 0%,color-mix(in srgb,var(--trust-glow) 14%,transparent) 27%,transparent 68%),
+    radial-gradient(circle at 58% 38%,rgba(255,255,255,.075),transparent 28%);
+  filter:blur(34px) saturate(118%);
+  opacity:.34;
+  transform:translate3d(-26%,0,0) scale(.78);
+  transform-origin:center;
+  animation:trustProofAuraIdle 8.8s ease-in-out infinite alternate;
+}
+.trust-proof:nth-child(2)::before{animation-duration:10.1s;animation-delay:-2.2s}
+.trust-proof:nth-child(3)::before{animation-duration:9.3s;animation-delay:-4.6s}
+.trust-proof:nth-child(4)::before{animation-duration:10.7s;animation-delay:-6.8s}
+.trust-proof h3,.trust-proof p{position:relative;z-index:1}
+.trust-proof::after{z-index:2}
 
-@keyframes trustProofGlowIdle{
-  0%{background-position:-68% 18%,118% 72%}
-  38%{background-position:-4% 72%,76% 28%}
-  72%{background-position:74% 26%,24% 82%}
-  100%{background-position:132% 76%,-18% 20%}
+@keyframes trustProofAuraIdle{
+  0%{left:-24%;opacity:.24;transform:translate3d(-28%,-4%,0) scale(.72)}
+  35%{left:4%;opacity:.38;transform:translate3d(-4%,7%,0) scale(.94)}
+  68%{left:36%;opacity:.30;transform:translate3d(8%,-6%,0) scale(.84)}
+  100%{left:58%;opacity:.42;transform:translate3d(24%,5%,0) scale(1.02)}
 }
 
 @supports (animation-timeline:view()){
-  .trust-proof{
-    animation-name:trustProofGlowScroll;
+  .trust-proof::before{
+    animation-name:trustProofAuraScroll;
     animation-duration:1ms;
     animation-timing-function:linear;
     animation-fill-mode:both;
@@ -93,10 +112,10 @@
   }
 }
 
-@keyframes trustProofGlowScroll{
-  0%{background-position:-92% 12%,126% 78%}
-  25%{background-position:-28% 64%,92% 30%}
-  50%{background-position:34% 30%,52% 76%}
-  75%{background-position:92% 70%,10% 24%}
-  100%{background-position:148% 18%,-34% 82%}
+@keyframes trustProofAuraScroll{
+  0%{left:-30%;opacity:.14;transform:translate3d(-30%,-8%,0) scale(.66)}
+  24%{left:-4%;opacity:.34;transform:translate3d(-8%,6%,0) scale(.86)}
+  50%{left:23%;opacity:.43;transform:translate3d(4%,-4%,0) scale(1.02)}
+  76%{left:49%;opacity:.32;transform:translate3d(14%,7%,0) scale(.90)}
+  100%{left:72%;opacity:.16;transform:translate3d(30%,-5%,0) scale(.70)}
 }
