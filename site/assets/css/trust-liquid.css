@@ -1,4 +1,4 @@
-.trust-sticky h2{color:var(--text)}
+.trust-sticky h2{color:var(--text);font-size:clamp(4.8rem,8.3vw,8.4rem)}
 
 /* Trust heading: Apple-style liquid colour moving inside the glyphs. */
 @supports ((-webkit-background-clip:text) or (background-clip:text)){
@@ -125,4 +125,9 @@
   50%{left:10%;opacity:.39;transform:translate3d(2%,-4%,0) scale(1.04)}
   76%{left:24%;opacity:.29;transform:translate3d(6%,8%,0) scale(.94)}
   100%{left:34%;opacity:.13;transform:translate3d(10%,-6%,0) scale(.74)}
+}
+
+/* Keep the phone composition controlled while allowing a larger desktop/tablet statement. */
+@media(max-width:640px){
+  .trust-sticky h2{font-size:clamp(3.7rem,15vw,5rem)}
 }
