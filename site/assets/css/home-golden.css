@@ -1,353 +1,83 @@
-/*
- * Staple IT homepage golden pass.
- * Loaded last. This owns the final visual corrections that must win the cascade.
- */
+/* Staple IT homepage final visual pass. Loaded last. */
+:root{--gold-ease:cubic-bezier(.16,1,.3,1)}
 
-:root{
-  --gold-ease:cubic-bezier(.16,1,.3,1);
-}
-
-/* --------------------------------------------------------------------------
-   Intro pair — balanced on desktop, natural on mobile.
-   -------------------------------------------------------------------------- */
+/* Intro pair */
 @media(min-width:981px){
-  .home-intro-grid{
-    grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr)!important;
-    gap:20px!important;
-    align-items:stretch!important;
-  }
-
-  .home-info-card,
-  .home-services-card{
-    min-height:clamp(430px,29vw,520px)!important;
-  }
-
-  .home-statement-card{
-    display:flex!important;
-    align-items:center!important;
-    justify-content:flex-start!important;
-    padding:44px 52px!important;
-  }
-
-  .home-statement-card h2{
-    width:100%!important;
-    max-width:10.8ch!important;
-    margin:0!important;
-    font-size:clamp(4rem,4.9vw,5.5rem)!important;
-    line-height:.94!important;
-    letter-spacing:-.047em!important;
-  }
-
-  .service-slide{
-    padding:42px 72px 42px 50px!important;
-  }
-
-  .service-slide-content{
-    min-height:100%!important;
-  }
-
-  .service-slide h2{
-    font-size:clamp(2.85rem,3.8vw,3.9rem)!important;
-    line-height:.97!important;
-  }
-
-  .service-slide p{
-    margin-top:18px!important;
-    line-height:1.56!important;
-  }
-
+  .home-intro-grid{grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr)!important;gap:20px!important;align-items:stretch!important}
+  .home-info-card,.home-services-card{min-height:clamp(430px,29vw,520px)!important}
+  .home-statement-card{display:flex!important;align-items:center!important;justify-content:flex-start!important;padding:44px 52px!important}
+  .home-statement-card h2{width:100%!important;max-width:10.8ch!important;margin:0!important;font-size:clamp(4rem,4.9vw,5.5rem)!important;line-height:.94!important;letter-spacing:-.047em!important}
+  .service-slide{padding:42px 72px 42px 50px!important}
+  .service-slide-content{min-height:100%!important}
+  .service-slide h2{font-size:clamp(2.85rem,3.8vw,3.9rem)!important;line-height:.97!important}
+  .service-slide p{margin-top:18px!important;line-height:1.56!important}
   .service-points{margin-top:20px!important}
   .service-cta{margin-top:28px!important;align-self:flex-start!important}
 }
 
-/* --------------------------------------------------------------------------
-   Statement — explicit one-time scroll drop. app.js owns the trigger.
-   -------------------------------------------------------------------------- */
+/* Strong one-time drop using the existing IntersectionObserver classes. */
 @media(prefers-reduced-motion:no-preference){
-  .home-statement-card.statement-ready{
-    opacity:0;
-    transform:translateY(-44px) scale(.982);
-    filter:blur(9px);
-  }
-
-  .home-statement-card.statement-in{
-    animation:goldStatementDrop 980ms var(--gold-ease) both;
-  }
-
-  .home-statement-card.statement-in .brand-red{
-    animation:goldStatementAccent 1100ms 260ms var(--gold-ease) both;
-  }
+  .home-statement-card.motion-ready{opacity:0!important;transform:translateY(-46px) scale(.98)!important;filter:blur(10px)!important}
+  .home-statement-card.motion-in{animation:goldStatementDrop 980ms var(--gold-ease) both!important}
+  .home-statement-card.motion-in .brand-red{animation:goldStatementAccent 1100ms 260ms var(--gold-ease) both!important}
 }
-
 @keyframes goldStatementDrop{
-  0%{opacity:0;transform:translateY(-44px) scale(.982);filter:blur(9px)}
-  64%{opacity:1;transform:translateY(5px) scale(1.004);filter:blur(0)}
+  0%{opacity:0;transform:translateY(-46px) scale(.98);filter:blur(10px)}
+  64%{opacity:1;transform:translateY(6px) scale(1.004);filter:blur(0)}
   100%{opacity:1;transform:none;filter:none}
 }
-
 @keyframes goldStatementAccent{
   0%{filter:brightness(.78) saturate(.86);text-shadow:0 0 0 rgba(230,43,43,0)}
   52%{filter:brightness(1.2) saturate(1.15);text-shadow:0 0 30px rgba(230,43,43,.22)}
   100%{filter:brightness(1) saturate(1);text-shadow:0 0 0 rgba(230,43,43,0)}
 }
 
-/* --------------------------------------------------------------------------
-   Trust — permanently neutralise the old whole-heading liquid clipping.
-   Only the second line carries colour and it gets real glyph breathing room.
-   -------------------------------------------------------------------------- */
-.trust-section,
-.trust-inner,
-.trust-intro,
-.trust-sticky{
-  overflow:visible!important;
-}
-
-.trust-sticky h2{
-  max-width:none!important;
-  margin:0!important;
-  padding:0 .14em .06em .02em!important;
-  overflow:visible!important;
-  background:none!important;
-  background-image:none!important;
-  background-clip:border-box!important;
-  -webkit-background-clip:border-box!important;
-  color:#fff!important;
-  -webkit-text-fill-color:#fff!important;
-  filter:none!important;
-  animation:none!important;
-}
-
-.trust-title-line{
-  display:block!important;
-  white-space:nowrap!important;
-}
-
-.trust-title-accent{
-  display:block!important;
-  width:max-content!important;
-  max-width:none!important;
-  margin:.08em 0 0 -.04em!important;
-  padding:0 .18em .08em .05em!important;
-  overflow:visible!important;
-  white-space:nowrap!important;
-  line-height:.96!important;
-  color:transparent!important;
-  background:linear-gradient(102deg,var(--brand-blue) 0%,#6f63ff 22%,var(--brand-security) 40%,var(--brand-red) 62%,var(--brand-solutions) 82%,var(--brand-blue) 100%)!important;
-  background-size:260% 100%!important;
-  background-position:0 50%;
-  -webkit-background-clip:text!important;
-  background-clip:text!important;
-  -webkit-text-fill-color:transparent!important;
-  animation:goldTrustAccent 8.5s ease-in-out infinite alternate!important;
-}
-
-@keyframes goldTrustAccent{
-  from{background-position:0% 50%}
-  to{background-position:100% 50%}
-}
+/* Trust heading: remove old whole-heading clip and give every glyph room. */
+.trust-section,.trust-inner,.trust-intro,.trust-sticky{overflow:visible!important}
+.trust-sticky h2{max-width:none!important;margin:0!important;padding:0 .18em .08em .03em!important;overflow:visible!important;background:none!important;background-image:none!important;background-clip:border-box!important;-webkit-background-clip:border-box!important;color:#fff!important;-webkit-text-fill-color:#fff!important;filter:none!important;animation:none!important}
+.trust-title-line{display:block!important;white-space:nowrap!important}
+.trust-title-accent{display:block!important;width:max-content!important;max-width:none!important;margin:.08em 0 0 -.04em!important;padding:0 .24em .10em .06em!important;overflow:visible!important;white-space:nowrap!important;line-height:.96!important;color:transparent!important;background:linear-gradient(102deg,var(--brand-blue) 0%,#6f63ff 22%,var(--brand-security) 40%,var(--brand-red) 62%,var(--brand-solutions) 82%,var(--brand-blue) 100%)!important;background-size:260% 100%!important;background-position:0 50%;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;animation:goldTrustAccent 8.5s ease-in-out infinite alternate!important}
+@keyframes goldTrustAccent{from{background-position:0% 50%}to{background-position:100% 50%}}
 
 @media(min-width:981px){
-  .trust-inner{
-    grid-template-columns:minmax(300px,.78fr) minmax(0,1.22fr)!important;
-    gap:clamp(64px,6.5vw,104px)!important;
-  }
-
-  .trust-sticky{
-    top:118px!important;
-    padding:8px 12px 0 0!important;
-  }
-
-  .trust-sticky h2{
-    font-size:clamp(3.9rem,5.45vw,5.85rem)!important;
-    line-height:.92!important;
-    letter-spacing:-.052em!important;
-  }
+  .trust-inner{grid-template-columns:minmax(320px,.8fr) minmax(0,1.2fr)!important;gap:clamp(62px,6vw,98px)!important}
+  .trust-sticky{top:118px!important;padding:8px 8px 0 0!important}
+  .trust-sticky h2{font-size:clamp(3.8rem,5.25vw,5.65rem)!important;line-height:.92!important;letter-spacing:-.052em!important}
 }
-
 @media(max-width:980px){
-  .trust-sticky h2{
-    font-size:clamp(3rem,9vw,4.2rem)!important;
-    line-height:.94!important;
-    letter-spacing:-.047em!important;
-  }
+  .trust-sticky h2{font-size:clamp(3rem,9vw,4.2rem)!important;line-height:.94!important;letter-spacing:-.047em!important}
 }
-
 @media(max-width:700px){
-  .trust-sticky h2{
-    width:100%!important;
-    max-width:none!important;
-    margin-bottom:28px!important;
-    padding-right:.20em!important;
-    font-size:clamp(2.65rem,10.7vw,3.2rem)!important;
-    line-height:.96!important;
-  }
-
+  .trust-sticky h2{width:100%!important;max-width:none!important;margin-bottom:28px!important;padding-right:.24em!important;font-size:clamp(2.65rem,10.7vw,3.2rem)!important;line-height:.96!important}
   .trust-title-line{white-space:normal!important}
-  .trust-title-accent{margin-left:-.03em!important;padding-right:.22em!important}
+  .trust-title-accent{margin-left:-.03em!important;padding-right:.28em!important}
 }
 
-/* --------------------------------------------------------------------------
-   Touch services — native Safari drag/scroll. Dots are secondary controls.
-   -------------------------------------------------------------------------- */
+/* Touch services: native horizontal drag. */
 @media(max-width:980px){
   .home-services-card{overflow:hidden!important}
-
-  .service-stage{
-    display:flex!important;
-    position:relative!important;
-    inset:auto!important;
-    width:100%!important;
-    max-width:100%!important;
-    overflow-x:auto!important;
-    overflow-y:hidden!important;
-    scroll-snap-type:x mandatory!important;
-    scroll-padding-inline:0!important;
-    overscroll-behavior-x:contain!important;
-    -webkit-overflow-scrolling:touch!important;
-    touch-action:pan-x!important;
-    scrollbar-width:none!important;
-  }
-
+  .service-stage{display:flex!important;position:relative!important;inset:auto!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory!important;scroll-padding-inline:0!important;overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x!important;scrollbar-width:none!important}
   .service-stage::-webkit-scrollbar{display:none!important}
-
-  .service-slide{
-    flex:0 0 100%!important;
-    width:100%!important;
-    min-width:100%!important;
-    max-width:100%!important;
-    position:relative!important;
-    inset:auto!important;
-    opacity:1!important;
-    transform:none!important;
-    pointer-events:auto!important;
-    scroll-snap-align:start!important;
-    scroll-snap-stop:always!important;
-  }
+  .service-slide{flex:0 0 100%!important;width:100%!important;min-width:100%!important;max-width:100%!important;position:relative!important;inset:auto!important;opacity:1!important;transform:none!important;pointer-events:auto!important;scroll-snap-align:start!important;scroll-snap-stop:always!important}
 }
 
-/* --------------------------------------------------------------------------
-   Google review chapter — hero first, compact review CTA second.
-   -------------------------------------------------------------------------- */
-.google-review-section{
-  position:relative;
-  width:100vw;
-  margin:0 0 0 calc(50% - 50vw);
-  padding:86px 0 108px;
-  overflow:hidden;
-  background:#000;
-}
-
-.google-review-inner{
-  width:var(--page);
-  max-width:1220px;
-  margin:0 auto;
-}
-
-.google-review-hero{
-  display:grid;
-  grid-template-columns:minmax(0,1.08fr) minmax(300px,.58fr);
-  gap:clamp(48px,6vw,84px);
-  align-items:end;
-  padding-bottom:36px;
-}
-
-.google-review-eyebrow{
-  grid-column:1/-1;
-  margin:0 0 -18px;
-  color:#818b98;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.09em;
-  text-transform:uppercase;
-}
-
-.google-review-hero h2{
-  max-width:10.5ch;
-  margin:0;
-  color:#f8f9fb;
-  font-size:clamp(4.5rem,6.5vw,6.8rem);
-  line-height:.9;
-  letter-spacing:-.055em;
-}
-
-.google-review-hero h2 span{
-  color:var(--blue-bright);
-}
-
-.google-review-hero>p:last-child{
-  max-width:30rem;
-  margin:0 0 8px;
-  color:#9ca5b1;
-  font-size:clamp(1.05rem,1.45vw,1.28rem);
-  line-height:1.55;
-}
-
-.google-review-card{
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
-  gap:22px;
-  align-items:center;
-  padding:22px 24px;
-  border:1px solid rgba(255,255,255,.11);
-  border-radius:25px;
-  background:
-    radial-gradient(circle at 10% 50%,rgba(79,133,255,.09),transparent 26%),
-    linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012) 44%,rgba(0,0,0,.22)),
-    rgba(0,0,0,.62);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 70px rgba(0,0,0,.22);
-  backdrop-filter:blur(20px) saturate(125%);
-  -webkit-backdrop-filter:blur(20px) saturate(125%);
-}
-
-.google-review-mark{
-  width:54px;
-  height:54px;
-  display:grid;
-  place-items:center;
-  border:1px solid rgba(255,255,255,.11);
-  border-radius:17px;
-  background:rgba(255,255,255,.035);
-  font-family:Arial,sans-serif;
-  font-size:30px;
-  font-weight:700;
-  line-height:1;
-}
-
-.google-review-mark span{
-  display:inline-block;
-  color:transparent;
-  background:conic-gradient(from -45deg,#4285F4 0 25%,#34A853 0 50%,#FBBC05 0 75%,#EA4335 0 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-}
-
+/* Google review chapter */
+.google-review-section{position:relative;width:100vw;margin:0 0 0 calc(50% - 50vw);padding:86px 0 108px;overflow:hidden;background:#000}
+.google-review-inner{width:var(--page);max-width:1220px;margin:0 auto}
+.google-review-hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(300px,.58fr);gap:clamp(48px,6vw,84px);align-items:end;padding-bottom:36px}
+.google-review-eyebrow{grid-column:1/-1;margin:0 0 -18px;color:#818b98;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.google-review-hero h2{max-width:10.5ch;margin:0;color:#f8f9fb;font-size:clamp(4.5rem,6.5vw,6.8rem);line-height:.9;letter-spacing:-.055em}
+.google-review-hero h2 span{color:var(--blue-bright)}
+.google-review-hero>p:last-child{max-width:30rem;margin:0 0 8px;color:#9ca5b1;font-size:clamp(1.05rem,1.45vw,1.28rem);line-height:1.55}
+.google-review-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:22px;align-items:center;padding:22px 24px;border:1px solid rgba(255,255,255,.11);border-radius:25px;background:radial-gradient(circle at 10% 50%,rgba(79,133,255,.09),transparent 26%),linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012) 44%,rgba(0,0,0,.22)),rgba(0,0,0,.62);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 70px rgba(0,0,0,.22);backdrop-filter:blur(20px) saturate(125%);-webkit-backdrop-filter:blur(20px) saturate(125%)}
+.google-review-mark{width:54px;height:54px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.11);border-radius:17px;background:rgba(255,255,255,.035);font-family:Arial,sans-serif;font-size:30px;font-weight:700;line-height:1}
+.google-review-mark span{display:inline-block;color:transparent;background:conic-gradient(from -45deg,#4285F4 0 25%,#34A853 0 50%,#FBBC05 0 75%,#EA4335 0 100%);-webkit-background-clip:text;background-clip:text}
 .google-review-copy{min-width:0}
 .google-review-kicker{margin:0 0 4px;color:#8c96a3;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .google-review-copy h3{margin:0;color:#f7f9fc;font-size:clamp(1.45rem,2.15vw,2rem);line-height:1.04;letter-spacing:-.034em}
 .google-review-copy p:last-child{max-width:680px;margin:7px 0 0;color:#9099a5;font-size:13.5px;line-height:1.5}
-
-.google-review-link{
-  min-width:174px;
-  min-height:48px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:0 18px;
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:999px;
-  background:rgba(255,255,255,.035);
-  color:#f2f4f7;
-  font-size:13px;
-  font-weight:700;
-  white-space:nowrap;
-  transition:transform 180ms var(--gold-ease),border-color 180ms ease,background 180ms ease;
-}
-
-.google-review-link:hover,.google-review-link:focus-visible{
-  transform:translateY(-1px);
-  border-color:rgba(79,133,255,.5);
-  background:rgba(79,133,255,.08);
-}
+.google-review-link{min-width:174px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;padding:0 18px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.035);color:#f2f4f7;font-size:13px;font-weight:700;white-space:nowrap;transition:transform 180ms var(--gold-ease),border-color 180ms ease,background 180ms ease}
+.google-review-link:hover,.google-review-link:focus-visible{transform:translateY(-1px);border-color:rgba(79,133,255,.5);background:rgba(79,133,255,.08)}
 
 @media(max-width:700px){
   .google-review-section{padding:66px 0 78px}
@@ -362,45 +92,13 @@
   .google-review-link{grid-column:1/-1;width:100%;min-height:46px;margin-top:2px}
 }
 
-/* --------------------------------------------------------------------------
-   Audit final geometry. Motion itself lives in audit-enhancements.css.
-   -------------------------------------------------------------------------- */
-.audit-form{
-  border-radius:32px!important;
-  overflow:hidden!important;
-  transform:none!important;
-}
-
-.audit-form:hover,.audit-form:focus-within{
-  transform:none!important;
-  border-radius:32px!important;
-}
-
-.audit-explainer{
-  border-radius:20px!important;
-  transform:none!important;
-}
-
-.audit-explainer:hover,.audit-explainer:focus-within{
-  transform:none!important;
-}
-
-@media(max-width:700px){
-  .audit-form{border-radius:22px!important}
-  .audit-form:hover,.audit-form:focus-within{border-radius:22px!important}
-  .audit-explainer{border-radius:17px!important}
-}
+/* Audit geometry: no square hover state. */
+.audit-form{border-radius:32px!important;overflow:hidden!important;transform:none!important}
+.audit-form:hover,.audit-form:focus-within{transform:none!important;border-radius:32px!important}
+.audit-explainer{border-radius:20px!important;transform:none!important}
+.audit-explainer:hover,.audit-explainer:focus-within{transform:none!important}
+@media(max-width:700px){.audit-form{border-radius:22px!important}.audit-form:hover,.audit-form:focus-within{border-radius:22px!important}.audit-explainer{border-radius:17px!important}}
 
 @media(prefers-reduced-motion:reduce){
-  .home-statement-card,
-  .home-statement-card .brand-red,
-  .trust-title-accent,
-  .google-review-hero,
-  .google-review-card{
-    animation:none!important;
-    transition:none!important;
-    transform:none!important;
-    filter:none!important;
-    opacity:1!important;
-  }
+  .home-statement-card,.home-statement-card .brand-red,.trust-title-accent,.google-review-hero,.google-review-card{animation:none!important;transition:none!important;transform:none!important;filter:none!important;opacity:1!important}
 }
