@@ -23,8 +23,9 @@ if [[ -f "$THEME/front-page.php" ]]; then
   cp "$THEME/front-page.php" "$THEME/front-page.php.before-$VERSION-$STAMP"
 fi
 
+rm -rf "$THEME/assets"
 mkdir -p "$THEME/assets"
-rsync -a --delete "$SOURCE/assets/" "$THEME/assets/"
+cp -a "$SOURCE/assets/." "$THEME/assets/"
 cp "$SOURCE/favicon.ico" "$THEME/favicon.ico"
 cp "$SOURCE/apple-touch-icon.png" "$THEME/apple-touch-icon.png"
 
@@ -52,7 +53,7 @@ replacements = {
 for old, new in replacements.items():
     s = s.replace(old, new)
 
-# Cache-bust theme CSS and JS from the source commit deployed.
+# Cache-bust theme CSS and JS from the exact source commit deployed.
 s = re.sub(r'(href="[^"?]+\.css)(")', rf'\1?v={version}\2', s)
 s = re.sub(r'(src="[^"?]+\.js)(")', rf'\1?v={version}\2', s)
 
@@ -67,7 +68,7 @@ PY
 
 php -l "$THEME/front-page.php"
 
-chown -R deploy:www-data "$THEME"
+sudo chown -R deploy:www-data "$THEME"
 find "$THEME" -type d -exec chmod 755 {} \;
 find "$THEME" -type f -exec chmod 644 {} \;
 
