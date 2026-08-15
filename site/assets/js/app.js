@@ -1,32 +1,46 @@
 (() => {
   const toggle = document.getElementById('menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
-  const details = [...document.querySelectorAll('.nav-details')];
+  const desktopDetails = [...document.querySelectorAll('.primary-nav .nav-details')];
+  const mobileDetails = [...document.querySelectorAll('.mobile-menu details')];
 
   const closeMobile = () => {
     if (!toggle || !mobileMenu) return;
     mobileMenu.hidden = true;
     toggle.setAttribute('aria-expanded', 'false');
+    mobileDetails.forEach(item => { item.open = false; });
   };
 
   toggle?.addEventListener('click', () => {
     const open = toggle.getAttribute('aria-expanded') === 'true';
     mobileMenu.hidden = open;
     toggle.setAttribute('aria-expanded', String(!open));
+    if (open) mobileDetails.forEach(item => { item.open = false; });
   });
 
   mobileMenu?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobile));
-  details.forEach(item => item.addEventListener('toggle', () => {
-    if (item.open) details.forEach(other => { if (other !== item) other.open = false; });
+
+  desktopDetails.forEach(item => item.addEventListener('toggle', () => {
+    if (!item.open) return;
+    desktopDetails.forEach(other => { if (other !== item) other.open = false; });
   }));
 
   document.addEventListener('pointerdown', event => {
-    if (!event.target.closest('.nav-details')) details.forEach(item => { item.open = false; });
+    if (!event.target.closest('.nav-details')) {
+      desktopDetails.forEach(item => { item.open = false; });
+    }
+
+    if (
+      toggle?.getAttribute('aria-expanded') === 'true' &&
+      !event.target.closest('.site-header')
+    ) {
+      closeMobile();
+    }
   });
 
   document.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;
-    details.forEach(item => { item.open = false; });
+    desktopDetails.forEach(item => { item.open = false; });
     closeMobile();
   });
 })();
@@ -106,19 +120,25 @@
   if (slides.length < 2) return;
 
   const desktop = window.matchMedia('(min-width: 981px)');
+  const touchViewport = window.matchMedia('(hover: none), (pointer: coarse)');
+
   let index = 0;
   let timer = null;
   let wheelLock = 0;
   let wheelTotal = 0;
+  let pointer = null;
 
   const paint = next => {
     index = (next + slides.length) % slides.length;
+
     slides.forEach((slide, slideIndex) => {
       const active = slideIndex === index;
       slide.classList.toggle('is-active', active);
       slide.setAttribute('aria-hidden', String(!active));
     });
+
     card.dataset.activeService = slides[index].dataset.service || '';
+
     indicators.forEach((indicator, indicatorIndex) => {
       if (indicatorIndex === index) indicator.setAttribute('aria-current', 'true');
       else indicator.removeAttribute('aria-current');
@@ -158,15 +178,45 @@
 
     const direction = wheelTotal > 0 ? 1 : -1;
     wheelTotal = 0;
-    const target = index + direction;
-    if (target < 0 || target >= slides.length) return;
 
     const now = performance.now();
     event.preventDefault();
     if (now < wheelLock) return;
     wheelLock = now + 650;
-    go(target);
+    go(index + direction);
   }, { passive: false });
+
+  card.addEventListener('pointerdown', event => {
+    const touchLike = event.pointerType === 'touch' || event.pointerType === 'pen' || touchViewport.matches;
+    if (!touchLike || !event.isPrimary) return;
+    if (event.target.closest('a,button,input,textarea,select,summary')) return;
+
+    pointer = {
+      id: event.pointerId,
+      x: event.clientX,
+      y: event.clientY
+    };
+
+    card.classList.add('is-swiping');
+    card.setPointerCapture?.(event.pointerId);
+  });
+
+  card.addEventListener('pointerup', event => {
+    if (!pointer || event.pointerId !== pointer.id) return;
+
+    const dx = event.clientX - pointer.x;
+    const dy = event.clientY - pointer.y;
+    pointer = null;
+    card.classList.remove('is-swiping');
+
+    if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.18) return;
+    go(dx < 0 ? index + 1 : index - 1);
+  });
+
+  card.addEventListener('pointercancel', () => {
+    pointer = null;
+    card.classList.remove('is-swiping');
+  });
 
   document.addEventListener('visibilitychange', arm);
   paint(0);
@@ -174,37 +224,51 @@
 })();
 
 (() => {
-  const setupReveal = ({ id, timeout = 1400, threshold = .15, rootMargin = '0px 0px -8% 0px' }) => {
-    const section = document.getElementById(id);
-    if (!section) return;
+  const audit = document.querySelector('.audit-section');
+  const explainer = document.querySelector('[data-audit-explainer]');
+  if (!audit || !explainer) return;
 
-    section.classList.add('reveal-ready');
-    const reveal = () => {
-      if (section.classList.contains('is-visible')) return;
-      section.classList.add('is-visible');
-      window.setTimeout(() => section.classList.remove('reveal-ready'), timeout);
-    };
+  const toggle = explainer.querySelector('.audit-explainer-toggle');
+  const body = explainer.querySelector('.audit-explainer-body');
+  const desktop = window.matchMedia('(min-width: 981px)');
+  let userToggled = false;
+  let autoOpened = false;
 
-    if (!('IntersectionObserver' in window)) {
-      reveal();
-      return;
-    }
-
-    const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        reveal();
-        observer.disconnect();
-        break;
-      }
-    }, { threshold, rootMargin });
-
-    observer.observe(section);
+  const setOpen = open => {
+    explainer.classList.toggle('is-open', open);
+    toggle?.setAttribute('aria-expanded', String(open));
+    body?.setAttribute('aria-hidden', String(!open));
   };
 
-  setupReveal({ id: 'who-we-support', timeout: 1400 });
-  setupReveal({ id: 'trust', timeout: 1900, threshold: .12, rootMargin: '0px 0px -10% 0px' });
-  setupReveal({ id: 'free-it-audit', timeout: 1800, threshold: .10, rootMargin: '0px 0px -8% 0px' });
+  toggle?.addEventListener('click', () => {
+    userToggled = true;
+    setOpen(!explainer.classList.contains('is-open'));
+  });
+
+  const maybeAutoOpen = () => {
+    if (!desktop.matches || userToggled || autoOpened) return;
+    autoOpened = true;
+    window.setTimeout(() => {
+      if (desktop.matches && !userToggled) setOpen(true);
+    }, 620);
+  };
+
+  setOpen(false);
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting)) return;
+      maybeAutoOpen();
+      observer.disconnect();
+    }, { threshold: .18, rootMargin: '0px 0px -8% 0px' });
+    observer.observe(audit);
+  } else {
+    maybeAutoOpen();
+  }
+
+  desktop.addEventListener?.('change', event => {
+    if (!event.matches) setOpen(false);
+  });
 })();
 
 (() => {
@@ -220,134 +284,46 @@
 })();
 
 (() => {
-  const audit = document.querySelector('.audit-section');
-  if (!audit) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  if (!document.querySelector('link[data-audit-enhancements]')) {
-    const enhancements = document.createElement('link');
-    enhancements.rel = 'stylesheet';
-    enhancements.href = '/assets/css/audit-enhancements.css';
-    enhancements.dataset.auditEnhancements = 'true';
-    document.head.append(enhancements);
-  }
+  const elements = [...document.querySelectorAll([
+    '.home-statement-card',
+    '.home-services-card',
+    '.audience-header',
+    '.audience-item',
+    '.trust-sticky',
+    '.trust-proof',
+    '.audit-hero',
+    '.audit-form',
+    '.contact-hero',
+    '.contact-panel',
+    '.contact-map-card',
+    '.footer-panel',
+    '.footer-legal-bar'
+  ].join(','))];
 
-  const auditTitle = document.getElementById('audit-title');
-  const formTitle = audit.querySelector('.audit-form-heading h3');
-  const formHeading = formTitle?.parentElement;
-  if (auditTitle) {
-    auditTitle.innerHTML = 'Let us look over <span class="accent-orange">your</span> IT. <span>Completely free.</span>';
-  }
-  if (formTitle) {
-    formTitle.innerHTML = 'Request <span class="accent-orange">your</span><br/>free audit';
-  }
+  if (!elements.length) return;
 
-  if (formHeading && !formHeading.querySelector('.audit-explainer')) {
-    const explainer = document.createElement('div');
-    explainer.className = 'audit-explainer';
-    explainer.innerHTML = `
-      <button class="audit-explainer-toggle" type="button" aria-expanded="false">
-        <span>What is an IT Audit?</span>
-        <span class="audit-explainer-icon" aria-hidden="true">+</span>
-      </button>
-      <div class="audit-explainer-body" aria-hidden="true">
-        <div class="audit-explainer-copy">
-          <p>A quick review of your IT setup, security, Microsoft 365, devices and support arrangements — highlighting risks, quick wins and where you may be overspending.</p>
-        </div>
-      </div>`;
-    formHeading.append(explainer);
-
-    const toggle = explainer.querySelector('.audit-explainer-toggle');
-    const body = explainer.querySelector('.audit-explainer-body');
-    let userToggled = false;
-
-    const setOpen = open => {
-      explainer.classList.toggle('is-open', open);
-      toggle?.setAttribute('aria-expanded', String(open));
-      body?.setAttribute('aria-hidden', String(!open));
-    };
-
-    toggle?.addEventListener('click', () => {
-      userToggled = true;
-      setOpen(!explainer.classList.contains('is-open'));
-    });
-
-    const autoOpen = () => {
-      if (userToggled) return;
-      window.setTimeout(() => {
-        if (!userToggled) setOpen(true);
-      }, 520);
-    };
-
-    if ('IntersectionObserver' in window) {
-      const explainerObserver = new IntersectionObserver(entries => {
-        if (!entries.some(entry => entry.isIntersecting)) return;
-        autoOpen();
-        explainerObserver.disconnect();
-      }, { threshold: .18, rootMargin: '0px 0px -8% 0px' });
-      explainerObserver.observe(audit);
-    } else {
-      autoOpen();
-    }
-  }
-
-  const shell = audit.querySelector('.audit-contact-shell');
-  const oldPanel = audit.querySelector('.audit-direct');
-  if (!shell || !oldPanel) return;
-
-  oldPanel.remove();
-
-  const contact = document.createElement('section');
-  contact.className = 'contact-section';
-  contact.id = 'contact';
-  contact.setAttribute('aria-labelledby', 'contact-title');
-
-  contact.innerHTML = `
-    <div class="contact-inner">
-      <header class="contact-hero">
-        <h2 id="contact-title">We’re here when <span class="accent-orange">you</span> need us.</h2>
-      </header>
-      <div class="contact-grid">
-        <section class="contact-panel" aria-labelledby="contact-panel-title">
-          <h3 id="contact-panel-title">Speak to Staple IT</h3>
-          <p class="contact-panel-intro">Monday to Friday, 9am–5pm.</p>
-          <dl class="contact-list">
-            <div class="contact-row"><dt>Call us</dt><dd><a href="tel:+441372309707">01372 309 707</a></dd></div>
-            <div class="contact-row"><dt>WhatsApp Business</dt><dd><a class="contact-whatsapp" href="https://wa.me/+441372309707" rel="noopener noreferrer" target="_blank">Click to chat</a></dd></div>
-            <div class="contact-row"><dt>Email</dt><dd><a href="mailto:hello@stapleit.co.uk">hello@stapleit.co.uk</a></dd></div>
-            <div class="contact-row"><dt>Hours</dt><dd>Monday to Friday, 9am–5pm</dd></div>
-            <div class="contact-row contact-address"><dt>Address</dt><dd>88 Eastdean Avenue, Epsom, KT18 7SN</dd></div>
-          </dl>
-        </section>
-        <section class="contact-map-card" aria-label="Staple IT location">
-          <div class="contact-map-shell is-loaded" data-contact-map>
-            <iframe data-contact-map-frame loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=51.3351004,-0.2637125&z=15&output=embed" title="Staple IT location in Epsom"></iframe>
-          </div>
-          <div class="contact-map-footer">
-            <span>Epsom, Surrey</span>
-            <a href="https://www.google.com/maps/search/?api=1&query=88+Eastdean+Avenue,+Epsom,+KT18+7SN" rel="noopener noreferrer" target="_blank">Open in Google Maps ↗</a>
-          </div>
-        </section>
-      </div>
-    </div>`;
-
-  audit.insertAdjacentElement('afterend', contact);
-
-  contact.classList.add('reveal-ready');
-  const reveal = () => {
-    contact.classList.add('is-visible');
-    window.setTimeout(() => contact.classList.remove('reveal-ready'), 1200);
-  };
+  elements.forEach((element, index) => {
+    element.classList.add('motion-ready');
+    element.style.setProperty('--motion-delay', `${(index % 4) * 55}ms`);
+  });
 
   if (!('IntersectionObserver' in window)) {
-    reveal();
+    elements.forEach(element => element.classList.add('motion-in'));
     return;
   }
 
   const observer = new IntersectionObserver(entries => {
-    if (!entries.some(entry => entry.isIntersecting)) return;
-    reveal();
-    observer.disconnect();
-  }, { threshold: .08, rootMargin: '0px 0px -6% 0px' });
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('motion-in');
+      observer.unobserve(entry.target);
+    });
+  }, {
+    threshold: .12,
+    rootMargin: '0px 0px -6% 0px'
+  });
 
-  observer.observe(contact);
+  elements.forEach(element => observer.observe(element));
 })();
