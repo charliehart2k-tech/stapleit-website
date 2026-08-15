@@ -18,6 +18,10 @@ if [[ ! -d "$THEME" ]]; then
   exit 1
 fi
 
+echo "=== Release gate: static site audit ==="
+python3 "$REPO/tools/audit-site.py" --root "$SOURCE"
+
+echo
 echo "Deploying Staple IT homepage from Git $VERSION"
 
 mkdir -p "$BACKUP_DIR"
@@ -58,7 +62,6 @@ for old, new in replacements.items():
     s = s.replace(old, new)
 
 # Cache-bust local theme CSS/JS using the exact Git revision deployed.
-# Do not exclude '?' here: the generated WordPress URI contains '<?php ... ?>'.
 s = re.sub(r'(href="[^"]+\.css)(")', rf'\1?v={version}\2', s)
 s = re.sub(r'(src="[^"]+\.js)(")', rf'\1?v={version}\2', s)
 
@@ -77,7 +80,10 @@ grep -Fq 'class="mobile-nav-group"' "$THEME/front-page.php"
 grep -Fq 'data-audit-explainer' "$THEME/front-page.php"
 grep -Fq 'class="contact-section"' "$THEME/front-page.php"
 grep -Fq "assets/css/home-polish.css?v=$VERSION" "$THEME/front-page.php"
+grep -Fq "assets/css/home-golden.css?v=$VERSION" "$THEME/front-page.php"
 grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
+grep -Fq '<link rel="canonical" href="https://stapleit.co.uk/"' "$THEME/front-page.php"
+grep -Fq 'https://stapleit.co.uk/#organization' "$THEME/front-page.php"
 
 if grep -Fq 'home-polish.js' "$THEME/front-page.php"; then
   echo "Legacy home-polish.js is still referenced; refusing deployment." >&2
