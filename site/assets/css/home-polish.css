@@ -1,6 +1,326 @@
 /*
- * Intentionally empty.
- * The previous homepage polish override was backed out after staging review.
- * Homepage layout remains governed by the approved component styles while
- * responsive/alignment refinements are rebuilt in smaller verified changes.
+ * Staple IT homepage refinement layer.
+ * Scoped, reversible overrides only: rails, type rhythm, mobile flow and motion.
  */
+
+:root{
+  --home-enter:720ms;
+  --home-enter-ease:cubic-bezier(.16,1,.3,1);
+  --home-section-title:clamp(4.8rem,6.4vw,6.7rem);
+  --home-card-title:clamp(1.9rem,2.4vw,2.45rem);
+}
+
+/* Keep every major chapter on one visual rail. */
+.nav-shell,
+.mobile-menu,
+.home-hero,
+.home-intro,
+.audience-inner,
+.trust-inner,
+.audit-inner,
+.contact-inner,
+.site-footer{
+  width:var(--page);
+  margin-inline:auto;
+}
+
+.home-intro-grid>*,
+.audience-grid>*,
+.trust-inner>*,
+.audit-hero>*,
+.audit-form>*,
+.contact-grid>*{min-width:0}
+
+/* Desktop type hierarchy: hero remains unique; chapter titles share one scale. */
+@media(min-width:981px){
+  .audience-header h2,
+  .trust-sticky h2,
+  .audit-hero h2,
+  .contact-hero h2{
+    font-size:var(--home-section-title);
+    line-height:.92;
+    letter-spacing:-.052em;
+  }
+
+  .audience-item h3,
+  .trust-proof h3{font-size:var(--home-card-title)}
+
+  .audience-header,
+  .audit-hero{
+    grid-template-columns:minmax(0,1.08fr) minmax(320px,.68fr);
+    gap:clamp(52px,6vw,86px);
+  }
+
+  .audit-contact-shell{width:100%;max-width:none}
+  .audit-form{width:100%}
+}
+
+/* A clearer, consistent entrance language. */
+@media(prefers-reduced-motion:no-preference){
+  .nav-shell{animation:homeNavIn 520ms var(--home-enter-ease) both}
+  .home-hero-copy{animation:homeHeroCopyIn 760ms 80ms var(--home-enter-ease) both}
+  .status-panel{animation:homeHeroPanelIn 760ms 180ms var(--home-enter-ease) both}
+
+  .audience-section.reveal-ready.is-visible .audience-header,
+  .audience-section.reveal-ready.is-visible .audience-item,
+  .trust-section.reveal-ready.is-visible .trust-sticky,
+  .trust-section.reveal-ready.is-visible .trust-proof,
+  .audit-section.reveal-ready.is-visible .audit-hero,
+  .audit-section.reveal-ready.is-visible .audit-form,
+  .contact-section.reveal-ready.is-visible .contact-hero,
+  .contact-section.reveal-ready.is-visible .contact-panel,
+  .contact-section.reveal-ready.is-visible .contact-map-card{
+    transition-duration:var(--home-enter);
+    transition-timing-function:var(--home-enter-ease);
+  }
+
+  /* Progressive enhancement: intro cards reveal as they enter the viewport. */
+  @supports(animation-timeline:view()){
+    .home-statement-card,
+    .home-services-card{
+      animation:homeIntroCardIn linear both;
+      animation-timeline:view(block);
+      animation-range:entry 5% cover 28%;
+    }
+  }
+}
+
+@keyframes homeNavIn{
+  from{opacity:0;transform:translateY(-14px) scale(.988)}
+  to{opacity:1;transform:none}
+}
+@keyframes homeHeroCopyIn{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:none}
+}
+@keyframes homeHeroPanelIn{
+  from{opacity:0;transform:translateY(20px) scale(.985)}
+  to{opacity:1;transform:none}
+}
+@keyframes homeIntroCardIn{
+  from{opacity:.25;transform:translateY(30px) scale(.985)}
+  to{opacity:1;transform:none}
+}
+
+/* Make the approved statement sweep read sooner without turning it into a glow. */
+@media(prefers-reduced-motion:no-preference){
+  .home-statement-card::before,
+  .home-statement-card .brand-red{animation-duration:7s}
+}
+
+/* --------------------------------------------------------------------------
+   Mobile / iPhone
+   -------------------------------------------------------------------------- */
+@media(max-width:640px){
+  :root{
+    --page:calc(100% - 24px);
+    --home-section-title:clamp(3rem,13vw,3.65rem);
+    --home-card-title:clamp(1.72rem,7.2vw,2.08rem);
+  }
+
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  html,body{max-width:100%;overflow-x:hidden}
+  body{min-width:0}
+
+  h1,h2,h3,h4{text-wrap:pretty}
+
+  /* Compact navigation panel: two useful choices per row instead of one long list. */
+  .site-header{padding-top:max(8px,env(safe-area-inset-top))}
+  .nav-shell{min-height:60px;padding:6px 7px 6px 12px;border-radius:21px}
+  .brand img{width:128px}
+  .menu-toggle{min-height:42px;padding-inline:14px}
+
+  .mobile-menu:not([hidden]){
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    max-height:calc(100dvh - 82px - env(safe-area-inset-top));
+    padding:10px;
+    border-radius:21px;
+    -webkit-overflow-scrolling:touch;
+    animation:homeMenuIn 220ms var(--home-enter-ease) both;
+  }
+  .mobile-menu a{
+    min-width:0;
+    min-height:50px;
+    margin:0;
+    padding:9px 10px;
+    justify-content:center;
+    text-align:center;
+    white-space:normal;
+    line-height:1.2;
+    font-size:13px;
+  }
+  .mobile-menu a:nth-child(4),
+  .mobile-menu a:nth-child(8),
+  .mobile-menu a:nth-child(9),
+  .mobile-menu a:nth-child(10){border-color:rgba(255,255,255,.20)}
+
+  /* Hero: keep the drama, lose unnecessary vertical weight. */
+  .home-hero{padding:24px 0 30px}
+  .home-hero-shell{min-height:0;border-radius:28px}
+  .home-hero-copy{padding:40px 22px 28px}
+  .home-hero h1{
+    max-width:9ch;
+    font-size:clamp(3rem,13.2vw,3.75rem);
+    line-height:.94;
+    letter-spacing:-.045em;
+  }
+  .hero-tagline{
+    max-width:none;
+    margin-top:18px;
+    font-size:clamp(1.08rem,5vw,1.3rem);
+    line-height:1.32;
+  }
+  .hero-actions{margin-top:24px}
+  .hero-actions .button{width:100%;min-height:52px}
+  .status-panel{
+    margin:0 16px 18px;
+    padding:25px 21px;
+    border-radius:22px;
+  }
+  .status-title{font-size:clamp(2rem,9.5vw,2.55rem)}
+  .status-message{font-size:13.5px}
+  .status-hours{margin-top:18px;padding-top:14px}
+
+  /* Statement + services should read as one chapter, not two giant screens. */
+  .home-intro{padding:8px 0 52px}
+  .home-intro-grid{gap:14px}
+  .home-info-card{border-radius:24px}
+  .home-statement-card{
+    min-height:0;
+    padding:32px 22px;
+  }
+  .home-statement-card h2{
+    max-width:11ch;
+    font-size:clamp(2.55rem,11vw,3.2rem);
+    line-height:.98;
+  }
+  .home-services-card{min-height:430px}
+  .service-slide{padding:28px 44px 28px 22px}
+  .service-slide h2{
+    max-width:11ch;
+    font-size:clamp(2.2rem,9.6vw,2.8rem);
+  }
+  .service-slide p{margin-top:16px;font-size:14.5px;line-height:1.52}
+  .service-points{margin-top:18px;gap:9px}
+  .service-points li{font-size:14px;line-height:1.38}
+  .service-cta{
+    width:100%;
+    min-width:0;
+    min-height:48px;
+    padding-inline:15px;
+    justify-content:center;
+    font-size:13px;
+  }
+  .service-indicator{right:14px}
+
+  /* Chapter headings now share a single mobile scale. */
+  .audience-header h2,
+  .trust-sticky h2,
+  .audit-hero h2,
+  .contact-hero h2{
+    max-width:10ch;
+    font-size:var(--home-section-title);
+    line-height:.94;
+    letter-spacing:-.047em;
+  }
+
+  /* Audience */
+  .audience-section{padding:68px 0 76px}
+  .audience-header{gap:18px;padding-bottom:30px}
+  .audience-header>p:last-child{font-size:15.5px;line-height:1.58}
+  .audience-grid{gap:13px}
+  .audience-item{
+    min-height:0;
+    padding:26px 21px;
+    border-radius:24px;
+  }
+  .audience-item h3{
+    max-width:none;
+    min-height:0;
+    font-size:var(--home-card-title);
+    line-height:1.05;
+  }
+  .audience-item p{
+    max-width:none;
+    margin-top:17px;
+    font-size:15px;
+    line-height:1.6;
+  }
+
+  /* Trust */
+  .trust-section{padding:76px 0 84px}
+  .trust-inner{gap:34px}
+  .trust-sticky{position:static;padding:0}
+  .trust-proof{grid-template-columns:1fr;gap:12px;padding:27px 0 30px}
+  .trust-proof h3{max-width:none;font-size:var(--home-card-title);line-height:1.05}
+  .trust-proof p{font-size:15px;line-height:1.62}
+  .trust-proof::before{filter:blur(40px) saturate(110%);opacity:.25}
+
+  /* Audit: preserve the liquid drawer but make the form feel like part of the flow. */
+  .audit-section{padding:72px 0 58px}
+  .audit-hero{gap:20px;padding-bottom:30px}
+  .audit-lead{font-size:15.5px;line-height:1.56}
+  .audit-form{display:block;padding:24px 18px;border-radius:23px}
+  .audit-form-heading{margin-bottom:24px}
+  .audit-form-heading h3{
+    max-width:none;
+    font-size:clamp(2.15rem,9.5vw,2.65rem);
+    line-height:.98;
+  }
+  .audit-fields{grid-template-columns:1fr;gap:15px}
+  .audit-field>span{font-size:13px}
+  .audit-field input{min-height:56px;padding-inline:16px;border-radius:16px;font-size:16px}
+  .audit-consent{margin-top:16px;padding:15px;align-items:flex-start;border-radius:16px;font-size:12.5px}
+  .audit-submit{width:100%;min-height:54px;margin-top:18px;justify-content:center}
+  .audit-explainer{margin-top:18px;border-radius:17px}
+  .audit-explainer-toggle{min-height:54px;padding:13px 15px;font-size:14px}
+  .audit-explainer-copy p{padding:0 15px 13px;font-size:13px;line-height:1.58}
+  .audit-explainer-copy::after{margin:0 15px 15px;padding-top:12px;font-size:12px;line-height:1.58}
+
+  /* Contact */
+  .contact-section{padding:26px 0 72px}
+  .contact-hero{padding-bottom:28px}
+  .contact-grid{gap:13px}
+  .contact-panel,.contact-map-card{border-radius:22px}
+  .contact-panel{padding:20px}
+  .contact-panel h3{font-size:clamp(1.75rem,7.5vw,2.1rem)}
+  .contact-panel-intro{margin-bottom:18px}
+  .contact-list{gap:8px}
+  .contact-row{min-height:56px;gap:10px;padding:10px 12px}
+  .contact-row dt{font-size:12px}
+  .contact-row dd{max-width:66%;font-size:12.5px}
+  .contact-address dd{max-width:66%}
+  .contact-map-card{grid-template-rows:270px auto}
+  .contact-map-shell,.contact-map-shell iframe{min-height:270px}
+
+  /* Footer: brand full width, useful link groups side by side. */
+  .site-footer{margin-top:46px;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+  .footer-shell{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .footer-brand-panel{grid-column:1/-1;padding:22px}
+  .footer-nav-group{padding:18px}
+  .footer-nav-group h3{margin-bottom:8px}
+  .footer-nav-group a{min-height:38px;font-size:12.5px}
+  .footer-nav-group:last-child{grid-column:1/-1}
+  .footer-logo img{width:190px}
+  .footer-tagline{margin-top:14px;font-size:13px;line-height:1.65}
+  .footer-legal-bar{margin-top:11px;padding:15px 16px;border-radius:17px}
+}
+
+@keyframes homeMenuIn{
+  from{opacity:0;transform:translateY(-8px) scale(.985)}
+  to{opacity:1;transform:none}
+}
+
+@media(max-width:380px){
+  :root{--page:calc(100% - 20px)}
+  .brand img{width:120px}
+  .mobile-menu a{font-size:12.5px;padding-inline:8px}
+  .home-hero-copy{padding-inline:19px}
+  .home-services-card{min-height:445px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .nav-shell,.home-hero-copy,.status-panel,.home-statement-card,.home-services-card,.mobile-menu{animation:none!important}
+}
