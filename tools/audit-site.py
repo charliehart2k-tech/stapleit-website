@@ -3,12 +3,15 @@ from __future__ import annotations
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+from xml.etree import ElementTree
 import argparse
+import json
 import re
 import sys
 
 
-ALLOWED_EXTERNAL_HOSTS = {"fonts.googleapis.com", "fonts.gstatic.com"}
+PRODUCTION_ORIGIN = "https://stapleit.co.uk"
+ALLOWED_EXTERNAL_HOSTS = {"fonts.googleapis.com", "fonts.gstatic.com", "www.google.com"}
 RESOURCE_TAGS = {"link", "img", "source", "video", "audio", "iframe"}
 WARN_ASSET_BYTES = 1_500_000
 ERROR_ASSET_BYTES = 5_000_000
@@ -27,16 +30,44 @@ class HtmlAuditParser(HTMLParser):
         self.inline_style_block = False
         self.inline_handlers: list[str] = []
         self.style_attributes = 0
-        self.json_ld_blocks = 0
+        self.json_ld_blocks: list[str] = []
+        self.title_parts: list[str] = []
+        self.h1_parts: list[list[str]] = []
+        self.heading_levels: list[int] = []
+        self.meta_description = ""
+        self.robots = ""
+        self.canonical = ""
+        self.lang = ""
+        self._capture_title = False
+        self._current_h1: list[str] | None = None
         self._script_without_src = False
         self._script_is_json_ld = False
-        self._script_has_content = False
+        self._script_parts: list[str] = []
         self._style_depth = 0
         self._style_has_content = False
 
     def handle_starttag(self, tag: str, attrs):
         data = {k.lower(): (v or "") for k, v in attrs}
         tag = tag.lower()
+
+        if tag == "html":
+            self.lang = data.get("lang", "").strip()
+        if tag == "title":
+            self._capture_title = True
+        if tag == "meta":
+            name = data.get("name", "").strip().lower()
+            if name == "description":
+                self.meta_description = data.get("content", "").strip()
+            elif name == "robots":
+                self.robots = data.get("content", "").strip().lower()
+        if tag == "link" and "canonical" in data.get("rel", "").lower().split():
+            self.canonical = data.get("href", "").strip()
+
+        if tag in {"h1", "h2", "h3", "h4", "h5", "h6"}:
+            self.heading_levels.append(int(tag[1]))
+        if tag == "h1":
+            self._current_h1 = []
+            self.h1_parts.append(self._current_h1)
 
         element_id = data.get("id")
         if element_id:
@@ -65,7 +96,7 @@ class HtmlAuditParser(HTMLParser):
         if tag == "script" and not data.get("src"):
             self._script_without_src = True
             self._script_is_json_ld = data.get("type", "").lower() == "application/ld+json"
-            self._script_has_content = False
+            self._script_parts = []
 
         if tag == "style":
             self._style_depth += 1
@@ -73,15 +104,21 @@ class HtmlAuditParser(HTMLParser):
 
     def handle_endtag(self, tag: str):
         tag = tag.lower()
+        if tag == "title":
+            self._capture_title = False
+        if tag == "h1":
+            self._current_h1 = None
+
         if tag == "script" and self._script_without_src:
-            if self._script_has_content:
+            content = "".join(self._script_parts).strip()
+            if content:
                 if self._script_is_json_ld:
-                    self.json_ld_blocks += 1
+                    self.json_ld_blocks.append(content)
                 else:
                     self.inline_script = True
             self._script_without_src = False
             self._script_is_json_ld = False
-            self._script_has_content = False
+            self._script_parts = []
 
         if tag == "style" and self._style_depth:
             if self._style_has_content:
@@ -90,10 +127,26 @@ class HtmlAuditParser(HTMLParser):
             self._style_has_content = False
 
     def handle_data(self, data: str):
-        if self._script_without_src and data.strip():
-            self._script_has_content = True
+        if self._capture_title:
+            self.title_parts.append(data)
+        if self._current_h1 is not None:
+            self._current_h1.append(data)
+        if self._script_without_src:
+            self._script_parts.append(data)
         if self._style_depth and data.strip():
             self._style_has_content = True
+
+    @property
+    def title(self) -> str:
+        return " ".join("".join(self.title_parts).split())
+
+    @property
+    def h1_texts(self) -> list[str]:
+        return [" ".join("".join(parts).split()) for parts in self.h1_parts]
+
+    @property
+    def noindex(self) -> bool:
+        return "noindex" in {token.strip() for token in self.robots.split(",")}
 
 
 def local_target(root: Path, source: Path, raw_url: str) -> Path | None:
@@ -123,13 +176,49 @@ def external_host(raw_url: str) -> str | None:
     return None
 
 
+def expected_canonical(root: Path, html: Path) -> str:
+    rel = html.relative_to(root).as_posix()
+    if rel == "index.html":
+        return f"{PRODUCTION_ORIGIN}/"
+    if rel.endswith("/index.html"):
+        return f"{PRODUCTION_ORIGIN}/{rel[:-10]}"
+    return f"{PRODUCTION_ORIGIN}/{rel}"
+
+
+def json_ld_types(blocks: list[str], errors: list[str], rel: Path) -> set[str]:
+    types: set[str] = set()
+
+    def visit(value):
+        if isinstance(value, dict):
+            raw_type = value.get("@type")
+            if isinstance(raw_type, str):
+                types.add(raw_type)
+            elif isinstance(raw_type, list):
+                types.update(item for item in raw_type if isinstance(item, str))
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    for block in blocks:
+        try:
+            visit(json.loads(block))
+        except json.JSONDecodeError as exc:
+            errors.append(f"{rel}: invalid JSON-LD ({exc})")
+    return types
+
+
 def audit(root: Path) -> int:
     root = root.resolve()
     errors: list[str] = []
     warnings: list[str] = []
     html_files = sorted(root.rglob("*.html"))
     checked_refs = 0
-    json_ld_blocks = 0
+    json_ld_count = 0
+    indexable: dict[str, tuple[Path, HtmlAuditParser]] = {}
+    titles: dict[str, Path] = {}
+    descriptions: dict[str, Path] = {}
 
     for html in html_files:
         rel = html.relative_to(root)
@@ -146,7 +235,21 @@ def audit(root: Path) -> int:
             errors.append(f"{rel}: HTML parser error: {exc}")
             continue
 
-        json_ld_blocks += parser.json_ld_blocks
+        json_ld_count += len(parser.json_ld_blocks)
+        types = json_ld_types(parser.json_ld_blocks, errors, rel)
+
+        if parser.lang.lower() != "en-gb":
+            errors.append(f"{rel}: html lang must be en-GB")
+        if not parser.title:
+            errors.append(f"{rel}: missing non-empty <title>")
+        if len(parser.h1_texts) != 1 or not parser.h1_texts[0]:
+            errors.append(f"{rel}: expected exactly one non-empty H1, found {len(parser.h1_texts)}")
+
+        for previous, current in zip(parser.heading_levels, parser.heading_levels[1:]):
+            if current > previous + 1:
+                warnings.append(f"{rel}: heading level jumps from H{previous} to H{current}")
+                break
+
         for duplicate in sorted(parser.duplicate_ids):
             errors.append(f"{rel}: duplicate id #{duplicate}")
         if parser.inline_script:
@@ -157,6 +260,35 @@ def audit(root: Path) -> int:
             errors.append(f"{rel}: {parser.style_attributes} inline style attribute(s) found")
         for handler in parser.inline_handlers:
             errors.append(f"{rel}: inline event handler found: {handler}")
+
+        if not parser.noindex:
+            if not parser.meta_description:
+                errors.append(f"{rel}: indexable page missing meta description")
+            elif len(parser.meta_description) < 70:
+                warnings.append(f"{rel}: meta description is unusually short ({len(parser.meta_description)} chars)")
+
+            if not parser.canonical:
+                errors.append(f"{rel}: indexable page missing canonical link")
+            elif not parser.canonical.startswith(f"{PRODUCTION_ORIGIN}/"):
+                errors.append(f"{rel}: canonical must use production HTTPS origin: {parser.canonical}")
+            elif parser.canonical != expected_canonical(root, html):
+                errors.append(f"{rel}: canonical mismatch; expected {expected_canonical(root, html)}")
+
+            if parser.title in titles:
+                errors.append(f"{rel}: duplicate indexable title also used by {titles[parser.title]}")
+            titles[parser.title] = rel
+            if parser.meta_description in descriptions:
+                errors.append(f"{rel}: duplicate indexable meta description also used by {descriptions[parser.meta_description]}")
+            descriptions[parser.meta_description] = rel
+            indexable[parser.canonical] = (rel, parser)
+
+            if rel.as_posix() == "index.html":
+                if "Organization" not in types:
+                    errors.append("index.html: homepage JSON-LD must include Organization")
+                if "WebSite" not in types:
+                    errors.append("index.html: homepage JSON-LD must include WebSite")
+        elif rel.as_posix() != "404.html" and not parser.h1_texts[0]:
+            errors.append(f"{rel}: placeholder route needs a visible H1")
 
         for tag, attr, raw in parser.refs:
             checked_refs += 1
@@ -171,8 +303,6 @@ def audit(root: Path) -> int:
                     errors.append(f"{rel}: external runtime script: {raw}")
                 elif tag in RESOURCE_TAGS and host not in ALLOWED_EXTERNAL_HOSTS:
                     warnings.append(f"{rel}: external resource host: {host}")
-                elif tag == "form" and host not in ALLOWED_EXTERNAL_HOSTS:
-                    warnings.append(f"{rel}: external form target: {host}")
                 continue
 
             target = local_target(root, html, raw)
@@ -190,7 +320,12 @@ def audit(root: Path) -> int:
         rel = css.relative_to(root)
         text = css.read_text(encoding="utf-8-sig")
         refs = [match.group(2) for match in CSS_URL_RE.finditer(text)]
-        refs += [match.group(1) for match in CSS_IMPORT_RE.finditer(text)]
+        imports = [match.group(1) for match in CSS_IMPORT_RE.finditer(text)]
+        refs += imports
+        if imports:
+            warnings.append(f"{rel}: CSS @import creates a request chain; prefer <link> in HTML")
+        if re.search(r"font-weight\s*:\s*(?:[1-5][0-9]{2}|8[0-9]{2}|9[0-9]{2})\b", text, re.IGNORECASE):
+            warnings.append(f"{rel}: non-standard project font weight detected; Manrope baseline is 400/600/700")
         for raw in refs:
             checked_refs += 1
             if not raw or raw.startswith("#"):
@@ -216,9 +351,37 @@ def audit(root: Path) -> int:
         elif size >= WARN_ASSET_BYTES:
             warnings.append(f"{rel}: large asset ({size / 1024 / 1024:.2f} MiB)")
 
+    robots = root / "robots.txt"
+    if not robots.exists():
+        errors.append("robots.txt: missing")
+    else:
+        robots_text = robots.read_text(encoding="utf-8-sig")
+        if f"Sitemap: {PRODUCTION_ORIGIN}/sitemap.xml" not in robots_text:
+            errors.append("robots.txt: missing canonical sitemap directive")
+
+    sitemap = root / "sitemap.xml"
+    sitemap_urls: set[str] = set()
+    if not sitemap.exists():
+        errors.append("sitemap.xml: missing")
+    else:
+        try:
+            tree = ElementTree.parse(sitemap)
+            ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+            sitemap_urls = {node.text.strip() for node in tree.findall(".//sm:loc", ns) if node.text}
+        except ElementTree.ParseError as exc:
+            errors.append(f"sitemap.xml: invalid XML ({exc})")
+
+    for canonical in indexable:
+        if canonical not in sitemap_urls:
+            errors.append(f"sitemap.xml: missing indexable canonical {canonical}")
+    for listed in sitemap_urls:
+        if listed not in indexable:
+            errors.append(f"sitemap.xml: URL is not an indexable canonical page: {listed}")
+
     print(
         f"Staple IT site audit: {len(html_files)} HTML files, "
-        f"{checked_refs} references checked, {json_ld_blocks} JSON-LD block(s)"
+        f"{checked_refs} references checked, {json_ld_count} JSON-LD block(s), "
+        f"{len(indexable)} indexable page(s)"
     )
     if warnings:
         print(f"\nWarnings ({len(warnings)}):")
@@ -230,12 +393,12 @@ def audit(root: Path) -> int:
             print(f"  ERROR {item}")
         return 1
 
-    print("\nPASS: no blocking site-audit errors found.")
+    print("\nPASS: content, security, reference and SEO/AEO static gates passed.")
     return 0
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Audit the static Staple IT site without external dependencies.")
+    parser = argparse.ArgumentParser(description="Audit the Staple IT static site and release gates without external dependencies.")
     parser.add_argument("--root", default=None, help="Site root. Defaults to ../site relative to this script.")
     args = parser.parse_args()
     default_root = Path(__file__).resolve().parents[1] / "site"
