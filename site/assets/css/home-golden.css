@@ -5,8 +5,8 @@
 @media(min-width:981px){
   .home-intro-grid{grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr)!important;gap:20px!important;align-items:stretch!important}
   .home-info-card,.home-services-card{min-height:clamp(430px,29vw,520px)!important}
-  .home-statement-card{display:flex!important;align-items:center!important;justify-content:flex-start!important;padding:38px 48px!important}
-  .home-statement-card h2{width:100%!important;max-width:11.2ch!important;margin:0!important;font-size:clamp(4.35rem,5.15vw,5.85rem)!important;line-height:.92!important;letter-spacing:-.049em!important}
+  .home-statement-card{display:flex!important;align-items:center!important;justify-content:flex-start!important;padding:50px 56px!important}
+  .home-statement-card h2{width:100%!important;max-width:12.2ch!important;margin:0!important;font-size:clamp(4rem,4.7vw,5.3rem)!important;line-height:1.015!important;letter-spacing:-.036em!important}
   .service-slide{padding:42px 72px 42px 50px!important}
   .service-slide-content{min-height:100%!important}
   .service-slide h2{font-size:clamp(2.85rem,3.8vw,3.9rem)!important;line-height:.97!important}
@@ -15,18 +15,18 @@
   .service-cta{margin-top:28px!important;align-self:flex-start!important}
 }
 
-/* Strong one-time drop using the existing IntersectionObserver classes.
-   Do not use keyframes on the card itself: !important hidden states can beat
-   animations in Safari. A transition between the observer classes is robust. */
+/* Slow, deliberate one-time drop using the existing IntersectionObserver.
+   This is intentionally much slower than the other reveal animations so the
+   statement reads as a chapter moment rather than flashing into place. */
 @media(prefers-reduced-motion:no-preference){
   .home-statement-card.motion-ready{
     opacity:0!important;
-    transform:translateY(-54px) scale(.978)!important;
-    filter:blur(11px)!important;
+    transform:translateY(-62px) scale(.982)!important;
+    filter:blur(10px)!important;
     transition:
-      opacity 760ms ease,
-      transform 980ms var(--gold-ease),
-      filter 720ms ease!important;
+      opacity 1350ms 120ms ease,
+      transform 1650ms 120ms var(--gold-ease),
+      filter 1450ms 120ms ease!important;
   }
   .home-statement-card.motion-ready.motion-in{
     opacity:1!important;
@@ -34,15 +34,15 @@
     filter:none!important;
   }
   .home-statement-card.motion-ready h2{
-    transform:translateY(-10px);
-    transition:transform 980ms var(--gold-ease);
+    transform:translateY(-14px);
+    transition:transform 1650ms 160ms var(--gold-ease);
   }
   .home-statement-card.motion-ready.motion-in h2{transform:none}
-  .home-statement-card.motion-ready.motion-in .brand-red{animation:goldStatementAccent 1100ms 260ms var(--gold-ease) both!important}
+  .home-statement-card.motion-ready.motion-in .brand-red{animation:goldStatementAccent 1850ms 680ms var(--gold-ease) both!important}
 }
 @keyframes goldStatementAccent{
-  0%{filter:brightness(.78) saturate(.86);text-shadow:0 0 0 rgba(230,43,43,0)}
-  52%{filter:brightness(1.2) saturate(1.15);text-shadow:0 0 30px rgba(230,43,43,.22)}
+  0%{filter:brightness(.82) saturate(.9);text-shadow:0 0 0 rgba(230,43,43,0)}
+  50%{filter:brightness(1.16) saturate(1.12);text-shadow:0 0 26px rgba(230,43,43,.18)}
   100%{filter:brightness(1) saturate(1);text-shadow:0 0 0 rgba(230,43,43,0)}
 }
 
@@ -97,6 +97,9 @@
   .trust-sticky h2{width:100%!important;max-width:none!important;margin-bottom:28px!important;padding-right:.28em!important;font-size:clamp(2.65rem,10.7vw,3.2rem)!important;line-height:.97!important}
   .trust-title-line{white-space:normal!important}
   .trust-title-accent{padding-right:.34em!important}
+
+  .home-statement-card{padding:32px 22px!important}
+  .home-statement-card h2{max-width:12ch!important;font-size:clamp(2.05rem,8.35vw,2.48rem)!important;line-height:1.075!important;letter-spacing:-.028em!important}
 }
 
 /* Touch services: native horizontal drag. */
