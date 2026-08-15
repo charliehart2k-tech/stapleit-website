@@ -21,14 +21,14 @@ The site is dark, clean, premium and restrained.
 
 ### Approved homepage exceptions
 
-These are intentional and should not be treated as permission to repeat the effect everywhere:
-
 - the hero uses the approved blue liquid-wave video and blue hero copy;
 - the statement card uses Staple Signal Red on `care` and `deliver` plus a restrained glass sweep;
 - the service carousel uses Support Green, Solutions Orange, Consultancy Yellow and Security Purple to identify service state;
-- the three `Who do we support?` audience cards use a very soft palette glow *behind* otherwise neutral black glass.
+- the three `Who do we support?` audience cards use a very soft palette glow behind otherwise neutral black glass;
+- the audit uses a contained, continuous organic orange liquid field;
+- the Trust heading may use the approved moving Staple palette treatment.
 
-The approved navigation, hero, statement/service row and current audience chapter are midpoint reference components. Do not casually redesign them while building later routes.
+These are deliberate exceptions, not permission to spread colour effects across unrelated components.
 
 ## 2. Canonical colour use
 
@@ -56,20 +56,58 @@ Colour rules:
 - if colour is removed and the component no longer communicates its meaning, it is probably justified;
 - if colour exists only because the page looked empty, remove it.
 
-## 3. Typography
+## 3. Typography and editorial conformity
 
-Use **Manrope throughout**.
+Use **Manrope throughout**, and only the loaded weights:
 
-- 400 — body copy.
-- 600 — labels, controls and supporting emphasis.
+- 400 — body copy;
+- 600 — labels, controls and supporting emphasis;
 - 700 — navigation and headings.
-- Do not introduce a second font family without an explicit design decision.
-- Headings use tight negative tracking and short, balanced line lengths.
-- Body copy must remain comfortably readable; never make text tiny simply to force a layout to fit.
 
-Current staging loads Manrope from Google Fonts. Production may move to a self-hosted Manrope webfont if zero third-party asset delivery is required.
+Do not use synthetic intermediate weights such as 500 or 650. Do not introduce a second font family without an explicit design decision.
 
-## 4. Glass material
+Canonical type tokens live in `site/assets/css/tokens.css`:
+
+- `--type-small` — small UI/supporting labels;
+- `--type-ui` — buttons, navigation and compact interface text;
+- `--type-body` — normal paragraph copy;
+- `--type-lead` — supporting chapter/hero copy;
+- `--type-card` — card headings;
+- `--type-section` — major chapter headings;
+- `--type-hero` — page-level hero headings.
+
+Editorial rules:
+
+- write in UK English;
+- descriptive headings use sentence case unless a proper service/product name requires capitals;
+- service names are `IT Support`, `IT Solutions`, `IT Consultancy`, `Cyber Security` and `AI Integrations`;
+- use `Microsoft 365`, `Wi-Fi`, `OneDrive` and other product names consistently;
+- body copy should normally stay within `--copy-max` (44rem / roughly 65–75 characters per line);
+- headings use tight negative tracking and short, balanced line lengths;
+- body copy must remain comfortably readable; never make text tiny simply to force a layout to fit;
+- prices and recurring terms must use one wording within a page. The homepage uses `From £35 per staff member, per month`.
+
+Current staging loads Manrope through a direct Google Fonts stylesheet link, not a CSS `@import`. Production may self-host it later if zero third-party font delivery is preferred.
+
+## 4. Spacing and radius rhythm
+
+Shared spacing tokens are the default rhythm:
+
+- `--space-1`: 8px
+- `--space-2`: 12px
+- `--space-3`: 16px
+- `--space-4`: 24px
+- `--space-5`: 32px
+- `--space-6`: 48px
+- `--space-7`: 64px
+- `--space-8`: 96px
+- `--space-9`: 128px
+
+Prefer these values over arbitrary one-off gaps. Component-specific spacing is allowed when composition genuinely needs it, but adjacent chapters should still feel like one site.
+
+Canonical radii remain `--radius-md`, `--radius-lg`, `--radius-xl` and `--radius-xxl`. Mobile components may step down one radius tier rather than becoming square.
+
+## 5. Glass material
 
 Default glass recipe:
 
@@ -83,7 +121,7 @@ Default glass recipe:
 
 Repeated cards should generally use less blur than major hero surfaces. Backdrop filters are relatively expensive, particularly on mobile/tablet hardware.
 
-## 5. Component hierarchy
+## 6. Component hierarchy
 
 ### Navigation
 
@@ -92,7 +130,8 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - No visible chevrons/down arrows.
 - Manrope 700.
 - Minimum interactive height: 44px.
-- Current desktop-to-menu breakpoint: 1080px.
+- Desktop-to-menu breakpoint: 1080px.
+- Mobile/tablet menu uses a compact grid with an expandable IT Services group, not one long stack of links.
 - Client Portal is a normal primary navigation item.
 
 ### Homepage hero
@@ -107,24 +146,27 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 
 - Large editorial statement rather than explanatory body copy.
 - `care` and `deliver` use Signal Red.
-- Slow specular sweep is approved on this component.
+- Slow specular sweep and a single deliberate viewport entrance are approved.
 
 ### Service carousel
 
-- One fixed visual card; service states crossfade rather than slide/zoom/blur.
-- Automatic rotation interval: 15 seconds.
-- Manual indicator controls remain available.
+- Desktop: one fixed visual card; service states crossfade automatically every 15 seconds, with wheel/keyboard/indicator controls.
+- Phone/tablet: native horizontal touch scrolling with scroll snap. The card must follow the user’s finger; indicators are secondary controls only.
 - Active indicator and service accent use the current canonical service colour.
 - Content pattern: heading, short explanation, three scannable service points, CTA.
 
 ### Audience cards
 
 - Three matching neutral black glass cards.
-- Desktop order: Charities / Small & Medium Sized Businesses / Sole traders & Freelancers.
-- Small & Medium Sized Businesses deliberately occupies the centre position.
-- Card headings reserve consistent vertical rhythm on desktop.
+- Desktop order: Charities / Small & medium-sized businesses / Sole traders & freelancers.
 - Approved external glows: purple for charities, green for businesses, orange for sole traders/freelancers.
 - No small metadata/footer line underneath the main paragraph.
+
+### Trust
+
+- Desktop may use the sticky editorial heading plus proof rows.
+- Mobile uses readable vertical proof cards; do not force a clipped sideways strip.
+- Colour remains contained and must never clip heading glyphs.
 
 ### Footer
 
@@ -132,42 +174,24 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - Legal/company strip spans underneath.
 - Black monochrome glass only.
 - Logo retains original brand colours.
+- Mobile remains compact and may retain two columns where the links fit comfortably.
 
-## 6. Motion language
+## 7. Motion language
 
 Motion must add depth, hierarchy, feedback or continuity. It should never make the interface feel like a demo reel.
 
 Approved patterns:
 
 - short hover/press feedback on buttons and cards;
-- clean crossfade between service carousel states;
-- slow statement-card glass sweep;
+- clean desktop crossfade and native mobile swipe for services;
+- slow statement-card glass sweep and entrance;
 - viewport-triggered entrance reveal for major homepage chapters;
-- same-origin View Transition for route changes where supported.
+- same-origin View Transition for route changes where supported;
+- continuous, spatially contained liquid movement in the audit.
 
-### Audience reveal pattern
+Avoid scroll-jacking, large parallax systems, custom cursors, constant mouse-follow effects, or animation that delays reading. Every reveal must fail open if JavaScript/observer support is unavailable. Respect `prefers-reduced-motion`.
 
-`Who do we support?` uses a small `IntersectionObserver` trigger plus CSS transitions:
-
-1. the chapter is prepared in its hidden state;
-2. once roughly 15% enters the viewport, the heading fades/settles in;
-3. the three cards follow with a small 120ms stagger;
-4. the observer disconnects after the first reveal.
-
-This is preferred over fragile continuous scroll calculations for this section.
-
-Avoid:
-
-- scroll-jacking;
-- large parallax systems;
-- blur/zoom/translate all at once;
-- custom cursors;
-- constant mouse-follow effects;
-- decorative animation with no hierarchy/feedback purpose.
-
-## 7. Responsive baseline
-
-Design mobile-first in behaviour even where desktop is built first.
+## 8. Responsive baseline
 
 Reference checks for every completed route:
 
@@ -184,42 +208,29 @@ Current breakpoints:
 
 - navigation changes to menu at 1080px and below;
 - homepage hero/content row stacks at 980px and below;
-- audience cards stack at 980px and below;
-- footer progressively collapses to two columns then one.
+- service carousel becomes native horizontal touch scrolling at 980px and below;
+- trust sticky/two-column composition collapses for touch/tablet layouts;
+- global page gutters reduce below 700px;
+- footer progressively collapses while preserving useful horizontal grouping.
 
-Never solve responsive problems with horizontal page scrolling.
+Never solve responsive problems with horizontal page scrolling or artificial text downsizing.
 
-## 8. Accessibility baseline
+## 9. Accessibility baseline
 
-Every page must retain:
+Every page must retain semantic `main`, `nav`, `header` and `footer` regions, a working skip link, visible focus states, 44px touch targets, useful alt text, logical headings and accessible labels. Decorative media is hidden from assistive technology. Do not rely on colour alone to communicate information.
 
-- semantic `main`, `nav`, `header` and `footer` regions;
-- working skip-to-content link;
-- visible keyboard focus states;
-- sensible 44px interactive targets;
-- meaningful alt text for informative imagery;
-- decorative media hidden from assistive technology;
-- sufficient text contrast;
-- logical heading order;
-- controls with useful accessible labels.
-
-Do not rely on colour alone to communicate information.
-
-## 9. Performance baseline
-
-The site should remain lightweight and dependency-light.
-
-Rules:
+## 10. Performance baseline
 
 - no framework for static content that HTML/CSS/small JS can handle;
 - no casual external runtime libraries;
 - avoid duplicate image/video assets;
+- load fonts with direct stylesheet links rather than CSS `@import` chains;
 - preload only genuinely critical resources;
-- lazy-load future below-the-fold imagery;
+- lazy-load below-the-fold imagery/iframes where appropriate;
 - keep hero video exceptional;
 - prefer CSS glass over JavaScript/WebGL glass;
 - keep repeated backdrop-filter surfaces modest on mobile/tablet;
-- run `tools/audit-site.py` at milestones and before release.
+- run `tools/audit-site.py` at milestones and before every deployment.
 
 Working budgets:
 
@@ -231,63 +242,45 @@ Working budgets:
 
 The current hero video is an approved large-asset exception and is expected to appear as a warning in the audit.
 
-## 10. Security baseline
+## 11. Security baseline
 
-The current static architecture gives us a strong default position.
-
-Rules:
-
-- no inline JavaScript without a documented reason;
+- no executable inline JavaScript without a documented reason; JSON-LD is inert structured data and is allowed;
 - avoid third-party scripts/trackers by default;
 - never commit keys, credentials, connection strings or tokens;
-- keep forms/server integrations separate from static presentation code;
 - validate untrusted input at the server boundary;
 - keep `.well-known/security.txt` current;
 - HTTPS only in production.
 
-Recommended production headers while Google Fonts is in use:
+Recommended production headers while Google Fonts and the approved Google Maps iframe are in use:
 
 ```text
-Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; script-src 'self'; connect-src 'self'
+Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; script-src 'self'; connect-src 'self'; frame-src https://www.google.com
 X-Content-Type-Options: nosniff
 Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
 
-The local staging server mirrors the CSP, `nosniff`, referrer and permissions baseline so problems surface during development. It intentionally does not send HSTS because staging uses local HTTP.
+Deployment headers belong at the hosting/CDN layer rather than HTML meta tags where possible.
 
-Deployment headers belong at the hosting/CDN layer rather than being copied into HTML meta tags where possible.
-
-## 11. Page build template
+## 12. Page build template
 
 Before editing a route:
 
 1. pull the current working branch;
-2. inspect the route's original scrape/visible text under `reference/`;
+2. inspect the route’s original scrape/visible text under `reference/`;
 3. decide which original content is required;
 4. reuse the approved nav/footer/tokens;
 5. add only the page-specific CSS/JS needed;
-6. test desktop, tablet and mobile;
+6. test all six reference viewports;
 7. check keyboard navigation and interaction timing;
 8. run the static-site audit;
-9. complete the relevant SEO/AEO/schema work;
+9. complete the relevant SEO/AEO/ASEO/schema work;
 10. keep the diff scoped to the route/section being rebuilt.
 
-Normal route structure:
+Unfinished routes must contain a truthful visible placeholder and remain `noindex,nofollow`; never leave an empty `<main>`.
 
-```html
-<header><!-- approved global navigation --></header>
-<main id="main">
-  <section class="page-hero"><!-- page-specific hero --></section>
-  <section class="section"><!-- content --></section>
-</main>
-<footer><!-- approved global footer --></footer>
-```
-
-Shared styling belongs in shared files only when it is genuinely shared. Page-specific CSS should not be pushed into global files simply to avoid creating a small stylesheet.
-
-## 12. Things we deliberately do not do
+## 13. Things we deliberately do not do
 
 - casually redesign approved navigation/homepage reference components;
 - colour-code navigation buttons;
@@ -295,6 +288,7 @@ Shared styling belongs in shared files only when it is genuinely shared. Page-sp
 - add LiquidGL/WebGL by default;
 - reintroduce old assets merely because they exist in repository history;
 - replace source-of-truth copy with generic AI marketing language;
+- create keyword doorway pages or fake review/schema content;
 - over-engineer static pages;
 - leave dead experiments/aliases/selectors in the active build after a direction is abandoned.
 
