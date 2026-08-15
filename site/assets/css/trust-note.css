@@ -96,7 +96,7 @@
 
 /* Desktop: make the left rail use the full height of the four trust rows.
    The statement card fills the space beneath the heading down to the bottom
-   of the Local to Epsom, Surrey row instead of leaving a black void. */
+   of the Local to Epsom, Surrey row, and the statement itself fills that glass. */
 @media(min-width:981px){
   .trust-inner{align-items:stretch!important}
   .trust-intro{align-self:stretch!important;display:flex!important;min-height:100%!important}
@@ -114,13 +114,20 @@
     max-width:none!important;
     min-height:0!important;
     margin:28px 0 0 .08em!important;
-    padding:38px 36px!important;
-    align-items:flex-start!important;
+    padding:42px 38px!important;
+    align-items:center!important;
   }
   .trust-note-card p{
-    max-width:25ch!important;
-    font-size:clamp(1.34rem,1.55vw,1.55rem)!important;
-    line-height:1.56!important;
+    width:100%!important;
+    max-width:14ch!important;
+    font-size:clamp(2.05rem,2.55vw,2.6rem)!important;
+    line-height:1.27!important;
+    letter-spacing:-.034em!important;
+    text-wrap:balance!important;
+  }
+  .trust-note-accent{
+    font-size:1.12em!important;
+    letter-spacing:-.045em!important;
   }
 }
 
