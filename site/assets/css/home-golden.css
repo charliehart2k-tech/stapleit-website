@@ -1,7 +1,6 @@
 /*
  * Staple IT homepage golden pass.
- * Permanent final-stage rules for the approved homepage composition.
- * Loaded after home-polish.css.
+ * Loaded last. This owns the final visual corrections that must win the cascade.
  */
 
 :root{
@@ -9,7 +8,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Intro pair: keep desktop balanced and stop the service CTA kissing the edge.
+   Intro pair — balanced on desktop, natural on mobile.
    -------------------------------------------------------------------------- */
 @media(min-width:981px){
   .home-intro-grid{
@@ -18,28 +17,29 @@
     align-items:stretch!important;
   }
 
-  .home-info-card{
-    min-height:500px!important;
+  .home-info-card,
+  .home-services-card{
+    min-height:clamp(430px,29vw,520px)!important;
   }
 
   .home-statement-card{
-    padding:50px 54px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    padding:44px 52px!important;
   }
 
   .home-statement-card h2{
-    max-width:10.5ch!important;
+    width:100%!important;
+    max-width:10.8ch!important;
     margin:0!important;
-    font-size:clamp(3.35rem,4.45vw,4.7rem)!important;
-    line-height:.99!important;
-    letter-spacing:-.042em!important;
-  }
-
-  .home-services-card{
-    min-height:500px!important;
+    font-size:clamp(4rem,4.9vw,5.5rem)!important;
+    line-height:.94!important;
+    letter-spacing:-.047em!important;
   }
 
   .service-slide{
-    padding:46px 72px 44px 50px!important;
+    padding:42px 72px 42px 50px!important;
   }
 
   .service-slide-content{
@@ -47,7 +47,7 @@
   }
 
   .service-slide h2{
-    font-size:clamp(2.9rem,4vw,4.05rem)!important;
+    font-size:clamp(2.85rem,3.8vw,3.9rem)!important;
     line-height:.97!important;
   }
 
@@ -56,112 +56,83 @@
     line-height:1.56!important;
   }
 
-  .service-points{
-    margin-top:20px!important;
-  }
-
-  .service-cta{
-    margin-top:28px!important;
-    align-self:flex-start!important;
-  }
+  .service-points{margin-top:20px!important}
+  .service-cta{margin-top:28px!important;align-self:flex-start!important}
 }
 
 /* --------------------------------------------------------------------------
-   Statement: deliberate scroll entrance, then retain the existing glass sweep.
-   app.js adds motion-ready / motion-in when the card enters the viewport.
+   Statement — explicit one-time scroll drop. app.js owns the trigger.
    -------------------------------------------------------------------------- */
 @media(prefers-reduced-motion:no-preference){
-  .home-statement-card.motion-ready h2{
+  .home-statement-card.statement-ready{
     opacity:0;
-    transform:translateY(28px) scale(.985);
-    filter:blur(7px);
-    clip-path:inset(0 0 18% 0 round 4px);
+    transform:translateY(-44px) scale(.982);
+    filter:blur(9px);
   }
 
-  .home-statement-card.motion-in h2{
-    animation:goldStatementCopyIn 900ms 70ms var(--gold-ease) both;
+  .home-statement-card.statement-in{
+    animation:goldStatementDrop 980ms var(--gold-ease) both;
   }
 
-  .home-statement-card.motion-ready .brand-red{
-    filter:brightness(.76) saturate(.82);
-  }
-
-  .home-statement-card.motion-in .brand-red{
-    animation:goldStatementAccentIn 1050ms 300ms var(--gold-ease) both;
+  .home-statement-card.statement-in .brand-red{
+    animation:goldStatementAccent 1100ms 260ms var(--gold-ease) both;
   }
 }
 
-@keyframes goldStatementCopyIn{
-  0%{
-    opacity:0;
-    transform:translateY(28px) scale(.985);
-    filter:blur(7px);
-    clip-path:inset(0 0 18% 0 round 4px);
-  }
-  58%{
-    opacity:1;
-    filter:blur(0);
-  }
-  100%{
-    opacity:1;
-    transform:none;
-    filter:none;
-    clip-path:inset(0 round 0);
-  }
+@keyframes goldStatementDrop{
+  0%{opacity:0;transform:translateY(-44px) scale(.982);filter:blur(9px)}
+  64%{opacity:1;transform:translateY(5px) scale(1.004);filter:blur(0)}
+  100%{opacity:1;transform:none;filter:none}
 }
 
-@keyframes goldStatementAccentIn{
-  0%{
-    filter:brightness(.76) saturate(.82);
-    text-shadow:0 0 0 rgba(230,43,43,0);
-  }
-  48%{
-    filter:brightness(1.22) saturate(1.15);
-    text-shadow:0 0 28px rgba(230,43,43,.22);
-  }
-  100%{
-    filter:brightness(1) saturate(1);
-    text-shadow:0 0 0 rgba(230,43,43,0);
-  }
+@keyframes goldStatementAccent{
+  0%{filter:brightness(.78) saturate(.86);text-shadow:0 0 0 rgba(230,43,43,0)}
+  52%{filter:brightness(1.2) saturate(1.15);text-shadow:0 0 30px rgba(230,43,43,.22)}
+  100%{filter:brightness(1) saturate(1);text-shadow:0 0 0 rgba(230,43,43,0)}
 }
 
 /* --------------------------------------------------------------------------
-   Trust: one clean heading treatment. The old full-heading liquid clip is
-   deliberately neutralised; only "Staple IT?" carries the moving colour.
+   Trust — permanently neutralise the old whole-heading liquid clipping.
+   Only the second line carries colour and it gets real glyph breathing room.
    -------------------------------------------------------------------------- */
+.trust-section,
+.trust-inner,
+.trust-intro,
+.trust-sticky{
+  overflow:visible!important;
+}
+
 .trust-sticky h2{
   max-width:none!important;
   margin:0!important;
-  padding:0!important;
+  padding:0 .14em .06em .02em!important;
+  overflow:visible!important;
   background:none!important;
+  background-image:none!important;
+  background-clip:border-box!important;
+  -webkit-background-clip:border-box!important;
   color:#fff!important;
   -webkit-text-fill-color:#fff!important;
   filter:none!important;
   animation:none!important;
-  overflow:visible!important;
 }
 
 .trust-title-line{
   display:block!important;
-  white-space:nowrap;
+  white-space:nowrap!important;
 }
 
 .trust-title-accent{
   display:block!important;
   width:max-content!important;
-  max-width:100%!important;
-  margin-top:.10em!important;
-  line-height:.94!important;
+  max-width:none!important;
+  margin:.08em 0 0 -.04em!important;
+  padding:0 .18em .08em .05em!important;
+  overflow:visible!important;
+  white-space:nowrap!important;
+  line-height:.96!important;
   color:transparent!important;
-  background:linear-gradient(
-    102deg,
-    var(--brand-blue) 0%,
-    #6f63ff 22%,
-    var(--brand-security) 40%,
-    var(--brand-red) 62%,
-    var(--brand-solutions) 82%,
-    var(--brand-blue) 100%
-  )!important;
+  background:linear-gradient(102deg,var(--brand-blue) 0%,#6f63ff 22%,var(--brand-security) 40%,var(--brand-red) 62%,var(--brand-solutions) 82%,var(--brand-blue) 100%)!important;
   background-size:260% 100%!important;
   background-position:0 50%;
   -webkit-background-clip:text!important;
@@ -177,18 +148,18 @@
 
 @media(min-width:981px){
   .trust-inner{
-    grid-template-columns:minmax(260px,.72fr) minmax(0,1.28fr)!important;
-    gap:clamp(66px,7vw,108px)!important;
+    grid-template-columns:minmax(300px,.78fr) minmax(0,1.22fr)!important;
+    gap:clamp(64px,6.5vw,104px)!important;
   }
 
   .trust-sticky{
     top:118px!important;
-    padding:8px 16px 0 0!important;
+    padding:8px 12px 0 0!important;
   }
 
   .trust-sticky h2{
-    font-size:clamp(4rem,5.75vw,6.05rem)!important;
-    line-height:.91!important;
+    font-size:clamp(3.9rem,5.45vw,5.85rem)!important;
+    line-height:.92!important;
     letter-spacing:-.052em!important;
   }
 }
@@ -203,29 +174,23 @@
 
 @media(max-width:700px){
   .trust-sticky h2{
-    max-width:9.5ch!important;
+    width:100%!important;
+    max-width:none!important;
     margin-bottom:28px!important;
-    font-size:clamp(2.7rem,11vw,3.25rem)!important;
-    line-height:.95!important;
+    padding-right:.20em!important;
+    font-size:clamp(2.65rem,10.7vw,3.2rem)!important;
+    line-height:.96!important;
   }
 
-  .trust-title-line{
-    white-space:normal;
-  }
-
-  .trust-title-accent{
-    margin-top:.08em!important;
-  }
+  .trust-title-line{white-space:normal!important}
+  .trust-title-accent{margin-left:-.03em!important;padding-right:.22em!important}
 }
 
 /* --------------------------------------------------------------------------
-   Touch services: make the horizontal strip genuinely draggable in Safari.
-   Indicator dots are secondary controls only.
+   Touch services — native Safari drag/scroll. Dots are secondary controls.
    -------------------------------------------------------------------------- */
 @media(max-width:980px){
-  .home-services-card{
-    overflow:hidden!important;
-  }
+  .home-services-card{overflow:hidden!important}
 
   .service-stage{
     display:flex!important;
@@ -233,13 +198,13 @@
     inset:auto!important;
     width:100%!important;
     max-width:100%!important;
-    overflow-x:scroll!important;
+    overflow-x:auto!important;
     overflow-y:hidden!important;
     scroll-snap-type:x mandatory!important;
     scroll-padding-inline:0!important;
     overscroll-behavior-x:contain!important;
     -webkit-overflow-scrolling:touch!important;
-    touch-action:pan-x pan-y!important;
+    touch-action:pan-x!important;
     scrollbar-width:none!important;
   }
 
@@ -261,13 +226,13 @@
 }
 
 /* --------------------------------------------------------------------------
-   Google review strip. No hard-coded score: live ratings can change.
+   Google review chapter — hero first, compact review CTA second.
    -------------------------------------------------------------------------- */
 .google-review-section{
   position:relative;
   width:100vw;
   margin:0 0 0 calc(50% - 50vw);
-  padding:0 0 96px;
+  padding:86px 0 108px;
   overflow:hidden;
   background:#000;
 }
@@ -276,15 +241,57 @@
   width:var(--page);
   max-width:1220px;
   margin:0 auto;
+}
+
+.google-review-hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) minmax(300px,.58fr);
+  gap:clamp(48px,6vw,84px);
+  align-items:end;
+  padding-bottom:36px;
+}
+
+.google-review-eyebrow{
+  grid-column:1/-1;
+  margin:0 0 -18px;
+  color:#818b98;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.google-review-hero h2{
+  max-width:10.5ch;
+  margin:0;
+  color:#f8f9fb;
+  font-size:clamp(4.5rem,6.5vw,6.8rem);
+  line-height:.9;
+  letter-spacing:-.055em;
+}
+
+.google-review-hero h2 span{
+  color:var(--blue-bright);
+}
+
+.google-review-hero>p:last-child{
+  max-width:30rem;
+  margin:0 0 8px;
+  color:#9ca5b1;
+  font-size:clamp(1.05rem,1.45vw,1.28rem);
+  line-height:1.55;
+}
+
+.google-review-card{
   display:grid;
   grid-template-columns:auto minmax(0,1fr) auto;
-  gap:24px;
+  gap:22px;
   align-items:center;
-  padding:24px 26px;
+  padding:22px 24px;
   border:1px solid rgba(255,255,255,.11);
-  border-radius:26px;
+  border-radius:25px;
   background:
-    radial-gradient(circle at 12% 50%,rgba(79,133,255,.08),transparent 28%),
+    radial-gradient(circle at 10% 50%,rgba(79,133,255,.09),transparent 26%),
     linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012) 44%,rgba(0,0,0,.22)),
     rgba(0,0,0,.62);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 70px rgba(0,0,0,.22);
@@ -314,34 +321,10 @@
   background-clip:text;
 }
 
-.google-review-copy{
-  min-width:0;
-}
-
-.google-review-eyebrow{
-  margin:0 0 3px;
-  color:#8d96a3;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-
-.google-review-copy h2{
-  margin:0;
-  color:#f7f9fc;
-  font-size:clamp(1.45rem,2.25vw,2.2rem);
-  line-height:1.05;
-  letter-spacing:-.035em;
-}
-
-.google-review-copy p:last-child{
-  max-width:720px;
-  margin:7px 0 0;
-  color:#9099a5;
-  font-size:14px;
-  line-height:1.5;
-}
+.google-review-copy{min-width:0}
+.google-review-kicker{margin:0 0 4px;color:#8c96a3;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.google-review-copy h3{margin:0;color:#f7f9fc;font-size:clamp(1.45rem,2.15vw,2rem);line-height:1.04;letter-spacing:-.034em}
+.google-review-copy p:last-child{max-width:680px;margin:7px 0 0;color:#9099a5;font-size:13.5px;line-height:1.5}
 
 .google-review-link{
   min-width:174px;
@@ -360,67 +343,60 @@
   transition:transform 180ms var(--gold-ease),border-color 180ms ease,background 180ms ease;
 }
 
-.google-review-link:hover,
-.google-review-link:focus-visible{
+.google-review-link:hover,.google-review-link:focus-visible{
   transform:translateY(-1px);
-  border-color:rgba(79,133,255,.50);
+  border-color:rgba(79,133,255,.5);
   background:rgba(79,133,255,.08);
 }
 
-@supports(animation-timeline:view()){
-  @media(prefers-reduced-motion:no-preference){
-    .google-review-inner{
-      animation:googleReviewReveal linear both;
-      animation-timeline:view(block);
-      animation-range:entry 5% cover 34%;
-    }
-  }
+@media(max-width:700px){
+  .google-review-section{padding:66px 0 78px}
+  .google-review-hero{grid-template-columns:1fr;gap:16px;padding-bottom:26px}
+  .google-review-eyebrow{margin:0 0 -4px;font-size:11px}
+  .google-review-hero h2{max-width:10ch;font-size:clamp(2.85rem,11.5vw,3.55rem);line-height:.93}
+  .google-review-hero>p:last-child{margin:0;font-size:14.5px}
+  .google-review-card{grid-template-columns:46px minmax(0,1fr);gap:14px;padding:18px;border-radius:21px}
+  .google-review-mark{width:46px;height:46px;border-radius:15px}
+  .google-review-copy h3{font-size:clamp(1.35rem,5.8vw,1.65rem)}
+  .google-review-copy p:last-child{font-size:12.5px}
+  .google-review-link{grid-column:1/-1;width:100%;min-height:46px;margin-top:2px}
 }
 
-@keyframes googleReviewReveal{
-  from{opacity:0;transform:translateY(22px) scale(.992);filter:blur(4px)}
-  to{opacity:1;transform:none;filter:none}
+/* --------------------------------------------------------------------------
+   Audit final geometry. Motion itself lives in audit-enhancements.css.
+   -------------------------------------------------------------------------- */
+.audit-form{
+  border-radius:32px!important;
+  overflow:hidden!important;
+  transform:none!important;
+}
+
+.audit-form:hover,.audit-form:focus-within{
+  transform:none!important;
+  border-radius:32px!important;
+}
+
+.audit-explainer{
+  border-radius:20px!important;
+  transform:none!important;
+}
+
+.audit-explainer:hover,.audit-explainer:focus-within{
+  transform:none!important;
 }
 
 @media(max-width:700px){
-  .google-review-section{
-    padding:0 0 74px;
-  }
-
-  .google-review-inner{
-    grid-template-columns:46px minmax(0,1fr);
-    gap:14px;
-    padding:19px;
-    border-radius:22px;
-  }
-
-  .google-review-mark{
-    width:46px;
-    height:46px;
-    border-radius:15px;
-  }
-
-  .google-review-copy h2{
-    font-size:clamp(1.32rem,5.8vw,1.7rem);
-  }
-
-  .google-review-copy p:last-child{
-    font-size:12.8px;
-  }
-
-  .google-review-link{
-    grid-column:1/-1;
-    width:100%;
-    min-height:46px;
-    margin-top:2px;
-  }
+  .audit-form{border-radius:22px!important}
+  .audit-form:hover,.audit-form:focus-within{border-radius:22px!important}
+  .audit-explainer{border-radius:17px!important}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .home-statement-card h2,
+  .home-statement-card,
   .home-statement-card .brand-red,
   .trust-title-accent,
-  .google-review-inner{
+  .google-review-hero,
+  .google-review-card{
     animation:none!important;
     transition:none!important;
     transform:none!important;
