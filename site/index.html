@@ -30,7 +30,7 @@
 <nav aria-label="Primary navigation" class="primary-nav">
 <a class="nav-pill active" href="index.html">Home</a>
 <details class="nav-details">
-<summary class="nav-pill">IT Services <span aria-hidden="true" class="nav-chevron"></span></summary>
+<summary class="nav-pill">IT Services</summary>
 <div class="nav-menu">
 <a href="it-services/it-support/index.html">IT Support</a>
 <a href="it-services/it-solutions/index.html">IT Solutions</a>
@@ -40,7 +40,7 @@
 </div>
 </details>
 <details class="nav-details">
-<summary class="nav-pill">About Us <span aria-hidden="true" class="nav-chevron"></span></summary>
+<summary class="nav-pill">About Us</summary>
 <div class="nav-menu">
 <a href="about-us/index.html">About Staple</a>
 <a href="about-us/who-we-support/index.html">Who We Support</a>
@@ -56,17 +56,25 @@
 <button aria-controls="mobile-menu" aria-expanded="false" class="nav-pill menu-toggle" id="menu-toggle" type="button">Menu</button>
 </div>
 <nav aria-label="Mobile navigation" class="mobile-menu liquid-glass" hidden id="mobile-menu">
-<a class="nav-pill" href="index.html">Home</a>
+<div class="mobile-menu-primary">
+<details class="mobile-nav-group">
+<summary class="nav-pill">IT Services</summary>
+<div class="mobile-nav-grid">
 <a class="nav-pill" href="it-services/it-support/index.html">IT Support</a>
 <a class="nav-pill" href="it-services/it-solutions/index.html">IT Solutions</a>
 <a class="nav-pill" href="it-services/it-consultancy/index.html">IT Consultancy</a>
 <a class="nav-pill" href="it-services/cybersecurity/index.html">Cybersecurity</a>
 <a class="nav-pill" href="it-services/ai-integrations/index.html">AI Integrations</a>
+</div>
+</details>
 <a class="nav-pill" href="about-us/index.html">About Us</a>
 <a class="nav-pill" href="get-in-touch/index.html">Get in touch</a>
-<a class="nav-pill" href="client-portal/index.html">Client Portal</a>
-<a class="nav-pill remote" href="remote-support/index.html">Remote Support</a>
-<a class="nav-pill blog" href="the-staple-blog/index.html">The Staple Blog</a>
+</div>
+<div class="mobile-menu-utility">
+<a href="client-portal/index.html">Client Portal</a>
+<a href="remote-support/index.html">Remote Support</a>
+<a href="the-staple-blog/index.html">The Staple Blog</a>
+</div>
 </nav>
 </header>
 <main class="reset-stage" id="main">
@@ -180,7 +188,7 @@
 <div class="trust-inner">
 <div class="trust-intro">
 <div class="trust-sticky">
-<h2 id="trust-title">Why trust Staple IT?</h2>
+<h2 id="trust-title">Why trust <span class="trust-title-accent">Staple IT?</span></h2>
 </div>
 </div>
 <div class="trust-proof-list">
@@ -207,14 +215,14 @@
 <div class="audit-inner">
 <header class="audit-hero">
 <div>
-<h2 id="audit-title">Let us look over your IT. <span>Completely free.</span></h2>
+<h2 id="audit-title">Let us look over <span class="accent-orange">your</span> IT. <span>Completely free.</span></h2>
 </div>
 <p class="audit-lead">Let us look over your current setup completely free of charge. Leave your details and we’ll get back to you within one working day.</p>
 </header>
 <div class="audit-contact-shell">
 <form class="audit-form" data-audit-form>
 <div class="audit-form-heading">
-<h3>Request your free audit</h3>
+<h3>Request <span class="accent-orange">your</span><br/>free audit</h3>
 </div>
 <div class="audit-fields">
 <label class="audit-field">
@@ -232,15 +240,58 @@
 </label>
 <button class="button audit-submit" type="submit">Request my free IT audit</button>
 <p aria-live="polite" class="audit-form-status" data-audit-form-status hidden></p>
-</form>
-<aside class="audit-direct" aria-label="Direct contact details">
-<h3>Talk to a real person.</h3>
-<div class="audit-direct-links">
-<a class="audit-direct-link" href="tel:+441372309707">01372 309 707</a>
-<a class="audit-direct-link" href="mailto:hello@stapleit.co.uk">hello@stapleit.co.uk</a>
+<div class="audit-explainer" data-audit-explainer>
+<button class="audit-explainer-toggle" type="button" aria-expanded="false" aria-controls="audit-explainer-body">
+<span>What is an IT Audit?</span>
+<span class="audit-explainer-icon" aria-hidden="true">+</span>
+</button>
+<div class="audit-explainer-body" id="audit-explainer-body" aria-hidden="true">
+<div class="audit-explainer-copy">
+<p>A quick review of your IT setup, security, Microsoft 365, devices and support arrangements — highlighting risks, quick wins and where you may be overspending.</p>
+<div class="audit-coverage">
+<p class="audit-coverage-title">Our free IT audit covers:</p>
+<ul>
+<li>Devices, servers and cloud services</li>
+<li>Microsoft 365, email, software and licensing</li>
+<li>Internet, Wi-Fi, networks and business phones</li>
+<li>Cyber security, backups and disaster recovery</li>
+<li>IT support, suppliers, contracts and recurring costs</li>
+<li>Lifecycle risks and opportunities to simplify and reduce costs</li>
+</ul>
 </div>
-<p class="audit-direct-hours">Monday–Friday<br/><strong>09:00–17:00</strong></p>
-</aside>
+</div>
+</div>
+</div>
+</form>
+</div>
+</div>
+</section>
+<section class="contact-section" id="contact" aria-labelledby="contact-title">
+<div class="contact-inner">
+<header class="contact-hero">
+<h2 id="contact-title"><span class="contact-title-line">We’re here when</span><span class="contact-title-line"><span class="accent-orange">you</span> need us.</span></h2>
+</header>
+<div class="contact-grid">
+<section class="contact-panel" aria-labelledby="contact-panel-title">
+<h3 id="contact-panel-title">Speak to Staple IT</h3>
+<p class="contact-panel-intro">Monday to Friday, 9am–5pm.</p>
+<dl class="contact-list">
+<div class="contact-row"><dt>Call us</dt><dd><a href="tel:+441372309707">01372 309 707</a></dd></div>
+<div class="contact-row"><dt>WhatsApp Business</dt><dd><a class="contact-whatsapp" href="https://wa.me/+441372309707" rel="noopener noreferrer" target="_blank">Click to chat</a></dd></div>
+<div class="contact-row"><dt>Email</dt><dd><a href="mailto:hello@stapleit.co.uk">hello@stapleit.co.uk</a></dd></div>
+<div class="contact-row"><dt>Hours</dt><dd>Monday to Friday, 9am–5pm</dd></div>
+<div class="contact-row contact-address"><dt>Address</dt><dd>88 Eastdean Avenue, Epsom, KT18 7SN</dd></div>
+</dl>
+</section>
+<section class="contact-map-card" aria-label="Staple IT location">
+<div class="contact-map-shell is-loaded" data-contact-map>
+<iframe data-contact-map-frame loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=51.3351004,-0.2637125&amp;z=15&amp;output=embed" title="Staple IT location in Epsom"></iframe>
+</div>
+<div class="contact-map-footer">
+<span>Epsom, Surrey</span>
+<a href="https://www.google.com/maps/search/?api=1&amp;query=88+Eastdean+Avenue,+Epsom,+KT18+7SN" rel="noopener noreferrer" target="_blank">Open in Google Maps ↗</a>
+</div>
+</section>
 </div>
 </div>
 </section>
