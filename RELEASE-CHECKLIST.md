@@ -4,21 +4,29 @@ No page is complete because it merely looks finished on a desktop browser.
 
 Use these gates for every rebuilt route and at major homepage milestones.
 
-## Gate 1 — Content accuracy
+## Gate 1 — Content accuracy and conformity
 
 - Content has been checked against the relevant `reference/` scrape/source files.
 - Claims, support hours, prices, service details and legal information are current and truthful.
 - No generic filler copy has replaced source-of-truth content without an explicit decision.
-- Links and calls to action point to the intended route.
-- Placeholder routes/content are clearly identified and excluded from indexing where appropriate.
+- Links and calls to action point to the intended clean route.
+- Placeholder routes are visibly identified, `noindex,nofollow`, and excluded from the sitemap.
+- UK English is used consistently.
+- Service naming is consistent: `IT Support`, `IT Solutions`, `IT Consultancy`, `Cyber Security`, `AI Integrations`.
+- Product naming is consistent, including `Microsoft 365`, `Wi-Fi` and `OneDrive`.
+- Sentence case is used for descriptive headings unless a proper service/product name requires capitals.
+- Repeated prices/terms use one wording within a page.
 
-## Gate 2 — Design
+## Gate 2 — Design and typography
 
 - Approved navigation and footer are preserved.
-- Manrope follows the 400/600/700 system.
+- Manrope follows the 400/600/700 system; no synthetic intermediate weights or stray font families.
+- Shared type and spacing tokens in `tokens.css` are used as the baseline.
+- Body copy remains comfortably readable and important text is not shrunk to make a layout fit.
+- Copy line length is controlled where practical.
 - Glass remains monochrome unless colour communicates state or is an explicitly approved brand treatment.
 - No internal glass shelf, unapproved coloured glow, spotlight effect or decorative clutter has crept back in.
-- Approved palette-glow exceptions follow `DESIGN-SYSTEM.md`; do not generalise them to unrelated cards.
+- Approved palette-glow exceptions follow `DESIGN-SYSTEM.md`.
 - Spacing, radius and card hierarchy match the current design system.
 
 ## Gate 3 — Responsive and accessibility
@@ -41,24 +49,27 @@ Confirm:
 - keyboard navigation and visible focus states;
 - sensible 44px touch targets;
 - useful alt text and accessible labels;
-- interaction remains understandable without relying on colour alone.
+- interaction remains understandable without relying on colour alone;
+- touch carousels follow the user’s finger rather than requiring tiny indicators.
 
 ## Gate 4 — Security
 
 - No secrets, tokens, credentials or connection strings are present.
-- No unexpected inline/event-handler JavaScript has been introduced.
+- No unexpected executable inline/event-handler JavaScript has been introduced.
+- JSON-LD is truthful inert structured data only.
 - No unexpected third-party runtime script has been introduced.
 - Forms/future integrations validate untrusted input at the server boundary.
 - `.well-known/security.txt` is current.
-- Production headers match `DESIGN-SYSTEM.md`.
+- Production headers match `DESIGN-SYSTEM.md`, including the approved Google Maps `frame-src` when the map is present.
 - Production is HTTPS-only.
-- Local staging runs cleanly under the development CSP/security headers.
+- Staging remains intentionally excluded from indexing.
 
 ## Gate 5 — Performance
 
 - No unnecessary framework or external runtime dependency has been introduced.
+- No CSS `@import` request chains are introduced for fonts/assets.
 - New images are compressed and appropriately sized.
-- Below-the-fold imagery is lazy-loaded.
+- Below-the-fold imagery/iframes are lazy-loaded where appropriate.
 - Media dimensions are declared where relevant to reduce layout shift.
 - Repeated glass surfaces use restrained blur, especially on phones/tablets.
 - Autoplay video remains exceptional.
@@ -72,20 +83,25 @@ Production targets:
 - INP <= 200ms
 - CLS <= 0.1
 
-## Gate 6 — SEO, AEO and schema
+## Gate 6 — SEO, AEO, ASEO and schema
 
-Complete the checklist in `SEO-AEO-SCHEMA.md`.
+Complete `SEO-AEO-SCHEMA.md`.
 
-At minimum:
+At minimum every indexable page has:
 
 - unique title and meta description;
 - one clear H1;
 - logical headings;
-- absolute canonical URL;
-- useful internal links;
+- absolute HTTPS canonical URL;
+- useful crawlable internal links;
 - truthful JSON-LD only where appropriate;
+- visible text containing the important service/business information;
 - no schema on unfinished placeholder content;
-- route only enters the production sitemap once genuinely launch-ready.
+- inclusion in the production sitemap only when launch-ready.
+
+Homepage additionally requires stable `Organization` and `WebSite` JSON-LD identities.
+
+Do not add fake review/rating markup, keyword doorway pages, `llms.txt`, or AI-only markup as a substitute for normal SEO.
 
 ## Gate 7 — Conversion and usability
 
@@ -105,13 +121,14 @@ At minimum test current versions of:
 - Firefox desktop;
 - Android/Chromium where available.
 
-Progressive enhancements such as cross-document View Transitions must fail cleanly when unsupported. Viewport-triggered reveals must not leave content permanently hidden if the observer/API is unavailable.
+Progressive enhancements must fail cleanly when unsupported. Viewport-triggered reveals must not leave content permanently hidden if the observer/API is unavailable. Check font loading, wrapping and glyph clipping at every reference viewport.
 
 ## Gate 9 — Release and deployment
 
 Before production:
 
-- run `py -3 .\tools\audit-site.py --root .\site` and resolve blocking errors;
+- run `python3 tools/audit-site.py --root site` (or Windows equivalent) and resolve blocking errors;
+- staging deployment also runs the static audit automatically and refuses to deploy on blocking failures;
 - canonical domain is correct;
 - redirects are intentional and tested;
 - custom 404 works;
@@ -125,11 +142,4 @@ Before production:
 
 ## Motion and polish acceptance rule
 
-Motion is allowed only when it adds one of these:
-
-- depth;
-- hierarchy;
-- interaction feedback;
-- continuity between pages/components.
-
-Prefer the simplest mechanism that reliably creates the intended result. If an animation exists merely because it looks clever, remove it.
+Motion is allowed only when it adds depth, hierarchy, interaction feedback or continuity. Prefer the simplest reliable mechanism. If an animation exists merely because it looks clever, remove it.
