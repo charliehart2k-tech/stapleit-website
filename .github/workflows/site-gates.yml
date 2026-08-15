@@ -1,0 +1,27 @@
+name: Site quality gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate audit tool
+        run: python3 -m py_compile tools/audit-site.py
+
+      - name: Validate staging deploy script
+        run: bash -n tools/deploy-wordpress-staging.sh
+
+      - name: Run content security SEO and AEO gates
+        run: python3 tools/audit-site.py --root site
