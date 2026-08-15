@@ -1,9 +1,23 @@
-/* Homepage audit refinements: continuous orange water-light, glossy explainer and contact shimmer. */
+/* Homepage audit/contact enhancements. Static markup owns structure; CSS owns presentation. */
+
+.audit-form{
+  isolation:isolate;
+}
+
+.audit-form>*{
+  position:relative;
+  z-index:2;
+}
+
 .audit-form::before{
+  content:"";
+  position:absolute;
+  z-index:1;
   left:-28%;
   top:-42%;
   width:156%;
   height:190%;
+  pointer-events:none;
   border-radius:48%;
   background:
     radial-gradient(ellipse at center,rgba(255,176,92,.34) 0%,rgba(249,115,22,.17) 22%,rgba(249,115,22,.055) 44%,transparent 68%),
@@ -19,12 +33,21 @@
   animation:auditWaterFlow 15s ease-in-out infinite;
   will-change:background-position,transform;
 }
+
 .audit-form::after{
-  width:270px;
+  content:"";
+  position:absolute;
+  z-index:1;
+  top:0;
   right:8%;
+  width:270px;
+  height:1px;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(249,115,22,.78),transparent);
   opacity:.42;
   animation:auditWaterEdge 12s ease-in-out infinite;
 }
+
 @keyframes auditWaterFlow{
   0%{background-position:-4% 22%,82% 72%,38% 30%;transform:translate3d(-1.5%,-1%,0) rotate(-.7deg) scale(1.01)}
   24%{background-position:24% 8%,58% 84%,63% 48%;transform:translate3d(1%,1.5%,0) rotate(.5deg) scale(1.025)}
@@ -32,6 +55,7 @@
   74%{background-position:82% 68%,38% 12%,42% 70%;transform:translate3d(-.5%,1%,0) rotate(.65deg) scale(1.03)}
   100%{background-position:12% 76%,72% 34%,20% 46%;transform:translate3d(-1.5%,-1%,0) rotate(-.6deg) scale(1.01)}
 }
+
 @keyframes auditWaterEdge{
   0%{transform:translateX(-30%);opacity:.24;filter:brightness(.85)}
   38%{transform:translateX(12%);opacity:.5;filter:brightness(1.12)}
@@ -39,12 +63,11 @@
   100%{transform:translateX(-12%);opacity:.42;filter:brightness(1.04)}
 }
 
-/* Auto-opening audit explainer: moving liquid-glass surface, not a hover-only effect. */
 .audit-explainer{
   position:relative;
   isolation:isolate;
-  margin-top:34px;
   overflow:hidden;
+  margin-top:24px;
   border:1px solid rgba(255,255,255,.12);
   border-radius:20px;
   background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.018) 42%,rgba(249,115,22,.028));
@@ -56,6 +79,7 @@
   -webkit-backdrop-filter:blur(18px) saturate(125%);
   transition:border-color 240ms ease,box-shadow 240ms ease,transform 240ms var(--ease);
 }
+
 .audit-explainer::before{
   content:"";
   position:absolute;
@@ -74,6 +98,7 @@
   will-change:transform;
   animation:auditExplainerFlow 10s ease-in-out infinite alternate;
 }
+
 .audit-explainer::after{
   content:"";
   position:absolute;
@@ -89,24 +114,27 @@
   will-change:transform;
   animation:auditExplainerSheen 6.8s ease-in-out infinite;
 }
-.audit-explainer:hover{
-  transform:translateY(-1px);
-  border-color:rgba(249,115,22,.24);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 -1px 0 rgba(249,115,22,.08),0 18px 46px rgba(0,0,0,.22),0 0 28px rgba(249,115,22,.035);
-}
+
 @keyframes auditExplainerFlow{
   0%{transform:translate3d(-5%,4%,0) rotate(-5deg) scale(1)}
   30%{transform:translate3d(11%,-3%,0) rotate(2deg) scale(1.04)}
   62%{transform:translate3d(24%,5%,0) rotate(-1deg) scale(1.02)}
   100%{transform:translate3d(38%,-4%,0) rotate(4deg) scale(1.05)}
 }
+
 @keyframes auditExplainerSheen{
   0%,12%{transform:translate3d(-30%,0,0) skewX(-13deg);opacity:0}
   22%{opacity:.72}
   52%{opacity:.46}
   70%,100%{transform:translate3d(430%,0,0) skewX(-13deg);opacity:0}
 }
-.audit-explainer-toggle,.audit-explainer-body{position:relative;z-index:2}
+
+.audit-explainer-toggle,
+.audit-explainer-body{
+  position:relative;
+  z-index:2;
+}
+
 .audit-explainer-toggle{
   width:100%;
   min-height:58px;
@@ -124,8 +152,17 @@
   text-align:left;
   cursor:pointer;
 }
-.audit-explainer-toggle:hover,.audit-explainer-toggle:focus-visible{background:rgba(255,255,255,.018)}
-.audit-explainer-toggle:focus-visible{outline:2px solid rgba(249,115,22,.72);outline-offset:-2px}
+
+.audit-explainer-toggle:hover,
+.audit-explainer-toggle:focus-visible{
+  background:rgba(255,255,255,.018);
+}
+
+.audit-explainer-toggle:focus-visible{
+  outline:2px solid rgba(249,115,22,.72);
+  outline-offset:-2px;
+}
+
 .audit-explainer-icon{
   flex:0 0 auto;
   width:28px;
@@ -142,35 +179,70 @@
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
   transition:transform 420ms var(--ease),border-color 180ms ease,background 180ms ease;
 }
-.audit-explainer.is-open .audit-explainer-icon{transform:rotate(45deg);border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.08)}
+
+.audit-explainer.is-open .audit-explainer-icon{
+  transform:rotate(45deg);
+  border-color:rgba(249,115,22,.35);
+  background:rgba(249,115,22,.08);
+}
+
 .audit-explainer-body{
   display:grid;
   grid-template-rows:0fr;
   opacity:0;
   transition:grid-template-rows 520ms var(--ease),opacity 360ms ease;
 }
-.audit-explainer-copy{overflow:hidden}
-.audit-explainer-copy p{
+
+.audit-explainer-copy{
+  min-height:0;
+  overflow:hidden;
+}
+
+.audit-explainer.is-open .audit-explainer-body{
+  grid-template-rows:1fr;
+  opacity:1;
+}
+
+.audit-explainer-copy>p{
   margin:0;
-  padding:0 17px 15px;
   color:#b8c0ca;
   font-size:14px;
   line-height:1.62;
 }
-.audit-explainer-copy::after{
-  content:"Our free IT audit covers:\A ✓  Devices, servers and cloud services\A ✓  Microsoft 365, email, software and licensing\A ✓  Internet, Wi-Fi, networks and business phones\A ✓  Cyber security, backups and disaster recovery\A ✓  IT support, suppliers, contracts and recurring costs\A ✓  Lifecycle risks and opportunities to simplify and reduce costs";
-  display:block;
-  margin:0 17px 17px;
-  padding-top:14px;
-  border-top:1px solid rgba(255,255,255,.08);
-  white-space:pre-line;
+
+.audit-coverage-title{
+  margin:0 0 10px;
+  color:#f1f3f6;
+  font-size:13px;
+  font-weight:700;
+}
+
+.audit-coverage ul{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 20px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.audit-coverage li{
+  position:relative;
+  padding-left:18px;
   color:#d8dde3;
   font-size:13px;
-  line-height:1.7;
+  line-height:1.55;
 }
-.audit-explainer.is-open .audit-explainer-body{grid-template-rows:1fr;opacity:1}
 
-/* Contact heading: white at rest with the approved Staple palette sweeping through "you". */
+.audit-coverage li::before{
+  content:"✓";
+  position:absolute;
+  left:0;
+  top:0;
+  color:var(--solutions);
+  font-weight:700;
+}
+
 #contact-title .accent-orange{
   display:inline-block!important;
   color:#fff!important;
@@ -187,103 +259,138 @@
     #fff 69%,
     #fff 100%
   );
-  background-size:340% 100%;
+  background-size:360% 100%;
   background-position:100% 50%;
   -webkit-background-clip:text;
   background-clip:text;
   -webkit-text-fill-color:transparent;
-  animation:contactStapleShimmer 7.5s linear infinite;
+  animation:contactStapleShimmer 9s linear infinite;
   will-change:background-position;
 }
+
 @keyframes contactStapleShimmer{
-  0%,16%{background-position:100% 50%}
-  64%,100%{background-position:-30% 50%}
+  0%,18%{background-position:100% 50%}
+  66%,100%{background-position:-30% 50%}
 }
 
-/* Desktop audit composition: compact form above, full-width explainer drawer below. */
 @media(min-width:981px){
   .audit-form{
+    display:grid;
     grid-template-columns:minmax(320px,.72fr) minmax(0,1.28fr);
     grid-template-rows:auto auto auto auto auto;
     column-gap:54px;
     row-gap:18px;
   }
-  .audit-form-heading{display:contents}
-  .audit-form-heading h3{
+
+  .audit-form-heading{
     grid-column:1;
-    grid-row:1 / span 3;
+    grid-row:1 / span 4;
     align-self:start;
     max-width:360px;
     margin:0;
     padding-top:4px;
   }
+
+  .audit-form-heading h3{
+    margin:0;
+  }
+
   .audit-fields{grid-column:2;grid-row:1}
-  .audit-consent{grid-column:2;grid-row:2}
-  .audit-submit{grid-column:2;grid-row:3}
-  .audit-form-status{grid-column:2;grid-row:5;margin-top:0}
+  .audit-consent{grid-column:2;grid-row:2;margin-top:0}
+  .audit-submit{grid-column:2;grid-row:3;margin-top:0;justify-self:start}
+  .audit-form-status{grid-column:2;grid-row:4;margin-top:0}
+
   .audit-explainer{
     grid-column:1 / -1;
-    grid-row:4;
+    grid-row:5;
     width:100%;
-    max-width:none;
-    margin:12px 0 0;
+    margin:10px 0 0;
     border-radius:22px;
   }
+
   .audit-explainer-toggle{
     min-height:60px;
     padding:16px 20px;
     font-size:16px;
   }
+
   .audit-explainer-copy{
     display:grid;
     grid-template-columns:minmax(240px,.65fr) minmax(0,1.35fr);
-    grid-template-rows:auto 1fr;
-    gap:8px 34px;
-    padding:2px 20px 20px;
+    gap:34px;
+    padding:4px 20px 22px;
   }
-  .audit-explainer-copy p{
-    grid-column:1;
-    grid-row:1 / span 2;
+
+  .audit-explainer-copy>p{
     padding:4px 24px 0 0;
     border-right:1px solid rgba(255,255,255,.08);
     font-size:14px;
     line-height:1.65;
   }
-  .audit-explainer-copy::before{
-    content:"Our free IT audit covers:";
-    grid-column:2;
-    grid-row:1;
-    display:block;
-    color:#f2f4f7;
-    font-size:13px;
-    font-weight:700;
-    line-height:1.4;
-  }
-  .audit-explainer-copy::after{
-    grid-column:2;
-    grid-row:2;
-    margin:0;
-    padding:0;
-    border-top:0;
-    content:"✓  Devices, servers and cloud services\A ✓  Microsoft 365, email, software and licensing\A ✓  Internet, Wi-Fi, networks and business phones\A ✓  Cyber security, backups and disaster recovery\A ✓  IT support, suppliers, contracts and recurring costs\A ✓  Lifecycle risks and opportunities to simplify and reduce costs";
-    columns:2;
-    column-gap:30px;
-    column-rule:1px solid rgba(255,255,255,.055);
-    font-size:13px;
-    line-height:1.7;
-  }
 }
 
 @media(max-width:980px){
-  .audit-explainer{max-width:620px;margin-top:24px}
+  .audit-explainer-copy{
+    display:grid;
+    gap:16px;
+    padding:0 17px 17px;
+  }
+
+  .audit-coverage{
+    padding-top:14px;
+    border-top:1px solid rgba(255,255,255,.08);
+  }
 }
+
 @media(max-width:640px){
-  .audit-explainer{margin-top:20px;border-radius:17px}
-  .audit-explainer-toggle{min-height:54px;padding:13px 15px;font-size:14px}
-  .audit-explainer-copy p{padding:0 15px 14px;font-size:13px}
-  .audit-explainer-copy::after{margin:0 15px 15px;font-size:12px;line-height:1.65}
+  .audit-explainer{
+    margin-top:16px;
+    border-radius:17px;
+  }
+
+  .audit-explainer-toggle{
+    min-height:52px;
+    padding:12px 14px;
+    font-size:13.5px;
+  }
+
+  .audit-explainer-copy{
+    gap:13px;
+    padding:0 14px 14px;
+  }
+
+  .audit-explainer-copy>p{
+    font-size:12.8px;
+    line-height:1.58;
+  }
+
+  .audit-coverage{
+    padding-top:12px;
+  }
+
+  .audit-coverage ul{
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+
+  .audit-coverage li{
+    font-size:12px;
+    line-height:1.5;
+  }
 }
+
 @media(prefers-reduced-motion:reduce){
-  .audit-form::before,.audit-form::after,.audit-explainer::before,.audit-explainer::after,#contact-title .accent-orange{animation:none!important}
-  #contact-title .accent-orange{background:none!important;-webkit-text-fill-color:#fff;color:#fff!important}
+  .audit-form::before,
+  .audit-form::after,
+  .audit-explainer::before,
+  .audit-explainer::after,
+  #contact-title .accent-orange{
+    animation:none!important;
+  }
+
+  #contact-title .accent-orange{
+    background:none!important;
+    -webkit-text-fill-color:#fff;
+    color:#fff!important;
+  }
 }
