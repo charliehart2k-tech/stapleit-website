@@ -301,15 +301,17 @@
   border-radius:17px;
   background:rgba(255,255,255,.035);
   font-family:Arial,sans-serif;
-  font-size:29px;
+  font-size:30px;
   font-weight:700;
   line-height:1;
 }
 
 .google-review-mark span{
-  color:#4285F4;
-  text-shadow:12px 0 0 #34A853,0 12px 0 #FBBC05,12px 12px 0 #EA4335;
-  transform:translate(-6px,-6px) scale(.55);
+  display:inline-block;
+  color:transparent;
+  background:conic-gradient(from -45deg,#4285F4 0 25%,#34A853 0 50%,#FBBC05 0 75%,#EA4335 0 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
 }
 
 .google-review-copy{
