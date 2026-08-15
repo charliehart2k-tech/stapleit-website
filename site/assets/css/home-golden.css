@@ -91,6 +91,8 @@
 .service-slide p,.audience-item p,.trust-proof p,.audit-lead{font-size:var(--home-copy)!important;line-height:1.6!important}
 .service-points li,.audit-consent,.audit-explainer-copy,.contact-row{font-family:var(--font-body)!important}
 .service-cta,.audit-submit,.google-review-link,.contact-whatsapp{font-weight:600!important}
+.mobile-nav-group>summary::after{font-weight:600!important}
+.contact-row dt{font-weight:400!important}
 .audience-section,.trust-section{padding-top:var(--space-8)!important;padding-bottom:var(--space-8)!important}
 .audit-section{padding-top:112px!important;padding-bottom:88px!important}
 .contact-section{padding-top:var(--space-7)!important;padding-bottom:112px!important}
