@@ -1,63 +1,85 @@
 /*
  * Staple IT audit/contact presentation layer.
- * Structure and responsive layout are owned by index.html + home-polish.css.
+ * Structure + layout are owned by index.html and home-polish.css.
+ * This file owns only the liquid treatment, explainer interaction styling,
+ * and the contact-title shimmer.
  */
 
-.audit-form{isolation:isolate}
-.audit-form>*{position:relative;z-index:2}
+.audit-form{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.032),rgba(255,255,255,.008) 38%,rgba(0,0,0,.18)),
+    #020202!important;
+}
 
+.audit-form>*{position:relative;z-index:3}
+
+/* Two continuously moving organic light fields. No rectangular sweep. */
 .audit-form::before{
   content:"";
   position:absolute;
   z-index:1;
-  left:-28%;
-  top:-42%;
-  width:156%;
-  height:190%;
+  left:-32%;
+  top:-54%;
+  width:112%;
+  height:188%;
   pointer-events:none;
-  border-radius:48%;
+  border-radius:46% 54% 58% 42% / 52% 44% 56% 48%;
   background:
-    radial-gradient(ellipse at center,rgba(255,176,92,.34) 0%,rgba(249,115,22,.17) 22%,rgba(249,115,22,.055) 44%,transparent 68%),
-    radial-gradient(ellipse at center,rgba(255,104,18,.24) 0%,rgba(249,115,22,.10) 27%,transparent 64%),
-    radial-gradient(circle at center,rgba(255,239,220,.16) 0 3%,rgba(255,170,86,.065) 8%,transparent 20%);
-  background-repeat:no-repeat;
-  background-size:48% 58%,56% 64%,25% 32%;
-  background-position:-4% 22%,82% 72%,38% 30%;
-  filter:blur(42px) saturate(130%);
+    radial-gradient(ellipse at 35% 42%,rgba(255,184,108,.30) 0%,rgba(249,115,22,.17) 24%,rgba(249,115,22,.055) 48%,transparent 70%),
+    radial-gradient(ellipse at 68% 64%,rgba(255,110,28,.20) 0%,rgba(249,115,22,.08) 28%,transparent 66%);
+  filter:blur(48px) saturate(132%);
   mix-blend-mode:screen;
-  opacity:.20;
-  transform:translate3d(0,0,0);
-  animation:auditWaterFlow 15s ease-in-out infinite;
-  will-change:background-position,transform;
+  opacity:.42;
+  transform:translate3d(0,0,0) rotate(-6deg) scale(1.02);
+  transform-origin:center;
+  animation:auditOrganicA 15s ease-in-out infinite alternate;
+  will-change:transform;
 }
 
 .audit-form::after{
   content:"";
   position:absolute;
-  z-index:1;
-  top:0;
-  right:8%;
-  width:270px;
-  height:1px;
+  z-index:2;
+  right:-28%;
+  bottom:-58%;
+  width:86%;
+  height:154%;
   pointer-events:none;
-  background:linear-gradient(90deg,transparent,rgba(249,115,22,.78),transparent);
-  opacity:.42;
-  animation:auditWaterEdge 12s ease-in-out infinite;
+  border-radius:58% 42% 46% 54% / 44% 58% 42% 56%;
+  background:
+    radial-gradient(ellipse at 50% 50%,rgba(255,130,45,.20) 0%,rgba(249,115,22,.09) 30%,transparent 68%),
+    radial-gradient(circle at 38% 34%,rgba(255,239,220,.12) 0 5%,rgba(255,168,92,.05) 12%,transparent 26%);
+  filter:blur(56px) saturate(126%);
+  mix-blend-mode:screen;
+  opacity:.34;
+  transform:translate3d(0,0,0) rotate(8deg) scale(.96);
+  transform-origin:center;
+  animation:auditOrganicB 18s ease-in-out infinite alternate;
+  will-change:transform;
 }
 
-@keyframes auditWaterFlow{
-  0%{background-position:-4% 22%,82% 72%,38% 30%;transform:translate3d(-1.5%,-1%,0) rotate(-.7deg) scale(1.01)}
-  24%{background-position:24% 8%,58% 84%,63% 48%;transform:translate3d(1%,1.5%,0) rotate(.5deg) scale(1.025)}
-  49%{background-position:64% 26%,18% 58%,78% 20%;transform:translate3d(2%,-.5%,0) rotate(-.25deg) scale(1.015)}
-  74%{background-position:82% 68%,38% 12%,42% 70%;transform:translate3d(-.5%,1%,0) rotate(.65deg) scale(1.03)}
-  100%{background-position:12% 76%,72% 34%,20% 46%;transform:translate3d(-1.5%,-1%,0) rotate(-.6deg) scale(1.01)}
+@keyframes auditOrganicA{
+  0%{transform:translate3d(-8%,-5%,0) rotate(-7deg) scale(.96)}
+  28%{transform:translate3d(12%,4%,0) rotate(2deg) scale(1.07)}
+  58%{transform:translate3d(26%,-2%,0) rotate(-2deg) scale(1.02)}
+  100%{transform:translate3d(44%,8%,0) rotate(6deg) scale(1.10)}
 }
 
-@keyframes auditWaterEdge{
-  0%{transform:translateX(-30%);opacity:.24;filter:brightness(.85)}
-  38%{transform:translateX(12%);opacity:.5;filter:brightness(1.12)}
-  72%{transform:translateX(34%);opacity:.31;filter:brightness(.94)}
-  100%{transform:translateX(-12%);opacity:.42;filter:brightness(1.04)}
+@keyframes auditOrganicB{
+  0%{transform:translate3d(8%,8%,0) rotate(8deg) scale(.94)}
+  32%{transform:translate3d(-14%,-4%,0) rotate(-3deg) scale(1.06)}
+  68%{transform:translate3d(-28%,7%,0) rotate(4deg) scale(1.01)}
+  100%{transform:translate3d(-42%,-8%,0) rotate(-7deg) scale(1.10)}
+}
+
+/* Hover/focus only sharpen the glass very slightly; motion never starts/stops. */
+.audit-form:hover,
+.audit-form:focus-within{
+  border-color:rgba(249,115,22,.22)!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.34),0 0 52px rgba(249,115,22,.035)!important;
 }
 
 .audit-explainer{
@@ -65,57 +87,36 @@
   isolation:isolate;
   overflow:hidden;
   border:1px solid rgba(255,255,255,.12);
-  background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.018) 42%,rgba(249,115,22,.028));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(249,115,22,.05),0 16px 42px rgba(0,0,0,.18);
+  background:linear-gradient(145deg,rgba(255,255,255,.048),rgba(255,255,255,.015) 42%,rgba(249,115,22,.025));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1px 0 rgba(249,115,22,.04),0 16px 42px rgba(0,0,0,.18);
   backdrop-filter:blur(18px) saturate(125%);
   -webkit-backdrop-filter:blur(18px) saturate(125%);
-  transition:border-color 240ms ease,box-shadow 240ms ease,transform 240ms var(--ease);
+  transition:border-color 220ms ease,box-shadow 220ms ease;
 }
 
 .audit-explainer::before{
   content:"";
   position:absolute;
   z-index:0;
-  width:150%;
-  height:180%;
-  left:-48%;
-  top:-55%;
+  left:-34%;
+  top:-86%;
+  width:130%;
+  height:230%;
   pointer-events:none;
-  background:
-    radial-gradient(ellipse at 34% 42%,rgba(255,168,83,.25) 0%,rgba(249,115,22,.11) 22%,transparent 55%),
-    radial-gradient(ellipse at 72% 66%,rgba(255,108,23,.15) 0%,rgba(249,115,22,.055) 26%,transparent 58%);
-  filter:blur(26px) saturate(135%);
-  opacity:.64;
-  animation:auditExplainerFlow 10s ease-in-out infinite alternate;
+  border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(255,156,70,.20) 0%,rgba(249,115,22,.075) 34%,transparent 68%);
+  filter:blur(34px) saturate(125%);
+  opacity:.48;
+  animation:auditExplainerDrift 12s ease-in-out infinite alternate;
+  will-change:transform;
 }
 
-.audit-explainer::after{
-  content:"";
-  position:absolute;
-  z-index:1;
-  top:-45%;
-  bottom:-45%;
-  left:-42%;
-  width:34%;
-  pointer-events:none;
-  background:linear-gradient(102deg,transparent 0%,rgba(255,255,255,.02) 30%,rgba(255,255,255,.18) 49%,rgba(255,184,112,.10) 56%,transparent 78%);
-  filter:blur(3px);
-  transform:skewX(-13deg);
-  animation:auditExplainerSheen 6.8s ease-in-out infinite;
-}
+.audit-explainer::after{display:none!important}
 
-@keyframes auditExplainerFlow{
-  0%{transform:translate3d(-5%,4%,0) rotate(-5deg) scale(1)}
-  30%{transform:translate3d(11%,-3%,0) rotate(2deg) scale(1.04)}
-  62%{transform:translate3d(24%,5%,0) rotate(-1deg) scale(1.02)}
-  100%{transform:translate3d(38%,-4%,0) rotate(4deg) scale(1.05)}
-}
-
-@keyframes auditExplainerSheen{
-  0%,12%{transform:translate3d(-30%,0,0) skewX(-13deg);opacity:0}
-  22%{opacity:.72}
-  52%{opacity:.46}
-  70%,100%{transform:translate3d(430%,0,0) skewX(-13deg);opacity:0}
+@keyframes auditExplainerDrift{
+  0%{transform:translate3d(-7%,4%,0) rotate(-4deg) scale(.98)}
+  48%{transform:translate3d(18%,-3%,0) rotate(2deg) scale(1.04)}
+  100%{transform:translate3d(38%,5%,0) rotate(5deg) scale(1.08)}
 }
 
 .audit-explainer-toggle,.audit-explainer-body{position:relative;z-index:2}
@@ -157,7 +158,11 @@
   transition:transform 420ms var(--ease),border-color 180ms ease,background 180ms ease;
 }
 
-.audit-explainer.is-open .audit-explainer-icon{transform:rotate(45deg);border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.08)}
+.audit-explainer.is-open .audit-explainer-icon{
+  transform:rotate(45deg);
+  border-color:rgba(249,115,22,.35);
+  background:rgba(249,115,22,.08);
+}
 
 .audit-explainer-body{
   display:grid;
@@ -224,6 +229,6 @@
 }
 
 @media(prefers-reduced-motion:reduce){
-  .audit-form::before,.audit-form::after,.audit-explainer::before,.audit-explainer::after,#contact-title .accent-orange{animation:none!important}
+  .audit-form::before,.audit-form::after,.audit-explainer::before,#contact-title .accent-orange{animation:none!important}
   #contact-title .accent-orange{background:none!important;-webkit-text-fill-color:#fff;color:#fff!important}
 }
