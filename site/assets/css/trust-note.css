@@ -6,20 +6,19 @@
 .trust-sticky{
   display:flex!important;
   flex-direction:column!important;
-  align-items:stretch!important;
+  align-items:flex-start!important;
 }
 
 .trust-note-card{
   position:relative;
-  width:100%;
-  max-width:none;
-  min-height:258px;
-  margin:30px 0 0;
-  padding:34px 36px;
+  width:min(100%,500px);
+  min-height:190px;
+  margin:28px 0 0 .08em;
+  padding:30px 32px;
   display:flex;
   align-items:center;
   border:1px solid rgba(255,255,255,.13);
-  border-radius:26px;
+  border-radius:24px;
   overflow:hidden;
   isolation:isolate;
   background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.018));
@@ -55,19 +54,19 @@
 }
 
 .trust-note-card p{
-  width:100%;
-  max-width:27ch;
+  max-width:31ch;
   margin:0;
-  color:rgba(255,255,255,.94);
+  color:rgba(255,255,255,.91);
   font-family:var(--font-body);
-  font-size:clamp(1.38rem,1.7vw,1.62rem);
+  font-size:clamp(1.2rem,1.45vw,1.38rem);
   font-weight:400;
-  line-height:1.48;
-  letter-spacing:-.022em;
+  line-height:1.58;
+  letter-spacing:-.018em;
   text-wrap:pretty;
 }
 
-/* Match the Staple IT title accent exactly rather than using a separate approximation. */
+/* Match the Staple IT title accent exactly rather than using a separate
+   approximation. */
 .trust-note-accent{
   display:inline-block;
   font-size:1.16em;
@@ -95,6 +94,36 @@
   50%{transform:translateX(125%);opacity:0}
 }
 
+/* Desktop: make the left rail use the full height of the four trust rows.
+   The statement card fills the space beneath the heading down to the bottom
+   of the Local to Epsom, Surrey row instead of leaving a black void. */
+@media(min-width:981px){
+  .trust-inner{align-items:stretch!important}
+  .trust-intro{align-self:stretch!important;display:flex!important;min-height:100%!important}
+  .trust-sticky{
+    position:relative!important;
+    top:auto!important;
+    width:100%!important;
+    min-height:100%!important;
+    height:100%!important;
+    padding-top:8px!important;
+  }
+  .trust-note-card{
+    flex:1 1 auto!important;
+    width:100%!important;
+    max-width:none!important;
+    min-height:0!important;
+    margin:28px 0 0 .08em!important;
+    padding:38px 36px!important;
+    align-items:flex-start!important;
+  }
+  .trust-note-card p{
+    max-width:25ch!important;
+    font-size:clamp(1.34rem,1.55vw,1.55rem)!important;
+    line-height:1.56!important;
+  }
+}
+
 /* In browsers with scroll-linked animation support, make the purple/blue aura
    travel through the glass as this trust statement moves through the viewport. */
 @supports (animation-timeline:view()){
@@ -118,8 +147,8 @@
 }
 
 @media(max-width:980px){
-  .trust-note-card{width:100%;max-width:620px;min-height:220px;margin-top:24px;padding:30px 32px}
-  .trust-note-card p{max-width:31ch;font-size:clamp(1.22rem,3vw,1.45rem)}
+  .trust-note-card{width:100%;max-width:560px;min-height:0;margin-top:22px;padding:26px 28px}
+  .trust-note-card p{max-width:none;font-size:1.15rem}
 }
 
 @media(max-width:700px){
@@ -128,10 +157,10 @@
     max-width:none;
     min-height:0;
     margin:20px 0 30px;
-    padding:24px 22px;
+    padding:22px 20px;
     border-radius:20px;
   }
-  .trust-note-card p{max-width:none;font-size:1.08rem;line-height:1.56}
+  .trust-note-card p{font-size:1.04rem;line-height:1.58}
   .trust-note-accent{font-size:1.12em}
 }
 
