@@ -115,20 +115,21 @@
   const card = document.querySelector('[data-service-carousel]');
   if (!card) return;
 
+  const stage = card.querySelector('.service-stage');
   const slides = [...card.querySelectorAll('[data-service-slide]')];
   const indicators = [...card.querySelectorAll('.service-indicator button')];
-  if (slides.length < 2) return;
+  if (!stage || slides.length < 2 || indicators.length !== slides.length) return;
 
+  const touchLayout = window.matchMedia('(max-width: 980px)');
   const desktop = window.matchMedia('(min-width: 981px)');
-  const touchViewport = window.matchMedia('(hover: none), (pointer: coarse)');
 
   let index = 0;
   let timer = null;
   let wheelLock = 0;
   let wheelTotal = 0;
-  let pointer = null;
+  let scrollFrame = 0;
 
-  const paint = next => {
+  const setActive = next => {
     index = (next + slides.length) % slides.length;
 
     slides.forEach((slide, slideIndex) => {
@@ -150,16 +151,37 @@
     });
   };
 
-  const arm = () => {
+  const clearTimer = () => {
     window.clearInterval(timer);
     timer = null;
-    if (document.hidden) return;
-    timer = window.setInterval(() => paint(index + 1), 15000);
+  };
+
+  const arm = () => {
+    clearTimer();
+    if (!desktop.matches || document.hidden) return;
+    timer = window.setInterval(() => setActive(index + 1), 15000);
+  };
+
+  const scrollToIndex = (next, behavior = 'smooth') => {
+    const targetIndex = (next + slides.length) % slides.length;
+    setActive(targetIndex);
+
+    if (!touchLayout.matches) return;
+
+    stage.scrollTo({
+      left: slides[targetIndex].offsetLeft,
+      behavior
+    });
   };
 
   const go = next => {
-    paint(next);
-    arm();
+    if (touchLayout.matches) {
+      clearTimer();
+      scrollToIndex(next, 'smooth');
+    } else {
+      setActive(next);
+      arm();
+    }
   };
 
   indicators.forEach((indicator, indicatorIndex) => {
@@ -178,6 +200,7 @@
 
   card.addEventListener('wheel', event => {
     if (!desktop.matches) return;
+
     wheelTotal += event.deltaY;
     if (Math.abs(wheelTotal) < 35) return;
 
@@ -191,41 +214,46 @@
     go(index + direction);
   }, { passive: false });
 
-  card.addEventListener('pointerdown', event => {
-    const touchLike = event.pointerType === 'touch' || event.pointerType === 'pen' || touchViewport.matches;
-    if (!touchLike || !event.isPrimary) return;
-    if (event.target.closest('a,button,input,textarea,select,summary')) return;
+  /* Native touch scrolling is the source of truth on phone/tablet. */
+  stage.addEventListener('scroll', () => {
+    if (!touchLayout.matches) return;
 
-    pointer = {
-      id: event.pointerId,
-      x: event.clientX,
-      y: event.clientY
-    };
+    window.cancelAnimationFrame(scrollFrame);
+    scrollFrame = window.requestAnimationFrame(() => {
+      let nearest = 0;
+      let distance = Number.POSITIVE_INFINITY;
 
-    card.classList.add('is-swiping');
-    card.setPointerCapture?.(event.pointerId);
-  });
+      slides.forEach((slide, slideIndex) => {
+        const currentDistance = Math.abs(stage.scrollLeft - slide.offsetLeft);
+        if (currentDistance < distance) {
+          distance = currentDistance;
+          nearest = slideIndex;
+        }
+      });
 
-  card.addEventListener('pointerup', event => {
-    if (!pointer || event.pointerId !== pointer.id) return;
+      if (nearest !== index) setActive(nearest);
+    });
+  }, { passive: true });
 
-    const dx = event.clientX - pointer.x;
-    const dy = event.clientY - pointer.y;
-    pointer = null;
-    card.classList.remove('is-swiping');
+  const applyMode = () => {
+    clearTimer();
+    setActive(index);
 
-    if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.18) return;
-    go(dx < 0 ? index + 1 : index - 1);
-  });
+    if (touchLayout.matches) {
+      window.requestAnimationFrame(() => {
+        stage.scrollTo({ left: slides[index].offsetLeft, behavior: 'auto' });
+      });
+    } else {
+      stage.scrollLeft = 0;
+      arm();
+    }
+  };
 
-  card.addEventListener('pointercancel', () => {
-    pointer = null;
-    card.classList.remove('is-swiping');
-  });
-
+  touchLayout.addEventListener?.('change', applyMode);
   document.addEventListener('visibilitychange', arm);
-  paint(0);
-  arm();
+
+  setActive(0);
+  applyMode();
 })();
 
 (() => {
@@ -255,7 +283,7 @@
     autoOpened = true;
     window.setTimeout(() => {
       if (desktop.matches && !userToggled) setOpen(true);
-    }, 620);
+    }, 700);
   };
 
   setOpen(false);
@@ -309,9 +337,9 @@
 
   if (!elements.length) return;
 
-  elements.forEach((element, index) => {
+  elements.forEach((element, elementIndex) => {
     element.classList.add('motion-ready');
-    element.style.setProperty('--motion-delay', `${(index % 4) * 55}ms`);
+    element.style.setProperty('--motion-delay', `${(elementIndex % 4) * 50}ms`);
   });
 
   if (!('IntersectionObserver' in window)) {
@@ -326,8 +354,8 @@
       observer.unobserve(entry.target);
     });
   }, {
-    threshold: .12,
-    rootMargin: '0px 0px -6% 0px'
+    threshold: .10,
+    rootMargin: '0px 0px -5% 0px'
   });
 
   elements.forEach(element => observer.observe(element));
