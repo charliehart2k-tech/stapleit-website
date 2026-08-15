@@ -135,6 +135,11 @@
       const active = slideIndex === index;
       slide.classList.toggle('is-active', active);
       slide.setAttribute('aria-hidden', String(!active));
+
+      slide.querySelectorAll('a,button,input,textarea,select,[tabindex]').forEach(control => {
+        if (active) control.removeAttribute('tabindex');
+        else control.setAttribute('tabindex', '-1');
+      });
     });
 
     card.dataset.activeService = slides[index].dataset.service || '';
