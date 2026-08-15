@@ -4,6 +4,7 @@ set -euo pipefail
 REPO="${REPO:-/srv/stapleit/repo}"
 THEME="${THEME:-/var/www/stapleit/wp-content/themes/stapleit}"
 SOURCE="$REPO/site"
+BACKUP_DIR="${BACKUP_DIR:-/home/deploy/stapleit-theme-backups}"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 VERSION="$(git -C "$REPO" rev-parse --short HEAD)"
 
@@ -19,8 +20,11 @@ fi
 
 echo "Deploying Staple IT homepage from Git $VERSION"
 
-if [[ -f "$THEME/front-page.php" ]]; then
-  cp "$THEME/front-page.php" "$THEME/front-page.php.before-$VERSION-$STAMP"
+mkdir -p "$BACKUP_DIR"
+if [[ -f "$THEME/front-page.php" && -d "$THEME/assets" ]]; then
+  tar -czf "$BACKUP_DIR/stapleit-theme-$STAMP.tar.gz" \
+    -C "$THEME" front-page.php assets favicon.ico apple-touch-icon.png 2>/dev/null || true
+  echo "Rollback backup: $BACKUP_DIR/stapleit-theme-$STAMP.tar.gz"
 fi
 
 rm -rf "$THEME/assets"
@@ -68,9 +72,20 @@ PY
 
 php -l "$THEME/front-page.php"
 
+grep -q 'class="mobile-nav-group"' "$THEME/front-page.php"
+grep -q 'data-audit-explainer' "$THEME/front-page.php"
+grep -q 'class="contact-section"' "$THEME/front-page.php"
+grep -q 'assets/js/app.js?v=' "$THEME/front-page.php"
+
+if grep -q 'home-polish.js' "$THEME/front-page.php"; then
+  echo "Legacy home-polish.js is still referenced; refusing deployment." >&2
+  exit 1
+fi
+
 sudo chown -R deploy:www-data "$THEME"
 find "$THEME" -type d -exec chmod 755 {} \;
 find "$THEME" -type f -exec chmod 644 {} \;
 
+echo "Deployment verified."
 echo "Deployed Git $VERSION to $THEME"
 echo "Homepage source of truth: $SOURCE/index.html"
