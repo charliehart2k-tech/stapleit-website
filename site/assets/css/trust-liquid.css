@@ -131,3 +131,33 @@
 @media(max-width:640px){
   .trust-sticky h2{font-size:clamp(3.7rem,15vw,5rem)}
 }
+
+/* Trust icon layout correction.
+   The final icon layer originally positioned the small icons outside each H3.
+   .trust-proof-list intentionally clips overflow for the coloured auras, so the
+   icons were clipped as well. Keep every icon inside the heading flow instead. */
+.trust-proof h3{
+  display:flex!important;
+  align-items:flex-start!important;
+  gap:14px!important;
+  padding-left:0!important;
+}
+.trust-proof h3::before{
+  position:relative!important;
+  left:auto!important;
+  top:.08em!important;
+  flex:0 0 32px!important;
+  width:32px!important;
+  height:32px!important;
+  margin:0!important;
+}
+.trust-sticky::after{
+  width:116px!important;
+  height:116px!important;
+  margin-top:30px!important;
+}
+@media(max-width:700px){
+  .trust-proof h3{gap:12px!important;padding-left:0!important}
+  .trust-proof h3::before{flex-basis:28px!important;width:28px!important;height:28px!important;top:.06em!important}
+  .trust-sticky::after{width:78px!important;height:78px!important;margin-top:20px!important;margin-bottom:28px!important}
+}
