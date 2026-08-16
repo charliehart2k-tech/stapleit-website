@@ -34,10 +34,10 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   The hero film is the colour source. Staple IT is deliberately translucent so
-   the moving liquid behind it remains visible through the glyphs. Red and blue
-   exist only as fine refracted edges, not as an opaque gradient painted over
-   the lettering. */
+   The branded line is deliberately almost transparent. The moving hero film is
+   therefore the dominant colour source inside the glyphs; CSS only supplies a
+   thin glass edge, chromatic dispersion and a travelling specular caustic.
+   There is no opaque red/blue fill and no coloured rectangle behind the text. */
 .home-hero-copy h1{
   position:relative!important;
   isolation:isolate;
@@ -80,10 +80,12 @@
 .home-hero-copy h1::before{
   content:"Welcome to";
   top:0;
-  z-index:3;
+  z-index:2;
   color:#fff;
   -webkit-text-fill-color:#fff;
   -webkit-text-stroke:0;
+  background:none;
+  text-shadow:none;
 }
 
 .home-hero-copy h1::after{
@@ -91,65 +93,93 @@
   top:.98em;
   z-index:3;
 
-  /* Nearly-clear glass body. The hero video supplies the visible movement. */
-  color:rgba(235,242,255,.105);
-  -webkit-text-fill-color:rgba(235,242,255,.105);
-  -webkit-text-stroke:.72px rgba(215,228,255,.34);
+  /* Let the live hero video remain visible through almost the entire glyph. */
+  color:rgba(255,255,255,.035);
+  -webkit-text-fill-color:rgba(255,255,255,.035);
+  -webkit-text-stroke:.72px rgba(224,232,255,.34);
 
-  /* Chromatic refraction sits on the glass edge only. */
+  /* One narrow caustic travels through otherwise transparent glass. */
+  background:linear-gradient(108deg,
+    transparent 0%,
+    transparent 34%,
+    rgba(229,43,63,.04) 38%,
+    rgba(239,55,72,.22) 43%,
+    rgba(255,255,255,.23) 47%,
+    rgba(74,118,255,.26) 51%,
+    rgba(43,91,235,.10) 56%,
+    transparent 62%,
+    transparent 100%);
+  background-repeat:no-repeat;
+  background-size:275% 100%;
+  background-position:-118% 50%;
+  -webkit-background-clip:text;
+  background-clip:text;
+
+  /* RGB edge separation reads as refracted glass, not coloured typography. */
   text-shadow:
-    -1.15px .15px 0 rgba(238,38,64,.54),
-    1.15px -.10px 0 rgba(55,105,245,.62),
-    -.35px .75px 0 rgba(238,38,64,.18),
-    .35px -.75px 0 rgba(55,105,245,.22),
-    0 0 10px rgba(99,134,230,.055);
+    -.65px 0 rgba(235,42,61,.42),
+    .75px 0 rgba(54,101,255,.46),
+    0 -1px 0 rgba(255,255,255,.12),
+    0 1px 0 rgba(4,8,18,.34),
+    0 8px 22px rgba(0,0,0,.10);
 
   mix-blend-mode:screen;
-  filter:saturate(1.18) contrast(1.05);
-  opacity:.96;
-  animation:heroGlassRefraction 2.9s cubic-bezier(.45,.05,.25,1) infinite alternate;
-  will-change:text-shadow,filter,opacity;
+  filter:saturate(1.08) contrast(1.03);
+  opacity:.94;
+  animation:heroGlassCaustic 2.85s cubic-bezier(.3,.05,.22,1) infinite;
+  will-change:background-position,text-shadow,filter;
 }
 
-/* The movement is intentionally tiny. The large motion comes from the live hero
-   film showing through the transparent glyphs; this just makes the red/blue
-   refraction breathe around the edge like thick optical glass. */
-@keyframes heroGlassRefraction{
+@keyframes heroGlassCaustic{
   0%{
+    background-position:-128% 50%;
     text-shadow:
-      -1.30px .22px 0 rgba(238,38,64,.48),
-      1.05px -.16px 0 rgba(55,105,245,.58),
-      -.30px .82px 0 rgba(238,38,64,.15),
-      .42px -.70px 0 rgba(55,105,245,.20),
-      0 0 9px rgba(99,134,230,.045);
-    filter:saturate(1.10) contrast(1.03) brightness(.98);
+      -.48px 0 rgba(235,42,61,.28),
+      .58px 0 rgba(54,101,255,.34),
+      0 -1px 0 rgba(255,255,255,.10),
+      0 1px 0 rgba(4,8,18,.30),
+      0 8px 22px rgba(0,0,0,.08);
+    filter:saturate(1.02) contrast(1.01);
   }
-  34%{
+  28%{
+    background-position:-38% 50%;
     text-shadow:
-      -.72px -.20px 0 rgba(238,38,64,.58),
-      1.42px .18px 0 rgba(55,105,245,.68),
-      -.62px .44px 0 rgba(238,38,64,.21),
-      .18px -.92px 0 rgba(55,105,245,.24),
-      0 0 12px rgba(99,134,230,.06);
-    filter:saturate(1.22) contrast(1.06) brightness(1.03);
+      -.86px .08px rgba(235,42,61,.46),
+      .94px -.08px rgba(54,101,255,.50),
+      0 -1px 0 rgba(255,255,255,.15),
+      0 1px 0 rgba(4,8,18,.34),
+      0 8px 22px rgba(0,0,0,.10);
+    filter:saturate(1.10) contrast(1.04);
   }
-  67%{
+  54%{
+    background-position:42% 50%;
     text-shadow:
-      -1.48px -.08px 0 rgba(238,38,64,.56),
-      .68px .25px 0 rgba(55,105,245,.64),
-      -.18px .95px 0 rgba(238,38,64,.18),
-      .58px -.38px 0 rgba(55,105,245,.23),
-      0 0 11px rgba(99,134,230,.055);
-    filter:saturate(1.20) contrast(1.05) brightness(1.01);
+      -.58px -.08px rgba(235,42,61,.34),
+      .68px .08px rgba(54,101,255,.42),
+      0 -1px 0 rgba(255,255,255,.18),
+      0 1px 0 rgba(4,8,18,.32),
+      0 8px 22px rgba(0,0,0,.09);
+    filter:saturate(1.06) contrast(1.03);
+  }
+  78%{
+    background-position:108% 50%;
+    text-shadow:
+      -.92px 0 rgba(235,42,61,.48),
+      1px 0 rgba(54,101,255,.52),
+      0 -1px 0 rgba(255,255,255,.13),
+      0 1px 0 rgba(4,8,18,.36),
+      0 8px 22px rgba(0,0,0,.10);
+    filter:saturate(1.12) contrast(1.04);
   }
   100%{
+    background-position:172% 50%;
     text-shadow:
-      -.92px .18px 0 rgba(238,38,64,.50),
-      1.34px -.22px 0 rgba(55,105,245,.60),
-      -.52px .58px 0 rgba(238,38,64,.17),
-      .25px -.82px 0 rgba(55,105,245,.21),
-      0 0 9px rgba(99,134,230,.05);
-    filter:saturate(1.14) contrast(1.04) brightness(.99);
+      -.52px 0 rgba(235,42,61,.30),
+      .62px 0 rgba(54,101,255,.36),
+      0 -1px 0 rgba(255,255,255,.10),
+      0 1px 0 rgba(4,8,18,.30),
+      0 8px 22px rgba(0,0,0,.08);
+    filter:saturate(1.03) contrast(1.01);
   }
 }
 
@@ -173,6 +203,6 @@
 
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
-  .nav-pill:focus-visible::before,
-  .home-hero-copy h1::after{animation:none!important}
+  .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
+  .home-hero-copy h1::after{animation:none!important;background-position:48% 50%}
 }
