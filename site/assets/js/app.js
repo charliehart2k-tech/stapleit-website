@@ -316,6 +316,73 @@
   });
 })();
 
+/* Google review stars use real elements and a viewport observer rather than a
+ * scroll-timeline background trick. This makes the five-star drop deterministic
+ * across desktop and mobile browsers. */
+(() => {
+  const section = document.querySelector('.google-review-section');
+  const copy = section?.querySelector('.google-review-copy');
+  const card = section?.querySelector('.google-review-card');
+  if (!section || !copy || !card) return;
+
+  section.classList.add('google-stars-enhanced');
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .google-stars-enhanced .google-review-copy::after{display:none!important}
+    .google-review-stars{display:flex;align-items:center;gap:7px;min-height:27px;margin-top:10px}
+    .google-review-star{display:inline-block;color:#fbbc05;font-size:22px;line-height:1;opacity:0;transform:translate3d(0,-34px,0) scale(.72) rotate(-10deg);filter:drop-shadow(0 0 0 rgba(251,188,5,0));will-change:transform,opacity,filter}
+    .google-review-section.stars-in .google-review-star{animation:stapleGoogleStarDrop 720ms cubic-bezier(.16,1,.3,1) forwards}
+    .google-review-section.stars-in .google-review-star:nth-child(1){animation-delay:80ms}
+    .google-review-section.stars-in .google-review-star:nth-child(2){animation-delay:190ms}
+    .google-review-section.stars-in .google-review-star:nth-child(3){animation-delay:300ms}
+    .google-review-section.stars-in .google-review-star:nth-child(4){animation-delay:410ms}
+    .google-review-section.stars-in .google-review-star:nth-child(5){animation-delay:520ms}
+    @keyframes stapleGoogleStarDrop{
+      0%{opacity:0;transform:translate3d(0,-34px,0) scale(.72) rotate(-10deg);filter:drop-shadow(0 0 0 rgba(251,188,5,0))}
+      58%{opacity:1;transform:translate3d(0,5px,0) scale(1.12) rotate(2deg);filter:drop-shadow(0 0 15px rgba(251,188,5,.28))}
+      78%{opacity:1;transform:translate3d(0,-2px,0) scale(.98) rotate(0deg);filter:drop-shadow(0 0 11px rgba(251,188,5,.22))}
+      100%{opacity:1;transform:none;filter:drop-shadow(0 0 9px rgba(251,188,5,.18))}
+    }
+    @media(max-width:640px){.google-review-stars{gap:6px}.google-review-star{font-size:20px}}
+  `;
+  document.head.appendChild(style);
+
+  const stars = document.createElement('div');
+  stars.className = 'google-review-stars';
+  stars.setAttribute('aria-label', 'Five star Google reviews');
+
+  for (let index = 0; index < 5; index += 1) {
+    const star = document.createElement('span');
+    star.className = 'google-review-star';
+    star.setAttribute('aria-hidden', 'true');
+    star.textContent = '★';
+    stars.appendChild(star);
+  }
+
+  copy.appendChild(stars);
+
+  const reveal = () => {
+    section.classList.add('stars-in');
+  };
+
+  if (!('IntersectionObserver' in window)) {
+    reveal();
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    reveal();
+    observer.disconnect();
+  }, {
+    threshold: .38,
+    rootMargin: '0px 0px -8% 0px'
+  });
+
+  observer.observe(card);
+})();
+
 (() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
