@@ -129,9 +129,9 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
 
     if (
         $name === '' ||
-        mb_strlen( $name ) > 120 ||
+        strlen( $name ) > 120 ||
         ! is_email( $email ) ||
-        mb_strlen( $email ) > 254 ||
+        strlen( $email ) > 254 ||
         $consent !== 'yes'
     ) {
         return new WP_Error(
