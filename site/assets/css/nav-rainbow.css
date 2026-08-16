@@ -34,11 +34,19 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Welcome to remains solid white. Staple IT is rendered as clear refractive
-   glass: no coloured fill, no gradient paint and no rectangle. The live hero
-   remains visible through the glyphs; only the glass rim and RGB dispersion are
-   drawn. A tiny animated displacement makes the rim breathe like liquid glass. */
+   Do not fake transparent glass against a live video: that reads as washed-out
+   pink because the chromatic edge colours blend through the glyph. Instead the
+   brand line is treated as dark liquid chrome with physically separated red and
+   blue lenses. The lenses drift independently while the base metal moves more
+   slowly, so the colour never collapses into a flat magenta fill. */
+@property --hero-scroll-shift{
+  syntax:"<percentage>";
+  inherits:true;
+  initial-value:0%;
+}
+
 .home-hero-copy h1{
+  --hero-scroll-shift:0%;
   position:relative!important;
   isolation:isolate;
   display:block!important;
@@ -52,7 +60,6 @@
   background:none!important;
   text-shadow:none!important;
   filter:none!important;
-  animation:none!important;
   line-height:.94!important;
 }
 
@@ -92,114 +99,119 @@
   content:"Staple IT";
   top:.98em;
   z-index:3;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+  -webkit-text-stroke:.55px rgba(88,116,180,.48);
 
-  /* The interior is intentionally clear. */
-  color:rgba(255,255,255,.025);
-  -webkit-text-fill-color:rgba(255,255,255,.025);
-  background:none!important;
-  -webkit-background-clip:initial!important;
-  background-clip:initial!important;
+  /* Blue and red stay spatially separate. The dark chrome layer underneath is
+     what gives the word depth without introducing white or purple. */
+  background:
+    radial-gradient(ellipse at 18% 36%,
+      #4f7fff 0 5%,
+      #2f63e8 10%,
+      #163a95 18%,
+      rgba(10,24,59,0) 34%),
+    radial-gradient(ellipse at 82% 64%,
+      #f13a4d 0 5%,
+      #d91f32 10%,
+      #761126 18%,
+      rgba(35,8,16,0) 34%),
+    linear-gradient(108deg,
+      #071020 0%,
+      #0b1c42 10%,
+      #1748bd 18%,
+      #326cf0 25%,
+      #0a1735 34%,
+      #050b17 41%,
+      #44101d 47%,
+      #d82034 54%,
+      #861226 61%,
+      #0a132a 69%,
+      #153f9f 78%,
+      #2b63e5 86%,
+      #081326 94%,
+      #050a14 100%);
+  background-repeat:no-repeat;
+  background-size:175% 190%,175% 190%,315% 100%;
+  background-position:
+    calc(-22% + var(--hero-scroll-shift)) 20%,
+    calc(118% + var(--hero-scroll-shift)) 78%,
+    calc(-112% + var(--hero-scroll-shift)) 50%;
+  -webkit-background-clip:text;
+  background-clip:text;
 
-  /* Thick-glass rim with restrained red/blue chromatic dispersion. */
-  -webkit-text-stroke:1.05px rgba(218,228,255,.38);
   text-shadow:
-    -1.15px .05px 0 rgba(230,43,43,.52),
-     1.20px -.05px 0 rgba(63,111,255,.58),
-     0 -1px 0 rgba(255,255,255,.16),
-     0 1px 0 rgba(2,5,12,.72),
-     0 0 10px rgba(89,128,255,.06);
-  opacity:.92;
-  mix-blend-mode:normal;
-
-  /* Animated sub-pixel displacement: this deforms the glass rim itself instead
-     of sliding a colour gradient through the word. */
-  filter:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g' x='-8%25' y='-14%25' width='116%25' height='128%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .032' numOctaves='2' seed='7' result='n'%3E%3Canimate attributeName='baseFrequency' values='.012 .032;.018 .026;.010 .038;.012 .032' dur='4.2s' repeatCount='indefinite'/%3E%3C/feTurbulence%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='1.7' xChannelSelector='R' yChannelSelector='B'/%3E%3C/filter%3E%3C/svg%3E%23g");
-  animation:heroGlassEdge 3.8s ease-in-out infinite alternate;
-  will-change:text-shadow,opacity,transform;
+    0 -1px 0 rgba(67,100,181,.16),
+    0 1px 0 rgba(0,0,0,.78),
+    0 9px 20px rgba(0,0,0,.18);
+  filter:saturate(1.22) contrast(1.10) brightness(1.02);
+  animation:heroLiquidChrome 3.35s cubic-bezier(.42,.02,.18,1) infinite alternate;
+  will-change:background-position,background-size,filter,transform;
 }
 
-@keyframes heroGlassEdge{
+@keyframes heroLiquidChrome{
   0%{
-    opacity:.82;
+    background-size:175% 190%,175% 190%,315% 100%;
+    background-position:
+      calc(-28% + var(--hero-scroll-shift)) 16%,
+      calc(124% + var(--hero-scroll-shift)) 82%,
+      calc(-116% + var(--hero-scroll-shift)) 50%;
+    filter:saturate(1.14) contrast(1.08) brightness(.98);
     transform:translate3d(0,0,0);
-    text-shadow:
-      -.85px 0 0 rgba(230,43,43,.38),
-       .92px 0 0 rgba(63,111,255,.44),
-       0 -1px 0 rgba(255,255,255,.13),
-       0 1px 0 rgba(2,5,12,.68),
-       0 0 8px rgba(89,128,255,.04);
   }
-  34%{
-    opacity:.96;
-    transform:translate3d(.01em,-.006em,0);
-    text-shadow:
-      -1.35px .08px 0 rgba(230,43,43,.58),
-       1.42px -.08px 0 rgba(63,111,255,.64),
-       0 -1px 0 rgba(255,255,255,.19),
-       0 1px 0 rgba(2,5,12,.74),
-       0 0 12px rgba(89,128,255,.07);
+  23%{
+    background-size:188% 178%,166% 202%,300% 104%;
+    background-position:
+      calc(-4% + var(--hero-scroll-shift)) 48%,
+      calc(106% + var(--hero-scroll-shift)) 58%,
+      calc(-58% + var(--hero-scroll-shift)) 50%;
+    filter:saturate(1.27) contrast(1.11) brightness(1.03);
+    transform:translate3d(.003em,-.003em,0);
   }
-  67%{
-    opacity:.88;
-    transform:translate3d(-.006em,.004em,0);
-    text-shadow:
-      -.72px -.06px 0 rgba(230,43,43,.34),
-       .82px .06px 0 rgba(63,111,255,.48),
-       0 -1px 0 rgba(255,255,255,.17),
-       0 1px 0 rgba(2,5,12,.70),
-       0 0 9px rgba(89,128,255,.05);
+  49%{
+    background-size:164% 206%,184% 174%,326% 96%;
+    background-position:
+      calc(16% + var(--hero-scroll-shift)) 70%,
+      calc(82% + var(--hero-scroll-shift)) 28%,
+      calc(4% + var(--hero-scroll-shift)) 50%;
+    filter:saturate(1.32) contrast(1.13) brightness(1.05);
+    transform:translate3d(-.002em,.002em,0);
+  }
+  74%{
+    background-size:182% 182%,170% 196%,306% 102%;
+    background-position:
+      calc(34% + var(--hero-scroll-shift)) 30%,
+      calc(64% + var(--hero-scroll-shift)) 76%,
+      calc(66% + var(--hero-scroll-shift)) 50%;
+    filter:saturate(1.25) contrast(1.10) brightness(1.01);
+    transform:translate3d(.002em,.001em,0);
   }
   100%{
-    opacity:.94;
-    transform:translate3d(.004em,.002em,0);
-    text-shadow:
-      -1.18px 0 0 rgba(230,43,43,.50),
-       1.28px 0 0 rgba(63,111,255,.60),
-       0 -1px 0 rgba(255,255,255,.15),
-       0 1px 0 rgba(2,5,12,.73),
-       0 0 11px rgba(89,128,255,.06);
+    background-size:170% 198%,188% 180%,320% 100%;
+    background-position:
+      calc(48% + var(--hero-scroll-shift)) 58%,
+      calc(42% + var(--hero-scroll-shift)) 38%,
+      calc(132% + var(--hero-scroll-shift)) 50%;
+    filter:saturate(1.18) contrast(1.09) brightness(.99);
+    transform:translate3d(0,-.002em,0);
   }
 }
 
-/* Make the glass respond to the page position as well as idling. */
+/* The idle liquid keeps moving, while page position nudges the whole optical
+   field. This means scrolling changes the refraction without freezing the idle
+   animation. */
 @supports (animation-timeline:view()){
-  .home-hero-copy h1::after{
-    animation-name:heroGlassScroll;
-    animation-duration:1ms;
-    animation-timing-function:linear;
-    animation-fill-mode:both;
-    animation-iteration-count:1;
+  .home-hero-copy h1{
+    animation:heroScrollDrive 1ms linear both;
     animation-timeline:view(block);
     animation-range:entry 0% exit 100%;
   }
 }
 
-@keyframes heroGlassScroll{
-  0%{
-    opacity:.72;
-    transform:translate3d(-.012em,.006em,0);
-    text-shadow:-.65px 0 0 rgba(230,43,43,.28),.72px 0 0 rgba(63,111,255,.34),0 -1px 0 rgba(255,255,255,.10),0 1px 0 rgba(2,5,12,.66);
-  }
-  28%{
-    opacity:.92;
-    transform:translate3d(.006em,-.004em,0);
-    text-shadow:-1.15px 0 0 rgba(230,43,43,.50),1.22px 0 0 rgba(63,111,255,.58),0 -1px 0 rgba(255,255,255,.16),0 1px 0 rgba(2,5,12,.72);
-  }
-  55%{
-    opacity:1;
-    transform:translate3d(-.004em,.002em,0);
-    text-shadow:-1.45px .06px 0 rgba(230,43,43,.60),1.52px -.06px 0 rgba(63,111,255,.68),0 -1px 0 rgba(255,255,255,.20),0 1px 0 rgba(2,5,12,.76);
-  }
-  78%{
-    opacity:.90;
-    transform:translate3d(.008em,-.003em,0);
-    text-shadow:-.95px 0 0 rgba(230,43,43,.42),1.02px 0 0 rgba(63,111,255,.50),0 -1px 0 rgba(255,255,255,.14),0 1px 0 rgba(2,5,12,.70);
-  }
-  100%{
-    opacity:.68;
-    transform:translate3d(.012em,.004em,0);
-    text-shadow:-.58px 0 0 rgba(230,43,43,.24),.64px 0 0 rgba(63,111,255,.30),0 -1px 0 rgba(255,255,255,.09),0 1px 0 rgba(2,5,12,.64);
-  }
+@keyframes heroScrollDrive{
+  0%{--hero-scroll-shift:-24%}
+  50%{--hero-scroll-shift:0%}
+  100%{--hero-scroll-shift:24%}
 }
 
 @media(max-width:700px){
@@ -223,5 +235,6 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1::after{animation:none!important;transform:none!important}
+  .home-hero-copy h1,
+  .home-hero-copy h1::after{animation:none!important}
 }
