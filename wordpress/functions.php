@@ -33,6 +33,35 @@ add_action( 'wp_enqueue_scripts', function () {
     );
 } );
 
+/* Keep the public surface lean. These features are unused on Staple IT and
+ * add unnecessary output or attack surface. */
+add_action( 'after_setup_theme', function () {
+    remove_action( 'wp_head', 'wp_generator' );
+    remove_action( 'wp_head', 'rsd_link' );
+    remove_action( 'wp_head', 'wlwmanifest_link' );
+    remove_action( 'wp_head', 'wp_shortlink_wp_head', 10 );
+    remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+    remove_action( 'wp_print_styles', 'print_emoji_styles' );
+} );
+
+add_filter( 'emoji_svg_url', '__return_false' );
+add_filter( 'xmlrpc_enabled', '__return_false' );
+add_filter( 'pre_option_default_pingback_flag', '__return_zero' );
+add_filter( 'wp_headers', function ( $headers ) {
+    unset( $headers['X-Pingback'] );
+    return $headers;
+} );
+
+/* Sensible sender identity. An authenticated SMTP plugin can override these
+ * filters later; until then WordPress will at least identify mail correctly. */
+add_filter( 'wp_mail_from', function () {
+    return 'hello@stapleit.co.uk';
+}, 5 );
+
+add_filter( 'wp_mail_from_name', function () {
+    return 'Staple IT';
+}, 5 );
+
 add_action( 'init', function () {
     register_post_type( 'stapleit_lead', array(
         'labels' => array(
@@ -52,16 +81,8 @@ add_action( 'init', function () {
     ) );
 } );
 
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'stapleit/v1', '/audit', array(
-        'methods'             => 'POST',
-        'callback'            => 'stapleit_handle_audit_request',
-        'permission_callback' => '__return_true',
-    ) );
-} );
-
 /* Browser submissions use admin-ajax.php so form delivery does not depend on
- * REST rewrite routing. The REST endpoint remains available for future use. */
+ * REST rewrite routing. */
 add_action( 'wp_ajax_nopriv_stapleit_audit', 'stapleit_handle_audit_ajax' );
 add_action( 'wp_ajax_stapleit_audit', 'stapleit_handle_audit_ajax' );
 
@@ -97,8 +118,8 @@ function stapleit_request_ip() {
 }
 
 function stapleit_handle_audit_request( WP_REST_Request $request ) {
-    $name    = sanitize_text_field( (string) $request->get_param( 'name' ) );
-    $email   = sanitize_email( (string) $request->get_param( 'email' ) );
+    $name    = trim( sanitize_text_field( (string) $request->get_param( 'name' ) ) );
+    $email   = trim( sanitize_email( (string) $request->get_param( 'email' ) ) );
     $consent = sanitize_text_field( (string) $request->get_param( 'contact-consent' ) );
     $website = sanitize_text_field( (string) $request->get_param( 'website' ) );
 
@@ -106,7 +127,13 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
         return new WP_REST_Response( array( 'ok' => true ), 200 );
     }
 
-    if ( $name === '' || ! is_email( $email ) || $consent !== 'yes' ) {
+    if (
+        $name === '' ||
+        mb_strlen( $name ) > 120 ||
+        ! is_email( $email ) ||
+        mb_strlen( $email ) > 254 ||
+        $consent !== 'yes'
+    ) {
         return new WP_Error(
             'stapleit_invalid_form',
             'Please enter your name, a valid email address and confirm that Staple IT may contact you.',
@@ -145,7 +172,6 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
     update_post_meta( $lead_id, '_stapleit_name', $name );
     update_post_meta( $lead_id, '_stapleit_email', $email );
     update_post_meta( $lead_id, '_stapleit_consent', 'yes' );
-    update_post_meta( $lead_id, '_stapleit_ip', $ip );
     update_post_meta( $lead_id, '_stapleit_received_at', current_time( 'mysql' ) );
 
     $subject = sprintf( '[Staple IT] Free IT audit request — %s', $name );
@@ -166,11 +192,25 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
         sprintf( 'Reply-To: %s <%s>', $name, $email ),
     );
 
+    $mail_error = '';
+    $mail_failure_listener = function ( $error ) use ( &$mail_error ) {
+        if ( is_wp_error( $error ) ) {
+            $mail_error = $error->get_error_message();
+        }
+    };
+
+    add_action( 'wp_mail_failed', $mail_failure_listener );
     $mail_sent = wp_mail( 'hello@stapleit.co.uk', $subject, $message, $headers );
+    remove_action( 'wp_mail_failed', $mail_failure_listener );
+
     update_post_meta( $lead_id, '_stapleit_mail_sent', $mail_sent ? 'yes' : 'no' );
 
+    if ( $mail_error !== '' ) {
+        update_post_meta( $lead_id, '_stapleit_mail_error', sanitize_text_field( $mail_error ) );
+    }
+
     if ( ! $mail_sent ) {
-        error_log( sprintf( 'Staple IT audit enquiry %d saved but wp_mail() returned false.', $lead_id ) );
+        error_log( sprintf( 'Staple IT audit enquiry %d saved but wp_mail() returned false%s.', $lead_id, $mail_error ? ': ' . $mail_error : '' ) );
     }
 
     return new WP_REST_Response( array(
@@ -184,6 +224,7 @@ add_filter( 'manage_stapleit_lead_posts_columns', function ( $columns ) {
         'cb'             => $columns['cb'],
         'title'          => 'Enquiry',
         'stapleit_email' => 'Email',
+        'stapleit_mail'  => 'Mail',
         'date'           => 'Received',
     );
 } );
@@ -194,6 +235,11 @@ add_action( 'manage_stapleit_lead_posts_custom_column', function ( $column, $pos
         if ( $email ) {
             echo '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>';
         }
+    }
+
+    if ( $column === 'stapleit_mail' ) {
+        $mail_sent = get_post_meta( $post_id, '_stapleit_mail_sent', true );
+        echo esc_html( $mail_sent === 'yes' ? 'Sent' : 'Not sent' );
     }
 }, 10, 2 );
 
@@ -214,7 +260,7 @@ function stapleit_render_enquiry_details( WP_Post $post ) {
         'Email'      => get_post_meta( $post->ID, '_stapleit_email', true ),
         'Received'   => get_post_meta( $post->ID, '_stapleit_received_at', true ),
         'Mail sent'  => get_post_meta( $post->ID, '_stapleit_mail_sent', true ),
-        'IP address' => get_post_meta( $post->ID, '_stapleit_ip', true ),
+        'Mail error' => get_post_meta( $post->ID, '_stapleit_mail_error', true ),
     );
 
     echo '<table class="widefat striped"><tbody>';
