@@ -190,7 +190,7 @@
     min-height:100%!important;
     display:grid!important;
     grid-template-rows:auto auto minmax(0,1fr) auto!important;
-    row-gap:22px!important;
+    row-gap:26px!important;
     align-items:start!important;
   }
   .home-services-card .service-slide h2,
@@ -201,18 +201,29 @@
   }
   .home-services-card .service-slide p{
     align-self:start!important;
+    max-width:38rem!important;
+    font-size:clamp(1.16rem,1.45vw,1.28rem)!important;
+    line-height:1.62!important;
+    letter-spacing:-.012em!important;
   }
   .home-services-card .service-points{
     align-self:stretch!important;
     display:flex!important;
     flex-direction:column!important;
     justify-content:center!important;
-    gap:14px!important;
+    gap:17px!important;
     padding-block:8px!important;
+  }
+  .home-services-card .service-points li{
+    font-size:clamp(1rem,1.18vw,1.08rem)!important;
+    line-height:1.5!important;
   }
   .home-services-card .service-cta{
     align-self:end!important;
     justify-self:start!important;
+    min-height:54px!important;
+    padding-inline:26px!important;
+    font-size:14px!important;
   }
 }
 
