@@ -33,59 +33,68 @@
   box-shadow:0 10px 24px rgba(0,0,0,.24),0 0 18px rgba(111,99,255,.08)!important;
 }
 
-/* Hero title: use the same colour-inside-the-glyph treatment as the large
-   trust/WIN typography, but keep this one deliberately restrained and
-   red/white/blue. White remains the dominant state while red and blue liquid
-   bands travel through the letters. There is no outer glow or separate blue IT. */
+/* Hero: "Welcome to" stays solid white. Only Staple IT carries the moving
+   red/white/blue liquid treatment. The layers move at different rates so the
+   colour feels like it is flowing through the glyphs rather than sliding as a
+   single flat gradient. */
 .home-hero-copy h1{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  background:none!important;
+  text-shadow:none!important;
+  filter:none!important;
+  animation:none!important;
+}
+
+.hero-brand-liquid{
+  display:inline-block;
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
-  text-shadow:none!important;
   background:
-    radial-gradient(circle at 14% 36%,rgba(255,255,255,1) 0 1.2%,rgba(255,255,255,.55) 2.5%,transparent 6.5%),
-    radial-gradient(circle at 72% 64%,rgba(255,255,255,.92) 0 1%,rgba(255,255,255,.34) 2.2%,transparent 6%),
+    radial-gradient(ellipse at 18% 34%,rgba(255,255,255,1) 0 3%,rgba(255,255,255,.62) 6%,transparent 20%),
+    radial-gradient(circle at 78% 62%,rgba(29,78,216,.98) 0 7%,rgba(29,78,216,.52) 15%,transparent 34%),
+    radial-gradient(circle at 42% 58%,rgba(230,43,43,.96) 0 7%,rgba(230,43,43,.46) 16%,transparent 36%),
     linear-gradient(104deg,
       #ffffff 0%,
-      #ffffff 14%,
+      #ffffff 13%,
       #e62b2b 25%,
-      #ffffff 38%,
-      #ffffff 48%,
-      #1d4ed8 59%,
-      #ffffff 72%,
+      #ffffff 39%,
+      #f8fafc 49%,
+      #1d4ed8 61%,
+      #ffffff 74%,
       #ffffff 82%,
       #e62b2b 91%,
       #ffffff 100%);
   background-repeat:no-repeat;
-  background-size:165% 170%,175% 180%,290% 100%;
-  background-position:-28% 12%,110% 82%,0% 50%;
+  background-size:190% 190%,185% 185%,180% 180%,310% 100%;
+  background-position:-38% 8%,118% 82%,18% 72%,0% 50%;
   -webkit-background-clip:text!important;
   background-clip:text!important;
-  animation:heroUnionLiquid 8.5s ease-in-out infinite alternate;
+  filter:saturate(1.12) brightness(1.08);
+  animation:heroBrandLiquid 9s cubic-bezier(.45,.05,.2,1) infinite alternate;
+  will-change:background-position,filter;
 }
 
-.home-hero-copy h1 .it-blue{
-  color:inherit!important;
-  -webkit-text-fill-color:inherit!important;
-  text-shadow:none!important;
-  background:none!important;
-}
-
-@keyframes heroUnionLiquid{
+@keyframes heroBrandLiquid{
   0%{
-    background-position:-32% 10%,118% 84%,0% 50%;
-    filter:saturate(1.04) brightness(1.02);
+    background-position:-40% 8%,122% 84%,10% 74%,0% 50%;
+    filter:saturate(1.04) brightness(1.03);
   }
-  34%{
-    background-position:12% 52%,78% 34%,34% 50%;
-    filter:saturate(1.12) brightness(1.08);
+  28%{
+    background-position:4% 48%,88% 30%,38% 26%,27% 50%;
+    filter:saturate(1.14) brightness(1.09);
   }
-  68%{
-    background-position:58% 76%,28% 72%,68% 50%;
-    filter:saturate(1.16) brightness(1.10);
+  56%{
+    background-position:52% 78%,44% 72%,72% 60%,58% 50%;
+    filter:saturate(1.18) brightness(1.12);
+  }
+  78%{
+    background-position:88% 34%,8% 42%,46% 86%,82% 50%;
+    filter:saturate(1.13) brightness(1.08);
   }
   100%{
-    background-position:108% 26%,-18% 28%,100% 50%;
-    filter:saturate(1.08) brightness(1.04);
+    background-position:132% 68%,-30% 18%,-18% 32%,100% 50%;
+    filter:saturate(1.07) brightness(1.04);
   }
 }
 
@@ -98,5 +107,5 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1{animation:none!important;background-position:50% 50%,50% 50%,50% 50%}
+  .hero-brand-liquid{animation:none!important;background-position:48% 50%,62% 48%,38% 56%,54% 50%}
 }
