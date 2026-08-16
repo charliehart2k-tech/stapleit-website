@@ -7,6 +7,23 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+add_action( 'wp_enqueue_scripts', function () {
+    if ( ! is_front_page() ) {
+        return;
+    }
+
+    $forms_path = get_template_directory() . '/assets/js/forms.js';
+    $version    = file_exists( $forms_path ) ? (string) filemtime( $forms_path ) : null;
+
+    wp_enqueue_script(
+        'stapleit-forms',
+        get_template_directory_uri() . '/assets/js/forms.js',
+        array(),
+        $version,
+        true
+    );
+} );
+
 add_action( 'init', function () {
     register_post_type( 'stapleit_lead', array(
         'labels' => array(
@@ -158,11 +175,11 @@ add_action( 'add_meta_boxes_stapleit_lead', function () {
 
 function stapleit_render_enquiry_details( WP_Post $post ) {
     $fields = array(
-        'Name'        => get_post_meta( $post->ID, '_stapleit_name', true ),
-        'Email'       => get_post_meta( $post->ID, '_stapleit_email', true ),
-        'Received'    => get_post_meta( $post->ID, '_stapleit_received_at', true ),
-        'Mail sent'   => get_post_meta( $post->ID, '_stapleit_mail_sent', true ),
-        'IP address'  => get_post_meta( $post->ID, '_stapleit_ip', true ),
+        'Name'       => get_post_meta( $post->ID, '_stapleit_name', true ),
+        'Email'      => get_post_meta( $post->ID, '_stapleit_email', true ),
+        'Received'   => get_post_meta( $post->ID, '_stapleit_received_at', true ),
+        'Mail sent'  => get_post_meta( $post->ID, '_stapleit_mail_sent', true ),
+        'IP address' => get_post_meta( $post->ID, '_stapleit_ip', true ),
     );
 
     echo '<table class="widefat striped"><tbody>';
