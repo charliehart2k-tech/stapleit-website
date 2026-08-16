@@ -159,10 +159,19 @@
 }
 
 @media(min-width:981px){
+  /* Put feedback on its own full-width row beneath the CTA. The heading only
+     occupies rows 1-4, so row 5 is intentionally clear across both columns. */
   .audit-form-status{
-    grid-column:2 / -1!important;
-    grid-row:4!important;
+    grid-column:1 / -1!important;
+    grid-row:5!important;
     width:100%!important;
+    min-height:58px;
+    display:flex;
+    align-items:center;
+  }
+  .audit-explainer{
+    grid-column:1 / -1!important;
+    grid-row:6!important;
   }
 }
 
