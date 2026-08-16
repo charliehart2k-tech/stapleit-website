@@ -4,6 +4,13 @@
   const submit = form?.querySelector('.audit-submit');
   if (!form || !status || !submit) return;
 
+  const setStatus = (state, message) => {
+    status.hidden = false;
+    status.classList.remove('is-sending', 'is-success', 'is-error');
+    status.classList.add(`is-${state}`);
+    status.textContent = message;
+  };
+
   const honeypot = document.createElement('input');
   honeypot.type = 'text';
   honeypot.name = 'website';
@@ -28,8 +35,7 @@
     submit.disabled = true;
     submit.textContent = 'Sending…';
     form.setAttribute('aria-busy', 'true');
-    status.hidden = false;
-    status.textContent = 'Sending your request…';
+    setStatus('sending', 'Sending your request…');
 
     try {
       const body = new FormData(form);
@@ -55,12 +61,18 @@
         throw new Error(payload?.message || 'We could not send your request. Please try again.');
       }
 
-      status.textContent = payload.message || 'Thanks — your audit request has been received. We’ll get back to you within one working day.';
+      setStatus(
+        'success',
+        payload.message || 'Thanks — your audit request has been received. We’ll get back to you within one working day.'
+      );
       form.reset();
     } catch (error) {
-      status.textContent = error instanceof Error
-        ? error.message
-        : 'We could not send your request. Please try again or email hello@stapleit.co.uk.';
+      setStatus(
+        'error',
+        error instanceof Error
+          ? error.message
+          : 'We could not send your request. Please try again or email hello@stapleit.co.uk.'
+      );
     } finally {
       submit.disabled = false;
       submit.textContent = defaultLabel;
