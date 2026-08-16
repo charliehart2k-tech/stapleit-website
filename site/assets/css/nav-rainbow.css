@@ -109,29 +109,32 @@
   -webkit-text-fill-color:transparent;
   -webkit-text-stroke:0;
   text-shadow:none;
+
+  /* Radial colour pools sit over an always-opaque liquid base. The bottom
+     gradient guarantees every glyph stays filled while the pools move. */
   background-image:
-    radial-gradient(circle at 16% 32%,rgba(79,133,255,1) 0 6%,rgba(79,133,255,.42) 15%,transparent 31%),
-    radial-gradient(circle at 72% 68%,rgba(230,43,43,1) 0 6%,rgba(230,43,43,.42) 15%,transparent 31%),
-    radial-gradient(circle at 52% 24%,rgba(168,85,247,.92) 0 5%,rgba(168,85,247,.18) 14%,transparent 27%),
+    radial-gradient(circle at 16% 32%,rgba(96,165,250,.96) 0 8%,rgba(96,165,250,.46) 18%,rgba(96,165,250,.12) 30%,transparent 42%),
+    radial-gradient(circle at 74% 66%,rgba(239,68,68,.92) 0 8%,rgba(239,68,68,.42) 18%,rgba(239,68,68,.10) 30%,transparent 42%),
+    radial-gradient(circle at 52% 24%,rgba(168,85,247,.62) 0 7%,rgba(168,85,247,.18) 18%,transparent 34%),
     linear-gradient(104deg,
-      #3d78ff 0%,
-      #745cff 16%,
-      #ba42f5 31%,
-      #f02fb0 45%,
-      #ff2441 61%,
-      #ff4b2f 78%,
-      #ff7a18 100%);
+      #2563eb 0%,
+      #3b82f6 16%,
+      #8b5cf6 34%,
+      #d946ef 52%,
+      #f43f5e 70%,
+      #ff5a36 86%,
+      #f97316 100%);
   background-repeat:no-repeat;
-  background-size:145% 155%,150% 160%,142% 150%,225% 100%;
+  background-size:165% 170%,175% 180%,155% 160%,240% 100%;
   background-position:
-    calc(-48% + var(--hero-liquid-shift)) 4%,
-    calc(136% + var(--hero-liquid-shift)) 94%,
-    calc(104% + var(--hero-liquid-shift)) 6%,
-    calc(-42% + var(--hero-liquid-shift)) 50%;
+    calc(-18% + var(--hero-liquid-shift)) 20%,
+    calc(112% + var(--hero-liquid-shift)) 80%,
+    calc(88% + var(--hero-liquid-shift)) 12%,
+    calc(0% + var(--hero-liquid-shift)) 50%;
   -webkit-background-clip:text;
   background-clip:text;
-  filter:saturate(1.34) brightness(1.12) contrast(1.04);
-  animation:heroTrustLiquidIdle 2.25s cubic-bezier(.32,.02,.18,1) infinite alternate;
+  filter:saturate(1.34) brightness(1.10) contrast(1.04);
+  animation:heroTrustLiquidIdle 2.15s cubic-bezier(.32,.02,.18,1) infinite alternate;
   will-change:background-position,background-size,filter;
 }
 
@@ -148,53 +151,44 @@
 
 @keyframes heroTrustLiquidIdle{
   0%{
-    background-size:145% 155%,150% 160%,142% 150%,225% 100%;
+    background-size:165% 170%,175% 180%,155% 160%,240% 100%;
     background-position:
-      calc(-52% + var(--hero-liquid-shift)) 2%,
-      calc(140% + var(--hero-liquid-shift)) 96%,
-      calc(108% + var(--hero-liquid-shift)) 4%,
-      calc(-48% + var(--hero-liquid-shift)) 50%;
-    filter:saturate(1.24) brightness(1.04) contrast(1.03);
+      calc(-18% + var(--hero-liquid-shift)) 20%,
+      calc(112% + var(--hero-liquid-shift)) 80%,
+      calc(88% + var(--hero-liquid-shift)) 12%,
+      calc(0% + var(--hero-liquid-shift)) 50%;
+    filter:saturate(1.20) brightness(1.03) contrast(1.03);
   }
-  24%{
-    background-size:158% 145%,142% 171%,150% 142%,218% 102%;
+  35%{
+    background-size:178% 158%,164% 192%,166% 150%,240% 100%;
     background-position:
-      calc(-8% + var(--hero-liquid-shift)) 48%,
-      calc(104% + var(--hero-liquid-shift)) 38%,
-      calc(70% + var(--hero-liquid-shift)) 72%,
-      calc(4% + var(--hero-liquid-shift)) 50%;
-    filter:saturate(1.38) brightness(1.13) contrast(1.05);
+      calc(8% + var(--hero-liquid-shift)) 42%,
+      calc(86% + var(--hero-liquid-shift)) 30%,
+      calc(58% + var(--hero-liquid-shift)) 70%,
+      calc(28% + var(--hero-liquid-shift)) 50%;
+    filter:saturate(1.34) brightness(1.11) contrast(1.05);
   }
-  51%{
-    background-size:140% 170%,160% 145%,138% 164%,232% 98%;
+  68%{
+    background-size:158% 188%,186% 160%,148% 174%,240% 100%;
     background-position:
-      calc(44% + var(--hero-liquid-shift)) 82%,
-      calc(56% + var(--hero-liquid-shift)) 70%,
-      calc(26% + var(--hero-liquid-shift)) 18%,
-      calc(58% + var(--hero-liquid-shift)) 50%;
-    filter:saturate(1.46) brightness(1.18) contrast(1.06);
-  }
-  76%{
-    background-size:154% 148%,144% 168%,152% 145%,216% 102%;
-    background-position:
-      calc(94% + var(--hero-liquid-shift)) 26%,
-      calc(6% + var(--hero-liquid-shift)) 48%,
-      calc(-4% + var(--hero-liquid-shift)) 82%,
-      calc(106% + var(--hero-liquid-shift)) 50%;
-    filter:saturate(1.38) brightness(1.12) contrast(1.05);
+      calc(42% + var(--hero-liquid-shift)) 78%,
+      calc(46% + var(--hero-liquid-shift)) 66%,
+      calc(18% + var(--hero-liquid-shift)) 26%,
+      calc(62% + var(--hero-liquid-shift)) 50%;
+    filter:saturate(1.40) brightness(1.14) contrast(1.06);
   }
   100%{
-    background-size:144% 160%,156% 150%,140% 158%,228% 100%;
+    background-size:170% 166%,168% 186%,162% 154%,240% 100%;
     background-position:
-      calc(142% + var(--hero-liquid-shift)) 76%,
-      calc(-42% + var(--hero-liquid-shift)) 10%,
-      calc(-34% + var(--hero-liquid-shift)) 16%,
-      calc(154% + var(--hero-liquid-shift)) 50%;
-    filter:saturate(1.27) brightness(1.06) contrast(1.03);
+      calc(92% + var(--hero-liquid-shift)) 24%,
+      calc(-8% + var(--hero-liquid-shift)) 18%,
+      calc(-16% + var(--hero-liquid-shift)) 74%,
+      calc(100% + var(--hero-liquid-shift)) 50%;
+    filter:saturate(1.24) brightness(1.05) contrast(1.03);
   }
 }
 
-/* Scroll position now nudges the continuously-running idle animation instead of
+/* Scroll position nudges the continuously-running idle animation instead of
    replacing it. The liquid therefore stays visibly alive even when the page is
    not moving. */
 @supports (animation-timeline:view()){
@@ -206,9 +200,9 @@
 }
 
 @keyframes heroLiquidScrollShift{
-  0%{--hero-liquid-shift:-18%}
+  0%{--hero-liquid-shift:-12%}
   50%{--hero-liquid-shift:0%}
-  100%{--hero-liquid-shift:18%}
+  100%{--hero-liquid-shift:12%}
 }
 
 @media(max-width:700px){
