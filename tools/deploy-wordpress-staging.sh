@@ -92,7 +92,16 @@ grep -Fq "assets/css/home-golden.css?v=$VERSION" "$THEME/front-page.php"
 grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
 grep -Fq '<link rel="canonical" href="https://stapleit.co.uk/"' "$THEME/front-page.php"
 grep -Fq 'https://stapleit.co.uk/#organization' "$THEME/front-page.php"
-grep -Fq "register_rest_route( 'stapleit/v1', '/audit'" "$THEME/functions.php"
+grep -Fq '"ProfessionalService"' "$THEME/front-page.php"
+grep -Fq '"WebPage"' "$THEME/front-page.php"
+grep -Fq "wp_ajax_nopriv_stapleit_audit" "$THEME/functions.php"
+grep -Fq "xmlrpc_enabled" "$THEME/functions.php"
+grep -Fq "stapleit_mail_error" "$THEME/functions.php"
+
+if grep -Fq "register_rest_route( 'stapleit/v1', '/audit'" "$THEME/functions.php"; then
+  echo "Legacy public audit REST route is still registered; refusing deployment." >&2
+  exit 1
+fi
 
 if grep -Fq 'home-polish.js' "$THEME/front-page.php"; then
   echo "Legacy home-polish.js is still referenced; refusing deployment." >&2
