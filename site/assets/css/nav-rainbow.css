@@ -48,8 +48,9 @@
   display:block!important;
   width:100%!important;
   max-width:100%!important;
-  min-height:1.82em;
+  min-height:2.06em!important;
   margin:0!important;
+  overflow:visible!important;
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
   -webkit-text-stroke:0!important;
@@ -75,14 +76,15 @@
   font:inherit;
   font-weight:inherit;
   letter-spacing:inherit;
-  line-height:.94;
   white-space:nowrap;
+  overflow:visible!important;
 }
 
 .home-hero-copy h1::before{
   content:"Welcome to";
   top:0;
   z-index:2;
+  line-height:.94;
   color:#fff;
   -webkit-text-fill-color:#fff;
   -webkit-text-stroke:0;
@@ -92,8 +94,10 @@
 
 .home-hero-copy h1::after{
   content:"Staple IT";
-  top:.92em;
+  top:.94em;
   z-index:3;
+  line-height:1.08!important;
+  padding-bottom:.14em;
   color:transparent;
   -webkit-text-fill-color:transparent;
   -webkit-text-stroke:0;
@@ -124,7 +128,7 @@
   color:#fff!important;
   -webkit-text-fill-color:#fff!important;
   text-align:left!important;
-  margin-top:0!important;
+  margin-top:.14em!important;
 }
 
 .home-hero-copy .hero-actions{
@@ -195,14 +199,19 @@
 
 @media(max-width:700px){
   .home-hero-copy h1{
-    min-height:1.92em;
+    min-height:2.12em!important;
     width:100%!important;
   }
   .home-hero-copy h1::before,
   .home-hero-copy h1::after{
     max-width:100%;
   }
-  .home-hero-copy h1::after{top:.96em}
+  .home-hero-copy h1::after{
+    top:.96em;
+    line-height:1.08!important;
+    padding-bottom:.16em;
+  }
+  .home-hero-copy .hero-tagline{margin-top:.18em!important}
 }
 
 @keyframes navSpectrumOutline{
