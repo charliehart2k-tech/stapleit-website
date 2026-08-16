@@ -34,21 +34,12 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Do not fake transparent glass against a live video: that reads as washed-out
-   pink because the chromatic edge colours blend through the glyph. Instead the
-   brand line is treated as dark liquid chrome with physically separated red and
-   blue lenses. The lenses drift independently while the base metal moves more
-   slowly, so the colour never collapses into a flat magenta fill. */
-@property --hero-scroll-shift{
-  syntax:"<percentage>";
-  inherits:true;
-  initial-value:0%;
-}
+   Use the same proven liquid-colour language as the Trust / WIN typography.
+   Welcome to stays clean white; only Staple IT carries the effect. */
+.home-hero{view-timeline-name:--hero-chapter;view-timeline-axis:block}
 
 .home-hero-copy h1{
-  --hero-scroll-shift:0%;
   position:relative!important;
-  isolation:isolate;
   display:block!important;
   width:max-content!important;
   max-width:100%!important;
@@ -59,7 +50,6 @@
   -webkit-text-stroke:0!important;
   background:none!important;
   text-shadow:none!important;
-  filter:none!important;
   line-height:.94!important;
 }
 
@@ -101,117 +91,90 @@
   z-index:3;
   color:transparent;
   -webkit-text-fill-color:transparent;
-  -webkit-text-stroke:.55px rgba(88,116,180,.48);
-
-  /* Blue and red stay spatially separate. The dark chrome layer underneath is
-     what gives the word depth without introducing white or purple. */
-  background:
-    radial-gradient(ellipse at 18% 36%,
-      #4f7fff 0 5%,
-      #2f63e8 10%,
-      #163a95 18%,
-      rgba(10,24,59,0) 34%),
-    radial-gradient(ellipse at 82% 64%,
-      #f13a4d 0 5%,
-      #d91f32 10%,
-      #761126 18%,
-      rgba(35,8,16,0) 34%),
-    linear-gradient(108deg,
-      #071020 0%,
-      #0b1c42 10%,
-      #1748bd 18%,
-      #326cf0 25%,
-      #0a1735 34%,
-      #050b17 41%,
-      #44101d 47%,
-      #d82034 54%,
-      #861226 61%,
-      #0a132a 69%,
-      #153f9f 78%,
-      #2b63e5 86%,
-      #081326 94%,
-      #050a14 100%);
+  -webkit-text-stroke:0;
+  text-shadow:none;
+  background-image:
+    radial-gradient(circle at 16% 32%,rgba(79,133,255,.98) 0 5%,rgba(79,133,255,.28) 13%,transparent 30%),
+    radial-gradient(circle at 72% 68%,rgba(230,43,43,.96) 0 5%,rgba(230,43,43,.26) 14%,transparent 31%),
+    radial-gradient(circle at 52% 24%,rgba(168,85,247,.72) 0 4%,transparent 24%),
+    linear-gradient(104deg,
+      #4f85ff 0%,
+      #6f63ff 17%,
+      #a855f7 34%,
+      #d93dbb 49%,
+      #e62b2b 66%,
+      #f24732 82%,
+      #f97316 100%);
   background-repeat:no-repeat;
-  background-size:175% 190%,175% 190%,315% 100%;
-  background-position:
-    calc(-22% + var(--hero-scroll-shift)) 20%,
-    calc(118% + var(--hero-scroll-shift)) 78%,
-    calc(-112% + var(--hero-scroll-shift)) 50%;
+  background-size:170% 175%,180% 185%,165% 170%,285% 100%;
+  background-position:-30% 10%,118% 86%,92% 10%,0% 50%;
   -webkit-background-clip:text;
   background-clip:text;
-
-  text-shadow:
-    0 -1px 0 rgba(67,100,181,.16),
-    0 1px 0 rgba(0,0,0,.78),
-    0 9px 20px rgba(0,0,0,.18);
-  filter:saturate(1.22) contrast(1.10) brightness(1.02);
-  animation:heroLiquidChrome 3.35s cubic-bezier(.42,.02,.18,1) infinite alternate;
-  will-change:background-position,background-size,filter,transform;
+  filter:saturate(1.22) brightness(1.08);
+  animation:heroTrustLiquidIdle 4.9s cubic-bezier(.38,.02,.22,1) infinite alternate;
+  will-change:background-position,filter;
 }
 
-@keyframes heroLiquidChrome{
+@keyframes heroTrustLiquidIdle{
   0%{
-    background-size:175% 190%,175% 190%,315% 100%;
-    background-position:
-      calc(-28% + var(--hero-scroll-shift)) 16%,
-      calc(124% + var(--hero-scroll-shift)) 82%,
-      calc(-116% + var(--hero-scroll-shift)) 50%;
-    filter:saturate(1.14) contrast(1.08) brightness(.98);
-    transform:translate3d(0,0,0);
+    background-position:-34% 8%,122% 88%,96% 8%,0% 50%;
+    filter:saturate(1.14) brightness(1.02);
   }
-  23%{
-    background-size:188% 178%,166% 202%,300% 104%;
-    background-position:
-      calc(-4% + var(--hero-scroll-shift)) 48%,
-      calc(106% + var(--hero-scroll-shift)) 58%,
-      calc(-58% + var(--hero-scroll-shift)) 50%;
-    filter:saturate(1.27) contrast(1.11) brightness(1.03);
-    transform:translate3d(.003em,-.003em,0);
+  28%{
+    background-position:4% 46%,92% 30%,64% 72%,30% 50%;
+    filter:saturate(1.26) brightness(1.10);
   }
-  49%{
-    background-size:164% 206%,184% 174%,326% 96%;
-    background-position:
-      calc(16% + var(--hero-scroll-shift)) 70%,
-      calc(82% + var(--hero-scroll-shift)) 28%,
-      calc(4% + var(--hero-scroll-shift)) 50%;
-    filter:saturate(1.32) contrast(1.13) brightness(1.05);
-    transform:translate3d(-.002em,.002em,0);
+  56%{
+    background-position:48% 78%,48% 70%,28% 22%,60% 50%;
+    filter:saturate(1.32) brightness(1.14);
   }
-  74%{
-    background-size:182% 182%,170% 196%,306% 102%;
-    background-position:
-      calc(34% + var(--hero-scroll-shift)) 30%,
-      calc(64% + var(--hero-scroll-shift)) 76%,
-      calc(66% + var(--hero-scroll-shift)) 50%;
-    filter:saturate(1.25) contrast(1.10) brightness(1.01);
-    transform:translate3d(.002em,.001em,0);
+  78%{
+    background-position:88% 30%,8% 48%,2% 76%,84% 50%;
+    filter:saturate(1.25) brightness(1.09);
   }
   100%{
-    background-size:170% 198%,188% 180%,320% 100%;
-    background-position:
-      calc(48% + var(--hero-scroll-shift)) 58%,
-      calc(42% + var(--hero-scroll-shift)) 38%,
-      calc(132% + var(--hero-scroll-shift)) 50%;
-    filter:saturate(1.18) contrast(1.09) brightness(.99);
-    transform:translate3d(0,-.002em,0);
+    background-position:128% 72%,-28% 12%,-24% 18%,100% 50%;
+    filter:saturate(1.16) brightness(1.04);
   }
 }
 
-/* The idle liquid keeps moving, while page position nudges the whole optical
-   field. This means scrolling changes the refraction without freezing the idle
-   animation. */
 @supports (animation-timeline:view()){
-  .home-hero-copy h1{
-    animation:heroScrollDrive 1ms linear both;
-    animation-timeline:view(block);
+  .home-hero-copy h1::after{
+    animation-name:heroTrustLiquidScroll;
+    animation-duration:1ms;
+    animation-timing-function:linear;
+    animation-fill-mode:both;
+    animation-iteration-count:1;
+    animation-timeline:--hero-chapter;
     animation-range:entry 0% exit 100%;
   }
 }
 
-@keyframes heroScrollDrive{
-  0%{--hero-scroll-shift:-24%}
-  50%{--hero-scroll-shift:0%}
-  100%{--hero-scroll-shift:24%}
+@keyframes heroTrustLiquidScroll{
+  0%{
+    background-position:-46% 4%,132% 94%,108% 6%,0% 50%;
+    filter:saturate(1.10) brightness(.98);
+  }
+  22%{
+    background-position:-8% 38%,98% 42%,78% 66%,22% 50%;
+    filter:saturate(1.22) brightness(1.06);
+  }
+  44%{
+    background-position:34% 76%,62% 24%,46% 18%,46% 50%;
+    filter:saturate(1.31) brightness(1.14);
+  }
+  66%{
+    background-position:74% 26%,20% 72%,18% 78%,70% 50%;
+    filter:saturate(1.34) brightness(1.16);
+  }
+  84%{
+    background-position:108% 70%,-12% 26%,-6% 30%,90% 50%;
+    filter:saturate(1.25) brightness(1.10);
+  }
+  100%{
+    background-position:142% 18%,-38% 82%,-32% 74%,100% 50%;
+    filter:saturate(1.14) brightness(1.03);
+  }
 }
 
 @media(max-width:700px){
@@ -235,6 +198,5 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1,
-  .home-hero-copy h1::after{animation:none!important}
+  .home-hero-copy h1::after{animation:none!important;background-position:48% 50%,62% 48%,38% 58%,54% 50%}
 }
