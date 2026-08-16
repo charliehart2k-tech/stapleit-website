@@ -7,7 +7,7 @@
   padding:1.5px;
   pointer-events:none;
   opacity:0;
-  background:linear-gradient(115deg,#1D4ED8 0%,#6f63ff 16%,#A855F7 32%,#E62B2B 49%,#F97316 65%,#EAB308 81%,#22C55E 92%,#1D4ED8 100%);
+  background:linear-gradient(115deg,#1D4ED8 0%,#A855F7 24%,#E62B2B 48%,#F97316 68%,#EAB308 82%,#22C55E 92%,#1D4ED8 100%);
   background-size:320% 320%;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;
@@ -34,10 +34,9 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Welcome to stays white. Staple IT uses a deliberately simple, opaque liquid
-   colour field. Blue, red and orange each get real visual weight; purple only
-   acts as a short transition. Only positions move, so Chromium has nothing to
-   re-rasterise or expose as black between frames. */
+   Keep the hero brand inside the real Staple IT palette. Royal Blue and Signal
+   Red are dominant; Security Purple and Solutions Orange are controlled accent
+   pools. No invented pinks/blues and no white/black inside the moving fill. */
 .home-hero-copy{
   align-items:flex-start!important;
   text-align:left!important;
@@ -85,8 +84,8 @@
   top:0;
   z-index:2;
   line-height:.94;
-  color:#fff;
-  -webkit-text-fill-color:#fff;
+  color:#FFFFFF;
+  -webkit-text-fill-color:#FFFFFF;
   -webkit-text-stroke:0;
   background:none;
   text-shadow:none;
@@ -104,36 +103,36 @@
   -webkit-text-stroke:0;
   text-shadow:none;
 
-  /* Fixed opaque base plus three broad translucent lenses. No pink wash and no
-     transparent holes in the glyph. */
-  background-color:#1d4ed8;
+  /* Royal Blue is the permanent opaque base. The three accent pools cross the
+     word on separate paths, so the colour balance keeps changing without the
+     whole title collapsing into purple/pink. */
+  background-color:#1D4ED8;
   background-image:
-    radial-gradient(ellipse at 50% 50%,rgba(59,130,246,.96) 0 15%,rgba(37,99,235,.66) 30%,rgba(37,99,235,0) 58%),
-    radial-gradient(ellipse at 50% 50%,rgba(230,43,43,.96) 0 14%,rgba(230,43,43,.62) 29%,rgba(230,43,43,0) 58%),
-    radial-gradient(ellipse at 50% 50%,rgba(249,115,22,.96) 0 13%,rgba(249,115,22,.56) 28%,rgba(249,115,22,0) 56%),
-    linear-gradient(105deg,
-      #1d4ed8 0%,
-      #2563eb 18%,
-      #3b82f6 31%,
-      #6d4ee8 39%,
-      #e62b2b 52%,
-      #ef3d2f 66%,
-      #f97316 79%,
-      #e62b2b 90%,
-      #1d4ed8 100%);
+    radial-gradient(ellipse at 50% 50%,rgba(230,43,43,.98) 0 15%,rgba(230,43,43,.72) 29%,rgba(230,43,43,.20) 45%,rgba(230,43,43,0) 62%),
+    radial-gradient(ellipse at 50% 50%,rgba(249,115,22,.96) 0 12%,rgba(249,115,22,.60) 27%,rgba(249,115,22,.16) 43%,rgba(249,115,22,0) 59%),
+    radial-gradient(ellipse at 50% 50%,rgba(168,85,247,.84) 0 10%,rgba(168,85,247,.46) 25%,rgba(168,85,247,.12) 40%,rgba(168,85,247,0) 57%),
+    linear-gradient(108deg,
+      #1D4ED8 0%,
+      #1D4ED8 28%,
+      #A855F7 38%,
+      #E62B2B 50%,
+      #F97316 62%,
+      #E62B2B 74%,
+      #A855F7 84%,
+      #1D4ED8 100%);
   background-repeat:no-repeat;
-  background-size:168% 190%,170% 192%,164% 184%,230% 100%;
-  background-position:-34% 28%,84% 62%,132% 20%,0% 50%;
-  background-blend-mode:screen,normal,normal,normal;
+  background-size:170% 190%,156% 174%,148% 168%,210% 100%;
+  background-position:-36% 30%,122% 72%,62% -8%,0% 50%;
+  background-blend-mode:normal,normal,normal,normal;
   -webkit-background-clip:text;
   background-clip:text;
 
-  animation:heroLiquidFlow 4.2s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+  animation:heroBrandLiquidFlow 3.15s linear infinite;
 }
 
 .home-hero-copy .hero-tagline{
-  color:#fff!important;
-  -webkit-text-fill-color:#fff!important;
+  color:#FFFFFF!important;
+  -webkit-text-fill-color:#FFFFFF!important;
   text-align:left!important;
   margin-top:.14em!important;
 }
@@ -142,18 +141,24 @@
   align-self:flex-start!important;
 }
 
-@keyframes heroLiquidFlow{
+@keyframes heroBrandLiquidFlow{
   0%{
-    background-position:-34% 28%,84% 62%,132% 20%,0% 50%;
+    background-position:-36% 30%,122% 72%,62% -8%,0% 50%;
   }
-  33%{
-    background-position:8% 72%,48% 18%,92% 78%,36% 50%;
+  20%{
+    background-position:-2% 66%,92% 26%,92% 34%,22% 50%;
   }
-  66%{
-    background-position:62% 18%,10% 74%,44% 30%,68% 50%;
+  40%{
+    background-position:34% 78%,56% 4%,66% 82%,44% 50%;
+  }
+  60%{
+    background-position:72% 42%,18% 30%,28% 92%,66% 50%;
+  }
+  80%{
+    background-position:108% 10%,-16% 70%,-8% 38%,88% 50%;
   }
   100%{
-    background-position:116% 68%,-28% 24%,-18% 74%,100% 50%;
+    background-position:134% 30%,-36% 72%,-38% -8%,100% 50%;
   }
 }
 
@@ -183,5 +188,5 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1::after{animation:none!important;background-position:18% 46%,66% 52%,92% 30%,44% 50%}
+  .home-hero-copy h1::after{animation:none!important;background-position:10% 52%,78% 36%,46% 64%,50% 50%}
 }
