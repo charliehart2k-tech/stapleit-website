@@ -34,10 +34,10 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Keep this restrained and brand-led: Royal Blue and Signal Red only. The
-   opaque base gradient always fills the glyphs; two very broad colour lenses
-   drift across it in opposite directions. The animation alternates with zero
-   velocity at both ends, so there is no reset seam, snap or conveyor-belt feel. */
+   Welcome to remains pure white. Staple IT is also predominantly white, with a
+   restrained champagne-gold reflection moving through the letters. The white
+   base is fully opaque at every frame, so there are no dark gaps or colour-band
+   artefacts. Only the sheen position moves, giving a smooth premium finish. */
 .home-hero-copy{
   align-items:flex-start!important;
   text-align:left!important;
@@ -104,26 +104,33 @@
   -webkit-text-stroke:0;
   text-shadow:none;
 
-  /* Premium two-colour liquid treatment. No rainbow bands, no white glints,
-     no transparent base and no animated filter/compositing tricks. */
-  background-color:#1D4ED8;
+  /* Opaque white surface with one broad gold reflection. The base layer never
+     moves; the highlight simply drifts across it and back. */
+  background-color:#FFFFFF;
   background-image:
-    radial-gradient(ellipse at 50% 50%,rgba(230,43,43,.98) 0 10%,rgba(230,43,43,.72) 24%,rgba(230,43,43,.20) 42%,rgba(230,43,43,0) 64%),
-    radial-gradient(ellipse at 50% 50%,rgba(29,78,216,1) 0 12%,rgba(29,78,216,.78) 30%,rgba(29,78,216,.18) 47%,rgba(29,78,216,0) 66%),
-    linear-gradient(108deg,
-      #1D4ED8 0%,
-      #1D4ED8 34%,
-      #E62B2B 54%,
-      #E62B2B 66%,
-      #1D4ED8 88%,
-      #1D4ED8 100%);
-  background-repeat:no-repeat;
-  background-size:158% 184%,168% 196%,100% 100%;
-  background-position:-34% 32%,122% 68%,50% 50%;
+    radial-gradient(ellipse at 50% 50%,
+      rgba(255,246,205,.88) 0 8%,
+      rgba(239,211,116,.72) 18%,
+      rgba(212,175,55,.52) 30%,
+      rgba(184,134,11,.18) 43%,
+      rgba(184,134,11,0) 60%),
+    linear-gradient(100deg,
+      #FFFFFF 0%,
+      #FFFFFF 31%,
+      #F7F5EE 40%,
+      #F3E3A2 46%,
+      #D4AF37 50%,
+      #F3E3A2 54%,
+      #F7F5EE 60%,
+      #FFFFFF 69%,
+      #FFFFFF 100%);
+  background-repeat:no-repeat,no-repeat;
+  background-size:138% 180%,220% 100%;
+  background-position:-62% 48%,-62% 50%;
   -webkit-background-clip:text;
   background-clip:text;
 
-  animation:heroBrandLiquidDrift 4.35s cubic-bezier(.42,0,.18,1) infinite alternate;
+  animation:heroGoldSheen 5.4s cubic-bezier(.45,0,.55,1) infinite alternate;
 }
 
 .home-hero-copy .hero-tagline{
@@ -137,12 +144,15 @@
   align-self:flex-start!important;
 }
 
-@keyframes heroBrandLiquidDrift{
-  from{
-    background-position:-34% 32%,122% 68%,50% 50%;
+@keyframes heroGoldSheen{
+  0%{
+    background-position:-62% 48%,-62% 50%;
   }
-  to{
-    background-position:116% 66%,-36% 24%,50% 50%;
+  50%{
+    background-position:48% 54%,48% 50%;
+  }
+  100%{
+    background-position:158% 46%,158% 50%;
   }
 }
 
@@ -172,5 +182,5 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1::after{animation:none!important;background-position:22% 46%,72% 52%,50% 50%}
+  .home-hero-copy h1::after{animation:none!important;background-position:48% 52%,48% 50%}
 }
