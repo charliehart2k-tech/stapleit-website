@@ -33,143 +33,122 @@
   box-shadow:0 10px 24px rgba(0,0,0,.24),0 0 18px rgba(111,99,255,.08)!important;
 }
 
-/* Hero: Welcome to remains clean white. Staple IT is rendered as layered,
-   translucent red/blue liquid glass. Three unsynchronised clipped layers create
-   refraction and moving caustics without an exterior glow. */
-.home-hero-copy h1{
-  color:#fff!important;
-  -webkit-text-fill-color:#fff!important;
-  background:none!important;
-  text-shadow:none!important;
-  filter:none!important;
-  animation:none!important;
-}
+/* Hero brand glass.
+   The original heading markup is intentionally preserved. The whole heading is
+   used as the clipped liquid surface, then a clean white "Welcome to" copy is
+   laid over the matching glyphs so only Staple IT shows the treatment.
 
-.hero-brand-liquid{
+   The colour layers are translucent: the moving hero video remains visible
+   through the letters, so the result changes with the page rather than looking
+   like a self-contained gradient animation. */
+.home-hero-copy h1{
   position:relative;
-  display:inline-block;
   isolation:isolate;
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
-  -webkit-text-stroke:.45px rgba(92,136,232,.34);
+  -webkit-text-stroke:.34px rgba(54,104,220,.32);
+  text-shadow:none!important;
   background:
-    radial-gradient(ellipse at 18% 28%,rgba(246,35,59,.96) 0 9%,rgba(202,18,45,.78) 20%,rgba(136,9,34,.24) 38%,transparent 57%),
-    radial-gradient(ellipse at 82% 68%,rgba(37,99,235,.98) 0 10%,rgba(20,73,194,.76) 22%,rgba(9,39,113,.22) 42%,transparent 60%),
-    radial-gradient(ellipse at 52% 46%,rgba(239,35,55,.72) 0 8%,transparent 36%),
-    radial-gradient(ellipse at 36% 78%,rgba(32,88,218,.76) 0 9%,transparent 38%),
-    conic-gradient(from 122deg at 52% 48%,
-      rgba(8,29,86,.76) 0deg,
-      rgba(30,86,214,.96) 68deg,
-      rgba(96,18,55,.66) 132deg,
-      rgba(228,30,53,.95) 202deg,
-      rgba(18,62,162,.92) 278deg,
-      rgba(8,29,86,.76) 360deg);
+    radial-gradient(ellipse at 12% 30%,rgba(244,35,58,.92) 0 8%,rgba(211,23,48,.62) 19%,transparent 42%),
+    radial-gradient(ellipse at 84% 64%,rgba(45,101,238,.94) 0 9%,rgba(27,73,190,.62) 21%,transparent 44%),
+    radial-gradient(ellipse at 48% 76%,rgba(232,29,54,.70) 0 7%,transparent 33%),
+    radial-gradient(ellipse at 62% 24%,rgba(49,111,246,.72) 0 8%,transparent 35%),
+    linear-gradient(108deg,
+      rgba(178,17,42,.70) 0%,
+      rgba(239,35,58,.82) 20%,
+      rgba(22,66,174,.60) 39%,
+      rgba(44,105,235,.82) 56%,
+      rgba(218,24,50,.76) 75%,
+      rgba(25,72,184,.66) 100%);
   background-repeat:no-repeat;
-  background-size:205% 190%,210% 195%,175% 180%,180% 185%,235% 235%;
-  background-position:-40% 4%,128% 88%,12% 76%,88% 14%,52% 50%;
+  background-size:190% 180%,195% 185%,175% 175%,180% 180%,240% 100%;
+  background-position:-34% 8%,124% 84%,16% 76%,86% 18%,0% 50%;
   -webkit-background-clip:text!important;
   background-clip:text!important;
-  filter:saturate(1.26) contrast(1.10) brightness(1.02);
-  animation:heroGlassBody 5.1s cubic-bezier(.38,.02,.22,1) infinite alternate;
+  filter:saturate(1.18) contrast(1.07) brightness(1.02);
+  animation:heroBrandIdle 4.8s cubic-bezier(.36,.02,.2,1) infinite alternate;
   will-change:background-position,filter;
 }
 
-.hero-brand-liquid::before,
-.hero-brand-liquid::after{
-  content:"Staple IT";
+/* Keep the existing IT span from reintroducing its old solid blue. */
+.home-hero-copy h1 .it-blue{
+  color:inherit!important;
+  -webkit-text-fill-color:inherit!important;
+  text-shadow:none!important;
+}
+
+/* Exact white overlay for the unbranded words. Because it inherits the same
+   width, type and line-height it follows the heading's responsive wrapping. */
+.home-hero-copy h1::after{
+  content:"Welcome to";
   position:absolute;
-  inset:0;
-  pointer-events:none;
-  font:inherit;
-  letter-spacing:inherit;
-  line-height:inherit;
-  white-space:nowrap;
-  color:transparent;
-  -webkit-text-fill-color:transparent;
-  -webkit-background-clip:text;
-  background-clip:text;
-}
-
-/* Fast internal caustic: pale blue rather than white, so the glass catches
-   light without re-introducing a white band through the brand treatment. */
-.hero-brand-liquid::before{
   z-index:2;
-  background:
-    linear-gradient(112deg,
-      transparent 0%,
-      transparent 30%,
-      rgba(118,166,255,.08) 39%,
-      rgba(139,181,255,.80) 46%,
-      rgba(67,117,224,.34) 51%,
-      rgba(235,42,67,.18) 57%,
-      transparent 66%,
-      transparent 100%),
-    radial-gradient(ellipse at 68% 28%,rgba(84,139,255,.52) 0 7%,transparent 28%);
-  background-size:285% 100%,175% 180%;
-  background-position:-125% 50%,104% 18%;
-  opacity:.78;
-  mix-blend-mode:screen;
-  filter:saturate(1.08) contrast(1.08);
-  animation:heroGlassCaustic 3.15s cubic-bezier(.2,.62,.2,1) infinite;
+  inset:0;
+  width:100%;
+  pointer-events:none;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+  -webkit-text-stroke:0;
+  background:none;
+  filter:none;
+  text-shadow:none;
 }
 
-/* Slower refraction layer moves against the main body, creating the sense that
-   colour is bending through thick glass instead of following a scripted wipe. */
-.hero-brand-liquid::after{
-  z-index:3;
-  background:
-    radial-gradient(ellipse at 22% 64%,rgba(115,10,37,.46) 0 11%,transparent 31%),
-    radial-gradient(ellipse at 76% 38%,rgba(12,47,133,.52) 0 12%,transparent 34%),
-    linear-gradient(96deg,
-      transparent 12%,
-      rgba(12,42,112,.20) 31%,
-      rgba(233,28,52,.22) 48%,
-      rgba(24,78,188,.28) 66%,
-      transparent 86%);
-  background-size:190% 185%,195% 190%,250% 100%;
-  background-position:-28% 72%,120% 22%,0% 50%;
-  opacity:.72;
-  mix-blend-mode:multiply;
-  filter:contrast(1.16) saturate(1.14);
-  animation:heroGlassRefraction 4.35s cubic-bezier(.4,0,.18,1) infinite alternate-reverse;
-}
-
-@keyframes heroGlassBody{
+@keyframes heroBrandIdle{
   0%{
-    background-position:-42% 2%,132% 90%,6% 80%,92% 12%,44% 44%;
-    filter:saturate(1.18) contrast(1.08) brightness(.98);
+    background-position:-36% 6%,126% 86%,8% 80%,90% 14%,0% 50%;
+    filter:saturate(1.12) contrast(1.05) brightness(.98);
   }
-  22%{
-    background-position:-4% 46%,98% 32%,36% 20%,70% 66%,58% 38%;
-    filter:saturate(1.30) contrast(1.12) brightness(1.04);
+  33%{
+    background-position:8% 48%,92% 28%,40% 20%,66% 68%,34% 50%;
+    filter:saturate(1.22) contrast(1.08) brightness(1.03);
   }
-  47%{
-    background-position:46% 82%,54% 68%,78% 58%,32% 28%,48% 62%;
-    filter:saturate(1.36) contrast(1.13) brightness(1.07);
-  }
-  73%{
-    background-position:92% 30%,8% 48%,42% 88%,4% 72%,64% 54%;
-    filter:saturate(1.31) contrast(1.11) brightness(1.03);
+  66%{
+    background-position:66% 80%,34% 70%,78% 58%,24% 28%,70% 50%;
+    filter:saturate(1.27) contrast(1.09) brightness(1.05);
   }
   100%{
-    background-position:138% 72%,-38% 12%,-22% 28%,-26% 8%,40% 46%;
-    filter:saturate(1.22) contrast(1.09) brightness(1);
+    background-position:136% 68%,-34% 14%,-20% 30%,-24% 10%,100% 50%;
+    filter:saturate(1.16) contrast(1.06) brightness(1);
   }
 }
 
-@keyframes heroGlassCaustic{
-  0%{background-position:-130% 50%,108% 18%;opacity:.42}
-  18%{opacity:.76}
-  46%{background-position:-12% 50%,62% 72%;opacity:.88}
-  72%{opacity:.62}
-  100%{background-position:130% 50%,-18% 24%;opacity:.46}
+/* On browsers with view timelines, the brand responds to its position in the
+   page. Scrolling bends the red/blue fields through the glyphs while the hero
+   video continues moving beneath the translucent colour. */
+@supports (animation-timeline:view()){
+  .home-hero-copy h1{
+    animation-name:heroBrandScroll;
+    animation-duration:1ms;
+    animation-timing-function:linear;
+    animation-fill-mode:both;
+    animation-iteration-count:1;
+    animation-timeline:view(block);
+    animation-range:entry 0% exit 100%;
+  }
 }
 
-@keyframes heroGlassRefraction{
-  0%{background-position:-32% 74%,124% 18%,0% 50%;transform:translate3d(-.012em,.008em,0)}
-  35%{background-position:18% 28%,78% 74%,38% 50%;transform:translate3d(.006em,-.006em,0)}
-  67%{background-position:76% 82%,24% 30%,72% 50%;transform:translate3d(-.004em,.004em,0)}
-  100%{background-position:128% 22%,-28% 78%,100% 50%;transform:translate3d(.01em,-.004em,0)}
+@keyframes heroBrandScroll{
+  0%{
+    background-position:-52% 0%,142% 92%,-12% 88%,108% 8%,0% 50%;
+    filter:saturate(1.08) contrast(1.04) brightness(.95);
+  }
+  28%{
+    background-position:-4% 52%,98% 26%,34% 18%,72% 74%,30% 50%;
+    filter:saturate(1.22) contrast(1.08) brightness(1.02);
+  }
+  52%{
+    background-position:48% 84%,52% 66%,82% 62%,30% 24%,58% 50%;
+    filter:saturate(1.30) contrast(1.10) brightness(1.06);
+  }
+  76%{
+    background-position:96% 24%,4% 48%,38% 92%,0% 70%,82% 50%;
+    filter:saturate(1.23) contrast(1.08) brightness(1.02);
+  }
+  100%{
+    background-position:148% 76%,-48% 8%,-28% 20%,-34% 4%,100% 50%;
+    filter:saturate(1.10) contrast(1.05) brightness(.97);
+  }
 }
 
 @keyframes navSpectrumOutline{
@@ -181,7 +160,5 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .hero-brand-liquid,
-  .hero-brand-liquid::before,
-  .hero-brand-liquid::after{animation:none!important}
+  .home-hero-copy h1{animation:none!important;background-position:42% 50%,62% 48%,38% 58%,58% 38%,52% 50%}
 }
