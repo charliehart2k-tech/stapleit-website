@@ -12,14 +12,23 @@ add_action( 'wp_enqueue_scripts', function () {
         return;
     }
 
-    $forms_path = get_template_directory() . '/assets/js/forms.js';
-    $version    = file_exists( $forms_path ) ? (string) filemtime( $forms_path ) : null;
+    $nav_fx_path = get_template_directory() . '/assets/css/nav-rainbow.css';
+    $forms_path  = get_template_directory() . '/assets/js/forms.js';
+    $nav_version = file_exists( $nav_fx_path ) ? (string) filemtime( $nav_fx_path ) : null;
+    $js_version  = file_exists( $forms_path ) ? (string) filemtime( $forms_path ) : null;
+
+    wp_enqueue_style(
+        'stapleit-nav-rainbow',
+        get_template_directory_uri() . '/assets/css/nav-rainbow.css',
+        array(),
+        $nav_version
+    );
 
     wp_enqueue_script(
         'stapleit-forms',
         get_template_directory_uri() . '/assets/js/forms.js',
         array(),
-        $version,
+        $js_version,
         true
     );
 } );
