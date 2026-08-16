@@ -34,13 +34,10 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Keep the real H1 in the document for accessibility/layout, but render the two
-   visible lines independently. This avoids browser line-breaking ever leaving a
-   duplicate "to" in the coloured line.
-
-   "Staple IT" is translucent glass rather than an opaque gradient: the moving
-   hero film remains visible through the glyphs while red/blue refraction moves
-   across it. */
+   The hero film is the colour source. Staple IT is deliberately translucent so
+   the moving liquid behind it remains visible through the glyphs. Red and blue
+   exist only as fine refracted edges, not as an opaque gradient painted over
+   the lettering. */
 .home-hero-copy h1{
   position:relative!important;
   isolation:isolate;
@@ -83,7 +80,7 @@
 .home-hero-copy h1::before{
   content:"Welcome to";
   top:0;
-  z-index:2;
+  z-index:3;
   color:#fff;
   -webkit-text-fill-color:#fff;
   -webkit-text-stroke:0;
@@ -93,91 +90,66 @@
   content:"Staple IT";
   top:.98em;
   z-index:3;
-  color:transparent;
-  -webkit-text-fill-color:transparent;
-  -webkit-text-stroke:.38px rgba(112,145,225,.26);
-  background:
-    radial-gradient(ellipse at 12% 28%,rgba(245,30,57,.82) 0 10%,rgba(184,12,39,.48) 25%,transparent 52%),
-    radial-gradient(ellipse at 86% 68%,rgba(39,94,235,.84) 0 11%,rgba(16,58,161,.46) 27%,transparent 54%),
-    radial-gradient(ellipse at 56% 18%,rgba(84,126,242,.34) 0 8%,transparent 35%),
-    radial-gradient(ellipse at 42% 82%,rgba(228,25,51,.34) 0 9%,transparent 38%),
-    linear-gradient(112deg,
-      rgba(175,12,38,.42) 0%,
-      rgba(239,30,57,.68) 20%,
-      rgba(44,89,206,.34) 40%,
-      rgba(37,96,229,.67) 58%,
-      rgba(225,26,51,.58) 77%,
-      rgba(28,72,181,.44) 100%);
-  background-repeat:no-repeat;
-  background-size:205% 190%,210% 195%,175% 180%,185% 190%,255% 100%;
-  background-position:-38% 6%,132% 88%,96% 10%,10% 90%,0% 50%;
-  -webkit-background-clip:text;
-  background-clip:text;
-  background-blend-mode:screen,screen,screen,screen,normal;
-  filter:saturate(1.30) contrast(1.10) brightness(1.03);
+
+  /* Nearly-clear glass body. The hero video supplies the visible movement. */
+  color:rgba(235,242,255,.105);
+  -webkit-text-fill-color:rgba(235,242,255,.105);
+  -webkit-text-stroke:.72px rgba(215,228,255,.34);
+
+  /* Chromatic refraction sits on the glass edge only. */
+  text-shadow:
+    -1.15px .15px 0 rgba(238,38,64,.54),
+    1.15px -.10px 0 rgba(55,105,245,.62),
+    -.35px .75px 0 rgba(238,38,64,.18),
+    .35px -.75px 0 rgba(55,105,245,.22),
+    0 0 10px rgba(99,134,230,.055);
+
+  mix-blend-mode:screen;
+  filter:saturate(1.18) contrast(1.05);
   opacity:.96;
-  animation:heroLiquidIdle 3.7s cubic-bezier(.36,.02,.2,1) infinite alternate;
-  will-change:background-position,filter;
+  animation:heroGlassRefraction 2.9s cubic-bezier(.45,.05,.25,1) infinite alternate;
+  will-change:text-shadow,filter,opacity;
 }
 
-@keyframes heroLiquidIdle{
+/* The movement is intentionally tiny. The large motion comes from the live hero
+   film showing through the transparent glyphs; this just makes the red/blue
+   refraction breathe around the edge like thick optical glass. */
+@keyframes heroGlassRefraction{
   0%{
-    background-position:-42% 2%,136% 92%,104% 8%,2% 94%,0% 50%;
-    filter:saturate(1.20) contrast(1.07) brightness(.98);
+    text-shadow:
+      -1.30px .22px 0 rgba(238,38,64,.48),
+      1.05px -.16px 0 rgba(55,105,245,.58),
+      -.30px .82px 0 rgba(238,38,64,.15),
+      .42px -.70px 0 rgba(55,105,245,.20),
+      0 0 9px rgba(99,134,230,.045);
+    filter:saturate(1.10) contrast(1.03) brightness(.98);
   }
-  21%{
-    background-position:-6% 46%,104% 34%,76% 64%,26% 34%,24% 50%;
-    filter:saturate(1.32) contrast(1.10) brightness(1.03);
+  34%{
+    text-shadow:
+      -.72px -.20px 0 rgba(238,38,64,.58),
+      1.42px .18px 0 rgba(55,105,245,.68),
+      -.62px .44px 0 rgba(238,38,64,.21),
+      .18px -.92px 0 rgba(55,105,245,.24),
+      0 0 12px rgba(99,134,230,.06);
+    filter:saturate(1.22) contrast(1.06) brightness(1.03);
   }
-  47%{
-    background-position:44% 82%,58% 66%,36% 20%,72% 76%,52% 50%;
-    filter:saturate(1.39) contrast(1.12) brightness(1.06);
-  }
-  73%{
-    background-position:92% 28%,10% 50%,4% 72%,96% 20%,78% 50%;
-    filter:saturate(1.31) contrast(1.09) brightness(1.02);
+  67%{
+    text-shadow:
+      -1.48px -.08px 0 rgba(238,38,64,.56),
+      .68px .25px 0 rgba(55,105,245,.64),
+      -.18px .95px 0 rgba(238,38,64,.18),
+      .58px -.38px 0 rgba(55,105,245,.23),
+      0 0 11px rgba(99,134,230,.055);
+    filter:saturate(1.20) contrast(1.05) brightness(1.01);
   }
   100%{
-    background-position:142% 76%,-42% 8%,-30% 26%,132% 74%,100% 50%;
-    filter:saturate(1.22) contrast(1.07) brightness(.99);
-  }
-}
-
-/* Tie the liquid to the page position where supported. The animation is still
-   alive in browsers without view timelines, but on modern Chromium the colour
-   refracts differently as the hero travels through the viewport. */
-@supports (animation-timeline:view()){
-  .home-hero-copy h1::after{
-    animation-name:heroLiquidScroll;
-    animation-duration:1ms;
-    animation-timing-function:linear;
-    animation-fill-mode:both;
-    animation-iteration-count:1;
-    animation-timeline:view(block);
-    animation-range:entry 0% exit 100%;
-  }
-}
-
-@keyframes heroLiquidScroll{
-  0%{
-    background-position:-56% -4%,152% 96%,118% 2%,-12% 98%,0% 50%;
-    filter:saturate(1.15) contrast(1.06) brightness(.95);
-  }
-  30%{
-    background-position:-8% 54%,106% 26%,74% 76%,32% 24%,32% 50%;
-    filter:saturate(1.31) contrast(1.10) brightness(1.03);
-  }
-  55%{
-    background-position:54% 86%,48% 62%,28% 16%,80% 82%,61% 50%;
-    filter:saturate(1.42) contrast(1.12) brightness(1.07);
-  }
-  78%{
-    background-position:108% 20%,-2% 54%,-8% 84%,108% 14%,84% 50%;
-    filter:saturate(1.30) contrast(1.09) brightness(1.02);
-  }
-  100%{
-    background-position:158% 82%,-58% 0%,-38% 20%,142% 78%,100% 50%;
-    filter:saturate(1.16) contrast(1.06) brightness(.96);
+    text-shadow:
+      -.92px .18px 0 rgba(238,38,64,.50),
+      1.34px -.22px 0 rgba(55,105,245,.60),
+      -.52px .58px 0 rgba(238,38,64,.17),
+      .25px -.82px 0 rgba(55,105,245,.21),
+      0 0 9px rgba(99,134,230,.05);
+    filter:saturate(1.14) contrast(1.04) brightness(.99);
   }
 }
 
@@ -201,6 +173,6 @@
 
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
-  .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1::after{animation:none!important;background-position:42% 50%,62% 48%,38% 58%,58% 38%,52% 50%}
+  .nav-pill:focus-visible::before,
+  .home-hero-copy h1::after{animation:none!important}
 }
