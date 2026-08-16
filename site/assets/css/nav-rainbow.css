@@ -33,92 +33,122 @@
   box-shadow:0 10px 24px rgba(0,0,0,.24),0 0 18px rgba(111,99,255,.08)!important;
 }
 
-/* Hero brand glass.
-   The original heading markup is intentionally preserved. The whole heading is
-   used as the clipped liquid surface, then a clean white "Welcome to" copy is
-   laid over the matching glyphs so only Staple IT shows the treatment.
+/* Hero title ---------------------------------------------------------------
+   Keep the real H1 in the document for accessibility/layout, but render the two
+   visible lines independently. This avoids browser line-breaking ever leaving a
+   duplicate "to" in the coloured line.
 
-   The colour layers are translucent: the moving hero video remains visible
-   through the letters, so the result changes with the page rather than looking
-   like a self-contained gradient animation. */
+   "Staple IT" is translucent glass rather than an opaque gradient: the moving
+   hero film remains visible through the glyphs while red/blue refraction moves
+   across it. */
 .home-hero-copy h1{
-  position:relative;
+  position:relative!important;
   isolation:isolate;
+  display:block!important;
+  width:max-content!important;
+  max-width:100%!important;
+  min-height:1.92em;
+  margin:0!important;
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
-  -webkit-text-stroke:.34px rgba(54,104,220,.32);
+  -webkit-text-stroke:0!important;
+  background:none!important;
   text-shadow:none!important;
-  background:
-    radial-gradient(ellipse at 12% 30%,rgba(244,35,58,.92) 0 8%,rgba(211,23,48,.62) 19%,transparent 42%),
-    radial-gradient(ellipse at 84% 64%,rgba(45,101,238,.94) 0 9%,rgba(27,73,190,.62) 21%,transparent 44%),
-    radial-gradient(ellipse at 48% 76%,rgba(232,29,54,.70) 0 7%,transparent 33%),
-    radial-gradient(ellipse at 62% 24%,rgba(49,111,246,.72) 0 8%,transparent 35%),
-    linear-gradient(108deg,
-      rgba(178,17,42,.70) 0%,
-      rgba(239,35,58,.82) 20%,
-      rgba(22,66,174,.60) 39%,
-      rgba(44,105,235,.82) 56%,
-      rgba(218,24,50,.76) 75%,
-      rgba(25,72,184,.66) 100%);
-  background-repeat:no-repeat;
-  background-size:190% 180%,195% 185%,175% 175%,180% 180%,240% 100%;
-  background-position:-34% 8%,124% 84%,16% 76%,86% 18%,0% 50%;
-  -webkit-background-clip:text!important;
-  background-clip:text!important;
-  filter:saturate(1.18) contrast(1.07) brightness(1.02);
-  animation:heroBrandIdle 4.8s cubic-bezier(.36,.02,.2,1) infinite alternate;
-  will-change:background-position,filter;
+  filter:none!important;
+  animation:none!important;
+  line-height:.94!important;
 }
 
-/* Keep the existing IT span from reintroducing its old solid blue. */
 .home-hero-copy h1 .it-blue{
-  color:inherit!important;
-  -webkit-text-fill-color:inherit!important;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent!important;
   text-shadow:none!important;
 }
 
-/* Exact white overlay for the unbranded words. Because it inherits the same
-   width, type and line-height it follows the heading's responsive wrapping. */
+.home-hero-copy h1::before,
 .home-hero-copy h1::after{
-  content:"Welcome to";
   position:absolute;
-  z-index:2;
-  inset:0;
-  width:100%;
+  left:0;
+  display:block;
+  width:max-content;
+  max-width:100%;
   pointer-events:none;
+  font:inherit;
+  font-weight:inherit;
+  letter-spacing:inherit;
+  line-height:.94;
+  white-space:nowrap;
+}
+
+.home-hero-copy h1::before{
+  content:"Welcome to";
+  top:0;
+  z-index:2;
   color:#fff;
   -webkit-text-fill-color:#fff;
   -webkit-text-stroke:0;
-  background:none;
-  filter:none;
-  text-shadow:none;
 }
 
-@keyframes heroBrandIdle{
+.home-hero-copy h1::after{
+  content:"Staple IT";
+  top:.98em;
+  z-index:3;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+  -webkit-text-stroke:.38px rgba(112,145,225,.26);
+  background:
+    radial-gradient(ellipse at 12% 28%,rgba(245,30,57,.82) 0 10%,rgba(184,12,39,.48) 25%,transparent 52%),
+    radial-gradient(ellipse at 86% 68%,rgba(39,94,235,.84) 0 11%,rgba(16,58,161,.46) 27%,transparent 54%),
+    radial-gradient(ellipse at 56% 18%,rgba(84,126,242,.34) 0 8%,transparent 35%),
+    radial-gradient(ellipse at 42% 82%,rgba(228,25,51,.34) 0 9%,transparent 38%),
+    linear-gradient(112deg,
+      rgba(175,12,38,.42) 0%,
+      rgba(239,30,57,.68) 20%,
+      rgba(44,89,206,.34) 40%,
+      rgba(37,96,229,.67) 58%,
+      rgba(225,26,51,.58) 77%,
+      rgba(28,72,181,.44) 100%);
+  background-repeat:no-repeat;
+  background-size:205% 190%,210% 195%,175% 180%,185% 190%,255% 100%;
+  background-position:-38% 6%,132% 88%,96% 10%,10% 90%,0% 50%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  background-blend-mode:screen,screen,screen,screen,normal;
+  filter:saturate(1.30) contrast(1.10) brightness(1.03);
+  opacity:.96;
+  animation:heroLiquidIdle 3.7s cubic-bezier(.36,.02,.2,1) infinite alternate;
+  will-change:background-position,filter;
+}
+
+@keyframes heroLiquidIdle{
   0%{
-    background-position:-36% 6%,126% 86%,8% 80%,90% 14%,0% 50%;
-    filter:saturate(1.12) contrast(1.05) brightness(.98);
+    background-position:-42% 2%,136% 92%,104% 8%,2% 94%,0% 50%;
+    filter:saturate(1.20) contrast(1.07) brightness(.98);
   }
-  33%{
-    background-position:8% 48%,92% 28%,40% 20%,66% 68%,34% 50%;
-    filter:saturate(1.22) contrast(1.08) brightness(1.03);
+  21%{
+    background-position:-6% 46%,104% 34%,76% 64%,26% 34%,24% 50%;
+    filter:saturate(1.32) contrast(1.10) brightness(1.03);
   }
-  66%{
-    background-position:66% 80%,34% 70%,78% 58%,24% 28%,70% 50%;
-    filter:saturate(1.27) contrast(1.09) brightness(1.05);
+  47%{
+    background-position:44% 82%,58% 66%,36% 20%,72% 76%,52% 50%;
+    filter:saturate(1.39) contrast(1.12) brightness(1.06);
+  }
+  73%{
+    background-position:92% 28%,10% 50%,4% 72%,96% 20%,78% 50%;
+    filter:saturate(1.31) contrast(1.09) brightness(1.02);
   }
   100%{
-    background-position:136% 68%,-34% 14%,-20% 30%,-24% 10%,100% 50%;
-    filter:saturate(1.16) contrast(1.06) brightness(1);
+    background-position:142% 76%,-42% 8%,-30% 26%,132% 74%,100% 50%;
+    filter:saturate(1.22) contrast(1.07) brightness(.99);
   }
 }
 
-/* On browsers with view timelines, the brand responds to its position in the
-   page. Scrolling bends the red/blue fields through the glyphs while the hero
-   video continues moving beneath the translucent colour. */
+/* Tie the liquid to the page position where supported. The animation is still
+   alive in browsers without view timelines, but on modern Chromium the colour
+   refracts differently as the hero travels through the viewport. */
 @supports (animation-timeline:view()){
-  .home-hero-copy h1{
-    animation-name:heroBrandScroll;
+  .home-hero-copy h1::after{
+    animation-name:heroLiquidScroll;
     animation-duration:1ms;
     animation-timing-function:linear;
     animation-fill-mode:both;
@@ -128,27 +158,39 @@
   }
 }
 
-@keyframes heroBrandScroll{
+@keyframes heroLiquidScroll{
   0%{
-    background-position:-52% 0%,142% 92%,-12% 88%,108% 8%,0% 50%;
-    filter:saturate(1.08) contrast(1.04) brightness(.95);
+    background-position:-56% -4%,152% 96%,118% 2%,-12% 98%,0% 50%;
+    filter:saturate(1.15) contrast(1.06) brightness(.95);
   }
-  28%{
-    background-position:-4% 52%,98% 26%,34% 18%,72% 74%,30% 50%;
-    filter:saturate(1.22) contrast(1.08) brightness(1.02);
+  30%{
+    background-position:-8% 54%,106% 26%,74% 76%,32% 24%,32% 50%;
+    filter:saturate(1.31) contrast(1.10) brightness(1.03);
   }
-  52%{
-    background-position:48% 84%,52% 66%,82% 62%,30% 24%,58% 50%;
-    filter:saturate(1.30) contrast(1.10) brightness(1.06);
+  55%{
+    background-position:54% 86%,48% 62%,28% 16%,80% 82%,61% 50%;
+    filter:saturate(1.42) contrast(1.12) brightness(1.07);
   }
-  76%{
-    background-position:96% 24%,4% 48%,38% 92%,0% 70%,82% 50%;
-    filter:saturate(1.23) contrast(1.08) brightness(1.02);
+  78%{
+    background-position:108% 20%,-2% 54%,-8% 84%,108% 14%,84% 50%;
+    filter:saturate(1.30) contrast(1.09) brightness(1.02);
   }
   100%{
-    background-position:148% 76%,-48% 8%,-28% 20%,-34% 4%,100% 50%;
-    filter:saturate(1.10) contrast(1.05) brightness(.97);
+    background-position:158% 82%,-58% 0%,-38% 20%,142% 78%,100% 50%;
+    filter:saturate(1.16) contrast(1.06) brightness(.96);
   }
+}
+
+@media(max-width:700px){
+  .home-hero-copy h1{
+    min-height:1.98em;
+    width:100%!important;
+  }
+  .home-hero-copy h1::before,
+  .home-hero-copy h1::after{
+    max-width:100%;
+  }
+  .home-hero-copy h1::after{top:1em}
 }
 
 @keyframes navSpectrumOutline{
@@ -160,5 +202,5 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1{animation:none!important;background-position:42% 50%,62% 48%,38% 58%,58% 38%,52% 50%}
+  .home-hero-copy h1::after{animation:none!important;background-position:42% 50%,62% 48%,38% 58%,58% 38%,52% 50%}
 }
