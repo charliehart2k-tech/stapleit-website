@@ -60,6 +60,32 @@ add_action( 'rest_api_init', function () {
     ) );
 } );
 
+/* Browser submissions use admin-ajax.php so form delivery does not depend on
+ * REST rewrite routing. The REST endpoint remains available for future use. */
+add_action( 'wp_ajax_nopriv_stapleit_audit', 'stapleit_handle_audit_ajax' );
+add_action( 'wp_ajax_stapleit_audit', 'stapleit_handle_audit_ajax' );
+
+function stapleit_handle_audit_ajax() {
+    $request = new WP_REST_Request( 'POST', '/stapleit/v1/audit' );
+    $request->set_body_params( wp_unslash( $_POST ) );
+
+    $response = stapleit_handle_audit_request( $request );
+
+    if ( is_wp_error( $response ) ) {
+        $error_data = $response->get_error_data();
+        $status     = is_array( $error_data ) && isset( $error_data['status'] )
+            ? (int) $error_data['status']
+            : 400;
+
+        wp_send_json( array(
+            'ok'      => false,
+            'message' => $response->get_error_message(),
+        ), $status );
+    }
+
+    wp_send_json( $response->get_data(), $response->get_status() );
+}
+
 function stapleit_request_ip() {
     if ( ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
         return sanitize_text_field( wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
