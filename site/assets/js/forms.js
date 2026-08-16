@@ -32,17 +32,27 @@
     status.textContent = 'Sending your request…';
 
     try {
-      const response = await fetch('/wp-json/stapleit/v1/audit', {
+      const body = new FormData(form);
+      body.append('action', 'stapleit_audit');
+
+      const response = await fetch('/wp-admin/admin-ajax.php', {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
-        body: new FormData(form),
+        body,
         credentials: 'same-origin'
       });
 
-      const payload = await response.json().catch(() => ({}));
+      const raw = await response.text();
+      let payload = {};
 
-      if (!response.ok) {
-        throw new Error(payload.message || 'We could not send your request. Please try again.');
+      try {
+        payload = raw ? JSON.parse(raw) : {};
+      } catch (_) {
+        throw new Error('WordPress returned an invalid response. Please try again.');
+      }
+
+      if (!response.ok || payload?.ok === false) {
+        throw new Error(payload?.message || 'We could not send your request. Please try again.');
       }
 
       status.textContent = payload.message || 'Thanks — your audit request has been received. We’ll get back to you within one working day.';
