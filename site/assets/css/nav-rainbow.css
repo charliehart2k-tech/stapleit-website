@@ -38,12 +38,17 @@
    Welcome to stays clean white; only Staple IT carries the effect. */
 .home-hero{view-timeline-name:--hero-chapter;view-timeline-axis:block}
 
+.home-hero-copy{
+  align-items:flex-start!important;
+  text-align:left!important;
+}
+
 .home-hero-copy h1{
   position:relative!important;
   display:block!important;
-  width:max-content!important;
+  width:100%!important;
   max-width:100%!important;
-  min-height:1.92em;
+  min-height:1.82em;
   margin:0!important;
   color:transparent!important;
   -webkit-text-fill-color:transparent!important;
@@ -62,7 +67,7 @@
 .home-hero-copy h1::before,
 .home-hero-copy h1::after{
   position:absolute;
-  left:0;
+  left:0!important;
   display:block;
   width:max-content;
   max-width:100%;
@@ -87,7 +92,7 @@
 
 .home-hero-copy h1::after{
   content:"Staple IT";
-  top:.98em;
+  top:.92em;
   z-index:3;
   color:transparent;
   -webkit-text-fill-color:transparent;
@@ -113,6 +118,17 @@
   filter:saturate(1.22) brightness(1.08);
   animation:heroTrustLiquidIdle 4.9s cubic-bezier(.38,.02,.22,1) infinite alternate;
   will-change:background-position,filter;
+}
+
+.home-hero-copy .hero-tagline{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  text-align:left!important;
+  margin-top:0!important;
+}
+
+.home-hero-copy .hero-actions{
+  align-self:flex-start!important;
 }
 
 @keyframes heroTrustLiquidIdle{
@@ -179,14 +195,14 @@
 
 @media(max-width:700px){
   .home-hero-copy h1{
-    min-height:1.98em;
+    min-height:1.92em;
     width:100%!important;
   }
   .home-hero-copy h1::before,
   .home-hero-copy h1::after{
     max-width:100%;
   }
-  .home-hero-copy h1::after{top:1em}
+  .home-hero-copy h1::after{top:.96em}
 }
 
 @keyframes navSpectrumOutline{
