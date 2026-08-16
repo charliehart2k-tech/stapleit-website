@@ -34,12 +34,10 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Welcome to stays white. Staple IT uses an opaque colour surface with moving
-   liquid pools. The previous black creep came from Chromium compositing a
-   filtered, animated background-clip:text pseudo-element. Keep this layer
-   simple: no filter, no animated custom properties and no promoted will-change
-   surface. An opaque background-color sits behind every image layer so black can
-   never appear inside the glyphs even while the pools move. */
+   Welcome to stays white. Staple IT uses an opaque colour surface with three
+   broad colour pools moving on continuous looping paths. Sizes stay fixed and
+   only background-position changes, avoiding the stepping/jitter caused by
+   constantly resizing gradient layers. */
 .home-hero-copy{
   align-items:flex-start!important;
   text-align:left!important;
@@ -106,20 +104,21 @@
   -webkit-text-stroke:0;
   text-shadow:none;
 
-  /* Guaranteed opaque fallback under every moving layer. */
+  /* Opaque base guarantees a fully filled glyph at every frame. */
   background-color:#8b5cf6;
   background-image:
-    radial-gradient(circle at 10% 42%,rgba(37,99,235,1) 0 10%,rgba(59,130,246,.94) 18%,rgba(59,130,246,0) 39%),
-    radial-gradient(circle at 58% 30%,rgba(217,70,239,.96) 0 9%,rgba(217,70,239,.48) 18%,rgba(217,70,239,0) 38%),
-    radial-gradient(circle at 92% 62%,rgba(255,52,52,1) 0 10%,rgba(244,63,94,.92) 19%,rgba(244,63,94,0) 40%),
+    radial-gradient(circle at 50% 50%,rgba(37,99,235,1) 0 11%,rgba(59,130,246,.96) 21%,rgba(59,130,246,.34) 38%,transparent 58%),
+    radial-gradient(circle at 50% 50%,rgba(217,70,239,.98) 0 10%,rgba(217,70,239,.72) 21%,rgba(217,70,239,.24) 39%,transparent 60%),
+    radial-gradient(circle at 50% 50%,rgba(255,52,52,1) 0 11%,rgba(244,63,94,.94) 22%,rgba(244,63,94,.30) 40%,transparent 60%),
     linear-gradient(105deg,#2563eb 0%,#6366f1 24%,#a855f7 45%,#ec4899 64%,#ff334b 82%,#f97316 100%);
   background-repeat:no-repeat;
-  background-size:150% 175%,145% 165%,155% 180%,100% 100%;
-  background-position:-28% 28%,68% 12%,126% 72%,50% 50%;
+  background-size:175% 195%,170% 190%,178% 198%,100% 100%;
+  background-position:-25% 30%,70% 10%,125% 70%,50% 50%;
+  background-blend-mode:screen,screen,screen,normal;
   -webkit-background-clip:text;
   background-clip:text;
 
-  animation:heroLiquidSafe 1.85s cubic-bezier(.4,0,.2,1) infinite alternate;
+  animation:heroLiquidFlow 3.6s linear infinite;
 }
 
 .home-hero-copy .hero-tagline{
@@ -133,26 +132,27 @@
   align-self:flex-start!important;
 }
 
-@keyframes heroLiquidSafe{
+@keyframes heroLiquidFlow{
   0%{
-    background-size:150% 175%,145% 165%,155% 180%,100% 100%;
-    background-position:-28% 28%,68% 12%,126% 72%,50% 50%;
+    background-position:-25% 30%,70% 10%,125% 70%,50% 50%;
   }
-  25%{
-    background-size:164% 158%,154% 180%,146% 166%,100% 100%;
-    background-position:2% 58%,42% 72%,104% 34%,50% 50%;
+  16.666%{
+    background-position:4% 56%,46% 43%,101% 35%,50% 50%;
+  }
+  33.333%{
+    background-position:40% 76%,12% 76%,66% 10%,50% 50%;
   }
   50%{
-    background-size:144% 188%,162% 150%,160% 176%,100% 100%;
-    background-position:38% 76%,10% 24%,66% 78%,50% 50%;
+    background-position:79% 50%,-18% 45%,31% 31%,50% 50%;
   }
-  75%{
-    background-size:158% 162%,142% 184%,150% 160%,100% 100%;
-    background-position:72% 26%,-18% 66%,26% 30%,50% 50%;
+  66.666%{
+    background-position:50% 15%,6% 10%,10% 66%,50% 50%;
+  }
+  83.333%{
+    background-position:10% 4%,42% -5%,66% 86%,50% 50%;
   }
   100%{
-    background-size:148% 180%,158% 158%,164% 184%,100% 100%;
-    background-position:112% 68%,-42% 16%,-18% 74%,50% 50%;
+    background-position:-25% 30%,70% 10%,125% 70%,50% 50%;
   }
 }
 
