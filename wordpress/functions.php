@@ -62,6 +62,86 @@ add_filter( 'wp_mail_from_name', function () {
     return 'Staple IT';
 }, 5 );
 
+/* The static homepage already owns its title, canonical, description and core
+ * Organization/WebSite graph. Add only the missing social image/card metadata
+ * and complementary WebPage/ProfessionalService entities here. Keeping these
+ * identifiers stable makes the graph useful to search and answer engines while
+ * avoiding duplicate Organization output. */
+add_action( 'wp_head', function () {
+    if ( ! is_front_page() ) {
+        return;
+    }
+
+    $canonical   = 'https://stapleit.co.uk/';
+    $title       = 'IT Support in Surrey for Businesses & Charities | Staple IT';
+    $description = 'Staple IT provides reliable IT support, Microsoft 365, cyber security and IT consultancy for businesses, charities and individuals across Surrey.';
+    $image       = 'https://stapleit.co.uk/wp-content/themes/stapleit/assets/images/brand/staple-it-logo-transparent.webp';
+
+    echo "\n";
+    echo '<meta property="og:image" content="' . esc_url( $image ) . '">' . "\n";
+    echo '<meta property="og:image:alt" content="Staple IT">' . "\n";
+    echo '<meta name="twitter:card" content="summary">' . "\n";
+    echo '<meta name="twitter:title" content="' . esc_attr( $title ) . '">' . "\n";
+    echo '<meta name="twitter:description" content="' . esc_attr( $description ) . '">' . "\n";
+    echo '<meta name="twitter:image" content="' . esc_url( $image ) . '">' . "\n";
+
+    $schema = array(
+        '@context' => 'https://schema.org',
+        '@graph'   => array(
+            array(
+                '@type'       => 'WebPage',
+                '@id'         => $canonical . '#webpage',
+                'url'         => $canonical,
+                'name'        => $title,
+                'description' => $description,
+                'inLanguage'  => 'en-GB',
+                'isPartOf'     => array( '@id' => $canonical . '#website' ),
+                'about'        => array( '@id' => $canonical . '#organization' ),
+                'mainEntity'   => array( '@id' => $canonical . '#professional-service' ),
+            ),
+            array(
+                '@type'      => 'ProfessionalService',
+                '@id'        => $canonical . '#professional-service',
+                'name'       => 'Staple IT',
+                'url'        => $canonical,
+                'image'      => $image,
+                'telephone'  => '+44 1372 309 707',
+                'email'      => 'hello@stapleit.co.uk',
+                'parentOrganization' => array( '@id' => $canonical . '#organization' ),
+                'address'    => array(
+                    '@type'           => 'PostalAddress',
+                    'streetAddress'   => '88 Eastdean Avenue',
+                    'addressLocality' => 'Epsom',
+                    'postalCode'      => 'KT18 7SN',
+                    'addressRegion'   => 'Surrey',
+                    'addressCountry'  => 'GB',
+                ),
+                'areaServed'  => array(
+                    '@type' => 'AdministrativeArea',
+                    'name'  => 'Surrey',
+                ),
+                'serviceType' => array(
+                    'Managed IT support',
+                    'Microsoft 365',
+                    'Cyber security',
+                    'IT consultancy',
+                    'Cloud and IT solutions',
+                ),
+                'knowsAbout'  => array(
+                    'IT support',
+                    'Microsoft 365',
+                    'Cyber security',
+                    'Cloud services',
+                    'IT consultancy',
+                    'AI integrations',
+                ),
+            ),
+        ),
+    );
+
+    echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n";
+}, 20 );
+
 add_action( 'init', function () {
     register_post_type( 'stapleit_lead', array(
         'labels' => array(
