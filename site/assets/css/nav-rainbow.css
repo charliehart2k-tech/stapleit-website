@@ -34,10 +34,8 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Welcome to remains pure white. Staple IT is also predominantly white, with a
-   restrained champagne-gold reflection moving through the letters. The white
-   base is fully opaque at every frame, so there are no dark gaps or colour-band
-   artefacts. Only the sheen position moves, giving a smooth premium finish. */
+   Final treatment: simple white typography. Keep the existing two-line layout
+   and spacing, but remove all animated colour/glass effects from Staple IT. */
 .home-hero-copy{
   align-items:flex-start!important;
   text-align:left!important;
@@ -78,6 +76,11 @@
   letter-spacing:inherit;
   white-space:nowrap;
   overflow:visible!important;
+  color:#FFFFFF;
+  -webkit-text-fill-color:#FFFFFF;
+  -webkit-text-stroke:0;
+  background:none!important;
+  text-shadow:none!important;
 }
 
 .home-hero-copy h1::before{
@@ -85,11 +88,6 @@
   top:0;
   z-index:2;
   line-height:.94;
-  color:#FFFFFF;
-  -webkit-text-fill-color:#FFFFFF;
-  -webkit-text-stroke:0;
-  background:none;
-  text-shadow:none;
 }
 
 .home-hero-copy h1::after{
@@ -98,39 +96,6 @@
   z-index:3;
   line-height:1.08!important;
   padding-bottom:.14em;
-
-  color:transparent;
-  -webkit-text-fill-color:transparent;
-  -webkit-text-stroke:0;
-  text-shadow:none;
-
-  /* Opaque white surface with one broad gold reflection. The base layer never
-     moves; the highlight simply drifts across it and back. */
-  background-color:#FFFFFF;
-  background-image:
-    radial-gradient(ellipse at 50% 50%,
-      rgba(255,246,205,.88) 0 8%,
-      rgba(239,211,116,.72) 18%,
-      rgba(212,175,55,.52) 30%,
-      rgba(184,134,11,.18) 43%,
-      rgba(184,134,11,0) 60%),
-    linear-gradient(100deg,
-      #FFFFFF 0%,
-      #FFFFFF 31%,
-      #F7F5EE 40%,
-      #F3E3A2 46%,
-      #D4AF37 50%,
-      #F3E3A2 54%,
-      #F7F5EE 60%,
-      #FFFFFF 69%,
-      #FFFFFF 100%);
-  background-repeat:no-repeat,no-repeat;
-  background-size:138% 180%,220% 100%;
-  background-position:-62% 48%,-62% 50%;
-  -webkit-background-clip:text;
-  background-clip:text;
-
-  animation:heroGoldSheen 5.4s cubic-bezier(.45,0,.55,1) infinite alternate;
 }
 
 .home-hero-copy .hero-tagline{
@@ -142,18 +107,6 @@
 
 .home-hero-copy .hero-actions{
   align-self:flex-start!important;
-}
-
-@keyframes heroGoldSheen{
-  0%{
-    background-position:-62% 48%,-62% 50%;
-  }
-  50%{
-    background-position:48% 54%,48% 50%;
-  }
-  100%{
-    background-position:158% 46%,158% 50%;
-  }
 }
 
 @media(max-width:700px){
@@ -182,5 +135,4 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1::after{animation:none!important;background-position:48% 52%,48% 50%}
 }
