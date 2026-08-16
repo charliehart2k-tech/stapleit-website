@@ -34,10 +34,10 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Welcome to stays white. Staple IT now uses one opaque repeating brand-colour
-   field moving at a constant speed. The animation travels exactly one gradient
-   repeat per cycle, so frame 0 and the final frame are mathematically identical:
-   there is no reset point to jump, snap or reverse. */
+   Keep this restrained and brand-led: Royal Blue and Signal Red only. The
+   opaque base gradient always fills the glyphs; two very broad colour lenses
+   drift across it in opposite directions. The animation alternates with zero
+   velocity at both ends, so there is no reset seam, snap or conveyor-belt feel. */
 .home-hero-copy{
   align-items:flex-start!important;
   text-align:left!important;
@@ -104,29 +104,26 @@
   -webkit-text-stroke:0;
   text-shadow:none;
 
-  /* Exact Staple IT palette. Blue and red occupy the broadest sections, while
-     the four service colours pass through as shorter accents. Every stop is
-     opaque, so the black hero can never show through the glyphs. */
+  /* Premium two-colour liquid treatment. No rainbow bands, no white glints,
+     no transparent base and no animated filter/compositing tricks. */
   background-color:#1D4ED8;
-  background-image:repeating-linear-gradient(
-    90deg,
-    #1D4ED8 0em,
-    #1D4ED8 2.20em,
-    #A855F7 3.65em,
-    #E62B2B 5.25em,
-    #E62B2B 6.95em,
-    #F97316 8.55em,
-    #EAB308 9.65em,
-    #22C55E 10.80em,
-    #1D4ED8 12.80em,
-    #1D4ED8 14em
-  );
-  background-repeat:repeat;
-  background-position:0 50%;
+  background-image:
+    radial-gradient(ellipse at 50% 50%,rgba(230,43,43,.98) 0 10%,rgba(230,43,43,.72) 24%,rgba(230,43,43,.20) 42%,rgba(230,43,43,0) 64%),
+    radial-gradient(ellipse at 50% 50%,rgba(29,78,216,1) 0 12%,rgba(29,78,216,.78) 30%,rgba(29,78,216,.18) 47%,rgba(29,78,216,0) 66%),
+    linear-gradient(108deg,
+      #1D4ED8 0%,
+      #1D4ED8 34%,
+      #E62B2B 54%,
+      #E62B2B 66%,
+      #1D4ED8 88%,
+      #1D4ED8 100%);
+  background-repeat:no-repeat;
+  background-size:158% 184%,168% 196%,100% 100%;
+  background-position:-34% 32%,122% 68%,50% 50%;
   -webkit-background-clip:text;
   background-clip:text;
 
-  animation:heroBrandLiquidFlow 3.4s linear infinite;
+  animation:heroBrandLiquidDrift 4.35s cubic-bezier(.42,0,.18,1) infinite alternate;
 }
 
 .home-hero-copy .hero-tagline{
@@ -140,11 +137,13 @@
   align-self:flex-start!important;
 }
 
-/* The gradient itself repeats every 14em. Moving it by exactly 14em creates a
-   continuous loop with the same pixels at both ends of the animation. */
-@keyframes heroBrandLiquidFlow{
-  from{background-position:0 50%}
-  to{background-position:14em 50%}
+@keyframes heroBrandLiquidDrift{
+  from{
+    background-position:-34% 32%,122% 68%,50% 50%;
+  }
+  to{
+    background-position:116% 66%,-36% 24%,50% 50%;
+  }
 }
 
 @media(max-width:700px){
@@ -173,5 +172,5 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1::after{animation:none!important;background-position:2em 50%}
+  .home-hero-copy h1::after{animation:none!important;background-position:22% 46%,72% 52%,50% 50%}
 }
