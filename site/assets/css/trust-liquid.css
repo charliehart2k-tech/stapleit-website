@@ -161,3 +161,15 @@
   .trust-proof h3::before{flex-basis:28px!important;width:28px!important;height:28px!important;top:.06em!important}
   .trust-sticky::after{width:78px!important;height:78px!important;margin-top:20px!important;margin-bottom:28px!important}
 }
+
+/* Google review stars: simple staggered drop, no bounce or overshoot. */
+.google-review-section.stars-in .google-review-star{
+  animation-name:stapleGoogleStarDropSimple!important;
+  animation-duration:520ms!important;
+  animation-timing-function:cubic-bezier(.22,.61,.36,1)!important;
+  animation-fill-mode:forwards!important;
+}
+@keyframes stapleGoogleStarDropSimple{
+  0%{opacity:0;transform:translate3d(0,-28px,0) scale(.9);filter:drop-shadow(0 0 0 rgba(251,188,5,0))}
+  100%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:drop-shadow(0 0 9px rgba(251,188,5,.18))}
+}
