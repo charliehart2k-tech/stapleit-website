@@ -34,23 +34,18 @@
 }
 
 /* Hero title ---------------------------------------------------------------
-   Use the same proven liquid-colour language as the Trust / WIN typography.
-   Welcome to stays clean white; only Staple IT carries the effect. */
-.home-hero{view-timeline-name:--hero-chapter;view-timeline-axis:block}
-
-@property --hero-liquid-shift{
-  syntax:"<percentage>";
-  inherits:true;
-  initial-value:0%;
-}
-
+   Welcome to stays white. Staple IT uses an opaque colour surface with moving
+   liquid pools. The previous black creep came from Chromium compositing a
+   filtered, animated background-clip:text pseudo-element. Keep this layer
+   simple: no filter, no animated custom properties and no promoted will-change
+   surface. An opaque background-color sits behind every image layer so black can
+   never appear inside the glyphs even while the pools move. */
 .home-hero-copy{
   align-items:flex-start!important;
   text-align:left!important;
 }
 
 .home-hero-copy h1{
-  --hero-liquid-shift:0%;
   position:relative!important;
   display:block!important;
   width:100%!important;
@@ -105,38 +100,26 @@
   z-index:3;
   line-height:1.08!important;
   padding-bottom:.14em;
+
   color:transparent;
   -webkit-text-fill-color:transparent;
   -webkit-text-stroke:0;
   text-shadow:none;
 
-  /* The final layer is a fixed, fully opaque base. Only the translucent colour
-     pools move. Keeping the base at 100% x 100% means the clipped glyph can
-     never expose the black hero behind it at either edge. */
+  /* Guaranteed opaque fallback under every moving layer. */
+  background-color:#8b5cf6;
   background-image:
-    radial-gradient(circle at 16% 32%,rgba(96,165,250,.96) 0 8%,rgba(96,165,250,.46) 18%,rgba(96,165,250,.12) 30%,transparent 42%),
-    radial-gradient(circle at 74% 66%,rgba(239,68,68,.92) 0 8%,rgba(239,68,68,.42) 18%,rgba(239,68,68,.10) 30%,transparent 42%),
-    radial-gradient(circle at 52% 24%,rgba(168,85,247,.62) 0 7%,rgba(168,85,247,.18) 18%,transparent 34%),
-    linear-gradient(104deg,
-      #2563eb 0%,
-      #3b82f6 16%,
-      #8b5cf6 34%,
-      #d946ef 52%,
-      #f43f5e 70%,
-      #ff5a36 86%,
-      #f97316 100%);
-  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat;
-  background-size:165% 170%,175% 180%,155% 160%,100% 100%;
-  background-position:
-    calc(-18% + var(--hero-liquid-shift)) 20%,
-    calc(112% + var(--hero-liquid-shift)) 80%,
-    calc(88% + var(--hero-liquid-shift)) 12%,
-    50% 50%;
+    radial-gradient(circle at 10% 42%,rgba(37,99,235,1) 0 10%,rgba(59,130,246,.94) 18%,rgba(59,130,246,0) 39%),
+    radial-gradient(circle at 58% 30%,rgba(217,70,239,.96) 0 9%,rgba(217,70,239,.48) 18%,rgba(217,70,239,0) 38%),
+    radial-gradient(circle at 92% 62%,rgba(255,52,52,1) 0 10%,rgba(244,63,94,.92) 19%,rgba(244,63,94,0) 40%),
+    linear-gradient(105deg,#2563eb 0%,#6366f1 24%,#a855f7 45%,#ec4899 64%,#ff334b 82%,#f97316 100%);
+  background-repeat:no-repeat;
+  background-size:150% 175%,145% 165%,155% 180%,100% 100%;
+  background-position:-28% 28%,68% 12%,126% 72%,50% 50%;
   -webkit-background-clip:text;
   background-clip:text;
-  filter:saturate(1.34) brightness(1.10) contrast(1.04);
-  animation:heroTrustLiquidIdle 2.15s cubic-bezier(.32,.02,.18,1) infinite alternate;
-  will-change:background-position,background-size,filter;
+
+  animation:heroLiquidSafe 1.85s cubic-bezier(.4,0,.2,1) infinite alternate;
 }
 
 .home-hero-copy .hero-tagline{
@@ -150,60 +133,27 @@
   align-self:flex-start!important;
 }
 
-@keyframes heroTrustLiquidIdle{
+@keyframes heroLiquidSafe{
   0%{
-    background-size:165% 170%,175% 180%,155% 160%,100% 100%;
-    background-position:
-      calc(-18% + var(--hero-liquid-shift)) 20%,
-      calc(112% + var(--hero-liquid-shift)) 80%,
-      calc(88% + var(--hero-liquid-shift)) 12%,
-      50% 50%;
-    filter:saturate(1.20) brightness(1.03) contrast(1.03);
+    background-size:150% 175%,145% 165%,155% 180%,100% 100%;
+    background-position:-28% 28%,68% 12%,126% 72%,50% 50%;
   }
-  35%{
-    background-size:178% 158%,164% 192%,166% 150%,100% 100%;
-    background-position:
-      calc(8% + var(--hero-liquid-shift)) 42%,
-      calc(86% + var(--hero-liquid-shift)) 30%,
-      calc(58% + var(--hero-liquid-shift)) 70%,
-      50% 50%;
-    filter:saturate(1.34) brightness(1.11) contrast(1.05);
+  25%{
+    background-size:164% 158%,154% 180%,146% 166%,100% 100%;
+    background-position:2% 58%,42% 72%,104% 34%,50% 50%;
   }
-  68%{
-    background-size:158% 188%,186% 160%,148% 174%,100% 100%;
-    background-position:
-      calc(42% + var(--hero-liquid-shift)) 78%,
-      calc(46% + var(--hero-liquid-shift)) 66%,
-      calc(18% + var(--hero-liquid-shift)) 26%,
-      50% 50%;
-    filter:saturate(1.40) brightness(1.14) contrast(1.06);
+  50%{
+    background-size:144% 188%,162% 150%,160% 176%,100% 100%;
+    background-position:38% 76%,10% 24%,66% 78%,50% 50%;
+  }
+  75%{
+    background-size:158% 162%,142% 184%,150% 160%,100% 100%;
+    background-position:72% 26%,-18% 66%,26% 30%,50% 50%;
   }
   100%{
-    background-size:170% 166%,168% 186%,162% 154%,100% 100%;
-    background-position:
-      calc(92% + var(--hero-liquid-shift)) 24%,
-      calc(-8% + var(--hero-liquid-shift)) 18%,
-      calc(-16% + var(--hero-liquid-shift)) 74%,
-      50% 50%;
-    filter:saturate(1.24) brightness(1.05) contrast(1.03);
+    background-size:148% 180%,158% 158%,164% 184%,100% 100%;
+    background-position:112% 68%,-42% 16%,-18% 74%,50% 50%;
   }
-}
-
-/* Scroll position nudges the continuously-running idle animation instead of
-   replacing it. The liquid therefore stays visibly alive even when the page is
-   not moving. */
-@supports (animation-timeline:view()){
-  .home-hero-copy h1{
-    animation:heroLiquidScrollShift 1ms linear both;
-    animation-timeline:--hero-chapter;
-    animation-range:entry 0% exit 100%;
-  }
-}
-
-@keyframes heroLiquidScrollShift{
-  0%{--hero-liquid-shift:-12%}
-  50%{--hero-liquid-shift:0%}
-  100%{--hero-liquid-shift:12%}
 }
 
 @media(max-width:700px){
@@ -232,7 +182,5 @@
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
   .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
-  .home-hero-copy h1,
-  .home-hero-copy h1::after{animation:none!important}
-  .home-hero-copy h1::after{background-position:48% 50%,62% 48%,38% 58%,50% 50%}
+  .home-hero-copy h1::after{animation:none!important;background-position:18% 50%,52% 35%,88% 62%,50% 50%}
 }
