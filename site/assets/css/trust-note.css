@@ -174,3 +174,17 @@
 @media(prefers-reduced-motion:reduce){
   .trust-note-card::before,.trust-note-card::after,.trust-note-accent{animation:none!important;transform:none!important}
 }
+
+/* Service cards use the full glass height. home-golden.css gives the desktop
+   CTA a fixed top margin; override that here so the CTA anchors to the lower
+   edge and the whole service card reads as one intentional composition. */
+@media(min-width:981px){
+  .home-services-card .service-slide-content{
+    height:100%!important;
+    min-height:100%!important;
+    flex:1 1 auto!important;
+  }
+  .home-services-card .service-cta{
+    margin-top:auto!important;
+  }
+}
