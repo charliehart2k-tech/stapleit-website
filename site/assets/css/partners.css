@@ -34,6 +34,14 @@
   letter-spacing:-.048em;
 }
 
+.partners-header h2 span{
+  color:#1D4ED8!important;
+  -webkit-text-fill-color:#1D4ED8!important;
+  background:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+}
+
 .partners-header p{
   max-width:32rem;
   margin:0 0 8px;
