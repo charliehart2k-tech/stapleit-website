@@ -33,38 +33,60 @@
   box-shadow:0 10px 24px rgba(0,0,0,.24),0 0 18px rgba(111,99,255,.08)!important;
 }
 
-/* Keep the hero wording itself crisp while giving it the same moving spectrum
-   light used by the navigation pills. Unlike the nav interaction, this glow is
-   deliberately always present rather than waiting for hover/focus. */
+/* Hero title: use the same colour-inside-the-glyph treatment as the large
+   trust/WIN typography, but keep this one deliberately restrained and
+   red/white/blue. White remains the dominant state while red and blue liquid
+   bands travel through the letters. There is no outer glow or separate blue IT. */
 .home-hero-copy h1{
-  position:relative;
-  isolation:isolate;
-  text-shadow:0 0 18px rgba(255,255,255,.055);
-}
-
-.home-hero-copy h1::before{
-  content:"Welcome to Staple IT";
-  position:absolute;
-  z-index:-1;
-  inset:0;
-  width:100%;
-  pointer-events:none;
-  color:transparent;
-  -webkit-text-fill-color:transparent;
-  background:linear-gradient(115deg,#1D4ED8 0%,#6f63ff 16%,#A855F7 32%,#E62B2B 49%,#F97316 65%,#EAB308 81%,#22C55E 92%,#1D4ED8 100%);
-  background-size:320% 320%;
-  background-position:0% 50%;
-  -webkit-background-clip:text;
-  background-clip:text;
-  filter:blur(13px) saturate(1.25);
-  opacity:.62;
-  transform:translateZ(0) scale(1.01);
-  transform-origin:left center;
-  animation:navSpectrumOutline 2.8s linear infinite;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent!important;
+  text-shadow:none!important;
+  background:
+    radial-gradient(circle at 14% 36%,rgba(255,255,255,1) 0 1.2%,rgba(255,255,255,.55) 2.5%,transparent 6.5%),
+    radial-gradient(circle at 72% 64%,rgba(255,255,255,.92) 0 1%,rgba(255,255,255,.34) 2.2%,transparent 6%),
+    linear-gradient(104deg,
+      #ffffff 0%,
+      #ffffff 14%,
+      #e62b2b 25%,
+      #ffffff 38%,
+      #ffffff 48%,
+      #1d4ed8 59%,
+      #ffffff 72%,
+      #ffffff 82%,
+      #e62b2b 91%,
+      #ffffff 100%);
+  background-repeat:no-repeat;
+  background-size:165% 170%,175% 180%,290% 100%;
+  background-position:-28% 12%,110% 82%,0% 50%;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  animation:heroUnionLiquid 8.5s ease-in-out infinite alternate;
 }
 
 .home-hero-copy h1 .it-blue{
-  text-shadow:0 0 18px rgba(79,133,255,.20),0 0 34px rgba(79,133,255,.09);
+  color:inherit!important;
+  -webkit-text-fill-color:inherit!important;
+  text-shadow:none!important;
+  background:none!important;
+}
+
+@keyframes heroUnionLiquid{
+  0%{
+    background-position:-32% 10%,118% 84%,0% 50%;
+    filter:saturate(1.04) brightness(1.02);
+  }
+  34%{
+    background-position:12% 52%,78% 34%,34% 50%;
+    filter:saturate(1.12) brightness(1.08);
+  }
+  68%{
+    background-position:58% 76%,28% 72%,68% 50%;
+    filter:saturate(1.16) brightness(1.10);
+  }
+  100%{
+    background-position:108% 26%,-18% 28%,100% 50%;
+    filter:saturate(1.08) brightness(1.04);
+  }
 }
 
 @keyframes navSpectrumOutline{
@@ -75,6 +97,6 @@
 
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
-  .nav-pill:focus-visible::before,
-  .home-hero-copy h1::before{animation:none!important;background-position:50% 50%}
+  .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
+  .home-hero-copy h1{animation:none!important;background-position:50% 50%,50% 50%,50% 50%}
 }
