@@ -230,9 +230,7 @@
     '.contact-panel',
     '.contact-map-card',
     '.support-section-heading',
-    '.support-feature-card',
-    '.support-step-card',
-    '.support-package-card',
+    '.support-card',
     '.footer-panel',
     '.footer-legal-bar'
   ].join(','))];
