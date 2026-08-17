@@ -14,31 +14,18 @@
   align-items:center;
   overflow:hidden;
   isolation:isolate;
-  border:1px solid transparent;
+  border:1px solid rgba(255,255,255,.12);
   border-radius:40px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.026),rgba(255,255,255,.007) 20%,rgba(0,0,0,.30) 100%) padding-box,
-    linear-gradient(132deg,rgba(255,255,255,.28),rgba(255,255,255,.07) 34%,rgba(255,255,255,.035) 68%,rgba(255,255,255,.10)) border-box;
+  background:rgba(0,0,0,.58);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.10),
-    inset 0 -28px 44px rgba(0,0,0,.26),
-    0 44px 112px rgba(0,0,0,.52);
-  backdrop-filter:blur(18px) saturate(150%);
-  -webkit-backdrop-filter:blur(18px) saturate(150%);
+    inset 0 1px 0 rgba(255,255,255,.09),
+    inset 0 -1px 0 rgba(255,255,255,.025),
+    0 34px 96px rgba(0,0,0,.48);
+  backdrop-filter:blur(24px) saturate(125%);
+  -webkit-backdrop-filter:blur(24px) saturate(125%);
 }
 
-.support-hero-shell::before{
-  content:"";
-  position:absolute;
-  z-index:0;
-  inset:-30% -12%;
-  pointer-events:none;
-  background:
-    radial-gradient(ellipse at 18% 42%,rgba(255,255,255,.055),transparent 38%),
-    radial-gradient(ellipse at 82% 62%,rgba(255,255,255,.025),transparent 34%);
-  filter:blur(34px);
-  opacity:.72;
-}
+.support-hero-shell::before{display:none}
 
 .support-hero-copy{
   position:relative;
