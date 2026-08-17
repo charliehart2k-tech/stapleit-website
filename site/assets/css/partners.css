@@ -1,5 +1,5 @@
 /* Homepage partner showcase -------------------------------------------------
-   Liquid-glass marquee using the supplied partner artwork on dark cards. */
+   Six supplied partner logos on one neutral liquid-glass conveyor. */
 .partners-section{
   position:relative;
   width:100vw;
@@ -33,12 +33,9 @@
   letter-spacing:-.048em;
 }
 
-.partners-header h2 span{
+.partners-accent{
   color:#1D4ED8!important;
   -webkit-text-fill-color:#1D4ED8!important;
-  background:none!important;
-  -webkit-background-clip:border-box!important;
-  background-clip:border-box!important;
 }
 
 .partners-header p{
@@ -55,9 +52,7 @@
   padding:16px;
   border:1px solid rgba(255,255,255,.11);
   border-radius:30px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.014) 48%,rgba(0,0,0,.18)),
-    rgba(8,8,8,.72);
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.014) 48%,rgba(0,0,0,.18)),rgba(8,8,8,.72);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 24px 70px rgba(0,0,0,.24);
   backdrop-filter:blur(22px) saturate(120%);
   -webkit-backdrop-filter:blur(22px) saturate(120%);
@@ -98,24 +93,24 @@
   overflow:hidden;
   border:1px solid rgba(255,255,255,.10);
   border-radius:22px;
-  background-color:#050505;
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:calc(100% - 44px) calc(100% - 44px);
+  background:rgba(5,5,5,.78);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
   transition:transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease;
 }
 
-/* The current HTML still contains numbered placeholders; real partner artwork
-   is painted onto the six matching tiles so the conveyor can stay untouched. */
-.partner-tile>span{opacity:0!important;pointer-events:none}
-.partners-group .partner-tile:nth-child(1){background-image:url("../media/partners/huntress.webp")}
-.partners-group .partner-tile:nth-child(2){background-image:url("../media/partners/dell.webp")}
-.partners-group .partner-tile:nth-child(3){background-image:url("../media/partners/hp.webp")}
-.partners-group .partner-tile:nth-child(4){background-image:url("../media/partners/microsoft.webp");background-size:calc(100% - 34px) auto}
-.partners-group .partner-tile:nth-child(5){background-image:url("../media/partners/ubiquiti.webp")}
-.partners-group .partner-tile:nth-child(6){background-image:url("../media/partners/fortinet.webp");background-size:calc(100% - 28px) auto}
-.partners-group .partner-tile:nth-child(7){display:none}
+.partner-tile img{
+  display:block;
+  width:auto;
+  height:auto;
+  max-width:100%;
+  max-height:78px;
+  object-fit:contain;
+}
+
+.partner-tile--wide img{
+  max-width:94%;
+  max-height:64px;
+}
 
 @media(hover:hover){
   .partner-tile:hover{
@@ -141,9 +136,9 @@
   .partners-header h2{max-width:12ch}
   .partners-header p{margin:0}
   .partners-conveyor{margin-inline:-8px;padding:12px;border-radius:24px}
-  .partner-tile{width:174px;height:108px;padding:18px;border-radius:18px;background-size:calc(100% - 36px) calc(100% - 36px)}
-  .partners-group .partner-tile:nth-child(4){background-size:calc(100% - 28px) auto}
-  .partners-group .partner-tile:nth-child(6){background-size:calc(100% - 24px) auto}
+  .partner-tile{width:174px;height:108px;padding:18px;border-radius:18px}
+  .partner-tile img{max-height:62px}
+  .partner-tile--wide img{max-height:52px}
 }
 
 @media(prefers-reduced-motion:reduce){
