@@ -91,6 +91,10 @@
   .service-grid-card .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;padding-inline:13px!important;justify-content:center!important;font-size:12.5px!important}
 }
 
+/* Keep the shortest service title on the same two-line rhythm as the other
+ * three cards: “We do IT” followed by “Support”. */
+.service-grid-card .service-support h2{max-width:7.6ch!important}
+
 @media(prefers-reduced-motion:reduce){
   .service-grid-card{transform:none!important;transition:none!important}
 }
