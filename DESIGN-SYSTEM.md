@@ -152,18 +152,22 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
 - `Unlimited` uses the approved Trust liquid-colour typography language with stronger saturation, brighter highlights and more obvious movement than the Trust heading while remaining contained inside the glyphs.
 - Pricing sits immediately beneath as `from £35, per staff member, per month`, with `£35` in canonical Support Green.
+- The support-summary card starts directly with `Core support cover`; small pre-heading labels are deliberately omitted.
 - The route remains `noindex,nofollow` while it is under construction.
 
 ### IT Support chapters
 
-- The managed-support feature chapter uses six matching neutral black-glass cards in a three-by-two desktop grid, collapsing to two columns on tablet and one column on phone.
-- Feature cards use Support Green only as a small semantic marker; the cards themselves remain neutral and restrained.
+- The managed-support feature chapter uses six matching black-glass cards in a three-by-two desktop grid, collapsing to two columns on tablet and one column on phone.
+- Feature and onboarding cards use Support Green as their interaction accent, including the same soft bloom, travelling sheen and small lift language as the approved homepage cards.
 - The onboarding chapter presents `01`, `02`, `03` in order as three matching step cards. It becomes a single vertical sequence below the tablet breakpoint.
+- Small pre-heading/kicker labels and repetitive closing straplines are omitted so the chapters read cleanly and directly.
+- Desktop card typography is vertically aligned: feature headings reserve a common heading row, onboarding titles reserve a common title row, and package badges do not push package titles or prices out of alignment.
 - IT Support packages always read left-to-right as `Basic`, `Standard`, `Premium` on desktop and in that same order when stacked.
 - Package pricing uses the same `per staff member, per month` wording as the IT Support hero.
-- Package cards do not receive unrelated colour coding. Support Green is the shared service accent for pricing and state.
-- `Standard` is explicitly marked `Most popular` and receives the slightly stronger green edge/material treatment; popularity must never be communicated by colour alone.
-- Below-fold IT Support headings and cards use the shared one-time opacity/vertical reveal and remain fully visible with reduced motion or without IntersectionObserver support.
+- Package tier accents are deliberate UI semantics: `Basic` uses `--tier-basic` red, `Standard` uses `--tier-standard` blue and `Premium` uses `--tier-premium` purple. The glass material remains predominantly black.
+- `Standard` is explicitly marked `Most popular`; the badge and blue treatment reinforce the tier but popularity must never be communicated by colour alone.
+- Every IT Support card, including the hero summary, uses the shared one-time opacity/vertical reveal and homepage-equivalent hover bloom/sheen interaction. Reduced motion and no-IntersectionObserver paths remain fully readable.
+- Cross-document page transitions are inherited from the same shared `base.css` View Transition treatment used by the homepage.
 
 ### Homepage service grid
 
