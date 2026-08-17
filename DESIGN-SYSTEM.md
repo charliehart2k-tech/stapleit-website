@@ -21,9 +21,10 @@ The site is dark, clean, premium and restrained.
 
 ### Approved homepage exceptions
 
-- the hero uses the approved blue liquid-wave video and blue hero copy;
-- the four-card service grid uses Support Green, Solutions Orange, Consultancy Yellow and Security Purple to identify each service, with a restrained matching external glow;
-- the `you` accent in the service chapter heading may use the same approved moving Staple palette treatment as the Trust heading;
+- the hero uses the approved liquid-wave video behind white heading/supporting copy, with the blue primary CTA retained as the principal action;
+- the four-card service grid uses Support Green, Solutions Orange, Consultancy Yellow and Security Purple to identify each service, with the approved matching bloom/sheeen hover treatment;
+- the `you` accent in the service chapter heading uses the same passing Staple-colour shimmer as the `you` accent in the final contact heading;
+- the `support` word in `Who do we support?` uses canonical Support Green;
 - the three `Who do we support?` audience cards use a very soft palette glow behind otherwise neutral black glass;
 - the audit uses a contained, continuous organic orange liquid field;
 - the Trust heading may use the approved moving Staple palette treatment.
@@ -83,7 +84,7 @@ Editorial rules:
 - service names are `IT Support`, `IT Solutions`, `IT Consultancy`, `Cyber Security` and `AI Integrations`;
 - use `Microsoft 365`, `Wi-Fi`, `OneDrive` and other product names consistently;
 - body copy should normally stay within `--copy-max` (44rem / roughly 65–75 characters per line);
-- headings use tight negative tracking and short, balanced line lengths;
+- headings use tight negative tracking and short, balanced line lengths, but line boxes must always preserve ascenders and descenders;
 - body copy must remain comfortably readable; never make text tiny simply to force a layout to fit;
 - prices and recurring terms must use one wording within a page. The homepage uses `From £35 per staff member, per month`.
 
@@ -137,28 +138,31 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 ### Homepage hero
 
 - Large black glass surface with the approved liquid-wave video.
-- Heading remains the dominant visual element.
-- Blue supporting statement is approved here.
+- Heading remains the dominant visual element and stays white.
+- Supporting hero copy stays white for clarity over the moving background.
 - Support availability panel uses Europe/London time.
 - Green/red status colour communicates open/closed state.
+- When open, the telephone number is presented as the prominent green call action with a white outline telephone icon.
 
 ### Homepage service grid
 
-- The chapter is introduced by `What can we do for you...`, with `you` using the same animated Staple palette text treatment as the approved Trust heading and supporting copy aligned to the right on desktop.
+- The chapter is introduced by `What can we do for you...`, with `you` using the same passing Staple-colour shimmer as the final contact heading and supporting copy aligned to the right on desktop.
 - The four core service propositions are displayed simultaneously as four matching black glass cards.
 - Desktop and tablet order is IT Support / IT Solutions, then IT Consultancy / Cyber Security in a two-by-two grid.
 - Each card keeps the proven service-card content pattern: heading, short explanation, three scannable service points and CTA.
 - `IT Support` uses the same two-line heading rhythm as the other cards: `We do IT` on the first line and `Support` on the second.
 - The service name, bullet markers, CTA treatment and restrained external glow use the service's canonical accent colour.
-- The glow strength follows the approved audience-card language: soft at rest, slightly stronger on hover/focus, never a coloured border.
-- There is no timer, wheel control, indicator control or carousel state; each service remains directly visible and directly reachable.
+- The cards use the same approved bloom, sheen, lift and external-glow interaction language as the audience cards, using the relevant service colour.
+- There is no timer, wheel control, indicator control, horizontal scroll-snap or carousel state; each service remains directly visible and directly reachable.
 - Phone layouts stack the four cards vertically while preserving the same order and content hierarchy.
 
 ### Audience cards
 
+- The chapter heading is `Who do we support?`; `support` is canonical Support Green (`#22C55E`).
 - Three matching neutral black glass cards.
 - Desktop order: Charities / Small & medium-sized businesses / Sole traders & freelancers.
 - Approved external glows: purple for charities, green for businesses, orange for sole traders/freelancers.
+- Hover/focus uses the approved soft bloom, travelling sheen and small lift without turning the card border into a solid service colour.
 - No small metadata/footer line underneath the main paragraph.
 
 ### Trust
@@ -182,12 +186,15 @@ Motion must add depth, hierarchy, feedback or continuity. It should never make t
 Approved patterns:
 
 - short hover/press feedback on buttons and cards;
-- light staggered viewport entrance for the four homepage service cards;
-- viewport-triggered entrance reveal for major homepage chapters;
+- service and audience cards use the approved colour bloom/sheen interaction on hover or keyboard focus;
+- viewport entrance reveals use only opacity and a small vertical transform so scrolling stays smooth and text is never blurred while moving;
+- each reveal runs once and releases `will-change` after entrance; no permanent compositor promotion for ordinary content;
 - same-origin View Transition for route changes where supported;
-- continuous, spatially contained liquid movement in the audit.
+- continuous, spatially contained liquid movement in the audit;
+- anchor navigation uses native smooth scrolling with sticky-header offset, and automatically falls back to instant scrolling when reduced motion is requested;
+- the hero video pauses while the document is hidden and when reduced motion is requested.
 
-Avoid scroll-jacking, large parallax systems, custom cursors, constant mouse-follow effects, or animation that delays reading. Every reveal must fail open if JavaScript/observer support is unavailable. Respect `prefers-reduced-motion`.
+Avoid scroll-jacking, large parallax systems, custom cursors, constant mouse-follow effects, blur/filter-heavy scroll reveals, or animation that delays reading. Every reveal must fail open if JavaScript/observer support is unavailable. Respect `prefers-reduced-motion`.
 
 ## 8. Responsive baseline
 
@@ -217,6 +224,8 @@ Never solve responsive problems with horizontal page scrolling or artificial tex
 
 Every page must retain semantic `main`, `nav`, `header` and `footer` regions, a working skip link, visible focus states, 44px touch targets, useful alt text, logical headings and accessible labels. Decorative media is hidden from assistive technology. Do not rely on colour alone to communicate information.
 
+Meaningful enhancement content should exist in semantic markup rather than being created only by JavaScript where practical. The homepage Google rating and form honeypot follow this rule; JavaScript enhances behaviour rather than supplying required presentation markup.
+
 ## 10. Performance baseline
 
 - no framework for static content that HTML/CSS/small JS can handle;
@@ -225,9 +234,10 @@ Every page must retain semantic `main`, `nav`, `header` and `footer` regions, a 
 - load fonts with direct stylesheet links rather than CSS `@import` chains;
 - preload only genuinely critical resources;
 - lazy-load below-the-fold imagery/iframes where appropriate;
-- keep hero video exceptional;
+- keep hero video exceptional and pause it when the tab is hidden or reduced motion is requested;
 - prefer CSS glass over JavaScript/WebGL glass;
 - keep repeated backdrop-filter surfaces modest on mobile/tablet;
+- avoid permanent `will-change` on ordinary cards/content;
 - run `tools/audit-site.py` at milestones and before every deployment.
 
 Working budgets:
@@ -238,16 +248,21 @@ Working budgets:
 - page-specific JS: normally well below 30 KB uncompressed;
 - third-party runtime JavaScript: zero by default.
 
-The current hero video is an approved large-asset exception and is expected to appear as a warning in the audit.
+The static audit warns when individual CSS/JS files exceed these working budgets. The current hero video is an approved large-asset exception and is expected to appear as a warning in the audit.
 
 ## 11. Security baseline
 
 - no executable inline JavaScript without a documented reason; JSON-LD is inert structured data and is allowed;
+- no runtime injection/mutation of inline styles; keep presentation in external stylesheets so the CSP contract remains clean;
+- no `eval()` or `new Function()` dynamic code execution;
 - avoid third-party scripts/trackers by default;
 - never commit keys, credentials, connection strings or tokens;
 - validate untrusted input at the server boundary;
+- keep anti-bot fields in semantic markup and validate them server-side;
 - keep `.well-known/security.txt` current;
 - HTTPS only in production.
+
+The static release audit enforces the no-runtime-inline-style and no-dynamic-code rules for site JavaScript.
 
 Recommended production headers while Google Fonts and the approved Google Maps iframe are in use:
 
