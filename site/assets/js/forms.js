@@ -11,19 +11,6 @@
     status.textContent = message;
   };
 
-  const honeypot = document.createElement('input');
-  honeypot.type = 'text';
-  honeypot.name = 'website';
-  honeypot.tabIndex = -1;
-  honeypot.autocomplete = 'off';
-  honeypot.setAttribute('aria-hidden', 'true');
-  honeypot.style.position = 'absolute';
-  honeypot.style.left = '-10000px';
-  honeypot.style.width = '1px';
-  honeypot.style.height = '1px';
-  honeypot.style.opacity = '0';
-  form.appendChild(honeypot);
-
   const defaultLabel = submit.textContent;
 
   form.addEventListener('submit', async event => {
