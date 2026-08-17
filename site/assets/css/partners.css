@@ -1,6 +1,5 @@
 /* Homepage partner showcase -------------------------------------------------
-   Simple liquid-glass marquee using placeholder partner tiles until the final
-   partner artwork is supplied. */
+   Liquid-glass marquee using the supplied partner artwork on dark cards. */
 .partners-section{
   position:relative;
   width:100vw;
@@ -91,41 +90,39 @@
 
 .partner-tile{
   flex:0 0 auto;
-  width:190px;
-  height:122px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:22px;
-  background:
-    radial-gradient(circle at 22% 8%,rgba(255,255,255,.075),transparent 34%),
-    linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.014)),
-    rgba(255,255,255,.018);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
-}
-
-.partner-placeholder-mark{
-  width:42px;
-  height:42px;
+  width:210px;
+  height:128px;
   display:grid;
   place-items:center;
-  border:1px solid rgba(255,255,255,.13);
-  border-radius:13px;
-  background:rgba(255,255,255,.035);
-  color:#d8dde5;
-  font-size:.78rem;
-  font-weight:700;
-  letter-spacing:.08em;
+  padding:22px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:22px;
+  background-color:#050505;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:calc(100% - 44px) calc(100% - 44px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+  transition:transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease;
 }
 
-.partner-tile span:last-child{
-  color:#f3f5f8;
-  font-size:.92rem;
-  font-weight:600;
-  letter-spacing:-.01em;
+/* The current HTML still contains numbered placeholders; real partner artwork
+   is painted onto the six matching tiles so the conveyor can stay untouched. */
+.partner-tile>span{opacity:0!important;pointer-events:none}
+.partners-group .partner-tile:nth-child(1){background-image:url("../media/partners/huntress.webp")}
+.partners-group .partner-tile:nth-child(2){background-image:url("../media/partners/dell.webp")}
+.partners-group .partner-tile:nth-child(3){background-image:url("../media/partners/hp.webp")}
+.partners-group .partner-tile:nth-child(4){background-image:url("../media/partners/microsoft.webp");background-size:calc(100% - 34px) auto}
+.partners-group .partner-tile:nth-child(5){background-image:url("../media/partners/ubiquiti.webp")}
+.partners-group .partner-tile:nth-child(6){background-image:url("../media/partners/fortinet.webp");background-size:calc(100% - 28px) auto}
+.partners-group .partner-tile:nth-child(7){display:none}
+
+@media(hover:hover){
+  .partner-tile:hover{
+    transform:translateY(-2px);
+    border-color:rgba(255,255,255,.16);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 16px 38px rgba(0,0,0,.28);
+  }
 }
 
 .partners-conveyor:hover .partners-track,
@@ -144,8 +141,9 @@
   .partners-header h2{max-width:12ch}
   .partners-header p{margin:0}
   .partners-conveyor{margin-inline:-8px;padding:12px;border-radius:24px}
-  .partner-tile{width:156px;height:104px;border-radius:18px}
-  .partner-placeholder-mark{width:36px;height:36px;border-radius:11px}
+  .partner-tile{width:174px;height:108px;padding:18px;border-radius:18px;background-size:calc(100% - 36px) calc(100% - 36px)}
+  .partners-group .partner-tile:nth-child(4){background-size:calc(100% - 28px) auto}
+  .partners-group .partner-tile:nth-child(6){background-size:calc(100% - 24px) auto}
 }
 
 @media(prefers-reduced-motion:reduce){
