@@ -22,7 +22,17 @@
   letter-spacing:-.048em;
 }
 
-.services-header-accent{color:var(--security)}
+.services-header-accent{
+  display:inline-block;
+  color:transparent!important;
+  background:linear-gradient(102deg,var(--brand-blue) 0%,#6f63ff 22%,var(--brand-security) 40%,var(--brand-red) 62%,var(--brand-solutions) 82%,var(--brand-blue) 100%)!important;
+  background-size:260% 100%!important;
+  background-position:0 50%;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  animation:goldTrustAccent 8.5s ease-in-out infinite alternate!important;
+}
 
 .services-header>p{
   max-width:34rem;
@@ -157,5 +167,6 @@
 }
 
 @media(prefers-reduced-motion:reduce){
+  .services-header-accent{animation:none!important;background-position:50% 50%!important}
   .service-grid-card{transform:none!important;transition:none!important}
 }
