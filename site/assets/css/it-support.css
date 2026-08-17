@@ -227,3 +227,28 @@
 @media(prefers-reduced-motion:reduce){
   .support-hero-unlimited{animation:none!important;background-position:44% 40%,62% 56%,78% 36%,48% 50%!important}
 }
+
+/* Phone refinement: tighter composition without sacrificing readability. */
+@media(max-width:700px){
+  .support-main{min-height:calc(100dvh - 74px)}
+  .support-hero{padding:14px 0 24px}
+  .support-hero-shell{border-radius:24px;backdrop-filter:blur(16px) saturate(116%);-webkit-backdrop-filter:blur(16px) saturate(116%)}
+  .support-hero-copy{padding:34px 18px 24px}
+  .support-hero-copy h1{max-width:100%;font-size:clamp(2.7rem,12.5vw,4rem);line-height:1;letter-spacing:-.045em}
+  .support-hero-unlimited{max-width:100%}
+  .support-hero-price{max-width:21ch;margin-top:20px;font-size:clamp(1.2rem,5.5vw,1.55rem);line-height:1.35}
+  .support-hero-summary{margin:0 12px 14px;padding:22px 18px 18px;border-radius:20px;backdrop-filter:blur(14px) saturate(118%);-webkit-backdrop-filter:blur(14px) saturate(118%)}
+  .support-summary-kicker{font-size:.72rem}
+  .support-hero-summary h2{font-size:clamp(1.65rem,8vw,2.15rem);line-height:1.05}
+  .support-summary-intro{max-width:none;font-size:.92rem;line-height:1.55}
+  .support-summary-list{margin-top:18px}
+  .support-summary-list li{min-height:50px;padding:13px 0 13px 22px;font-size:.9rem}
+  .support-summary-list li::before{top:19px;width:7px;height:7px}
+  .support-summary-list small{font-size:.76rem}
+}
+
+@media(max-width:380px){
+  .support-hero-copy{padding-inline:16px}
+  .support-hero-summary{margin-inline:10px;padding-inline:16px}
+  .support-hero-copy h1{font-size:clamp(2.45rem,12.2vw,3.25rem)}
+}
