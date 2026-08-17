@@ -86,6 +86,25 @@ body{letter-spacing:0}
   letter-spacing:0!important;
 }
 
+/* Keep package headings aligned while giving the Standard badge its own row. */
+.support-package-card{
+  padding-top:46px;
+}
+
+.support-package-card h3{
+  max-width:100%!important;
+}
+
+.support-package-badge{
+  top:10px!important;
+  right:18px!important;
+  min-height:24px!important;
+  padding-inline:10px!important;
+  font-size:.68rem!important;
+  line-height:1!important;
+  white-space:nowrap;
+}
+
 @media(min-width:981px){
   .service-grid-card .service-slide h2{min-height:2.2em!important}
   .support-feature-card{grid-template-rows:148px 1fr}
@@ -107,4 +126,15 @@ body{letter-spacing:0}
   }
 
   .service-grid-card .service-slide h2{min-height:0!important}
+
+  .support-package-card{
+    padding-top:42px!important;
+  }
+
+  .support-package-badge{
+    position:absolute!important;
+    top:8px!important;
+    right:14px!important;
+    margin:0!important;
+  }
 }
