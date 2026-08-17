@@ -214,6 +214,7 @@
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const elements = [...document.querySelectorAll([
+    '.services-header',
     '.home-services-card',
     '.audience-header',
     '.audience-item',
