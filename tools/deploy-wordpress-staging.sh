@@ -28,6 +28,10 @@ echo "=== Release gate: static site audit ==="
 python3 "$REPO/tools/audit-site.py" --root "$SOURCE"
 
 echo
+echo "=== Release gate: raster asset integrity ==="
+python3 "$REPO/tools/audit-assets.py" --root "$SOURCE/assets"
+
+echo
 echo "Deploying Staple IT homepage from Git $VERSION"
 
 mkdir -p "$BACKUP_DIR"
