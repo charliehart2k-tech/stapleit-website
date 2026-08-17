@@ -93,7 +93,7 @@
     const open = weekday && !holidays.has(now.date) && now.hour >= 9 && now.hour < 17;
 
     panel.classList.toggle('offline', !open);
-    title.textContent = open ? 'Support is open' : 'Support is closed';
+    title.textContent = open ? 'We are open' : 'We are asleep';
 
     if (open) {
       const copy = document.createElement('span');
