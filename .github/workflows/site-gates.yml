@@ -17,11 +17,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate audit tool
-        run: python3 -m py_compile tools/audit-site.py
+      - name: Validate governing standards
+        run: |
+          files=(
+            AGENTS.md
+            STANDARDS-INDEX.md
+            BRAND-PALETTE.md
+            DESIGN-SYSTEM.md
+            CODE-STANDARDS.md
+            ASSET-STANDARDS.md
+            SEO-AEO-SCHEMA.md
+            RELEASE-CHECKLIST.md
+            PRODUCTION-GATES.md
+            DEPLOYMENT-NOTES.md
+          )
+          for file in "${files[@]}"; do
+            test -s "$file" || { echo "::error::$file is missing or empty"; exit 1; }
+          done
+
+      - name: Validate audit tools
+        run: |
+          python3 -m py_compile tools/audit-site.py
+          python3 -m py_compile tools/audit-assets.py
 
       - name: Validate staging deploy script
         run: bash -n tools/deploy-wordpress-staging.sh
 
       - name: Run content security SEO and AEO gates
         run: python3 tools/audit-site.py --root site
+
+      - name: Validate raster asset integrity
+        run: python3 tools/audit-assets.py --root site/assets
