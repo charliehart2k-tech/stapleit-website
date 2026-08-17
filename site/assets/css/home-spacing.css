@@ -1,0 +1,37 @@
+/* Homepage chapter rhythm ---------------------------------------------------
+   Deliberately generous black breathing room between the major homepage
+   chapters. This file owns vertical spacing only; component geometry stays in
+   the section-specific stylesheets. */
+
+@media(min-width:981px){
+  .home-hero{padding-bottom:72px}
+  .home-intro{padding:56px 0 96px}
+  .audience-section{padding:132px 0 140px}
+  .trust-section{padding:156px 0 168px}
+  .google-review-section{padding:128px 0 132px}
+  .partners-section{padding:108px 0 136px}
+  .audit-section{padding:148px 0 112px}
+  .contact-section{padding:88px 0 148px}
+}
+
+@media(min-width:701px) and (max-width:980px){
+  .home-hero{padding-bottom:56px}
+  .home-intro{padding:42px 0 80px}
+  .audience-section{padding:108px 0 112px}
+  .trust-section{padding:120px 0 124px}
+  .google-review-section{padding:104px 0 108px}
+  .partners-section{padding:88px 0 108px}
+  .audit-section{padding:118px 0 94px}
+  .contact-section{padding:64px 0 124px}
+}
+
+@media(max-width:700px){
+  .home-hero{padding-bottom:38px!important}
+  .home-intro{padding:36px 0 70px!important}
+  .audience-section{padding:82px 0 86px!important}
+  .trust-section{padding:92px 0 96px!important}
+  .google-review-section{padding:82px 0 86px}
+  .partners-section{padding:76px 0 92px}
+  .audit-section{padding:92px 0 78px!important}
+  .contact-section{padding:56px 0 104px!important}
+}
