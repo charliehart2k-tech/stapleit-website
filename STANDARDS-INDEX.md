@@ -37,6 +37,10 @@ The repository currently enforces:
 - shell syntax for the staging deploy script;
 - required governing standards being present;
 - static content/security/reference/SEO/AEO checks;
+- canonical Manrope weight checks;
+- no runtime JavaScript inline-style injection/mutation;
+- no `eval()` / `new Function()` dynamic code execution;
+- working per-file CSS and JavaScript size budgets;
 - raster image integrity checks;
 - blocking deployment when static/asset audits fail.
 
@@ -63,17 +67,15 @@ Then inspect the diff and confirm:
 
 ## Warning policy
 
-CI currently distinguishes warnings from blocking errors, but warnings are still engineering debt.
+CI distinguishes warnings from blocking errors, but warnings are still engineering debt.
 
 A new change must not add an unexplained warning.
 
-Known current warnings at the time this standard was created:
+Current known static-audit warning:
 
-- `site/assets/css/home-conversion.css` contains legacy non-canonical Manrope weights `500` and `650`;
-- `site/assets/css/home-polish.css` contains a legacy non-canonical Manrope weight `500`;
-- `site/assets/media/liquid-wave.mp4` is approximately `1.81 MiB` and is an explicitly documented hero-video exception.
+- `site/assets/media/liquid-wave.mp4` is approximately `1.81 MiB` and is the explicitly approved hero-video exception.
 
-The font-weight warnings should be removed when those files are next materially touched. The hero video may remain until a visually equivalent smaller source is approved.
+The previous non-canonical Manrope weight warnings in the homepage CSS have been removed. The hero video may remain until a visually equivalent smaller source is approved.
 
 ## Release rule
 
