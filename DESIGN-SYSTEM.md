@@ -144,6 +144,14 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - Green/red status colour communicates open/closed state.
 - When open, the telephone number is presented as the prominent green call action with a white outline telephone icon.
 
+### IT Support hero
+
+- Uses the same large rounded black liquid-glass proportions and material language as the homepage hero, but without introducing a new decorative video or image by default.
+- Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
+- `Unlimited` uses the approved Trust liquid-colour typography language with stronger saturation, brighter highlights and more obvious movement than the Trust heading while remaining contained inside the glyphs.
+- Pricing sits immediately beneath as `from £35, per staff member, per month`, with `£35` in canonical Support Green.
+- The route remains `noindex,nofollow` while it is under construction.
+
 ### Homepage service grid
 
 - The chapter is introduced by `What can we do for you...`, with `you` using the same passing Staple-colour shimmer as the final contact heading and supporting copy aligned to the right on desktop.
