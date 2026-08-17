@@ -38,6 +38,7 @@
 <link data-audit-enhancements href="assets/css/audit-enhancements.css" rel="stylesheet"/>
 <link href="assets/css/home-polish.css" rel="stylesheet"/>
 <link href="assets/css/home-golden.css" rel="stylesheet"/>
+<link href="assets/css/home-services-grid.css" rel="stylesheet"/>
 <link href="assets/css/trust-note.css" rel="stylesheet"/>
 <link href="assets/css/partners.css" rel="stylesheet"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":["Organization","ProfessionalService"],"@id":"https://stapleit.co.uk/#organization","name":"Staple IT","legalName":"Hart Corporate Ltd","url":"https://stapleit.co.uk/","logo":{"@id":"https://stapleit.co.uk/#logo"},"description":"IT support, Microsoft 365, cyber security and IT consultancy for businesses, charities and individuals across Surrey.","slogan":"Small enough to care. Experienced enough to deliver.","email":"hello@stapleit.co.uk","telephone":"+44 1372 309 707","address":{"@type":"PostalAddress","streetAddress":"88 Eastdean Avenue","addressLocality":"Epsom","postalCode":"KT18 7SN","addressRegion":"Surrey","addressCountry":"GB"},"areaServed":[{"@type":"AdministrativeArea","name":"Surrey"},{"@type":"City","name":"Epsom"}],"contactPoint":{"@type":"ContactPoint","contactType":"customer service","telephone":"+44 1372 309 707","email":"hello@stapleit.co.uk","availableLanguage":"English"},"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"17:00"},"knowsAbout":["IT support","Microsoft 365","Cyber security","Cloud services","IT consultancy","Business continuity","Managed IT services"],"identifier":[{"@type":"PropertyValue","propertyID":"Companies House","value":"17274041"},{"@type":"PropertyValue","propertyID":"VAT","value":"522399484"}],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Staple IT services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"IT Support","url":"https://stapleit.co.uk/it-services/it-support/","provider":{"@id":"https://stapleit.co.uk/#organization"},"areaServed":{"@type":"AdministrativeArea","name":"Surrey"}}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"IT Solutions","url":"https://stapleit.co.uk/it-services/it-solutions/","provider":{"@id":"https://stapleit.co.uk/#organization"},"areaServed":{"@type":"AdministrativeArea","name":"Surrey"}}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"IT Consultancy","url":"https://stapleit.co.uk/it-services/it-consultancy/","provider":{"@id":"https://stapleit.co.uk/#organization"},"areaServed":{"@type":"AdministrativeArea","name":"Surrey"}}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Cyber Security","url":"https://stapleit.co.uk/it-services/cybersecurity/","provider":{"@id":"https://stapleit.co.uk/#organization"},"areaServed":{"@type":"AdministrativeArea","name":"Surrey"}}}]}},{"@type":"ImageObject","@id":"https://stapleit.co.uk/#logo","url":"https://stapleit.co.uk/wp-content/themes/stapleit/assets/images/brand/staple-it-logo-transparent.webp","contentUrl":"https://stapleit.co.uk/wp-content/themes/stapleit/assets/images/brand/staple-it-logo-transparent.webp","width":1867,"height":402,"caption":"Staple IT"},{"@type":"WebSite","@id":"https://stapleit.co.uk/#website","url":"https://stapleit.co.uk/","name":"Staple IT","publisher":{"@id":"https://stapleit.co.uk/#organization"},"inLanguage":"en-GB"},{"@type":"WebPage","@id":"https://stapleit.co.uk/#webpage","url":"https://stapleit.co.uk/","name":"IT Support in Surrey for Businesses & Charities | Staple IT","description":"Staple IT provides reliable IT support, Microsoft 365, cyber security and IT consultancy for businesses, charities and individuals across Surrey.","isPartOf":{"@id":"https://stapleit.co.uk/#website"},"about":{"@id":"https://stapleit.co.uk/#organization"},"primaryImageOfPage":{"@id":"https://stapleit.co.uk/#logo"},"inLanguage":"en-GB"}]}</script>
@@ -119,14 +120,11 @@
 </aside>
 </div>
 </section>
-<section class="home-intro" aria-label="Staple IT">
-<div class="home-intro-grid">
-<article class="home-info-card home-statement-card">
-<h2>Small enough to <span class="brand-red">care</span>. Experienced enough to <span class="brand-red">deliver</span>.</h2>
-</article>
-<article class="home-info-card home-services-card" aria-label="Staple IT services" aria-roledescription="carousel" data-service-carousel data-active-service="support" tabindex="0">
+<section class="home-intro" aria-label="Staple IT services">
+<div class="home-intro-grid service-card-grid">
+<article class="home-info-card home-services-card service-grid-card">
 <div class="service-stage">
-<section class="service-slide service-support is-active" data-service-slide data-service="support" aria-hidden="false">
+<div class="service-slide service-support is-active">
 <div class="service-slide-content">
 <h2>We do <span class="service-accent">IT Support</span></h2>
 <p>We provide unlimited remote support, Monday to Friday, backed by proactive monitoring and real-time alerting — from <span class="service-price">£35</span> per staff member, per month.</p>
@@ -135,34 +133,43 @@
 </ul>
 <a class="button service-cta" href="/it-services/it-support/">View IT Support Services</a>
 </div>
-</section>
-<section class="service-slide service-solutions" data-service-slide data-service="solutions" aria-hidden="true">
+</div>
+</div>
+</article>
+<article class="home-info-card home-services-card service-grid-card">
+<div class="service-stage">
+<div class="service-slide service-solutions is-active">
 <div class="service-slide-content">
 <h2>We do <span class="service-accent">IT Solutions</span></h2>
 <p>Want to move to the cloud, streamline DSAR requests or solve a frustrating IT problem? We deliver straightforward projects at affordable rates, without unnecessary complexity.</p>
 <ul class="service-points" aria-label="IT Solutions highlights"><li>Cloud &amp; Microsoft 365</li><li>Automation &amp; compliance</li><li>Fixed-scope projects</li></ul>
 <a class="button service-cta" href="/it-services/it-solutions/">View IT Solutions Services</a>
 </div>
-</section>
-<section class="service-slide service-consultancy" data-service-slide data-service="consultancy" aria-hidden="true">
+</div>
+</div>
+</article>
+<article class="home-info-card home-services-card service-grid-card">
+<div class="service-stage">
+<div class="service-slide service-consultancy is-active">
 <div class="service-slide-content">
 <h2>We do <span class="service-accent">IT Consultancy</span></h2>
 <p>From IT roadmaps and AI integrations to Cyber Essentials, compliance and Microsoft 365 strategy, we provide honest, straightforward advice tailored to your business.</p>
 <ul class="service-points" aria-label="IT Consultancy highlights"><li>IT planning &amp; roadmaps</li><li>Cyber Essentials</li><li>AI &amp; Microsoft 365 strategy</li></ul>
 <a class="button service-cta" href="/it-services/it-consultancy/">View IT Consultancy Services</a>
 </div>
-</section>
-<section class="service-slide service-security" data-service-slide data-service="security" aria-hidden="true">
+</div>
+</div>
+</article>
+<article class="home-info-card home-services-card service-grid-card">
+<div class="service-stage">
+<div class="service-slide service-security is-active">
 <div class="service-slide-content">
 <h2>We do <span class="service-accent">Cyber Security</span></h2>
 <p>From antivirus and email security to identity protection and security reviews, we provide layered protection designed to keep your business safe from real-world threats.</p>
 <ul class="service-points" aria-label="Cyber Security highlights"><li>Endpoint protection</li><li>Email security</li><li>Identity protection</li></ul>
 <a class="button service-cta" href="/it-services/cybersecurity/">View Cyber Security Services</a>
 </div>
-</section>
 </div>
-<div class="service-indicator" aria-label="Service slides">
-<button type="button" aria-label="Show IT Support" aria-current="true"></button><button type="button" aria-label="Show IT Solutions"></button><button type="button" aria-label="Show IT Consultancy"></button><button type="button" aria-label="Show Cyber Security"></button>
 </div>
 </article>
 </div>
