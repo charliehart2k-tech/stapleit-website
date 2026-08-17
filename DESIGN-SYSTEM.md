@@ -146,7 +146,7 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 
 ### IT Support hero
 
-- Uses the same large rounded black liquid-glass proportions and material language as the homepage hero, but without introducing a new decorative video or image by default.
+- Uses the same large rounded proportions as the homepage hero, but the pane itself is pure translucent black glass: no grey fill, no white radial wash and no coloured background treatment; depth comes from transparency, blur, a neutral edge and restrained black shadowing.
 - Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
 - `Unlimited` uses the approved Trust liquid-colour typography language with stronger saturation, brighter highlights and more obvious movement than the Trust heading while remaining contained inside the glyphs.
 - Pricing sits immediately beneath as `from £35, per staff member, per month`, with `£35` in canonical Support Green.
