@@ -106,6 +106,8 @@ Shared spacing tokens are the default rhythm:
 
 Prefer these values over arbitrary one-off gaps. Component-specific spacing is allowed when composition genuinely needs it, but adjacent chapters should still feel like one site.
 
+The homepage deliberately uses more generous vertical breathing room between major chapters than the component-level spacing tokens alone. Each section should read as a distinct chapter rather than one continuous stacked strip, with that separation reduced proportionally on tablet and phone rather than removed.
+
 Canonical radii remain `--radius-md`, `--radius-lg`, `--radius-xl` and `--radius-xxl`. Mobile components may step down one radius tier rather than becoming square.
 
 ## 5. Glass material
