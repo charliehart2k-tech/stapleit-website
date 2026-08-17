@@ -154,6 +154,17 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - Pricing sits immediately beneath as `from £35, per staff member, per month`, with `£35` in canonical Support Green.
 - The route remains `noindex,nofollow` while it is under construction.
 
+### IT Support chapters
+
+- The managed-support feature chapter uses six matching neutral black-glass cards in a three-by-two desktop grid, collapsing to two columns on tablet and one column on phone.
+- Feature cards use Support Green only as a small semantic marker; the cards themselves remain neutral and restrained.
+- The onboarding chapter presents `01`, `02`, `03` in order as three matching step cards. It becomes a single vertical sequence below the tablet breakpoint.
+- IT Support packages always read left-to-right as `Basic`, `Standard`, `Premium` on desktop and in that same order when stacked.
+- Package pricing uses the same `per staff member, per month` wording as the IT Support hero.
+- Package cards do not receive unrelated colour coding. Support Green is the shared service accent for pricing and state.
+- `Standard` is explicitly marked `Most popular` and receives the slightly stronger green edge/material treatment; popularity must never be communicated by colour alone.
+- Below-fold IT Support headings and cards use the shared one-time opacity/vertical reveal and remain fully visible with reduced motion or without IntersectionObserver support.
+
 ### Homepage service grid
 
 - The chapter is introduced by `What can we do for you...`, with `you` using the same passing Staple-colour shimmer as the final contact heading and supporting copy aligned to the right on desktop.
