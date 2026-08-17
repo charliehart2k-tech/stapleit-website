@@ -152,7 +152,7 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 
 - Uses the same large rounded proportions as the homepage hero, but the pane itself is pure translucent black glass: no grey fill, no white radial wash and no coloured background treatment; depth comes from transparency, blur, a neutral edge and restrained black shadowing.
 - Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
-- `Unlimited` uses the approved Trust liquid-colour typography language with stronger saturation, brighter highlights and more obvious movement than the Trust heading while remaining contained inside the glyphs.
+- `Unlimited` keeps the approved liquid moving-highlight treatment but is constrained to canonical Support Green (`#22C55E`) with lighter and darker green tonal variation rather than the multi-colour Staple palette.
 - Pricing sits immediately beneath as `from £35, per staff member, per month`, with `£35` in canonical Support Green.
 - The support-summary card starts directly with `Core support cover`; small pre-heading labels are deliberately omitted.
 - The route remains `noindex,nofollow` while it is under construction.
@@ -330,6 +330,6 @@ Unfinished routes must contain a truthful visible placeholder and remain `noinde
 - replace source-of-truth copy with generic AI marketing language;
 - create keyword doorway pages or fake review/schema content;
 - over-engineer static pages;
-- leave dead experiments/aliases/selectors in the active build after a direction is abandoned.
+- leave dead experiments/aliases/selectors in the active build after a direction has changed.
 
 If the design direction explicitly changes, update this document in the same change so the repository stays truthful.
