@@ -84,7 +84,9 @@ Editorial rules:
 - service names are `IT Support`, `IT Solutions`, `IT Consultancy`, `Cyber Security` and `AI Integrations`;
 - use `Microsoft 365`, `Wi-Fi`, `OneDrive` and other product names consistently;
 - body copy should normally stay within `--copy-max` (44rem / roughly 65–75 characters per line);
-- headings use tight negative tracking and short, balanced line lengths, but line boxes must always preserve ascenders and descenders;
+- headings use restrained negative tracking and short, balanced line lengths; large display headings should normally stay around `-.025em` or looser and card headings around `-.015em` or looser unless an explicitly approved treatment requires otherwise;
+- body copy, navigation and utility text use neutral tracking by default rather than compressed spacing;
+- line boxes must preserve ascenders and descenders and multi-line headings must not look vertically bunched;
 - body copy must remain comfortably readable; never make text tiny simply to force a layout to fit;
 - prices and recurring terms must use one wording within a page. The homepage uses `From £35 per staff member, per month`.
 
