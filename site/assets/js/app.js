@@ -96,7 +96,7 @@
     title.textContent = open ? 'Support is open' : 'Support is closed';
 
     if (open) {
-      message.textContent = 'Our support team is available until 5pm today.';
+      message.textContent = 'Our support team is available until 5pm today. Call us on 01372 309707.';
     } else if (weekday && !holidays.has(now.date) && now.hour < 9) {
       message.textContent = 'Our support team is available from 9am today.';
     } else {
