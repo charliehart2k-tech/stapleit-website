@@ -14,9 +14,16 @@ ALLOWED_EXTERNAL_HOSTS = {"stapleit.co.uk", "fonts.googleapis.com", "fonts.gstat
 RESOURCE_TAGS = {"link", "img", "source", "video", "audio", "iframe"}
 WARN_ASSET_BYTES = 1_500_000
 ERROR_ASSET_BYTES = 5_000_000
+WARN_CSS_BYTES = 50_000
+WARN_JS_BYTES = 30_000
 CSS_URL_RE = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.I)
 CSS_IMPORT_RE = re.compile(r"@import\s+(?:url\()?\s*['\"]([^'\"]+)['\"]", re.I)
 FONT_WEIGHT_RE = re.compile(r"font-weight\s*:\s*([1-9]00|[1-9][0-9]{2})\b", re.I)
+JS_INLINE_STYLE_RE = re.compile(
+    r"(?:createElement\(\s*['\"]style['\"]\s*\)|\.style(?:\.|\[)|setAttribute\(\s*['\"]style['\"])",
+    re.I,
+)
+JS_DYNAMIC_CODE_RE = re.compile(r"(?:\beval\s*\(|\bnew\s+Function\s*\()", re.I)
 
 
 class HtmlAuditParser(HTMLParser):
@@ -295,6 +302,8 @@ def audit(root: Path) -> int:
         text = css.read_text(encoding="utf-8-sig")
         imports = [m.group(1) for m in CSS_IMPORT_RE.finditer(text)]
         refs = [m.group(2) for m in CSS_URL_RE.finditer(text)] + imports
+        if css.stat().st_size > WARN_CSS_BYTES:
+            warnings.append(f"{rel}: CSS exceeds working 50 KiB budget")
         if imports:
             warnings.append(f"{rel}: CSS @import creates a request chain; prefer <link> in HTML")
         weights = sorted({int(m.group(1)) for m in FONT_WEIGHT_RE.finditer(text) if int(m.group(1)) not in {400, 600, 700}})
@@ -312,6 +321,16 @@ def audit(root: Path) -> int:
             target = local_target(root, css, raw)
             if target is not None and not target.exists():
                 errors.append(f"{rel}: missing CSS asset -> {raw}")
+
+    for js in sorted(root.rglob("*.js")):
+        rel = js.relative_to(root)
+        text = js.read_text(encoding="utf-8-sig")
+        if js.stat().st_size > WARN_JS_BYTES:
+            warnings.append(f"{rel}: JavaScript exceeds working 30 KiB budget")
+        if JS_INLINE_STYLE_RE.search(text):
+            errors.append(f"{rel}: runtime inline style injection/mutation found")
+        if JS_DYNAMIC_CODE_RE.search(text):
+            errors.append(f"{rel}: dynamic code execution found")
 
     for asset in sorted((root / "assets").rglob("*")) if (root / "assets").exists() else []:
         if not asset.is_file():
