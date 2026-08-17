@@ -22,8 +22,7 @@ The site is dark, clean, premium and restrained.
 ### Approved homepage exceptions
 
 - the hero uses the approved blue liquid-wave video and blue hero copy;
-- the statement card uses Staple Signal Red on `care` and `deliver` plus a restrained glass sweep;
-- the service carousel uses Support Green, Solutions Orange, Consultancy Yellow and Security Purple to identify service state;
+- the four-card service grid uses Support Green, Solutions Orange, Consultancy Yellow and Security Purple to identify each service;
 - the three `Who do we support?` audience cards use a very soft palette glow behind otherwise neutral black glass;
 - the audit uses a contained, continuous organic orange liquid field;
 - the Trust heading may use the approved moving Staple palette treatment.
@@ -142,18 +141,14 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - Support availability panel uses Europe/London time.
 - Green/red status colour communicates open/closed state.
 
-### Statement card
+### Homepage service grid
 
-- Large editorial statement rather than explanatory body copy.
-- `care` and `deliver` use Signal Red.
-- Slow specular sweep and a single deliberate viewport entrance are approved.
-
-### Service carousel
-
-- Desktop: one fixed visual card; service states crossfade automatically every 15 seconds, with wheel/keyboard/indicator controls.
-- Phone/tablet: native horizontal touch scrolling with scroll snap. The card must follow the user’s finger; indicators are secondary controls only.
-- Active indicator and service accent use the current canonical service colour.
-- Content pattern: heading, short explanation, three scannable service points, CTA.
+- The four core service propositions are displayed simultaneously as four matching black glass cards.
+- Desktop and tablet order is IT Support / IT Solutions, then IT Consultancy / Cyber Security in a two-by-two grid.
+- Each card keeps the proven service-card content pattern: heading, short explanation, three scannable service points and CTA.
+- The service name, bullet markers and CTA treatment use the service's canonical accent colour.
+- There is no timer, wheel control, indicator control or carousel state; each service remains directly visible and directly reachable.
+- Phone layouts stack the four cards vertically while preserving the same order and content hierarchy.
 
 ### Audience cards
 
@@ -183,8 +178,7 @@ Motion must add depth, hierarchy, feedback or continuity. It should never make t
 Approved patterns:
 
 - short hover/press feedback on buttons and cards;
-- clean desktop crossfade and native mobile swipe for services;
-- slow statement-card glass sweep and entrance;
+- light staggered viewport entrance for the four homepage service cards;
 - viewport-triggered entrance reveal for major homepage chapters;
 - same-origin View Transition for route changes where supported;
 - continuous, spatially contained liquid movement in the audit.
@@ -208,7 +202,7 @@ Current breakpoints:
 
 - navigation changes to menu at 1080px and below;
 - homepage hero/content row stacks at 980px and below;
-- service carousel becomes native horizontal touch scrolling at 980px and below;
+- homepage service cards remain a two-column grid down to 700px, then stack to one column;
 - trust sticky/two-column composition collapses for touch/tablet layouts;
 - global page gutters reduce below 700px;
 - footer progressively collapses while preserving useful horizontal grouping.
