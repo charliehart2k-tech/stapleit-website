@@ -229,6 +229,10 @@
     '.contact-hero',
     '.contact-panel',
     '.contact-map-card',
+    '.support-section-heading',
+    '.support-feature-card',
+    '.support-step-card',
+    '.support-package-card',
     '.footer-panel',
     '.footer-legal-bar'
   ].join(','))];
