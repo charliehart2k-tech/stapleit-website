@@ -22,7 +22,7 @@ The site is dark, clean, premium and restrained.
 ### Approved homepage exceptions
 
 - the hero uses the approved blue liquid-wave video and blue hero copy;
-- the four-card service grid uses Support Green, Solutions Orange, Consultancy Yellow and Security Purple to identify each service;
+- the four-card service grid uses Support Green, Solutions Orange, Consultancy Yellow and Security Purple to identify each service, with a restrained matching external glow;
 - the three `Who do we support?` audience cards use a very soft palette glow behind otherwise neutral black glass;
 - the audit uses a contained, continuous organic orange liquid field;
 - the Trust heading may use the approved moving Staple palette treatment.
@@ -143,10 +143,13 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 
 ### Homepage service grid
 
+- The chapter is introduced by `What can we do for you...`, with `you` in canonical Security Purple and supporting copy aligned to the right on desktop.
 - The four core service propositions are displayed simultaneously as four matching black glass cards.
 - Desktop and tablet order is IT Support / IT Solutions, then IT Consultancy / Cyber Security in a two-by-two grid.
 - Each card keeps the proven service-card content pattern: heading, short explanation, three scannable service points and CTA.
-- The service name, bullet markers and CTA treatment use the service's canonical accent colour.
+- `IT Support` uses the same two-line heading rhythm as the other cards: `We do IT` on the first line and `Support` on the second.
+- The service name, bullet markers, CTA treatment and restrained external glow use the service's canonical accent colour.
+- The glow strength follows the approved audience-card language: soft at rest, slightly stronger on hover/focus, never a coloured border.
 - There is no timer, wheel control, indicator control or carousel state; each service remains directly visible and directly reachable.
 - Phone layouts stack the four cards vertically while preserving the same order and content hierarchy.
 
