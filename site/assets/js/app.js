@@ -96,7 +96,25 @@
     title.textContent = open ? 'Support is open' : 'Support is closed';
 
     if (open) {
-      message.textContent = 'Our support team is available until 5pm today. Call us on 01372 309707.';
+      const copy = document.createElement('span');
+      copy.className = 'status-message-copy';
+      copy.textContent = 'Our support team is available until 5pm today.';
+
+      const call = document.createElement('a');
+      call.className = 'status-callout';
+      call.href = 'tel:+441372309707';
+      call.setAttribute('aria-label', 'Call Staple IT on 01372 309707');
+
+      const icon = document.createElement('span');
+      icon.className = 'status-callout-icon';
+      icon.setAttribute('aria-hidden', 'true');
+
+      const number = document.createElement('span');
+      number.className = 'status-callout-number';
+      number.textContent = '01372 309707';
+
+      call.append(icon, number);
+      message.replaceChildren(copy, call);
     } else if (weekday && !holidays.has(now.date) && now.hour < 9) {
       message.textContent = 'Our support team is available from 9am today.';
     } else {
