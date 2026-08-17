@@ -1,6 +1,8 @@
 /* Staple IT homepage service grid. Loaded after the legacy homepage composition layers.
  * The four service cards are static, equally weighted glass panels and use the same
- * restrained external glow language as the approved audience cards below. */
+ * restrained external glow language as the approved audience cards below.
+ * This stylesheet also carries the final homepage heading/alignment safety pass so
+ * tight display typography cannot clip descenders or collide between lines. */
 .home-intro{
   padding:72px 0 84px!important;
 }
@@ -18,20 +20,28 @@
   margin:0;
   font-size:var(--home-chapter);
   font-weight:700;
-  line-height:.94;
+  line-height:1.02;
   letter-spacing:-.048em;
+  overflow:visible;
+  padding-bottom:.08em;
 }
 
+/* Exact same passing Staple-colour shimmer used by the contact heading's “you”.
+   The word stays white most of the time and the colour band travels through it. */
 .services-header-accent{
   display:inline-block;
-  color:transparent!important;
-  background:linear-gradient(102deg,var(--brand-blue) 0%,#6f63ff 22%,var(--brand-security) 40%,var(--brand-red) 62%,var(--brand-solutions) 82%,var(--brand-blue) 100%)!important;
-  background-size:260% 100%!important;
-  background-position:0 50%;
-  -webkit-background-clip:text!important;
-  background-clip:text!important;
-  -webkit-text-fill-color:transparent!important;
-  animation:goldTrustAccent 8.5s ease-in-out infinite alternate!important;
+  color:#fff!important;
+  background:linear-gradient(108deg,#fff 0%,#fff 38%,var(--brand-blue) 44%,var(--brand-red) 48%,var(--brand-solutions) 52%,var(--brand-support) 57%,var(--brand-security) 62%,#fff 70%,#fff 100%);
+  background-size:380% 100%;
+  background-position:100% 50%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:contactStapleShimmer 9.5s linear infinite!important;
+  vertical-align:baseline;
+  overflow:visible!important;
+  padding:0 .02em .12em;
+  margin:0 -.02em -.12em;
 }
 
 .services-header>p{
@@ -98,6 +108,7 @@
 
 .service-grid-card .service-slide-content{
   width:100%!important;
+  min-width:0!important;
   min-height:100%!important;
   display:flex!important;
   flex-direction:column!important;
@@ -106,7 +117,9 @@
 .service-grid-card .service-slide h2{
   max-width:14ch!important;
   font-size:clamp(2.85rem,3.8vw,3.9rem)!important;
-  line-height:.97!important;
+  line-height:1.05!important;
+  overflow:visible!important;
+  padding-bottom:.06em!important;
 }
 
 .service-grid-card .service-slide p{
@@ -153,20 +166,111 @@
 @media(max-width:700px){
   .home-intro{padding:54px 0 60px!important}
   .services-header{grid-template-columns:1fr;gap:16px;padding-bottom:28px}
-  .services-header h2{max-width:9ch;font-size:clamp(2.75rem,11.2vw,3.45rem);line-height:.96}
+  .services-header h2{max-width:9ch;font-size:clamp(2.75rem,11.2vw,3.45rem);line-height:1.05}
   .services-header>p{max-width:none;margin:0;font-size:15px;line-height:1.56}
   .service-card-grid{grid-template-columns:1fr!important;gap:14px!important}
   .service-grid-card{min-height:0!important;border-radius:22px!important}
   .service-grid-card .service-slide{padding:25px 20px!important}
   .service-grid-card .service-slide-content{min-height:305px!important}
-  .service-grid-card .service-slide h2{max-width:11ch!important;font-size:clamp(1.9rem,8.1vw,2.35rem)!important;line-height:1!important}
+  .service-grid-card .service-slide h2{max-width:11ch!important;font-size:clamp(1.9rem,8.1vw,2.35rem)!important;line-height:1.08!important}
   .service-grid-card .service-slide p{margin-top:14px!important;font-size:13.8px!important;line-height:1.52!important}
   .service-grid-card .service-points{margin-top:16px!important;gap:8px!important}
   .service-grid-card .service-points li{font-size:13.2px!important;line-height:1.4!important}
   .service-grid-card .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;padding-inline:13px!important;justify-content:center!important;font-size:12.5px!important}
 }
 
+/* --------------------------------------------------------------------------
+   Homepage alignment / typography safety pass
+   --------------------------------------------------------------------------
+   The display type deliberately runs large and tightly tracked. Earlier layers
+   used sub-1 line heights in several chapters; that can visually collide lines
+   and can trim descenders such as y/g/p when text is clipped for gradients.
+   These final rules keep the existing scale while restoring safe line boxes. */
+.home-hero-copy,
+.services-header,
+.audience-header,
+.trust-sticky,
+.google-review-hero,
+.audit-hero,
+.contact-hero,
+.service-grid-card .service-slide-content{
+  min-width:0!important;
+}
+
+.audience-header h2,
+.trust-sticky h2,
+.google-review-hero h2,
+.audit-hero h2,
+.contact-hero h2{
+  line-height:1.02!important;
+  overflow:visible!important;
+  padding-bottom:.08em!important;
+}
+
+.contact-title-line{
+  display:block!important;
+  line-height:1.05!important;
+  overflow:visible!important;
+  padding-bottom:.06em!important;
+}
+.contact-title-line + .contact-title-line{margin-top:.03em!important}
+
+/* Gradient-clipped inline words need their own descender allowance. */
+#contact-title .accent-orange{
+  overflow:visible!important;
+  vertical-align:baseline!important;
+  padding:0 .02em .12em!important;
+  margin:0 -.02em -.12em!important;
+}
+
+.audit-form-heading h3{
+  line-height:1.04!important;
+  overflow:visible!important;
+  padding-bottom:.07em!important;
+}
+
+.audience-item h3,
+.trust-proof h3,
+.google-review-copy h3,
+.contact-panel h3{
+  line-height:1.10!important;
+  overflow:visible!important;
+  padding-bottom:.025em!important;
+}
+
+.services-header>p,
+.service-grid-card .service-slide p,
+.audience-header>p:last-child,
+.audience-item p,
+.trust-proof p,
+.google-review-hero>p:last-child,
+.audit-lead,
+.contact-panel-intro{
+  overflow-wrap:break-word;
+  word-break:normal;
+}
+
+@media(max-width:700px){
+  .audience-header h2,
+  .trust-sticky h2,
+  .google-review-hero h2,
+  .audit-hero h2,
+  .contact-hero h2{line-height:1.05!important}
+
+  .contact-title-line{line-height:1.07!important}
+  .audit-form-heading h3{line-height:1.08!important}
+}
+
+@media(max-width:430px){
+  .contact-title-line{white-space:normal!important}
+}
+
 @media(prefers-reduced-motion:reduce){
-  .services-header-accent{animation:none!important;background-position:50% 50%!important}
+  .services-header-accent{
+    animation:none!important;
+    background:none!important;
+    color:#fff!important;
+    -webkit-text-fill-color:#fff!important;
+  }
   .service-grid-card{transform:none!important;transition:none!important}
 }
