@@ -135,3 +135,29 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
   html{scroll-behavior:auto}
   ::view-transition-old(root),::view-transition-new(root){animation:none!important}
 }
+
+/* Global phone baseline: every route inherits readable, touch-safe behaviour. */
+a,button,summary{touch-action:manipulation}
+img,svg,video,canvas{height:auto;max-width:100%}
+input,textarea,select,button{max-width:100%}
+p,li,dd,a{overflow-wrap:break-word}
+
+@media(max-width:700px){
+  :root{--page:calc(100% - 24px)}
+  html,body{max-width:100%;overflow-x:hidden}
+  body{min-width:0;background:#000}
+  h1,h2,h3,h4{text-wrap:pretty;overflow-wrap:normal;word-break:normal;hyphens:none}
+  p,li,dd{word-break:normal}
+  input,textarea,select{min-width:0;font-size:16px}
+  textarea{resize:vertical}
+  .button{width:auto;min-height:48px;padding-inline:18px;white-space:normal;text-align:center}
+  .section-heading{margin-bottom:var(--space-5)}
+  .section-heading h2{line-height:1.02}
+  .section-heading>p:last-child{font-size:1rem;line-height:1.6}
+  .skip-link{left:12px;max-width:calc(100% - 24px)}
+}
+
+@media(max-width:380px){
+  :root{--page:calc(100% - 20px)}
+  .button{padding-inline:15px}
+}
