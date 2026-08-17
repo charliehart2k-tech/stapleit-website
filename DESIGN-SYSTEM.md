@@ -23,6 +23,7 @@ The site is dark, clean, premium and restrained.
 
 - the hero uses the approved blue liquid-wave video and blue hero copy;
 - the four-card service grid uses Support Green, Solutions Orange, Consultancy Yellow and Security Purple to identify each service, with a restrained matching external glow;
+- the `you` accent in the service chapter heading may use the same approved moving Staple palette treatment as the Trust heading;
 - the three `Who do we support?` audience cards use a very soft palette glow behind otherwise neutral black glass;
 - the audit uses a contained, continuous organic orange liquid field;
 - the Trust heading may use the approved moving Staple palette treatment.
@@ -143,7 +144,7 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 
 ### Homepage service grid
 
-- The chapter is introduced by `What can we do for you...`, with `you` in canonical Security Purple and supporting copy aligned to the right on desktop.
+- The chapter is introduced by `What can we do for you...`, with `you` using the same animated Staple palette text treatment as the approved Trust heading and supporting copy aligned to the right on desktop.
 - The four core service propositions are displayed simultaneously as four matching black glass cards.
 - Desktop and tablet order is IT Support / IT Solutions, then IT Consultancy / Cyber Security in a two-by-two grid.
 - Each card keeps the proven service-card content pattern: heading, short explanation, three scannable service points and CTA.
