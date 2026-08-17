@@ -1,6 +1,37 @@
 /* Staple IT homepage service grid. Loaded after the legacy homepage composition layers.
- * The four service cards are now static, equally weighted glass panels rather than
- * states inside a carousel. */
+ * The four service cards are static, equally weighted glass panels and use the same
+ * restrained external glow language as the approved audience cards below. */
+.home-intro{
+  padding:72px 0 84px!important;
+}
+
+.services-header{
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) minmax(300px,.72fr);
+  gap:52px;
+  align-items:end;
+  padding-bottom:48px;
+}
+
+.services-header h2{
+  max-width:10ch;
+  margin:0;
+  font-size:var(--home-chapter);
+  font-weight:700;
+  line-height:.94;
+  letter-spacing:-.048em;
+}
+
+.services-header-accent{color:var(--security)}
+
+.services-header>p{
+  max-width:34rem;
+  margin:0 0 7px;
+  color:#aab3c0;
+  font-size:clamp(1.15rem,1.8vw,1.4rem);
+  line-height:1.55;
+}
+
 .service-card-grid{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:20px!important;
@@ -8,12 +39,26 @@
 }
 
 .service-grid-card{
+  --service-card-glow:var(--support);
   min-height:clamp(430px,29vw,520px)!important;
   height:auto!important;
   padding:0!important;
   overflow:hidden!important;
   isolation:isolate;
+  box-shadow:
+    0 34px 96px color-mix(in srgb,var(--service-card-glow) 13%,transparent),
+    0 22px 58px rgba(0,0,0,.32)!important;
+  transition:
+    transform var(--motion-page) var(--ease),
+    border-color var(--motion-base) ease,
+    background var(--motion-base) ease,
+    box-shadow var(--motion-base) ease!important;
 }
+
+.service-grid-card--support{--service-card-glow:var(--support)}
+.service-grid-card--solutions{--service-card-glow:var(--solutions)}
+.service-grid-card--consultancy{--service-card-glow:var(--consultancy)}
+.service-grid-card--security{--service-card-glow:var(--security)}
 
 .service-grid-card .service-stage{
   position:relative!important;
@@ -64,15 +109,31 @@
 .service-grid-card .service-points{margin-top:20px!important}
 .service-grid-card .service-cta{margin-top:auto!important}
 
+.service-grid-card:focus-within{
+  border-color:rgba(255,255,255,.17)!important;
+  box-shadow:
+    0 38px 110px color-mix(in srgb,var(--service-card-glow) 17%,transparent),
+    0 28px 68px rgba(0,0,0,.34)!important;
+}
+
 @media(hover:hover) and (pointer:fine){
   .service-grid-card:hover{
-    transform:translateY(-2px);
-    border-color:rgba(255,255,255,.15);
-    box-shadow:0 28px 70px rgba(0,0,0,.31);
+    transform:translateY(-3px);
+    border-color:rgba(255,255,255,.17)!important;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.046),rgba(255,255,255,.012) 40%,rgba(0,0,0,.24) 100%),
+      rgba(0,0,0,.58)!important;
+    box-shadow:
+      0 38px 110px color-mix(in srgb,var(--service-card-glow) 17%,transparent),
+      0 28px 68px rgba(0,0,0,.34)!important;
   }
 }
 
 @media(min-width:701px) and (max-width:980px){
+  .home-intro{padding:64px 0 72px!important}
+  .services-header{grid-template-columns:1fr;gap:22px;padding-bottom:38px}
+  .services-header h2{max-width:9ch}
+  .services-header>p{max-width:42rem;margin:0}
   .service-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .service-grid-card{min-height:430px!important}
   .service-grid-card .service-slide{padding:34px 30px!important}
@@ -80,6 +141,10 @@
 }
 
 @media(max-width:700px){
+  .home-intro{padding:54px 0 60px!important}
+  .services-header{grid-template-columns:1fr;gap:16px;padding-bottom:28px}
+  .services-header h2{max-width:9ch;font-size:clamp(2.75rem,11.2vw,3.45rem);line-height:.96}
+  .services-header>p{max-width:none;margin:0;font-size:15px;line-height:1.56}
   .service-card-grid{grid-template-columns:1fr!important;gap:14px!important}
   .service-grid-card{min-height:0!important;border-radius:22px!important}
   .service-grid-card .service-slide{padding:25px 20px!important}
@@ -90,10 +155,6 @@
   .service-grid-card .service-points li{font-size:13.2px!important;line-height:1.4!important}
   .service-grid-card .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;padding-inline:13px!important;justify-content:center!important;font-size:12.5px!important}
 }
-
-/* Keep the shortest service title on the same two-line rhythm as the other
- * three cards: “We do IT” followed by “Support”. */
-.service-grid-card .service-support h2{max-width:7.6ch!important}
 
 @media(prefers-reduced-motion:reduce){
   .service-grid-card{transform:none!important;transition:none!important}
