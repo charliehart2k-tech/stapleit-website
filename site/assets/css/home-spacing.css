@@ -1,37 +1,121 @@
 /* Homepage chapter rhythm ---------------------------------------------------
-   Deliberately generous black breathing room between the major homepage
-   chapters. This file owns vertical spacing only; component geometry stays in
-   the section-specific stylesheets. */
+   Major homepage chapters are separated by deliberate black pause bands.
+   Component-internal padding still handles composition; margin-top creates the
+   unmistakable breathing room between chapters. */
 
 @media(min-width:981px){
-  .home-hero{padding-bottom:72px}
-  .home-intro{padding:56px 0 96px}
-  .audience-section{padding:132px 0 140px}
-  .trust-section{padding:156px 0 168px}
-  .google-review-section{padding:128px 0 132px}
-  .partners-section{padding:108px 0 136px}
-  .audit-section{padding:148px 0 112px}
-  .contact-section{padding:88px 0 148px}
+  .home-hero{padding-bottom:58px!important}
+
+  .home-intro{
+    margin-top:72px!important;
+    padding:24px 0 84px!important;
+  }
+
+  .audience-section{
+    margin-top:112px!important;
+    padding:92px 0 120px!important;
+  }
+
+  .trust-section{
+    margin-top:128px!important;
+    padding:112px 0 136px!important;
+  }
+
+  .google-review-section{
+    margin-top:128px!important;
+    padding:88px 0 104px!important;
+  }
+
+  .partners-section{
+    margin-top:112px!important;
+    padding:82px 0 104px!important;
+  }
+
+  .audit-section{
+    margin-top:136px!important;
+    padding:96px 0 104px!important;
+  }
+
+  .contact-section{
+    margin-top:120px!important;
+    padding:78px 0 148px!important;
+  }
 }
 
 @media(min-width:701px) and (max-width:980px){
-  .home-hero{padding-bottom:56px}
-  .home-intro{padding:42px 0 80px}
-  .audience-section{padding:108px 0 112px}
-  .trust-section{padding:120px 0 124px}
-  .google-review-section{padding:104px 0 108px}
-  .partners-section{padding:88px 0 108px}
-  .audit-section{padding:118px 0 94px}
-  .contact-section{padding:64px 0 124px}
+  .home-hero{padding-bottom:48px!important}
+
+  .home-intro{
+    margin-top:52px!important;
+    padding:24px 0 68px!important;
+  }
+
+  .audience-section{
+    margin-top:80px!important;
+    padding:76px 0 94px!important;
+  }
+
+  .trust-section{
+    margin-top:92px!important;
+    padding:84px 0 104px!important;
+  }
+
+  .google-review-section{
+    margin-top:92px!important;
+    padding:76px 0 88px!important;
+  }
+
+  .partners-section{
+    margin-top:80px!important;
+    padding:72px 0 88px!important;
+  }
+
+  .audit-section{
+    margin-top:96px!important;
+    padding:82px 0 86px!important;
+  }
+
+  .contact-section{
+    margin-top:88px!important;
+    padding:68px 0 124px!important;
+  }
 }
 
 @media(max-width:700px){
-  .home-hero{padding-bottom:38px!important}
-  .home-intro{padding:36px 0 70px!important}
-  .audience-section{padding:82px 0 86px!important}
-  .trust-section{padding:92px 0 96px!important}
-  .google-review-section{padding:82px 0 86px}
-  .partners-section{padding:76px 0 92px}
-  .audit-section{padding:92px 0 78px!important}
-  .contact-section{padding:56px 0 104px!important}
+  .home-hero{padding-bottom:32px!important}
+
+  .home-intro{
+    margin-top:32px!important;
+    padding:22px 0 58px!important;
+  }
+
+  .audience-section{
+    margin-top:48px!important;
+    padding:58px 0 70px!important;
+  }
+
+  .trust-section{
+    margin-top:56px!important;
+    padding:62px 0 76px!important;
+  }
+
+  .google-review-section{
+    margin-top:56px!important;
+    padding:60px 0 70px!important;
+  }
+
+  .partners-section{
+    margin-top:48px!important;
+    padding:56px 0 72px!important;
+  }
+
+  .audit-section{
+    margin-top:60px!important;
+    padding:64px 0 70px!important;
+  }
+
+  .contact-section{
+    margin-top:56px!important;
+    padding:60px 0 104px!important;
+  }
 }
