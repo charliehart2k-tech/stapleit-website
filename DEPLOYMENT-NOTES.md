@@ -36,6 +36,14 @@ Disallow: /
 
 The repository `site/robots.txt` is the production-intent file and points to the production sitemap.
 
+## Staging static route templates
+
+Git remains the source of truth for every current page shell. The staging deploy script compiles the homepage to `front-page.php` and compiles every rebuilt or in-progress route under `site/` to an explicit `static-*.php` theme template.
+
+`wordpress/mu-plugins/stapleit-static-routes.php` maps the navigation/footer routes to those generated templates so the whole site can be clicked through on staging before WordPress page records are created. The static route map and deploy-script template list must be kept in sync whenever a route is added or removed.
+
+In-progress static routes remain `noindex,nofollow`, and the MU-plugin also sends `X-Robots-Tag: noindex, nofollow, noarchive` when serving them.
+
 ## Favicon assets
 
 The site root contains `/favicon.ico` and `/apple-touch-icon.png`. HTML templates must explicitly reference both in `<head>`; do not rely only on browser fallback discovery of `/favicon.ico`.
