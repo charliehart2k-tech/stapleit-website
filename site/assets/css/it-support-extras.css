@@ -385,3 +385,39 @@
   .support-main .support-modal-group{padding:18px 16px}
   .support-main .support-modal-group:first-child{padding-top:18px}
 }
+
+/* Redundant category/tier labels duplicate the visible card or modal title. */
+.support-main .support-extra-category,
+.support-main .support-modal-tier{display:none}
+
+/* Let an open modal use the available viewport instead of squeezing the
+ * inclusion cards into narrow fixed columns. Shorter cards keep their natural
+ * height rather than stretching to match the tallest card in the row. */
+.support-main .support-modal{
+  width:min(1080px,calc(100vw - 48px));
+  max-width:1080px;
+  max-height:calc(100dvh - 72px);
+}
+
+.support-main .support-modal-body{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start;
+  gap:16px;
+}
+
+.support-main .support-modal-group{
+  align-self:start;
+  min-height:0;
+  height:auto;
+}
+
+.support-main .support-modal-body--single{grid-template-columns:1fr}
+
+@media(max-width:760px){
+  .support-main .support-modal{
+    width:min(100%,calc(100vw - 24px));
+    max-height:calc(100dvh - 24px);
+  }
+
+  .support-main .support-modal-body{grid-template-columns:1fr}
+}
