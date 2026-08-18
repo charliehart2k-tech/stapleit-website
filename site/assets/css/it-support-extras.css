@@ -254,7 +254,8 @@
 
 /* Shared package/service modal. Keep it above the sticky navigation and let
  * the body scroll inside the viewport rather than allowing the header to be
- * obscured. */
+ * obscured. The z-index clears both the sticky header (1002) and nav menus
+ * (1300), so the dialog is always the top interaction layer while open. */
 .support-main .support-modal-backdrop{
   z-index:2200;
   padding:24px;
