@@ -1,6 +1,5 @@
-/* IT Support additional services and add-on packs only.
- * Shared route surfaces, typography and modal behaviour are intentionally
- * owned by it-support-packages.css so this file cannot alter unrelated cards. */
+/* IT Support add-on packs and additional services only. */
+
 .support-packs{
   padding-block:var(--space-9);
   overflow:clip;
@@ -56,7 +55,6 @@
 }
 
 .support-extra-card[hidden]{display:none}
-.support-extra-category{display:none}
 
 .support-extra-card h3{
   max-width:16ch;
@@ -90,8 +88,8 @@
   letter-spacing:.02em;
 }
 
-/* Details remain the semantic fallback. app.js opens this same content in the
- * shared modal when JavaScript is available. */
+/* These details remain the no-JavaScript fallback. it-support.js intercepts
+ * the summary only after the native dialog enhancement has initialised. */
 .support-extra-details{
   margin-top:auto;
   padding-top:var(--space-4);
@@ -183,6 +181,8 @@
   margin-top:28px;
 }
 
+.support-packs-more[hidden]{display:none}
+
 .support-packs-more-btn{
   min-height:48px;
   padding:12px 28px;
@@ -206,8 +206,6 @@
   outline:2px solid var(--support);
   outline-offset:3px;
 }
-
-.support-packs-more-btn[aria-expanded="true"]{display:none}
 
 @media(max-width:980px){
   .support-packs{padding-block:var(--space-8)}
@@ -244,5 +242,5 @@
 }
 
 @media(prefers-reduced-motion:reduce){
-  .support-extra-details summary::after{transition:none!important}
+  .support-extra-details summary::after{transition:none}
 }
