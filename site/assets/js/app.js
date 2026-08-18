@@ -199,18 +199,6 @@
 })();
 
 (() => {
-  const form = document.querySelector('[data-audit-form]');
-  const status = form?.querySelector('[data-audit-form-status]');
-  if (!form || !status) return;
-
-  form.addEventListener('submit', event => {
-    event.preventDefault();
-    status.hidden = false;
-    status.textContent = 'This staging form is not connected to a mail endpoint yet. Please email hello@stapleit.co.uk or call 01372 309 707 for now.';
-  });
-})();
-
-(() => {
   const backdrop = document.getElementById('support-modal-backdrop');
   const modal = document.getElementById('support-modal');
   const closeBtn = document.getElementById('support-modal-close');
