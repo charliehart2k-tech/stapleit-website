@@ -1,4 +1,6 @@
-/* Staple IT navigation colour-outline interaction. Loaded after the base nav. */
+/* Approved Staple spectrum interaction for navigation controls.
+ * Keep this file navigation-only so homepage typography is owned by the
+ * homepage typography layer rather than a navigation stylesheet. */
 .nav-pill::before{
   content:"";
   position:absolute;
@@ -33,99 +35,6 @@
   box-shadow:0 10px 24px rgba(0,0,0,.24),0 0 18px rgba(111,99,255,.08)!important;
 }
 
-/* Hero title ---------------------------------------------------------------
-   Final treatment: simple white typography. Keep the existing two-line layout
-   and spacing, but remove all animated colour/glass effects from Staple IT. */
-.home-hero-copy{
-  align-items:flex-start!important;
-  text-align:left!important;
-}
-
-.home-hero-copy h1{
-  position:relative!important;
-  display:block!important;
-  width:100%!important;
-  max-width:100%!important;
-  min-height:2.06em!important;
-  margin:0!important;
-  overflow:visible!important;
-  color:transparent!important;
-  -webkit-text-fill-color:transparent!important;
-  -webkit-text-stroke:0!important;
-  background:none!important;
-  text-shadow:none!important;
-  line-height:.94!important;
-}
-
-.home-hero-copy h1 .it-blue{
-  color:transparent!important;
-  -webkit-text-fill-color:transparent!important;
-  text-shadow:none!important;
-}
-
-.home-hero-copy h1::before,
-.home-hero-copy h1::after{
-  position:absolute;
-  left:0!important;
-  display:block;
-  width:max-content;
-  max-width:100%;
-  pointer-events:none;
-  font:inherit;
-  font-weight:inherit;
-  letter-spacing:inherit;
-  white-space:nowrap;
-  overflow:visible!important;
-  color:#FFFFFF;
-  -webkit-text-fill-color:#FFFFFF;
-  -webkit-text-stroke:0;
-  background:none!important;
-  text-shadow:none!important;
-}
-
-.home-hero-copy h1::before{
-  content:"Welcome to";
-  top:0;
-  z-index:2;
-  line-height:.94;
-}
-
-.home-hero-copy h1::after{
-  content:"Staple IT";
-  top:.94em;
-  z-index:3;
-  line-height:1.08!important;
-  padding-bottom:.14em;
-}
-
-.home-hero-copy .hero-tagline{
-  color:#FFFFFF!important;
-  -webkit-text-fill-color:#FFFFFF!important;
-  text-align:left!important;
-  margin-top:.14em!important;
-}
-
-.home-hero-copy .hero-actions{
-  align-self:flex-start!important;
-}
-
-@media(max-width:700px){
-  .home-hero-copy h1{
-    min-height:2.12em!important;
-    width:100%!important;
-  }
-  .home-hero-copy h1::before,
-  .home-hero-copy h1::after{
-    max-width:100%;
-  }
-  .home-hero-copy h1::after{
-    top:.96em;
-    line-height:1.08!important;
-    padding-bottom:.16em;
-  }
-  .home-hero-copy .hero-tagline{margin-top:.18em!important}
-}
-
 @keyframes navSpectrumOutline{
   0%{background-position:0% 50%}
   50%{background-position:100% 50%}
@@ -134,5 +43,8 @@
 
 @media(prefers-reduced-motion:reduce){
   .nav-pill:hover::before,
-  .nav-pill:focus-visible::before{animation:none!important;background-position:50% 50%}
+  .nav-pill:focus-visible::before{
+    animation:none!important;
+    background-position:50% 50%;
+  }
 }
