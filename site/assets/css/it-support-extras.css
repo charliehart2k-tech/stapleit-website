@@ -422,3 +422,5 @@
 
   .support-main .support-modal-body{grid-template-columns:1fr}
 }
+
+/* Equal-height modal rows are intentional: paired inclusion cards align. */
