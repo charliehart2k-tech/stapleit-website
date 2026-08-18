@@ -1,10 +1,10 @@
 /* IT Support additional services and add-on packs. */
-.support-extras{
+.support-packs{
   padding-block:var(--space-9);
   overflow:clip;
 }
 
-.support-packs{
+.support-extras{
   padding-top:0;
   padding-bottom:var(--space-9);
   overflow:clip;
@@ -100,6 +100,9 @@
   letter-spacing:.02em;
 }
 
+/* Details remain semantic fallback content. app.js intercepts the summary
+ * when JavaScript is available and presents the same content in the shared
+ * package-style modal instead of expanding the card. */
 .support-extra-details{
   margin-top:auto;
   padding-top:var(--space-4);
@@ -185,6 +188,8 @@
   background:var(--support);
 }
 
+.support-modal-body--single{grid-template-columns:1fr}
+
 .support-packs-more{
   display:flex;
   justify-content:center;
@@ -218,15 +223,15 @@
 .support-packs-more-btn[aria-expanded="true"]{display:none}
 
 @media(max-width:980px){
-  .support-extras{padding-block:var(--space-8)}
-  .support-packs{padding-top:0;padding-bottom:var(--space-8)}
+  .support-packs{padding-block:var(--space-8)}
+  .support-extras{padding-top:0;padding-bottom:var(--space-8)}
   .support-catalogue-grid,
   #support-packs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 @media(max-width:700px){
-  .support-extras{padding-block:var(--space-7)}
-  .support-packs{padding-top:0;padding-bottom:var(--space-7)}
+  .support-packs{padding-block:var(--space-7)}
+  .support-extras{padding-top:0;padding-bottom:var(--space-7)}
   .support-catalogue-grid,
   #support-packs-grid,
   #support-services-grid{grid-template-columns:1fr;gap:10px;margin-top:var(--space-3)}
