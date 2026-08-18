@@ -1,4 +1,6 @@
-/* IT Support add-on packs and additional services only. */
+/* IT Support add-on packs, additional services and route interaction state. */
+
+body.support-dialog-open{overflow:hidden}
 
 .support-packs{
   padding-block:var(--space-9);
