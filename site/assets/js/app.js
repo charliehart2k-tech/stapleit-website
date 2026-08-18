@@ -435,11 +435,23 @@
     bodyEl.replaceChildren(...fragments);
   };
 
+  const revealModal = () => {
+    backdrop.hidden = false;
+    backdrop.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('support-modal-open');
+
+    window.requestAnimationFrame(() => {
+      backdrop.classList.add('is-open');
+      closeBtn.focus();
+    });
+  };
+
   const finishClose = () => {
     window.clearTimeout(closeTimer);
     backdrop.hidden = true;
     backdrop.setAttribute('aria-hidden', 'true');
     modal.classList.remove(...modalClasses);
+    bodyEl.classList.remove('support-modal-body--single');
     if (previousFocus instanceof HTMLElement) previousFocus.focus();
     previousFocus = null;
   };
@@ -468,7 +480,7 @@
     }, 300);
   };
 
-  const openModal = key => {
+  const openPackageModal = key => {
     const data = packages[key];
     if (!data) return;
 
@@ -477,25 +489,57 @@
 
     modal.classList.remove(...modalClasses);
     modal.classList.add(`support-modal--${key}`);
+    bodyEl.classList.remove('support-modal-body--single');
     tierEl.textContent = data.tier;
     titleEl.textContent = data.title;
     priceEl.textContent = data.price;
+    priceEl.hidden = false;
     noteEl.textContent = data.note;
     noteEl.hidden = !data.note;
     renderGroups(data.groups);
+    revealModal();
+  };
 
-    backdrop.hidden = false;
-    backdrop.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('support-modal-open');
+  const openCatalogueModal = card => {
+    const title = card.querySelector('h3')?.textContent?.trim();
+    const category = card.querySelector('.support-extra-category')?.textContent?.trim();
+    const price = card.querySelector('.support-extra-price')?.textContent?.trim() || '';
+    const copy = card.querySelector('.support-extra-copy');
+    if (!title || !copy) return;
 
-    window.requestAnimationFrame(() => {
-      backdrop.classList.add('is-open');
-      closeBtn.focus();
-    });
+    window.clearTimeout(closeTimer);
+    previousFocus = document.activeElement;
+
+    modal.classList.remove(...modalClasses);
+    bodyEl.classList.add('support-modal-body--single');
+    tierEl.textContent = category || 'Service';
+    titleEl.textContent = title;
+    priceEl.textContent = price;
+    priceEl.hidden = !price;
+    noteEl.textContent = '';
+    noteEl.hidden = true;
+
+    const group = document.createElement('section');
+    group.className = 'support-modal-group';
+    group.append(copy.cloneNode(true));
+    bodyEl.replaceChildren(group);
+    revealModal();
   };
 
   document.querySelectorAll('[data-package-open]').forEach(button => {
-    button.addEventListener('click', () => openModal(button.dataset.packageOpen));
+    button.addEventListener('click', () => openPackageModal(button.dataset.packageOpen));
+  });
+
+  document.querySelectorAll('.support-extra-details > summary').forEach(summary => {
+    summary.addEventListener('click', event => {
+      const details = summary.parentElement;
+      const card = summary.closest('.support-extra-card');
+      if (!details || !card) return;
+
+      event.preventDefault();
+      details.open = false;
+      openCatalogueModal(card);
+    });
   });
 
   closeBtn.addEventListener('click', closeModal);
