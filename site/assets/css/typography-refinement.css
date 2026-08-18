@@ -1,6 +1,6 @@
-/* Shared typography readability refinement.
- * Loaded last on the completed homepage and IT Support route so display type
- * stays bold without the overly compressed tracking used in earlier passes. */
+/* Homepage typography readability refinement.
+ * IT Support owns its final typography in its route stylesheets so the two
+ * completed routes no longer fight through a shared late override layer. */
 
 body{letter-spacing:0}
 
@@ -11,9 +11,7 @@ body{letter-spacing:0}
 .google-review-hero h2,
 .partners-header h2,
 .audit-hero h2,
-.contact-hero h2,
-.support-hero-copy h1,
-.support-section-heading h2{
+.contact-hero h2{
   letter-spacing:-.024em!important;
 }
 
@@ -26,13 +24,11 @@ body{letter-spacing:0}
 
 .services-header h2,
 .google-review-hero h2,
-.partners-header h2,
-.support-section-heading h2{
+.partners-header h2{
   line-height:1.02!important;
 }
 
-.home-hero h1,
-.support-hero-copy h1{
+.home-hero h1{
   line-height:1!important;
 }
 
@@ -41,43 +37,15 @@ body{letter-spacing:0}
 .trust-proof h3,
 .google-review-copy h3,
 .audit-form-heading h3,
-.contact-panel h3,
-.support-hero-summary h2,
-.support-feature-card h3,
-.support-step-card h3,
-.support-package-card h3{
+.contact-panel h3{
   letter-spacing:-.014em!important;
-}
-
-.service-grid-card .service-slide h2,
-.audience-item h3,
-.trust-proof h3,
-.google-review-copy h3,
-.audit-form-heading h3,
-.contact-panel h3,
-.support-feature-card h3,
-.support-step-card h3,
-.support-package-card h3{
   line-height:1.1!important;
 }
-
-.support-hero-summary h2{line-height:1.08!important}
-.support-summary-list li{line-height:1.5!important}
-.support-step-copy p,
-.support-package-copy p{line-height:1.72!important}
-.support-package-price span:last-child{line-height:1.45}
 
 .hero-tagline,
 .status-title,
 .status-callout,
 .service-points li,
-.support-hero-price,
-.support-summary-list li,
-.support-section-lead,
-.support-feature-card p,
-.support-step-copy p,
-.support-package-price,
-.support-package-copy p,
 .audit-lead,
 .contact-panel-intro,
 .contact-row,
@@ -86,59 +54,34 @@ body{letter-spacing:0}
   letter-spacing:0!important;
 }
 
-/* Keep the Unlimited liquid movement but constrain its colour to IT Support green. */
-.support-hero-unlimited{color:var(--support)}
-
-@supports ((-webkit-background-clip:text) or (background-clip:text)){
-  .support-hero-unlimited{
-    background-image:
-      radial-gradient(circle at 10% 26%,rgba(255,255,255,.98) 0 1.6%,rgba(197,255,215,.70) 3.2%,transparent 8.6%),
-      radial-gradient(circle at 52% 74%,rgba(228,255,236,.96) 0 1.45%,rgba(104,239,145,.52) 3.2%,transparent 8.2%),
-      radial-gradient(circle at 88% 34%,rgba(189,255,208,.92) 0 1.25%,rgba(34,197,94,.44) 2.8%,transparent 7.6%),
-      linear-gradient(104deg,
-        #b9f8cc 0%,
-        #6fe792 16%,
-        #22c55e 34%,
-        #16b653 50%,
-        #22c55e 66%,
-        #55dc7e 84%,
-        #a6f2bc 100%)!important;
-    filter:saturate(1.34) brightness(1.12)!important;
-  }
+/* Keep the semantic homepage H1 visible and in charge of its own rendering.
+ * The previous nav stylesheet repainted this text with pseudo-elements. */
+.home-hero-copy{
+  align-items:flex-start;
+  text-align:left;
 }
 
-/* Keep package headings aligned while giving the Standard badge its own row. */
-.support-package-card{
-  padding-top:58px;
+.home-hero-copy h1{
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+  text-shadow:none;
 }
 
-.support-package-card h3{
-  max-width:100%!important;
+.home-hero-copy h1 .it-blue{
+  color:inherit;
+  -webkit-text-fill-color:inherit;
 }
 
-.support-package-badge{
-  top:13px!important;
-  left:50%!important;
-  right:auto!important;
-  min-height:32px!important;
-  min-width:126px;
-  justify-content:center;
-  padding:0 16px!important;
-  transform:translateX(-50%);
-  border-color:rgba(79,133,255,.72)!important;
-  background:linear-gradient(180deg,rgba(79,133,255,.26),rgba(29,78,216,.16))!important;
-  box-shadow:0 8px 24px rgba(29,78,216,.18),inset 0 1px 0 rgba(255,255,255,.14);
-  color:#b8d4ff!important;
-  font-size:.72rem!important;
-  letter-spacing:.055em!important;
-  line-height:1!important;
-  white-space:nowrap;
+.home-hero-copy .hero-tagline{
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+  text-align:left;
 }
+
+.home-hero-copy .hero-actions{align-self:flex-start}
 
 @media(min-width:981px){
   .service-grid-card .service-slide h2{min-height:2.2em!important}
-  .support-feature-card{grid-template-rows:148px 1fr}
-  .support-step-card{grid-template-rows:auto 6.6rem 1fr}
 }
 
 @media(max-width:700px){
@@ -149,25 +92,9 @@ body{letter-spacing:0}
   .google-review-hero h2,
   .partners-header h2,
   .audit-hero h2,
-  .contact-hero h2,
-  .support-hero-copy h1,
-  .support-section-heading h2{
+  .contact-hero h2{
     letter-spacing:-.018em!important;
   }
 
   .service-grid-card .service-slide h2{min-height:0!important}
-
-  .support-package-card{
-    padding-top:54px!important;
-  }
-
-  .support-package-badge{
-    position:absolute!important;
-    top:11px!important;
-    left:50%!important;
-    right:auto!important;
-    min-width:120px;
-    margin:0!important;
-    transform:translateX(-50%);
-  }
 }
