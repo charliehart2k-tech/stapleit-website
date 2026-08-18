@@ -14,6 +14,10 @@ When two instructions appear to conflict, use this order:
 
 Do not silently invent a new convention. If a genuine design or engineering decision changes, update the relevant governing document in the same change.
 
+### Current approved visual exception
+
+The animated Staple-palette spectrum outline on navigation pills is explicitly approved and must be preserved. The same restrained outline language may be reused on selected interactive buttons where it improves hierarchy without turning the surface itself into a multicolour fill. This exception supersedes older wording that prohibited colour treatment on navigation; reduced-motion behaviour remains mandatory.
+
 ## Governing documents
 
 | Document | Purpose |
