@@ -47,8 +47,8 @@
     clone.querySelectorAll?.('.support-package-note').forEach(element => element.remove());
     body.append(...clone.childNodes);
 
-    document.body.classList.add('support-dialog-open');
     dialog.showModal();
+    document.body.classList.add('support-dialog-open');
     closeButton.focus();
   };
 
@@ -131,6 +131,8 @@
 
   if (!moreWrap || !moreButton || !lateCards.length) return;
 
+  moreButton.setAttribute('aria-controls', 'support-packs-grid');
+
   lateCards.forEach(card => {
     card.hidden = true;
   });
@@ -145,5 +147,10 @@
 
     moreButton.setAttribute('aria-expanded', 'true');
     moreWrap.hidden = true;
+
+    const firstRevealedControl = lateCards[0]?.querySelector('summary, button, a[href], [tabindex]:not([tabindex="-1"])');
+    if (firstRevealedControl instanceof HTMLElement) {
+      window.requestAnimationFrame(() => firstRevealedControl.focus());
+    }
   });
 })();
