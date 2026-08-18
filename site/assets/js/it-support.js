@@ -44,8 +44,10 @@
     note.hidden = !noteText;
 
     const clone = content.cloneNode(true);
+    clone.querySelectorAll?.('.support-package-note').forEach(element => element.remove());
     body.append(...clone.childNodes);
 
+    document.body.classList.add('support-dialog-open');
     dialog.showModal();
     closeButton.focus();
   };
@@ -115,6 +117,7 @@
   });
 
   dialog.addEventListener('close', () => {
+    document.body.classList.remove('support-dialog-open');
     resetDialog();
     if (previousFocus instanceof HTMLElement) previousFocus.focus();
     previousFocus = null;
