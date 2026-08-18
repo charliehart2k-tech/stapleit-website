@@ -391,8 +391,7 @@
 .support-main .support-modal-tier{display:none}
 
 /* Let an open modal use the available viewport instead of squeezing the
- * inclusion cards into narrow fixed columns. Shorter cards keep their natural
- * height rather than stretching to match the tallest card in the row. */
+ * inclusion cards into narrow fixed columns. */
 .support-main .support-modal{
   width:min(1080px,calc(100vw - 48px));
   max-width:1080px;
@@ -401,14 +400,16 @@
 
 .support-main .support-modal-body{
   grid-template-columns:repeat(2,minmax(0,1fr));
-  align-items:start;
+  align-items:stretch;
   gap:16px;
 }
 
+/* Every inclusion card stretches to the tallest card in its row. The row
+ * itself still grows naturally with its content, so nothing is clipped. */
 .support-main .support-modal-group{
-  align-self:start;
+  align-self:stretch;
   min-height:0;
-  height:auto;
+  height:100%;
 }
 
 .support-main .support-modal-body--single{grid-template-columns:1fr}
