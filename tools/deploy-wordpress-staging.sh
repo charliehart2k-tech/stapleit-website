@@ -184,6 +184,27 @@ grep -Fq "stapleit_mail_error" "$THEME/functions.php"
 grep -Fq '<title>IT Support | Staple IT</title>' "$THEME/static-it-support.php"
 grep -Fq 'aria-current="page" href="/it-services/it-support/"' "$THEME/static-it-support.php"
 grep -Fq "assets/css/nav-rainbow.css?v=$VERSION" "$THEME/static-it-support.php"
+grep -Fq "assets/css/it-support.css?v=$VERSION" "$THEME/static-it-support.php"
+grep -Fq "assets/css/it-support-extras.css?v=$VERSION" "$THEME/static-it-support.php"
+grep -Fq "assets/js/it-support.js?v=$VERSION" "$THEME/static-it-support.php"
+grep -Fq '<dialog class="support-dialog' "$THEME/static-it-support.php"
+grep -Fq 'data-pack-late' "$THEME/static-it-support.php"
+
+if grep -Fq 'assets/css/it-support-packages.css' "$THEME/static-it-support.php"; then
+  echo "Legacy IT Support package override stylesheet is still referenced; refusing deployment." >&2
+  exit 1
+fi
+
+if grep -Fq 'assets/css/typography-refinement.css' "$THEME/static-it-support.php"; then
+  echo "Homepage typography refinement leaked into IT Support; refusing deployment." >&2
+  exit 1
+fi
+
+if grep -Fq 'support-modal-backdrop' "$THEME/static-it-support.php"; then
+  echo "Legacy IT Support modal markup is still present; refusing deployment." >&2
+  exit 1
+fi
+
 grep -Fq "'/it-services/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 grep -Fq "'/about-us/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 grep -Fq "'/get-in-touch/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
