@@ -28,7 +28,22 @@ add_action( 'template_redirect', function () {
     $path = '/' . trim( $path, '/' ) . '/';
 
     $routes = array(
-        '/it-services/it-support/' => 'static-it-support.php',
+        '/it-services/'                    => 'static-it-services.php',
+        '/it-services/it-support/'         => 'static-it-support.php',
+        '/it-services/it-solutions/'       => 'static-it-solutions.php',
+        '/it-services/it-consultancy/'     => 'static-it-consultancy.php',
+        '/it-services/cybersecurity/'       => 'static-cybersecurity.php',
+        '/it-services/ai-integrations/'     => 'static-ai-integrations.php',
+        '/about-us/'                        => 'static-about-us.php',
+        '/about-us/who-we-support/'         => 'static-who-we-support.php',
+        '/about-us/our-partners/'           => 'static-our-partners.php',
+        '/about-us/privacy-policy/'         => 'static-privacy-policy.php',
+        '/about-us/legal/'                  => 'static-legal.php',
+        '/get-in-touch/'                    => 'static-get-in-touch.php',
+        '/get-in-touch/it-audit/'           => 'static-it-audit.php',
+        '/client-portal/'                   => 'static-client-portal.php',
+        '/remote-support/'                  => 'static-remote-support.php',
+        '/the-staple-blog/'                 => 'static-the-staple-blog.php',
     );
 
     if ( ! isset( $routes[ $path ] ) ) {
