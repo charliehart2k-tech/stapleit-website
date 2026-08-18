@@ -1,5 +1,134 @@
-/* IT Support package card actions. Package inclusion content is presented in
- * the shared modal defined by it-support.css. */
+/* IT Support final route layer.
+ *
+ * it-support.css owns the base composition. This file is loaded immediately
+ * afterwards and owns the deliberate final route typography, black-glass
+ * surface recipe, package actions and the shared package/service modal.
+ * Keeping these decisions here prevents unrelated extras styles or the shared
+ * homepage typography layer from becoming accidental cascade dependencies. */
+
+/* Final route typography -------------------------------------------------- */
+.support-main .support-hero-copy h1{
+  letter-spacing:-.024em!important;
+  line-height:1!important;
+}
+
+.support-main .support-section-heading h2{
+  letter-spacing:-.024em!important;
+  line-height:1.02!important;
+}
+
+.support-main .support-hero-summary h2{
+  letter-spacing:-.014em!important;
+  line-height:1.08!important;
+}
+
+.support-main .support-feature-card h3,
+.support-main .support-step-card h3,
+.support-main .support-package-card h3{
+  letter-spacing:-.014em!important;
+  line-height:1.1!important;
+}
+
+.support-main .support-hero-price,
+.support-main .support-summary-list li,
+.support-main .support-section-lead,
+.support-main .support-feature-card p,
+.support-main .support-step-copy p,
+.support-main .support-package-price,
+.support-main .support-package-copy p{
+  letter-spacing:0!important;
+}
+
+.support-main .support-summary-list li{line-height:1.5!important}
+
+.support-main .support-step-copy p,
+.support-main .support-package-copy p{line-height:1.72!important}
+
+.support-main .support-package-price span:last-child{line-height:1.45}
+
+/* Keep the approved Unlimited liquid movement but constrain it to Support
+ * Green tonal variation rather than the wider Staple spectrum. */
+.support-main .support-hero-unlimited{color:var(--support)}
+
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .support-main .support-hero-unlimited{
+    background-image:
+      radial-gradient(circle at 10% 26%,rgba(255,255,255,.98) 0 1.6%,rgba(197,255,215,.70) 3.2%,transparent 8.6%),
+      radial-gradient(circle at 52% 74%,rgba(228,255,236,.96) 0 1.45%,rgba(104,239,145,.52) 3.2%,transparent 8.2%),
+      radial-gradient(circle at 88% 34%,rgba(189,255,208,.92) 0 1.25%,rgba(34,197,94,.44) 2.8%,transparent 7.6%),
+      linear-gradient(104deg,#b9f8cc 0%,#6fe792 16%,#22c55e 34%,#16b653 50%,#22c55e 66%,#55dc7e 84%,#a6f2bc 100%)!important;
+    filter:saturate(1.34) brightness(1.12)!important;
+  }
+}
+
+/* One black-glass surface recipe across the route. */
+.support-main .support-hero-summary,
+.support-main .support-feature-card,
+.support-main .support-step-card,
+.support-main .support-package-card,
+.support-main .support-cta-panel{
+  border-color:rgba(255,255,255,.12);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.025),rgba(0,0,0,.18) 30%,rgba(0,0,0,.42) 100%),
+    rgba(0,0,0,.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 26px 72px rgba(0,0,0,.42);
+  backdrop-filter:blur(16px) saturate(112%);
+  -webkit-backdrop-filter:blur(16px) saturate(112%);
+}
+
+.support-main .support-package-card{
+  border-color:color-mix(in srgb,var(--support-card-accent) 28%,rgba(255,255,255,.12));
+  padding-top:58px;
+}
+
+.support-main .support-package-card h3{max-width:100%!important}
+
+.support-main .support-package-standard{
+  border-color:color-mix(in srgb,var(--tier-standard) 42%,rgba(255,255,255,.14));
+}
+
+/* Supporting text stays readable against black glass. */
+.support-main .support-summary-intro,
+.support-main .support-feature-card p,
+.support-main .support-step-copy p,
+.support-main .support-package-copy p,
+.support-main .support-section-lead,
+.support-main .support-cta-lead{color:#d7dde5}
+
+.support-main .support-summary-intro{font-size:1rem;line-height:1.65}
+.support-main .support-summary-list li{color:#edf1f5;font-size:.98rem}
+.support-main .support-summary-list small{color:#c4ccd6;font-size:.84rem}
+
+.support-main .support-package-price,
+.support-main .support-package-price span:first-child,
+.support-main .support-package-price span:last-child{color:#cdd4dd}
+
+.support-main .support-package-price span:first-child{font-size:.88rem}
+.support-main .support-package-price span:last-child{font-size:.98rem}
+.support-main .support-package-badge{color:#eef3fb}
+
+.support-main .support-package-badge{
+  top:13px!important;
+  left:50%!important;
+  right:auto!important;
+  min-height:32px!important;
+  min-width:126px;
+  justify-content:center;
+  padding:0 16px!important;
+  transform:translateX(-50%);
+  border-color:rgba(79,133,255,.72)!important;
+  background:linear-gradient(180deg,rgba(79,133,255,.26),rgba(29,78,216,.16))!important;
+  box-shadow:0 8px 24px rgba(29,78,216,.18),inset 0 1px 0 rgba(255,255,255,.14);
+  color:#b8d4ff!important;
+  font-size:.72rem!important;
+  letter-spacing:.055em!important;
+  line-height:1!important;
+  white-space:nowrap;
+}
+
+/* Package card actions ---------------------------------------------------- */
 .support-package-cta{
   align-self:flex-start;
   min-height:44px;
@@ -32,4 +161,130 @@
 .support-package-cta:focus-visible{
   outline:2px solid var(--support-card-accent);
   outline-offset:2px;
+}
+
+/* Shared package/service modal ------------------------------------------- */
+.support-main .support-modal-backdrop{
+  z-index:2200;
+  padding:24px;
+}
+
+.support-main .support-modal{
+  width:min(1080px,calc(100vw - 48px));
+  max-width:1080px;
+  max-height:calc(100dvh - 48px);
+  border:1px solid rgba(255,255,255,.14);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.16) 24%,rgba(0,0,0,.38) 100%),
+    rgba(0,0,0,.91);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 36px 110px rgba(0,0,0,.68);
+  backdrop-filter:blur(24px) saturate(112%);
+  -webkit-backdrop-filter:blur(24px) saturate(112%);
+}
+
+.support-main .support-modal-tier{display:none}
+
+.support-main .support-modal-header,
+.support-main .support-modal-note{background:rgba(0,0,0,.28)}
+
+.support-main .support-modal-body{
+  flex:1 1 auto;
+  min-height:0;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-auto-rows:1fr;
+  align-items:stretch;
+  gap:16px;
+  background:rgba(0,0,0,.46);
+}
+
+/* Package inclusion cards equalise across the full desktop grid. Single
+ * service/add-on modals opt back into natural-height content below. */
+.support-main .support-modal-group{
+  align-self:stretch;
+  min-height:0;
+  height:100%;
+  padding:22px 20px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:var(--radius-lg);
+  background:rgba(0,0,0,.74);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+.support-main .support-modal-group:first-child{
+  padding-top:22px;
+  border-top:1px solid rgba(255,255,255,.10);
+}
+
+.support-main .support-modal-price{
+  color:color-mix(in srgb,var(--support-card-accent) 62%,#fff);
+}
+
+.support-main .support-modal-group h4{color:#fff;font-size:1.1rem}
+.support-main .support-modal-group li{color:#e1e6ec;font-size:.98rem;line-height:1.68}
+.support-main .support-modal-group li::before{background:color-mix(in srgb,var(--support-card-accent) 68%,#fff)}
+.support-main .support-modal-note{color:#bac3ce;font-size:.84rem;line-height:1.6}
+
+.support-main .support-modal-body--single{
+  grid-template-columns:1fr;
+  grid-auto-rows:auto;
+}
+
+.support-main .support-modal-body--single .support-modal-group{height:auto}
+
+@media(min-width:981px){
+  .support-main .support-step-card{grid-template-rows:auto 6.6rem 1fr}
+}
+
+@media(max-width:760px){
+  .support-main .support-modal-backdrop{padding:12px}
+
+  .support-main .support-modal{
+    width:min(100%,calc(100vw - 24px));
+    max-height:calc(100dvh - 24px);
+  }
+
+  .support-main .support-modal-body{
+    grid-template-columns:1fr;
+    grid-auto-rows:auto;
+  }
+
+  .support-main .support-modal-group{height:auto}
+}
+
+@media(max-width:700px){
+  .support-main .support-hero-copy h1,
+  .support-main .support-section-heading h2{
+    letter-spacing:-.018em!important;
+  }
+
+  .support-main .support-package-card{padding-top:54px!important}
+
+  .support-main .support-package-badge{
+    position:absolute!important;
+    top:11px!important;
+    left:50%!important;
+    right:auto!important;
+    min-width:120px;
+    margin:0!important;
+    transform:translateX(-50%);
+  }
+
+  .support-main .support-hero-summary,
+  .support-main .support-feature-card,
+  .support-main .support-step-card,
+  .support-main .support-package-card,
+  .support-main .support-cta-panel{
+    backdrop-filter:blur(10px) saturate(108%);
+    -webkit-backdrop-filter:blur(10px) saturate(108%);
+  }
+
+  .support-main .support-modal{
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+  }
+
+  .support-main .support-modal-group{padding:18px 16px}
+  .support-main .support-modal-group:first-child{padding-top:18px}
 }
