@@ -125,13 +125,15 @@
 })();
 
 (() => {
+  const packGrid = document.getElementById('support-packs-grid');
   const moreWrap = document.querySelector('.support-packs-more');
   const moreButton = document.getElementById('support-packs-more');
   const lateCards = [...document.querySelectorAll('[data-pack-late]')];
 
-  if (!moreWrap || !moreButton || !lateCards.length) return;
+  if (!packGrid || !moreWrap || !moreButton || !lateCards.length) return;
 
-  moreButton.setAttribute('aria-controls', 'support-packs-grid');
+  moreButton.setAttribute('aria-controls', packGrid.id);
+  moreButton.setAttribute('aria-expanded', 'false');
 
   lateCards.forEach(card => {
     card.hidden = true;
