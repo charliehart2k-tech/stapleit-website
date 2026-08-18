@@ -533,6 +533,23 @@
 })();
 
 (() => {
+  const moreBtn = document.getElementById('support-packs-more');
+  if (!moreBtn) return;
+
+  const hiddenCards = [...document.querySelectorAll('[data-pack-hidden]')];
+  if (!hiddenCards.length) return;
+
+  moreBtn.addEventListener('click', () => {
+    hiddenCards.forEach(card => {
+      card.hidden = false;
+      card.removeAttribute('data-pack-hidden');
+      if (card.classList.contains('motion-ready')) card.classList.add('motion-in');
+    });
+    moreBtn.setAttribute('aria-expanded', 'true');
+  });
+})();
+
+(() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const elements = [...document.querySelectorAll([
