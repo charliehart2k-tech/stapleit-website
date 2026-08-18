@@ -211,6 +211,328 @@
 })();
 
 (() => {
+  const backdrop = document.getElementById('support-modal-backdrop');
+  const modal = document.getElementById('support-modal');
+  const closeBtn = document.getElementById('support-modal-close');
+  const tierEl = document.getElementById('support-modal-tier');
+  const titleEl = document.getElementById('support-modal-title');
+  const priceEl = document.getElementById('support-modal-price');
+  const bodyEl = document.getElementById('support-modal-body');
+  const noteEl = document.getElementById('support-modal-note');
+
+  if (!backdrop || !modal || !closeBtn || !tierEl || !titleEl || !priceEl || !bodyEl || !noteEl) return;
+
+  const packages = {
+    basic: {
+      tier: 'Basic',
+      title: 'Basic package inclusions',
+      price: 'From £35 per staff member, per month',
+      note: '* Microsoft 365 & Google Workspace licensing is billed separately at cost.',
+      groups: [
+        {
+          heading: 'Helpdesk & support',
+          items: [
+            'Real engineer, no call centres',
+            'Day-to-day IT issue resolution during business hours',
+            'Microsoft 365 & Google Workspace support',
+            'Email, Teams & calendar issues',
+            'Password resets & account access',
+            'Printer & peripheral support',
+            'Wi-Fi & VPN troubleshooting',
+            'Browser, plugin & web application issues',
+            'Mobile device support',
+            'Software faults & configuration queries',
+            'Most issues resolved remotely, same day'
+          ]
+        },
+        {
+          heading: 'Monitoring & patching',
+          items: [
+            '24/7 device monitoring',
+            'Proactive issue resolution before you notice',
+            'Automated Windows & macOS patching',
+            'Third-party application patching',
+            'Device health & asset register'
+          ]
+        },
+        {
+          heading: 'User & device management',
+          items: [
+            'New user setup — accounts, email & application access',
+            'Secure leaver process — deactivation, data preservation & licence reallocation',
+            'Mobile device management — MDM enrolment & policy',
+            'Personal device support on a best-efforts basis — something most IT providers won\'t offer',
+            'Physical device setup quoted separately'
+          ]
+        },
+        {
+          heading: 'Platform management',
+          items: [
+            'Microsoft 365 or Google Workspace management',
+            'Licence management & reallocation',
+            'Microsoft licensing managed on your behalf via CSP*'
+          ]
+        },
+        {
+          heading: 'Protection',
+          items: [
+            'Enterprise-grade antivirus & anti-malware',
+            'Hardware fault diagnosis & warranty management'
+          ]
+        },
+        {
+          heading: 'Pricing & contract',
+          items: [
+            'Fixed monthly price per staff member',
+            'No hidden costs or surprise call-out charges',
+            '3-month rolling agreement — no long-term lock-in'
+          ]
+        }
+      ]
+    },
+    standard: {
+      tier: 'Standard',
+      title: 'Standard package inclusions',
+      price: 'From £55 per staff member, per month',
+      note: '* Microsoft 365 & Google Workspace licensing is billed separately at cost.',
+      groups: [
+        {
+          heading: 'Security',
+          items: [
+            'Endpoint Detection & Response (EDR) — advanced threat detection & remediation on every device',
+            'Threat quarantine & automated response',
+            'Security alerting & incident notification',
+            'Anti-phishing & spam filtering',
+            'Malicious attachment & link scanning',
+            'Email impersonation & spoofing protection',
+            'DKIM, DMARC & SPF configuration & management',
+            'Email flow monitoring & quarantine management'
+          ]
+        },
+        {
+          heading: 'Identity & access',
+          items: [
+            'Multi-Factor Authentication (MFA) enforcement across Microsoft 365 & Google Workspace',
+            'Conditional Access policies — restricting access by device, location & risk',
+            'Privileged account management',
+            'SSO configuration where applicable',
+            'Access reviews & permission audits'
+          ]
+        },
+        {
+          heading: 'Mobile device management',
+          items: [
+            'MDM enrolment & policy enforcement',
+            'Device compliance management',
+            'Remote wipe capability',
+            'Work application setup & management'
+          ]
+        },
+        {
+          heading: 'Backup',
+          items: [
+            'Microsoft 365 or Google Workspace backup',
+            'Exchange, SharePoint, OneDrive, Teams & Gmail data protection',
+            'Backup monitoring & failure alerting',
+            'Periodic restore testing'
+          ]
+        },
+        {
+          heading: 'Proactive partnership',
+          items: [
+            'Proactive technology recommendations',
+            'Regular environment health reviews'
+          ]
+        },
+        {
+          heading: 'Pricing & contract',
+          items: [
+            'Fixed monthly price per staff member',
+            'No hidden costs or surprise call-out charges',
+            '3-month rolling agreement — no long-term lock-in'
+          ]
+        }
+      ]
+    },
+    premium: {
+      tier: 'Premium',
+      title: 'Premium package inclusions',
+      price: 'From £75 per staff member, per month — Microsoft 365 Business Premium included',
+      note: '',
+      groups: [
+        {
+          heading: 'Advanced security',
+          items: [
+            'DNS filtering & web content control',
+            'Policy configuration by user group or device',
+            'Vulnerability scanning across your entire environment',
+            'Remediation recommendations & prioritisation',
+            'Dark web monitoring — credential & email exposure alerts',
+            'Security incident response treated as P1 — highest priority',
+            'Microsoft Defender — advanced threat protection across devices, identity & email'
+          ]
+        },
+        {
+          heading: 'Compliance & data protection',
+          items: [
+            'Microsoft Purview — data classification & sensitivity labelling',
+            'Information protection policies',
+            'Data loss prevention (DLP) policies',
+            'Compliance reporting & audit trails',
+            'Cyber Essentials assistance & gap analysis',
+            'Acceptable Use Policy documentation',
+            'IT Security Policy documentation',
+            'BYOD Policy documentation',
+            'Disaster recovery planning & documentation'
+          ]
+        },
+        {
+          heading: 'Included licensing',
+          items: [
+            'Microsoft 365 Business Premium — included in your monthly price',
+            'Microsoft Defender Suite — included in your monthly price',
+            'Microsoft Purview Suite — included in your monthly price'
+          ]
+        },
+        {
+          heading: 'Pricing & contract',
+          items: [
+            'Fixed monthly price per staff member — includes Microsoft 365 Business Premium licensing',
+            'No hidden costs or surprise call-out charges',
+            '3-month rolling agreement — no long-term lock-in'
+          ]
+        }
+      ]
+    }
+  };
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let previousFocus = null;
+  let closeTimer = 0;
+
+  const modalClasses = ['support-modal--basic', 'support-modal--standard', 'support-modal--premium'];
+
+  const renderGroups = groups => {
+    const fragments = groups.map(group => {
+      const card = document.createElement('section');
+      card.className = 'support-modal-group';
+
+      const heading = document.createElement('h4');
+      heading.textContent = group.heading;
+
+      const list = document.createElement('ul');
+      const items = group.items.map(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        return li;
+      });
+
+      list.append(...items);
+      card.append(heading, list);
+      return card;
+    });
+
+    bodyEl.replaceChildren(...fragments);
+  };
+
+  const finishClose = () => {
+    window.clearTimeout(closeTimer);
+    backdrop.hidden = true;
+    backdrop.setAttribute('aria-hidden', 'true');
+    modal.classList.remove(...modalClasses);
+    if (previousFocus instanceof HTMLElement) previousFocus.focus();
+    previousFocus = null;
+  };
+
+  const closeModal = () => {
+    if (backdrop.hidden) return;
+
+    backdrop.classList.remove('is-open');
+    document.body.classList.remove('support-modal-open');
+
+    if (reducedMotion.matches) {
+      finishClose();
+      return;
+    }
+
+    const onTransitionEnd = event => {
+      if (event.target !== backdrop || event.propertyName !== 'opacity') return;
+      backdrop.removeEventListener('transitionend', onTransitionEnd);
+      finishClose();
+    };
+
+    backdrop.addEventListener('transitionend', onTransitionEnd);
+    closeTimer = window.setTimeout(() => {
+      backdrop.removeEventListener('transitionend', onTransitionEnd);
+      finishClose();
+    }, 300);
+  };
+
+  const openModal = key => {
+    const data = packages[key];
+    if (!data) return;
+
+    window.clearTimeout(closeTimer);
+    previousFocus = document.activeElement;
+
+    modal.classList.remove(...modalClasses);
+    modal.classList.add(`support-modal--${key}`);
+    tierEl.textContent = data.tier;
+    titleEl.textContent = data.title;
+    priceEl.textContent = data.price;
+    noteEl.textContent = data.note;
+    noteEl.hidden = !data.note;
+    renderGroups(data.groups);
+
+    backdrop.hidden = false;
+    backdrop.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('support-modal-open');
+
+    window.requestAnimationFrame(() => {
+      backdrop.classList.add('is-open');
+      closeBtn.focus();
+    });
+  };
+
+  document.querySelectorAll('[data-package-open]').forEach(button => {
+    button.addEventListener('click', () => openModal(button.dataset.packageOpen));
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+
+  backdrop.addEventListener('click', event => {
+    if (event.target === backdrop) closeModal();
+  });
+
+  document.addEventListener('keydown', event => {
+    if (backdrop.hidden) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeModal();
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+
+    const focusable = [...modal.querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+      .filter(element => !element.hasAttribute('disabled') && !element.hidden);
+    if (!focusable.length) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+})();
+
+(() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const elements = [...document.querySelectorAll([
