@@ -211,6 +211,50 @@
 })();
 
 (() => {
+  const catalogue = document.querySelector('[data-support-catalogue]');
+  if (!catalogue) return;
+
+  const filters = [...catalogue.querySelectorAll('[data-support-filter]')];
+  const cards = [...catalogue.querySelectorAll('[data-support-category]')];
+  const status = catalogue.querySelector('[data-support-catalogue-status]');
+  if (!filters.length || !cards.length) return;
+
+  const applyFilter = filter => {
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const visible = filter === 'all' || card.dataset.supportCategory === filter;
+      card.hidden = !visible;
+
+      if (visible) {
+        visibleCount += 1;
+        if (card.classList.contains('motion-ready')) card.classList.add('motion-in');
+      } else {
+        const details = card.querySelector('details');
+        if (details) details.open = false;
+      }
+    });
+
+    filters.forEach(button => {
+      button.setAttribute('aria-pressed', String(button.dataset.supportFilter === filter));
+    });
+
+    if (!status) return;
+    const active = filters.find(button => button.dataset.supportFilter === filter);
+    const label = active?.textContent.trim() || 'selected';
+    status.textContent = filter === 'all'
+      ? `Showing all ${visibleCount} additional services.`
+      : `Showing ${visibleCount} ${label} service${visibleCount === 1 ? '' : 's'}.`;
+  };
+
+  filters.forEach(button => {
+    button.addEventListener('click', () => applyFilter(button.dataset.supportFilter || 'all'));
+  });
+
+  applyFilter('all');
+})();
+
+(() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const elements = [...document.querySelectorAll([
