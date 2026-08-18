@@ -204,84 +204,101 @@
 <h2 id="support-extras-title">Need Something Extra?</h2>
 <p class="support-section-lead"><strong>All of our packages can be extended with additional services tailored to your business. From ad-hoc on-site support to fully managed phone systems, we have you covered. Explore more below.</strong></p>
 </header>
-<div class="support-extras-viewport" aria-label="Additional IT services catalogue">
-<div class="support-extras-track">
-<div class="support-extras-group">
-<article class="support-extra-card support-card">
+<div class="support-catalogue" data-support-catalogue>
+<div class="support-catalogue-toolbar">
+<div class="support-catalogue-toolbar-copy">
+<p class="support-catalogue-eyebrow">Browse by category</p>
+<p class="support-catalogue-help">Choose the area you need help with and we'll show you the relevant extras. You can switch categories at any time.</p>
+</div>
+<div class="support-catalogue-filters" role="group" aria-label="Filter additional IT services">
+<button type="button" data-support-filter="all" aria-controls="support-catalogue-grid" aria-pressed="true">All extras</button>
+<button type="button" data-support-filter="support" aria-controls="support-catalogue-grid" aria-pressed="false">Support &amp; on-site</button>
+<button type="button" data-support-filter="infrastructure" aria-controls="support-catalogue-grid" aria-pressed="false">Infrastructure</button>
+<button type="button" data-support-filter="procurement" aria-controls="support-catalogue-grid" aria-pressed="false">Devices &amp; software</button>
+<button type="button" data-support-filter="communications" aria-controls="support-catalogue-grid" aria-pressed="false">Communications</button>
+<button type="button" data-support-filter="specialist" aria-controls="support-catalogue-grid" aria-pressed="false">Specialist</button>
+</div>
+</div>
+<p class="support-catalogue-status" data-support-catalogue-status aria-live="polite">Showing all 6 additional services.</p>
+<div class="support-catalogue-grid" id="support-catalogue-grid">
+<article class="support-extra-card support-card" data-support-category="support">
+<p class="support-extra-category">Support &amp; on-site</p>
 <h3>On-site support</h3>
+<p class="support-extra-summary">Ad-hoc hands-on support at your workplace when something needs an engineer in the room.</p>
+<details class="support-extra-details">
+<summary>View details</summary>
 <div class="support-extra-copy">
 <p>We understand that sometimes things need an in-person touch. That's why we offer ad-hoc on-site IT support for when you need it most.</p>
 <p>Our engineers are based around Surrey and London and can be at your place of business at a time that suits you.</p>
 <p>Whether it's reconfiguring equipment after an office move or hands-on support that can't be done remotely, we've got you covered.</p>
 </div>
+</details>
 </article>
-<article class="support-extra-card support-card">
+<article class="support-extra-card support-card" data-support-category="infrastructure">
+<p class="support-extra-category">Infrastructure</p>
 <h3>Network management</h3>
+<p class="support-extra-summary">Proactive management for the routers, switches and Wi-Fi that keep your business connected.</p>
+<details class="support-extra-details">
+<summary>View details</summary>
 <div class="support-extra-copy">
 <p>We monitor and manage your routers, switches, Wi-Fi access points and other infrastructure around the clock, keeping your connectivity stable, secure and performing at its best.</p>
 <p>From flagging issues before they cause downtime to making sure your network is locked down and optimised.</p>
 <p>We take the stress of networking completely off your plate.</p>
 </div>
+</details>
 </article>
-<article class="support-extra-card support-card">
+<article class="support-extra-card support-card" data-support-category="infrastructure">
+<p class="support-extra-category">Infrastructure</p>
 <h3>Server management</h3>
+<p class="support-extra-summary">Round-the-clock management for on-premises and cloud servers that your business depends on.</p>
+<details class="support-extra-details">
+<summary>View details</summary>
 <div class="support-extra-copy">
 <p>Do you have servers on-premises or in the cloud? No problem — we'll take them off your hands and fully manage them for you.</p>
 <p>We keep them secure, up to date and running smoothly because we know these servers often host critical software that keeps your business ticking.</p>
 <p>We monitor them around the clock to make sure they're always in good health.</p>
 </div>
+</details>
 </article>
-<article class="support-extra-card support-card">
+<article class="support-extra-card support-card" data-support-category="procurement">
+<p class="support-extra-category">Devices &amp; software</p>
 <h3>IT procurement</h3>
+<p class="support-extra-summary">The right laptops, desktops, software and business technology without the shopping-around headache.</p>
+<details class="support-extra-details">
+<summary>View details</summary>
 <div class="support-extra-copy">
 <p>Do you require new laptops, desktops, licensed software or other business equipment?</p>
 <p>We can help you procure exactly what you need, ensuring you're never left behind with old, outdated technology.</p>
 <p>No more shopping from high street retailers or online marketplaces — we work with a wide range of distributors to bring you the right kit at a price that just makes sense.</p>
 </div>
+</details>
 </article>
-<article class="support-extra-card support-card">
+<article class="support-extra-card support-card" data-support-category="communications">
+<p class="support-extra-category">Communications</p>
 <h3>VoIP &amp; telephony</h3>
+<p class="support-extra-summary">Modern business phone systems, number porting, softphones, voicemail and auto-attendants.</p>
+<details class="support-extra-details">
+<summary>View details</summary>
 <div class="support-extra-copy">
 <p>Gone are the days of analogue phones and clunky desktop handsets.</p>
 <p>We set up and manage modern, flexible phone systems tailored to your business — and if you have existing numbers from legacy systems, we'll port them across for you free of charge.</p>
 <p>From flexible softphones that let you take calls on the go to voicemail systems and auto-attendants customised to suit the brand and feel of your business, we've got your communications covered.</p>
 </div>
+</details>
 </article>
-<article class="support-extra-card support-card">
+<article class="support-extra-card support-card" data-support-category="specialist">
+<p class="support-extra-category">Specialist</p>
 <h3>Bespoke needs</h3>
+<p class="support-extra-summary">Support for niche systems, unusual requirements and technology that does not fit neatly into a box.</p>
+<details class="support-extra-details">
+<summary>View details</summary>
 <div class="support-extra-copy">
 <p>We cover a lot here at Staple, but we love a challenge.</p>
 <p>If you have a bespoke system, product or service that needs looking after, we can still help.</p>
 <p>Our engineers have worked with custom and niche solutions across a wide range of sectors, and even if something falls outside our remit, we'll work with you on a migration plan to a suitable alternative — taking the headache of IT away from you completely.</p>
 </div>
+</details>
 </article>
-</div>
-<div class="support-extras-group" aria-hidden="true">
-<article class="support-extra-card support-card">
-<h3>On-site support</h3>
-<div class="support-extra-copy"><p>We understand that sometimes things need an in-person touch. That's why we offer ad-hoc on-site IT support for when you need it most.</p><p>Our engineers are based around Surrey and London and can be at your place of business at a time that suits you.</p><p>Whether it's reconfiguring equipment after an office move or hands-on support that can't be done remotely, we've got you covered.</p></div>
-</article>
-<article class="support-extra-card support-card">
-<h3>Network management</h3>
-<div class="support-extra-copy"><p>We monitor and manage your routers, switches, Wi-Fi access points and other infrastructure around the clock, keeping your connectivity stable, secure and performing at its best.</p><p>From flagging issues before they cause downtime to making sure your network is locked down and optimised.</p><p>We take the stress of networking completely off your plate.</p></div>
-</article>
-<article class="support-extra-card support-card">
-<h3>Server management</h3>
-<div class="support-extra-copy"><p>Do you have servers on-premises or in the cloud? No problem — we'll take them off your hands and fully manage them for you.</p><p>We keep them secure, up to date and running smoothly because we know these servers often host critical software that keeps your business ticking.</p><p>We monitor them around the clock to make sure they're always in good health.</p></div>
-</article>
-<article class="support-extra-card support-card">
-<h3>IT procurement</h3>
-<div class="support-extra-copy"><p>Do you require new laptops, desktops, licensed software or other business equipment?</p><p>We can help you procure exactly what you need, ensuring you're never left behind with old, outdated technology.</p><p>No more shopping from high street retailers or online marketplaces — we work with a wide range of distributors to bring you the right kit at a price that just makes sense.</p></div>
-</article>
-<article class="support-extra-card support-card">
-<h3>VoIP &amp; telephony</h3>
-<div class="support-extra-copy"><p>Gone are the days of analogue phones and clunky desktop handsets.</p><p>We set up and manage modern, flexible phone systems tailored to your business — and if you have existing numbers from legacy systems, we'll port them across for you free of charge.</p><p>From flexible softphones that let you take calls on the go to voicemail systems and auto-attendants customised to suit the brand and feel of your business, we've got your communications covered.</p></div>
-</article>
-<article class="support-extra-card support-card">
-<h3>Bespoke needs</h3>
-<div class="support-extra-copy"><p>We cover a lot here at Staple, but we love a challenge.</p><p>If you have a bespoke system, product or service that needs looking after, we can still help.</p><p>Our engineers have worked with custom and niche solutions across a wide range of sectors, and even if something falls outside our remit, we'll work with you on a migration plan to a suitable alternative — taking the headache of IT away from you completely.</p></div>
-</article>
-</div>
 </div>
 </div>
 </section>
