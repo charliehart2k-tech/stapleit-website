@@ -156,3 +156,48 @@
     }
   });
 })();
+
+(() => {
+  const section = document.querySelector('.support-onboarding[data-progress]');
+  const progress = section?.querySelector('[data-support-progress]');
+  if (!section || !progress) return;
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let started = false;
+
+  const setProgress = step => {
+    const value = String(step);
+    section.dataset.progress = value;
+    progress.dataset.progress = value;
+  };
+
+  const start = () => {
+    if (started) return;
+    started = true;
+
+    if (reducedMotion.matches) {
+      setProgress(3);
+      return;
+    }
+
+    [1, 2, 3].forEach((step, index) => {
+      window.setTimeout(() => setProgress(step), index * 280);
+    });
+  };
+
+  if (!('IntersectionObserver' in window)) {
+    start();
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    start();
+    observer.disconnect();
+  }, {
+    threshold: .2,
+    rootMargin: '0px 0px -8% 0px'
+  });
+
+  observer.observe(section);
+})();
