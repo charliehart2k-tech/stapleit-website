@@ -19,7 +19,7 @@
   position:relative;
   min-height:620px;
   display:grid;
-  grid-template-columns:minmax(360px,.82fr) minmax(0,1.28fr);
+  grid-template-columns:minmax(390px,.88fr) minmax(0,1.12fr);
   align-items:stretch;
   overflow:hidden;
   isolation:isolate;
@@ -40,7 +40,7 @@
   position:relative;
   z-index:1;
   min-width:0;
-  padding:72px 32px 64px 52px;
+  padding:72px 40px 64px 48px;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
@@ -85,15 +85,15 @@
 .support-hero-title{display:block;color:var(--white)}
 
 .support-hero-price{
-  max-width:none;
+  max-width:100%;
   margin:30px 0 0;
   color:var(--text);
   font-family:var(--font-display);
-  font-size:clamp(1.3rem,1.8vw,1.7rem);
+  font-size:clamp(1.15rem,1.55vw,1.35rem);
   font-weight:600;
-  line-height:1.32;
+  line-height:1.38;
   letter-spacing:0;
-  white-space:nowrap;
+  white-space:normal;
 }
 
 .support-hero-price strong{color:var(--red);font-weight:700}
@@ -152,7 +152,7 @@
   position:relative;
   z-index:1;
   min-width:0;
-  padding:72px 42px 48px 40px;
+  padding:72px 40px 48px 48px;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
@@ -160,31 +160,30 @@
 }
 
 .support-standard h2{
-  max-width:17ch;
+  max-width:16ch;
   margin:0;
   color:#fff;
-  font-size:clamp(2.2rem,2.75vw,2.75rem);
-  line-height:1.04;
-  letter-spacing:-.024em;
+  font-size:clamp(2.15rem,2.55vw,2.65rem);
+  line-height:1.03;
+  letter-spacing:-.022em;
   text-wrap:balance;
 }
 
 .support-standard-accent{
   display:block;
-  margin-top:.14em;
+  margin-top:.18em;
   color:var(--support);
-  font-size:.72em;
-  line-height:1.08;
-  letter-spacing:.035em;
-  text-transform:uppercase;
+  font-size:.7em;
+  line-height:1.12;
+  letter-spacing:.01em;
 }
 
 .support-standard-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:26px 32px;
+  gap:28px;
   align-items:start;
-  margin-top:32px;
+  margin-top:30px;
 }
 
 .support-standard-group{
@@ -196,10 +195,10 @@
 .support-standard-group h3{
   display:flex;
   align-items:center;
-  gap:10px;
-  margin:0 0 14px;
+  gap:9px;
+  margin:0 0 13px;
   color:#f7f9fc;
-  font-size:1.04rem;
+  font-size:1rem;
   font-weight:700;
   line-height:1.25;
   letter-spacing:-.01em;
@@ -216,7 +215,7 @@
 
 .support-standard-group ul{
   display:grid;
-  gap:9px;
+  gap:8px;
   margin:0;
   padding:0;
   list-style:none;
@@ -226,8 +225,8 @@
   position:relative;
   padding-left:15px;
   color:#d9dfe6;
-  font-size:.94rem;
-  line-height:1.55;
+  font-size:.92rem;
+  line-height:1.56;
 }
 
 .support-standard-group li::before{
