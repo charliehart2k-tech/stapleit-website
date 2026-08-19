@@ -160,10 +160,8 @@
 (() => {
   const section = document.querySelector('.support-onboarding[data-progress]');
   const progress = section?.querySelector('[data-support-progress]');
-  if (!section || !progress) return;
-
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let started = false;
+  const cards = section ? [...section.querySelectorAll('.support-step-card[data-step]')] : [];
+  if (!section || !progress || cards.length === 0) return;
 
   const setProgress = step => {
     const value = String(step);
@@ -171,33 +169,29 @@
     progress.dataset.progress = value;
   };
 
-  const start = () => {
-    if (started) return;
-    started = true;
+  setProgress(1);
 
-    if (reducedMotion.matches) {
-      setProgress(3);
-      return;
-    }
-
-    [1, 2, 3].forEach((step, index) => {
-      window.setTimeout(() => setProgress(step), index * 1100);
-    });
-  };
-
-  if (!('IntersectionObserver' in window)) {
-    start();
-    return;
-  }
-
-  const observer = new IntersectionObserver(entries => {
-    if (!entries.some(entry => entry.isIntersecting)) return;
-    start();
-    observer.disconnect();
-  }, {
-    threshold: .55,
-    rootMargin: '0px 0px -10% 0px'
+  cards.forEach(card => {
+    const step = Number(card.dataset.step);
+    card.addEventListener('pointerenter', () => setProgress(step));
+    card.addEventListener('focusin', () => setProgress(step));
   });
 
-  observer.observe(progress);
+  if (!('IntersectionObserver' in window)) return;
+
+  const desktopLayout = window.matchMedia('(min-width: 981px)');
+  const observer = new IntersectionObserver(entries => {
+    if (desktopLayout.matches) return;
+
+    const visibleCard = entries
+      .filter(entry => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+    if (visibleCard) setProgress(Number(visibleCard.target.dataset.step));
+  }, {
+    threshold: [.35, .55, .75],
+    rootMargin: '-10% 0px -25% 0px'
+  });
+
+  cards.forEach(card => observer.observe(card));
 })();
