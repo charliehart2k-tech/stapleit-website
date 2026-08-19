@@ -4,6 +4,7 @@
  * live in it-support-extras.css. */
 
 .support-main{
+  --support-glass-grain:url("/assets/images/effects/glass-grain.svg");
   width:100%;
   min-height:calc(100vh - 96px);
 }
@@ -228,13 +229,11 @@
   letter-spacing:-.01em;
 }
 
-.support-standard-group h3::before{
-  content:"";
-  flex:0 0 8px;
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:var(--support);
+.support-standard-icon{
+  flex:0 0 20px;
+  width:20px;
+  height:20px;
+  color:var(--support);
 }
 
 .support-standard-group ul{
@@ -309,9 +308,13 @@
 .support-package-card,
 .support-cta-panel{
   border:1px solid rgba(255,255,255,.12);
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.025),rgba(0,0,0,.18) 30%,rgba(0,0,0,.42) 100%),
-    rgba(0,0,0,.82);
+  background-color:rgba(0,0,0,.82);
+  background-image:
+    var(--support-glass-grain),
+    linear-gradient(180deg,rgba(255,255,255,.025),rgba(0,0,0,.18) 30%,rgba(0,0,0,.42) 100%);
+  background-repeat:repeat,no-repeat;
+  background-size:96px 96px,100% 100%;
+  background-blend-mode:soft-light,normal;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.055),
     0 26px 72px rgba(0,0,0,.42);
@@ -435,9 +438,13 @@
   overflow:hidden;
   border:1px solid rgba(255,255,255,.14);
   border-radius:var(--radius-xl);
-  background:
-    linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.02) 38%,rgba(0,0,0,.34) 100%),
-    rgba(4,5,7,.72);
+  background-color:rgba(4,5,7,.78);
+  background-image:
+    var(--support-glass-grain),
+    linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.02) 38%,rgba(0,0,0,.34) 100%);
+  background-repeat:repeat,no-repeat;
+  background-size:96px 96px,100% 100%;
+  background-blend-mode:soft-light,normal;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.09),
     0 28px 72px rgba(0,0,0,.42);
@@ -517,9 +524,10 @@
   .support-step-card:hover .support-step-content{
     transform:translateY(-6px) scale(1.006);
     border-color:rgba(255,255,255,.22);
-    background:
-      linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.025) 38%,rgba(0,0,0,.30) 100%),
-      rgba(4,5,7,.70);
+    background-color:rgba(4,5,7,.76);
+    background-image:
+      var(--support-glass-grain),
+      linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.025) 38%,rgba(0,0,0,.30) 100%);
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,.12),
       0 34px 82px rgba(0,0,0,.50);
@@ -754,9 +762,13 @@
   overflow:hidden;
   border:1px solid rgba(255,255,255,.14);
   border-radius:var(--radius-xl);
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.16) 24%,rgba(0,0,0,.38) 100%),
-    rgba(0,0,0,.94);
+  background-color:rgba(0,0,0,.94);
+  background-image:
+    var(--support-glass-grain),
+    linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.16) 24%,rgba(0,0,0,.38) 100%);
+  background-repeat:repeat,no-repeat;
+  background-size:96px 96px,100% 100%;
+  background-blend-mode:soft-light,normal;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.07),
     0 36px 110px rgba(0,0,0,.68);
@@ -1005,6 +1017,14 @@
   0%{background-position:0% 50%}
   50%{background-position:100% 50%}
   100%{background-position:0% 50%}
+}
+
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .support-hero-shell{background-color:#050505}
+  .support-step-content{background-color:#08090b}
+  .support-package-card,
+  .support-cta-panel{background-color:#050607}
+  .support-dialog{background-color:#020202}
 }
 
 /* Hero/tablet transition -------------------------------------------------- */
