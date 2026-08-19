@@ -172,8 +172,12 @@ grep -Fq 'class="contact-section"' "$THEME/front-page.php"
 grep -Fq "assets/css/home.bundle.css?v=$VERSION" "$THEME/front-page.php"
 grep -Fq "assets/fonts/manrope-latin.woff2" "$THEME/front-page.php"
 grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
-grep -Fq 'assets/media/it-support-liquid.mp4' "$THEME/static-it-support.php"
-test -s "$THEME/assets/media/it-support-liquid.mp4"
+grep -Fq 'class="support-css-ambient"' "$THEME/static-it-support.php"
+grep -Fq 'support-css-ambient' "$THEME/assets/css/it-support.css"
+if grep -Fq 'support-liquid-motion' "$THEME/static-it-support.php"; then
+  echo "Retired IT Support MP4 hero is still referenced; refusing deployment." >&2
+  exit 1
+fi
 grep -Fq 'assets/images/icons/it-support.svg#helpdesk' "$THEME/static-it-support.php"
 test -s "$THEME/assets/images/icons/it-support.svg"
 test -s "$THEME/assets/images/effects/glass-grain.svg"
