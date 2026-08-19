@@ -69,8 +69,12 @@ echo "Deploying Staple IT site from Git $VERSION"
 
 mkdir -p "$BACKUP_DIR"
 if [[ -f "$THEME/front-page.php" && -d "$THEME/assets" ]]; then
+  theme_backup_items=(front-page.php functions.php assets favicon.ico apple-touch-icon.png)
+  if [[ -f "$THEME/404.php" ]]; then
+    theme_backup_items+=(404.php)
+  fi
   tar -czf "$BACKUP_DIR/stapleit-theme-$STAMP.tar.gz" \
-    -C "$THEME" front-page.php functions.php assets favicon.ico apple-touch-icon.png 2>/dev/null || true
+    -C "$THEME" "${theme_backup_items[@]}" 2>/dev/null || true
   echo "Rollback backup: $BACKUP_DIR/stapleit-theme-$STAMP.tar.gz"
 fi
 
@@ -148,6 +152,7 @@ def build(source: Path, target: Path, inject_wp_hooks: bool) -> None:
 
 
 build(source_root / 'index.html', theme_root / 'front-page.php', True)
+build(source_root / '404.html', theme_root / '404.php', False)
 for relative_source, target_name in static_pages:
     build(source_root / relative_source, theme_root / target_name, False)
 PY
@@ -156,6 +161,7 @@ sudo mkdir -p "$MU_PLUGINS_DIR"
 sudo install -m 0644 -o deploy -g www-data "$STATIC_ROUTES_SOURCE" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 
 php -l "$THEME/front-page.php"
+php -l "$THEME/404.php"
 php -l "$THEME/functions.php"
 php -l "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 
@@ -166,6 +172,10 @@ for template in "$THEME"/static-*.php; do
   grep -Fq '<meta name="robots" content="noindex,nofollow"' "$template"
   grep -Fq "assets/js/app.js?v=$VERSION" "$template"
 done
+
+grep -Fq '<title>Page Not Found | Staple IT</title>' "$THEME/404.php"
+grep -Fq '<meta name="robots" content="noindex,nofollow"' "$THEME/404.php"
+grep -Fq 'class="reset-stage reset-404"' "$THEME/404.php"
 
 grep -Fq 'class="mobile-nav-group"' "$THEME/front-page.php"
 grep -Fq 'data-audit-explainer' "$THEME/front-page.php"
