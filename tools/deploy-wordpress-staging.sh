@@ -134,9 +134,9 @@ def build(source: Path, target: Path, inject_wp_hooks: bool) -> None:
     for old, new in replacements.items():
         html = html.replace(old, new)
 
-    # Cache-bust local theme CSS/JS using the exact Git revision deployed.
+    # Cache-bust local theme CSS, JavaScript and video using the exact Git revision deployed.
     html = re.sub(r'(href="[^"]+\.css)(")', rf'\1?v={version}\2', html)
-    html = re.sub(r'(src="[^"]+\.js)(")', rf'\1?v={version}\2', html)
+    html = re.sub(r'(src="[^"]+\.(?:js|mp4))(")', rf'\1?v={version}\2', html)
 
     if inject_wp_hooks:
         if '<?php wp_head(); ?>' not in html:
