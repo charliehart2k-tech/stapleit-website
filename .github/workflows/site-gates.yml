@@ -40,8 +40,10 @@ jobs:
           python3 -m py_compile tools/audit-site.py
           python3 -m py_compile tools/audit-assets.py
 
-      - name: Validate staging deploy script
-        run: bash -n tools/deploy-wordpress-staging.sh
+      - name: Validate shell tools
+        run: |
+          bash -n tools/deploy-wordpress-staging.sh
+          bash -n tools/audit-vps.sh
 
       - name: Run content security SEO and AEO gates
         run: python3 tools/audit-site.py --root site

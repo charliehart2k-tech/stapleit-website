@@ -47,3 +47,13 @@ In-progress static routes remain `noindex,nofollow`, and the MU-plugin also send
 ## Favicon assets
 
 The site root contains `/favicon.ico` and `/apple-touch-icon.png`. HTML templates must explicitly reference both in `<head>`; do not rely only on browser fallback discovery of `/favicon.ico`.
+
+## VPS audit
+
+Run the read-only infrastructure and deployment audit from the repository root:
+
+```bash
+bash tools/audit-vps.sh | tee /tmp/stapleit-vps-audit.txt
+```
+
+The report intentionally excludes WordPress salts, database credentials, database contents and visitor logs. Resolve failures as scoped changes with a rollback path; do not turn the audit into an automatic remediation script.

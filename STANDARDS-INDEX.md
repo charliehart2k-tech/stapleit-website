@@ -60,6 +60,7 @@ Before pushing a substantive change:
 python3 tools/audit-site.py --root site
 python3 tools/audit-assets.py --root site/assets
 bash -n tools/deploy-wordpress-staging.sh
+bash -n tools/audit-vps.sh
 ```
 
 Then inspect the diff and confirm:
