@@ -49,6 +49,7 @@
 }
 
 .support-hero-copy h1{
+  width:max-content;
   max-width:10ch;
   margin:0;
   padding-bottom:.08em;
@@ -63,7 +64,7 @@
   display:block;
   width:max-content;
   max-width:100%;
-  margin:0 -.03em -.12em;
+  margin:0 auto -.12em;
   padding:0 .03em .12em;
   overflow:visible;
   color:var(--support);
