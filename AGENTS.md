@@ -30,6 +30,7 @@ For every change:
    - `python3 tools/audit-assets.py --root site/assets`
    - `bash -n tools/deploy-wordpress-staging.sh`
    - `bash -n tools/audit-vps.sh`
+   - `bash -n tools/prune-theme-backups.sh`
 8. Push only after the change is internally consistent.
 9. Verify the GitHub **Site quality gates** workflow succeeds for the pushed commit.
 10. Only then tell the user that the change is safe to deploy.

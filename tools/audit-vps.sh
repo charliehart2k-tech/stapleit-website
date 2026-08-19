@@ -8,6 +8,7 @@ REPO="${REPO:-/srv/stapleit/repo}"
 WP_ROOT="${WP_ROOT:-/var/www/stapleit}"
 THEME="${THEME:-$WP_ROOT/wp-content/themes/stapleit}"
 BACKUP_DIR="${BACKUP_DIR:-/home/deploy/stapleit-theme-backups}"
+BACKUP_RETENTION="${BACKUP_RETENTION:-5}"
 STAGING_URL="${STAGING_URL:-https://staging.stapleitdev.co.uk}"
 
 warnings=0
@@ -53,6 +54,11 @@ printf 'Kernel: %s\n' "$(uname -srmo)"
 printf 'Uptime: %s\n' "$(uptime -p 2>/dev/null || uptime)"
 df -h "$WP_ROOT" 2>/dev/null || warn "Could not read filesystem usage for $WP_ROOT"
 free -h 2>/dev/null || warn "Could not read memory usage"
+if [[ -f /var/run/reboot-required ]]; then
+  warn "The VPS requires a restart to finish installed updates"
+else
+  pass "No pending system restart"
+fi
 
 section "Repository and release gates"
 if [[ ! -d "$REPO/.git" ]]; then
@@ -197,10 +203,19 @@ fi
 
 section "Backups"
 if [[ -d "$BACKUP_DIR" ]]; then
-  backup_count="$(find "$BACKUP_DIR" -type f 2>/dev/null | wc -l)"
-  printf 'Theme backup files: %s\n' "$backup_count"
-  find "$BACKUP_DIR" -type f -printf '%TY-%Tm-%Td %TH:%TM %10s %p\n' 2>/dev/null | sort | tail -10
-  [[ "$backup_count" -gt 0 ]] && pass "Theme deployment backups exist" || fail "Theme deployment backup directory is empty"
+  release_count="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'stapleit-theme-????????-??????.tar.gz' 2>/dev/null | wc -l)"
+  backup_size="$(du -sh "$BACKUP_DIR" 2>/dev/null | awk '{print $1}' || true)"
+  printf 'Rollback releases: %s\n' "$release_count"
+  printf 'Backup storage used: %s\n' "${backup_size:-unavailable}"
+  find "$BACKUP_DIR" -maxdepth 1 -type f -name 'stapleit-theme-????????-??????.tar.gz' \
+    -printf '%TY-%Tm-%Td %TH:%TM %10s %p\n' 2>/dev/null | sort | tail -5
+  if [[ "$release_count" -eq 0 ]]; then
+    fail "Theme deployment backup directory contains no rollback releases"
+  elif [[ "$release_count" -le "$BACKUP_RETENTION" ]]; then
+    pass "Rollback release count is within the $BACKUP_RETENTION-release retention policy"
+  else
+    warn "Rollback release count exceeds the $BACKUP_RETENTION-release retention policy"
+  fi
 else
   fail "Theme backup directory not found at $BACKUP_DIR"
 fi
@@ -231,8 +246,15 @@ else
     fail "Custom 404 is not active"
   fi
 
-  sitemap_status="$(curl -sS -o /dev/null --max-time 20 -w '%{http_code}' "$STAGING_URL/sitemap.xml" 2>/dev/null || true)"
-  printf 'Sitemap status: %s\n' "${sitemap_status:-unavailable}"
+  sitemap_result="$(curl -sS -L -o /dev/null --max-time 20 -w '%{http_code} %{url_effective}' "$STAGING_URL/sitemap.xml" 2>/dev/null || true)"
+  sitemap_status="${sitemap_result%% *}"
+  sitemap_target="${sitemap_result#* }"
+  printf 'Sitemap final status: %s (%s)\n' "${sitemap_status:-unavailable}" "${sitemap_target:-unavailable}"
+  if [[ "$sitemap_status" == "200" || "$sitemap_status" == "404" ]]; then
+    pass "Staging sitemap route resolves without a redirect loop or server error"
+  else
+    warn "Staging sitemap route returned an unexpected final status"
+  fi
 fi
 
 section "Summary"

@@ -44,6 +44,25 @@ jobs:
         run: |
           bash -n tools/deploy-wordpress-staging.sh
           bash -n tools/audit-vps.sh
+          bash -n tools/prune-theme-backups.sh
+
+      - name: Test rollback backup retention
+        run: |
+          backup_test_root="$(mktemp -d)"
+          for stamp in \
+            20260819-000001 20260819-000002 20260819-000003 \
+            20260819-000004 20260819-000005 20260819-000006 \
+            20260819-000007; do
+            touch "$backup_test_root/stapleit-theme-$stamp.tar.gz"
+            mkdir "$backup_test_root/static-templates-$stamp"
+            touch "$backup_test_root/static-templates-$stamp/static-test.php"
+            touch "$backup_test_root/stapleit-static-routes-$stamp.php"
+          done
+          BACKUP_DIR="$backup_test_root" BACKUP_RETENTION=5 \
+            bash tools/prune-theme-backups.sh
+          test "$(find "$backup_test_root" -maxdepth 1 -type f -name 'stapleit-theme-*.tar.gz' | wc -l)" -eq 5
+          test "$(find "$backup_test_root" -maxdepth 1 -type d -name 'static-templates-*' | wc -l)" -eq 5
+          test "$(find "$backup_test_root" -maxdepth 1 -type f -name 'stapleit-static-routes-*.php' | wc -l)" -eq 5
 
       - name: Validate WordPress PHP
         run: |

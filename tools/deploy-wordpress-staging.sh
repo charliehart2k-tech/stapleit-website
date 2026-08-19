@@ -8,6 +8,7 @@ SOURCE="$REPO/site"
 WORDPRESS_SOURCE="$REPO/wordpress"
 STATIC_ROUTES_SOURCE="$WORDPRESS_SOURCE/mu-plugins/stapleit-static-routes.php"
 BACKUP_DIR="${BACKUP_DIR:-/home/deploy/stapleit-theme-backups}"
+BACKUP_RETENTION="${BACKUP_RETENTION:-5}"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 VERSION="$(git -C "$REPO" rev-parse --short HEAD)"
 
@@ -237,6 +238,9 @@ fi
 sudo chown -R deploy:www-data "$THEME"
 find "$THEME" -type d -exec chmod 755 {} \;
 find "$THEME" -type f -exec chmod 644 {} \;
+
+BACKUP_DIR="$BACKUP_DIR" BACKUP_RETENTION="$BACKUP_RETENTION" \
+  bash "$REPO/tools/prune-theme-backups.sh"
 
 echo "Deployment verified."
 echo "Deployed Git $VERSION to $THEME"

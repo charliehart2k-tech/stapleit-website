@@ -57,3 +57,7 @@ bash tools/audit-vps.sh | tee /tmp/stapleit-vps-audit.txt
 ```
 
 The report intentionally excludes WordPress salts, database credentials, database contents and visitor logs. Resolve failures as scoped changes with a rollback path; do not turn the audit into an automatic remediation script.
+
+## Rollback backup retention
+
+Each successful staging deployment keeps the five newest theme rollback releases and removes older release groups. The retention applies only inside `/home/deploy/stapleit-theme-backups` and includes the matching legacy static-template and route-handler copies. Override the default for a specific deployment with `BACKUP_RETENTION`, but never set it below two.
