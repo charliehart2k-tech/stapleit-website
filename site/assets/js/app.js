@@ -217,7 +217,11 @@
     '.contact-hero',
     '.contact-panel',
     '.contact-map-card',
+    '.support-hero-copy',
+    '.support-standard',
+    '.support-standard-group',
     '.support-section-heading',
+    '.support-step-card',
     '.support-card',
     '.footer-panel',
     '.footer-legal-bar'
