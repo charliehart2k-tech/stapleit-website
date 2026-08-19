@@ -31,7 +31,10 @@ These standards apply to the static site, WordPress theme source and supporting 
 ## 3. CSS
 
 - Use external stylesheets.
+- Edit the scoped source modules, then run `python3 tools/build-css.py`; HTML loads one generated `*.bundle.css` file per route.
+- Do not edit generated bundle files by hand or add extra render-blocking stylesheet links.
 - Use Manrope and only canonical weights `400`, `600`, `700`.
+- Serve Manrope locally from `site/assets/fonts/`; do not add a third-party font request.
 - Use shared type, spacing, radius and palette tokens where they exist.
 - Solid brand/service colours must follow `BRAND-PALETTE.md`; neutral glass alpha values may remain component-specific.
 - No CSS `@import` asset/font chains.
@@ -39,6 +42,7 @@ These standards apply to the static site, WordPress theme source and supporting 
 - Do not use CSS backgrounds to carry meaningful logo/content semantics.
 - Avoid excessive specificity and `!important`.
 - `!important` is acceptable only when protecting an established cascade contract or overriding a legacy rule that cannot reasonably be removed in the same scoped change.
+- The homepage carries measured legacy specificity debt; the audit blocks any increase, and new IT Support CSS permits no `!important` declarations.
 - No generic RGB/neon/spotlight/glow treatments outside documented design-system exceptions.
 - Keep animation properties stable; avoid animating expensive layout/filter properties without a clear reason.
 - Respect `prefers-reduced-motion`.
@@ -121,6 +125,8 @@ Before deployment:
 ```bash
 python3 tools/audit-site.py --root site
 python3 tools/audit-assets.py --root site/assets
+python3 tools/audit-repository.py --root .
+python3 tools/build-css.py --check
 bash -n tools/deploy-wordpress-staging.sh
 ```
 

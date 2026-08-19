@@ -112,7 +112,7 @@ For local raster images:
 Working target from the design system:
 
 - ordinary image: aim below `250 KB` where visually acceptable;
-- hero video: exceptional, target below `2.5 MB`;
+- hero/background video: exceptional, target below `1.5 MB` where the rendered result remains visually equivalent;
 - do not duplicate large assets unnecessarily.
 
 Optimisation must not destroy transparency, logo sharpness or correct colour.

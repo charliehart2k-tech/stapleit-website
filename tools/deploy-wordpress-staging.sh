@@ -2,13 +2,53 @@
 set -euo pipefail
 
 REPO="${REPO:-/srv/stapleit/repo}"
-THEME="${THEME:-/var/www/stapleit/wp-content/themes/stapleit}"
-MU_PLUGINS_DIR="${MU_PLUGINS_DIR:-/var/www/stapleit/wp-content/mu-plugins}"
+WP_ROOT="${WP_ROOT:-/var/www/stapleit}"
+THEME="${THEME:-$WP_ROOT/wp-content/themes/stapleit}"
+MU_PLUGINS_DIR="${MU_PLUGINS_DIR:-$WP_ROOT/wp-content/mu-plugins}"
+WELL_KNOWN_DIR="${WELL_KNOWN_DIR:-$WP_ROOT/.well-known}"
 SOURCE="$REPO/site"
 WORDPRESS_SOURCE="$REPO/wordpress"
 STATIC_ROUTES_SOURCE="$WORDPRESS_SOURCE/mu-plugins/stapleit-static-routes.php"
 BACKUP_DIR="${BACKUP_DIR:-/home/deploy/stapleit-theme-backups}"
 BACKUP_RETENTION="${BACKUP_RETENTION:-5}"
+EXPECTED_BRANCH="${EXPECTED_BRANCH:-main}"
+
+fail() {
+  printf 'Deployment refused: %s\n' "$1" >&2
+  exit 1
+}
+
+require_safe_absolute_path() {
+  local label="$1"
+  local path="$2"
+  case "$path" in
+    ""|/|/var|/var/www|/home|/srv)
+      fail "$label resolves to an unsafe broad path: ${path:-<empty>}"
+      ;;
+  esac
+  [[ "$path" == /* ]] || fail "$label must be absolute: $path"
+  [[ "$path" != *'/../'* && "$path" != */.. ]] || fail "$label must not contain parent traversal: $path"
+}
+
+require_safe_absolute_path REPO "$REPO"
+require_safe_absolute_path WP_ROOT "$WP_ROOT"
+require_safe_absolute_path THEME "$THEME"
+require_safe_absolute_path MU_PLUGINS_DIR "$MU_PLUGINS_DIR"
+require_safe_absolute_path WELL_KNOWN_DIR "$WELL_KNOWN_DIR"
+require_safe_absolute_path BACKUP_DIR "$BACKUP_DIR"
+[[ "$THEME" == "$WP_ROOT"/wp-content/themes/* ]] || fail "THEME is outside the configured WordPress themes directory"
+[[ "$MU_PLUGINS_DIR" == "$WP_ROOT"/wp-content/mu-plugins ]] || fail "MU_PLUGINS_DIR does not match the configured WordPress root"
+[[ "$WELL_KNOWN_DIR" == "$WP_ROOT"/.well-known ]] || fail "WELL_KNOWN_DIR does not match the configured WordPress root"
+
+[[ -d "$REPO/.git" ]] || fail "Git repository not found at $REPO"
+CURRENT_BRANCH="$(git -C "$REPO" branch --show-current)"
+[[ "$CURRENT_BRANCH" == "$EXPECTED_BRANCH" ]] || fail "expected branch $EXPECTED_BRANCH, found ${CURRENT_BRANCH:-detached HEAD}"
+[[ -z "$(git -C "$REPO" status --porcelain)" ]] || fail "repository contains uncommitted changes"
+UPSTREAM_HEAD="$(git -C "$REPO" rev-parse '@{upstream}' 2>/dev/null || true)"
+[[ -n "$UPSTREAM_HEAD" ]] || fail "branch $EXPECTED_BRANCH has no configured upstream"
+[[ "$(git -C "$REPO" rev-parse HEAD)" == "$UPSTREAM_HEAD" ]] || fail "local $EXPECTED_BRANCH does not match its fetched upstream"
+[[ ! -L "$THEME/assets" ]] || fail "theme assets path must not be a symbolic link"
+
 STAMP="$(date +%Y%m%d-%H%M%S)"
 VERSION="$(git -C "$REPO" rev-parse --short HEAD)"
 
@@ -62,6 +102,10 @@ echo "=== Release gate: static site audit ==="
 python3 "$REPO/tools/audit-site.py" --root "$SOURCE"
 
 echo
+echo "=== Release gate: generated CSS bundles ==="
+python3 "$REPO/tools/build-css.py" --check
+
+echo
 echo "=== Release gate: raster asset integrity ==="
 python3 "$REPO/tools/audit-assets.py" --root "$SOURCE/assets"
 
@@ -95,71 +139,15 @@ cp "$SOURCE/apple-touch-icon.png" "$THEME/apple-touch-icon.png"
 cp "$WORDPRESS_SOURCE/functions.php" "$THEME/functions.php"
 find "$THEME" -maxdepth 1 -type f -name 'static-*.php' -delete
 
-SOURCE_ROOT="$SOURCE" THEME_ROOT="$THEME" VERSION="$VERSION" python3 <<'PY'
-from pathlib import Path
-import os
-import re
-
-source_root = Path(os.environ['SOURCE_ROOT'])
-theme_root = Path(os.environ['THEME_ROOT'])
-version = os.environ['VERSION']
-theme_uri = "<?php echo esc_url( get_template_directory_uri() ); ?>"
-
-static_pages = [
-    ('it-services/index.html', 'static-it-services.php'),
-    ('it-services/it-support/index.html', 'static-it-support.php'),
-    ('it-services/it-solutions/index.html', 'static-it-solutions.php'),
-    ('it-services/it-consultancy/index.html', 'static-it-consultancy.php'),
-    ('it-services/cybersecurity/index.html', 'static-cybersecurity.php'),
-    ('it-services/ai-integrations/index.html', 'static-ai-integrations.php'),
-    ('about-us/index.html', 'static-about-us.php'),
-    ('about-us/who-we-support/index.html', 'static-who-we-support.php'),
-    ('about-us/our-partners/index.html', 'static-our-partners.php'),
-    ('about-us/privacy-policy/index.html', 'static-privacy-policy.php'),
-    ('about-us/legal/index.html', 'static-legal.php'),
-    ('get-in-touch/index.html', 'static-get-in-touch.php'),
-    ('get-in-touch/it-audit/index.html', 'static-it-audit.php'),
-    ('client-portal/index.html', 'static-client-portal.php'),
-    ('remote-support/index.html', 'static-remote-support.php'),
-    ('the-staple-blog/index.html', 'static-the-staple-blog.php'),
-]
-
-
-def build(source: Path, target: Path, inject_wp_hooks: bool) -> None:
-    html = source.read_text(encoding='utf-8')
-    replacements = {
-        'href="/favicon.ico"': f'href="{theme_uri}/favicon.ico"',
-        'href="/apple-touch-icon.png"': f'href="{theme_uri}/apple-touch-icon.png"',
-        'href="assets/': f'href="{theme_uri}/assets/',
-        'src="assets/': f'src="{theme_uri}/assets/',
-        'href="/assets/': f'href="{theme_uri}/assets/',
-        'src="/assets/': f'src="{theme_uri}/assets/',
-    }
-
-    for old, new in replacements.items():
-        html = html.replace(old, new)
-
-    # Cache-bust local theme CSS, JavaScript and video using the exact Git revision deployed.
-    html = re.sub(r'(href="[^"]+\.css)(")', rf'\1?v={version}\2', html)
-    html = re.sub(r'(src="[^"]+\.(?:js|mp4))(")', rf'\1?v={version}\2', html)
-
-    if inject_wp_hooks:
-        if '<?php wp_head(); ?>' not in html:
-            html = html.replace('</head>', '<?php wp_head(); ?>\n</head>', 1)
-        if '<?php wp_footer(); ?>' not in html:
-            html = html.replace('</body>', '<?php wp_footer(); ?>\n</body>', 1)
-
-    target.write_text(html, encoding='utf-8')
-
-
-build(source_root / 'index.html', theme_root / 'front-page.php', True)
-build(source_root / '404.html', theme_root / '404.php', False)
-for relative_source, target_name in static_pages:
-    build(source_root / relative_source, theme_root / target_name, False)
-PY
+python3 "$REPO/tools/build-wordpress-templates.py" \
+  --source-root "$SOURCE" \
+  --theme-root "$THEME" \
+  --version "$VERSION"
 
 sudo mkdir -p "$MU_PLUGINS_DIR"
 sudo install -m 0644 -o deploy -g www-data "$STATIC_ROUTES_SOURCE" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
+sudo mkdir -p "$WELL_KNOWN_DIR"
+sudo install -m 0644 -o deploy -g www-data "$SOURCE/.well-known/security.txt" "$WELL_KNOWN_DIR/security.txt"
 
 php -l "$THEME/front-page.php"
 php -l "$THEME/404.php"
@@ -181,8 +169,8 @@ grep -Fq 'class="reset-stage reset-404"' "$THEME/404.php"
 grep -Fq 'class="mobile-nav-group"' "$THEME/front-page.php"
 grep -Fq 'data-audit-explainer' "$THEME/front-page.php"
 grep -Fq 'class="contact-section"' "$THEME/front-page.php"
-grep -Fq "assets/css/home-polish.css?v=$VERSION" "$THEME/front-page.php"
-grep -Fq "assets/css/home-golden.css?v=$VERSION" "$THEME/front-page.php"
+grep -Fq "assets/css/home.bundle.css?v=$VERSION" "$THEME/front-page.php"
+grep -Fq "assets/fonts/manrope-latin.woff2" "$THEME/front-page.php"
 grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
 grep -Fq 'assets/media/it-support-liquid.mp4' "$THEME/static-it-support.php"
 test -s "$THEME/assets/media/it-support-liquid.mp4"
@@ -198,17 +186,18 @@ grep -Fq "wp_ajax_nopriv_stapleit_audit" "$THEME/functions.php"
 grep -Fq "xmlrpc_enabled" "$THEME/functions.php"
 grep -Fq "stapleit_mail_error" "$THEME/functions.php"
 
-grep -Fq '<title>IT Support | Staple IT</title>' "$THEME/static-it-support.php"
+grep -Fq '<title>Managed IT Support in Surrey | Staple IT</title>' "$THEME/static-it-support.php"
 grep -Fq 'aria-current="page" href="/it-services/it-support/"' "$THEME/static-it-support.php"
-grep -Fq "assets/css/nav-rainbow.css?v=$VERSION" "$THEME/static-it-support.php"
-grep -Fq "assets/css/it-support.css?v=$VERSION" "$THEME/static-it-support.php"
-grep -Fq "assets/css/it-support-extras.css?v=$VERSION" "$THEME/static-it-support.php"
+grep -Fq "assets/css/it-support.bundle.css?v=$VERSION" "$THEME/static-it-support.php"
+grep -Fq '"@type":"Service"' "$THEME/static-it-support.php"
 grep -Fq "assets/js/it-support.js?v=$VERSION" "$THEME/static-it-support.php"
 grep -Fq '<dialog class="support-dialog' "$THEME/static-it-support.php"
 grep -Fq 'data-pack-late' "$THEME/static-it-support.php"
 grep -Fq 'class="support-step-card support-step-card--one"' "$THEME/static-it-support.php"
 grep -Fq 'class="support-step-content"' "$THEME/static-it-support.php"
 grep -Fq 'class="support-onboarding-accent"' "$THEME/static-it-support.php"
+test -s "$WELL_KNOWN_DIR/security.txt"
+grep -Fq 'Contact: mailto:hello@stapleit.co.uk' "$WELL_KNOWN_DIR/security.txt"
 
 if grep -Fq 'assets/css/it-support-packages.css' "$THEME/static-it-support.php"; then
   echo "Legacy IT Support package override stylesheet is still referenced; refusing deployment." >&2

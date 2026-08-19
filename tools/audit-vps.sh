@@ -89,6 +89,8 @@ else
 
   python3 "$REPO/tools/audit-site.py" --root "$REPO/site" || fail "Static site audit failed"
   python3 "$REPO/tools/audit-assets.py" --root "$REPO/site/assets" || fail "Asset integrity audit failed"
+  python3 "$REPO/tools/audit-repository.py" --root "$REPO" || fail "Repository secret/hygiene audit failed"
+  python3 "$REPO/tools/build-css.py" --check || fail "Generated CSS bundles are stale or over budget"
   bash -n "$REPO/tools/deploy-wordpress-staging.sh" || fail "Deployment script syntax check failed"
 fi
 
@@ -102,7 +104,13 @@ else
     fail "IT Support template does not carry the current Git revision"
   fi
 
-  for relative in assets/media/liquid-wave.mp4 assets/media/it-support-liquid.mp4; do
+  for relative in \
+    assets/css/home.bundle.css \
+    assets/css/it-support.bundle.css \
+    assets/css/site-shell.bundle.css \
+    assets/fonts/manrope-latin.woff2 \
+    assets/media/liquid-wave.mp4 \
+    assets/media/it-support-liquid.mp4; do
     if [[ ! -s "$THEME/$relative" ]]; then
       fail "Missing deployed asset: $relative"
     elif [[ -f "$REPO/site/$relative" ]] && cmp -s "$REPO/site/$relative" "$THEME/$relative"; then
@@ -231,6 +239,30 @@ else
     fail "Staging is missing the X-Robots-Tag noindex header"
   fi
 
+  if printf '%s\n' "$homepage_headers" | grep -Eqi '^content-security-policy:.*default-src'; then
+    pass "Staging enforces the full Content-Security-Policy"
+  else
+    fail "Staging only reports CSP violations or is missing an enforced CSP"
+  fi
+
+  if printf '%s\n' "$homepage_headers" | grep -Eqi '^content-security-policy:.*frame-ancestors.*none|^x-frame-options: *(deny|sameorigin)'; then
+    pass "Staging has clickjacking protection"
+  else
+    fail "Staging is missing frame-ancestors/X-Frame-Options protection"
+  fi
+
+  if printf '%s\n' "$homepage_headers" | grep -Eqi '^strict-transport-security:.*max-age='; then
+    pass "Staging sends HSTS"
+  else
+    fail "Staging is missing HSTS"
+  fi
+
+  if printf '%s\n' "$homepage_headers" | grep -Eqi '^x-content-type-options: *nosniff'; then
+    pass "Staging prevents MIME sniffing"
+  else
+    fail "Staging is missing X-Content-Type-Options: nosniff"
+  fi
+
   robots_body="$(curl -fsS --max-time 20 "$STAGING_URL/robots.txt" 2>/dev/null || true)"
   if printf '%s\n' "$robots_body" | grep -Eq '^Disallow: /$'; then
     pass "Staging robots.txt disallows all crawling"
@@ -254,6 +286,35 @@ else
     pass "Staging sitemap route resolves without a redirect loop or server error"
   else
     warn "Staging sitemap route returned an unexpected final status"
+  fi
+
+  security_body="$(curl -fsS --max-time 20 "$STAGING_URL/.well-known/security.txt" 2>/dev/null || true)"
+  if printf '%s\n' "$security_body" | grep -Fq 'Contact: mailto:hello@stapleit.co.uk'; then
+    pass "security.txt publishes the security contact"
+  else
+    fail "security.txt is missing or does not publish the expected contact"
+  fi
+
+  xmlrpc_status="$(curl -sS -o /dev/null --max-time 20 -w '%{http_code}' -X POST "$STAGING_URL/xmlrpc.php" --data '' 2>/dev/null || true)"
+  if [[ "$xmlrpc_status" == "403" || "$xmlrpc_status" == "404" || "$xmlrpc_status" == "405" ]]; then
+    pass "XML-RPC is blocked at the edge/origin"
+  else
+    fail "XML-RPC POST remains reachable (HTTP ${xmlrpc_status:-unavailable})"
+  fi
+
+  login_headers="$(curl -sS -o /dev/null -D - --max-time 20 "$STAGING_URL/wp-login.php" 2>/dev/null || true)"
+  login_status="$(printf '%s\n' "$login_headers" | awk '/^HTTP\//{status=$2} END{print status}')"
+  if [[ "$login_status" == "401" || "$login_status" == "403" ]] || printf '%s\n' "$login_headers" | grep -Eqi '^location:.*cloudflareaccess\.com'; then
+    pass "Development WordPress login is protected by an access policy"
+  else
+    fail "Development WordPress login is publicly reachable (HTTP ${login_status:-unavailable})"
+  fi
+
+  asset_headers="$(curl -fsSI --max-time 20 "$STAGING_URL/wp-content/themes/stapleit/assets/css/home.bundle.css" 2>/dev/null || true)"
+  if printf '%s\n' "$asset_headers" | grep -Eqi '^cache-control:.*max-age=31536000.*immutable'; then
+    pass "Revisioned theme assets use the immutable one-year cache policy"
+  else
+    warn "Theme assets are not yet using the immutable one-year cache policy"
   fi
 fi
 

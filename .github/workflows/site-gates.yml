@@ -9,13 +9,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: site-gates-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   static-gates:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Validate governing standards
         run: |
@@ -39,12 +43,61 @@ jobs:
         run: |
           python3 -m py_compile tools/audit-site.py
           python3 -m py_compile tools/audit-assets.py
+          python3 -m py_compile tools/build-css.py
+          python3 -m py_compile tools/build-wordpress-templates.py
+          python3 -m py_compile tools/audit-repository.py
+
+      - name: Scan repository for secrets and unsafe files
+        run: python3 tools/audit-repository.py --root .
+
+      - name: Verify generated CSS and performance budgets
+        run: python3 tools/build-css.py --check
+
+      - name: Compile and verify WordPress templates
+        run: |
+          template_root="$(mktemp -d)"
+          python3 tools/build-wordpress-templates.py \
+            --source-root site \
+            --theme-root "$template_root" \
+            --version ci-test
+          test "$(find "$template_root" -maxdepth 1 -type f -name '*.php' | wc -l)" -eq 18
+          grep -Fq 'assets/css/home.bundle.css?v=ci-test' "$template_root/front-page.php"
+          grep -Fq 'assets/css/it-support.bundle.css?v=ci-test' "$template_root/static-it-support.php"
+          grep -Fq '<?php wp_head(); ?>' "$template_root/front-page.php"
+          if rg -q 'fonts\.googleapis|fonts\.gstatic' "$template_root"; then
+            echo "::error::compiled templates contain a third-party font dependency"
+            exit 1
+          fi
 
       - name: Validate shell tools
         run: |
           bash -n tools/deploy-wordpress-staging.sh
           bash -n tools/audit-vps.sh
           bash -n tools/prune-theme-backups.sh
+
+      - name: Validate Nginx hardening baseline
+        run: |
+          test -s ops/nginx/stapleit-security-headers.conf
+          test -s ops/nginx/stapleit-hardening.conf
+          grep -Fq 'add_header Content-Security-Policy' ops/nginx/stapleit-security-headers.conf
+          grep -Fq "frame-ancestors 'none'" ops/nginx/stapleit-security-headers.conf
+          grep -Fq 'location = /xmlrpc.php' ops/nginx/stapleit-hardening.conf
+          grep -Fq 'max-age=31536000, immutable' ops/nginx/stapleit-hardening.conf
+          if rg -q 'fonts\.(googleapis|gstatic)' ops/nginx; then
+            echo "::error::Nginx CSP still contains retired Google Fonts allowances"
+            exit 1
+          fi
+
+      - name: Test destructive path safeguards
+        run: |
+          if REPO="$PWD" WP_ROOT=/tmp/stapleit-wp THEME=/ \
+            MU_PLUGINS_DIR=/tmp/stapleit-wp/wp-content/mu-plugins \
+            WELL_KNOWN_DIR=/tmp/stapleit-wp/.well-known \
+            BACKUP_DIR=/tmp/stapleit-backups \
+            bash tools/deploy-wordpress-staging.sh; then
+            echo "::error::deployment accepted an unsafe theme path"
+            exit 1
+          fi
 
       - name: Test rollback backup retention
         run: |

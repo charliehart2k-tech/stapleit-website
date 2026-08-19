@@ -120,7 +120,10 @@ This is the go/no-go checklist for moving `stapleit.co.uk` onto the new WordPres
 
 - Authenticated outbound WordPress mail / WP Mail SMTP.
 - Off-site database and uploads backup plus restore test.
-- CSP promotion from Report-Only to enforcement after the remaining pages/plugins are final.
+- Install the audited Nginx snippets and verify CSP enforcement; staging currently sends the full policy as Report-Only on normal pages.
+- Block `/xmlrpc.php` at Nginx/Cloudflare; the WordPress filter alone does not remove the public endpoint.
+- Put staging `/wp-login.php` and `/wp-admin/` behind Cloudflare Access; the normal login form is currently public.
+- Enable GitHub branch protection/rulesets for `main` with the Site quality gates required before merge.
 - Explicit production Nginx `server_name` at cutover.
 - Remaining site pages and redirects.
 - Production analytics/Search Console decision.

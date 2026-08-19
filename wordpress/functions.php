@@ -12,17 +12,8 @@ add_action( 'wp_enqueue_scripts', function () {
         return;
     }
 
-    $nav_fx_path = get_template_directory() . '/assets/css/nav-rainbow.css';
     $forms_path  = get_template_directory() . '/assets/js/forms.js';
-    $nav_version = file_exists( $nav_fx_path ) ? (string) filemtime( $nav_fx_path ) : null;
     $js_version  = file_exists( $forms_path ) ? (string) filemtime( $forms_path ) : null;
-
-    wp_enqueue_style(
-        'stapleit-nav-rainbow',
-        get_template_directory_uri() . '/assets/css/nav-rainbow.css',
-        array(),
-        $nav_version
-    );
 
     wp_enqueue_script(
         'stapleit-forms',
@@ -40,12 +31,15 @@ add_action( 'after_setup_theme', function () {
     remove_action( 'wp_head', 'rsd_link' );
     remove_action( 'wp_head', 'wlwmanifest_link' );
     remove_action( 'wp_head', 'wp_shortlink_wp_head', 10 );
+    remove_action( 'wp_head', 'rest_output_link_wp_head' );
+    remove_action( 'template_redirect', 'rest_output_link_header', 11 );
     remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
     remove_action( 'wp_print_styles', 'print_emoji_styles' );
 } );
 
 add_filter( 'emoji_svg_url', '__return_false' );
 add_filter( 'xmlrpc_enabled', '__return_false' );
+add_filter( 'xmlrpc_methods', '__return_empty_array' );
 add_filter( 'pre_option_default_pingback_flag', '__return_zero' );
 add_filter( 'wp_headers', function ( $headers ) {
     unset( $headers['X-Pingback'] );
@@ -112,13 +106,25 @@ function stapleit_handle_audit_ajax() {
 }
 
 function stapleit_request_ip() {
-    if ( ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
-        return sanitize_text_field( wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
+    $remote_ip = ! empty( $_SERVER['REMOTE_ADDR'] )
+        ? trim( (string) wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
+        : '';
+    $remote_ip = filter_var( $remote_ip, FILTER_VALIDATE_IP ) ? $remote_ip : 'unknown';
+
+    /* The documented architecture terminates cloudflared on loopback. Only
+     * trust its forwarding header on that path; a directly reachable origin
+     * must not let a visitor choose the rate-limit identity. */
+    if (
+        in_array( $remote_ip, array( '127.0.0.1', '::1' ), true ) &&
+        ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] )
+    ) {
+        $cloudflare_ip = trim( (string) wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
+        if ( filter_var( $cloudflare_ip, FILTER_VALIDATE_IP ) ) {
+            return $cloudflare_ip;
+        }
     }
 
-    return ! empty( $_SERVER['REMOTE_ADDR'] )
-        ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
-        : 'unknown';
+    return $remote_ip;
 }
 
 function stapleit_handle_audit_request( WP_REST_Request $request ) {
@@ -146,7 +152,7 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
     }
 
     $ip       = stapleit_request_ip();
-    $rate_key = 'stapleit_audit_' . md5( $ip );
+    $rate_key = 'stapleit_audit_' . hash_hmac( 'sha256', $ip, wp_salt( 'nonce' ) );
 
     if ( get_transient( $rate_key ) ) {
         return new WP_Error(

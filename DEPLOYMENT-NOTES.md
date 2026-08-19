@@ -4,28 +4,31 @@ This file records deployment-specific requirements that must be implemented at t
 
 ## Front-end CSP dependencies
 
-The current homepage has two external front-end dependencies that production CSP must allow while they remain in use:
+The public front end has one external embedded dependency:
 
 - Google Maps iframe: `https://www.google.com`
-- Google Fonts stylesheet/font delivery: `https://fonts.googleapis.com` and `https://fonts.gstatic.com`
 
 A compatible front-end baseline therefore needs the equivalent of:
 
 ```text
-style-src 'self' https://fonts.googleapis.com;
-font-src 'self' https://fonts.gstatic.com;
+style-src 'self';
+font-src 'self';
 frame-src https://www.google.com;
 ```
 
 The rest of the policy should remain restrictive, including `default-src 'self'`, `object-src 'none'` and `frame-ancestors 'none'`, with any WordPress-specific requirements reviewed separately before production.
 
-If Google Maps is later replaced with a normal outbound link, remove the `frame-src https://www.google.com` exception. If Manrope is self-hosted later, remove the Google Fonts allowances.
+Manrope is self-hosted under `site/assets/fonts/`; do not reintroduce a third-party font request. If Google Maps is later replaced with a normal outbound link, remove the `frame-src` exception.
+
+The audited Nginx policy is stored in `ops/nginx/`. Install the two snippets under `/etc/nginx/snippets/`, include `stapleit-hardening.conf` inside the Staple IT server block, then run `sudo nginx -t` before reloading. The hardening snippet blocks XML-RPC and sensitive dotfiles, promotes CSP to enforcement, and gives revisioned theme assets an immutable one-year cache policy. Preserve the existing PHP/WordPress locations and Cloudflare Tunnel binding.
 
 ## Development hostname / indexing
 
 Until unfinished routes are built, their HTML ships with `noindex,nofollow`. The current sitemap intentionally contains only the production homepage URL.
 
 The temporary development hostname must additionally remain behind Cloudflare Access. At the origin/CDN layer, send an `X-Robots-Tag: noindex, nofollow, noarchive` header for the entire dev hostname. Do not submit the dev hostname or its sitemap to search engines.
+
+Cloudflare Access must protect `/wp-login.php` and `/wp-admin/` on the development hostname. The public audit intentionally fails if the normal WordPress login form is directly reachable.
 
 For the dev hostname, prefer overriding `/robots.txt` to return:
 

@@ -10,7 +10,7 @@ import re
 import sys
 
 PRODUCTION_ORIGIN = "https://stapleit.co.uk"
-ALLOWED_EXTERNAL_HOSTS = {"stapleit.co.uk", "fonts.googleapis.com", "fonts.gstatic.com", "www.google.com"}
+ALLOWED_EXTERNAL_HOSTS = {"stapleit.co.uk", "www.google.com"}
 RESOURCE_TAGS = {"link", "img", "source", "video", "audio", "iframe"}
 WARN_ASSET_BYTES = 1_500_000
 ERROR_ASSET_BYTES = 5_000_000
@@ -24,6 +24,8 @@ JS_INLINE_STYLE_RE = re.compile(
     re.I,
 )
 JS_DYNAMIC_CODE_RE = re.compile(r"(?:\beval\s*\(|\bnew\s+Function\s*\()", re.I)
+IMPORTANT_RE = re.compile(r"!important\b", re.I)
+MAX_LEGACY_IMPORTANT = 932
 
 
 class HtmlAuditParser(HTMLParser):
@@ -38,6 +40,10 @@ class HtmlAuditParser(HTMLParser):
         self.inline_handlers: list[str] = []
         self.style_attributes = 0
         self.json_ld_blocks: list[str] = []
+        self.stylesheets: list[str] = []
+        self.images_missing_alt = 0
+        self.images_missing_dimensions = 0
+        self.video_issues: list[str] = []
         self.title_parts: list[str] = []
         self.h1_parts: list[list[str]] = []
         self.heading_levels: list[int] = []
@@ -71,6 +77,19 @@ class HtmlAuditParser(HTMLParser):
                 self.robots = data.get("content", "").strip().lower()
         elif tag == "link" and "canonical" in data.get("rel", "").lower().split():
             self.canonical = data.get("href", "").strip()
+
+        if tag == "link" and "stylesheet" in data.get("rel", "").lower().split():
+            self.stylesheets.append(data.get("href", "").strip())
+        if tag == "img":
+            if "alt" not in data:
+                self.images_missing_alt += 1
+            if not data.get("width") or not data.get("height"):
+                self.images_missing_dimensions += 1
+        if tag == "video":
+            if "autoplay" in data and ("muted" not in data or "playsinline" not in data):
+                self.video_issues.append("autoplay video must be muted and playsinline")
+            if data.get("preload", "").lower() not in {"none", "metadata"}:
+                self.video_issues.append("video preload must be none or metadata")
 
         if self._main_depth and tag in {"h1", "h2", "h3", "h4", "h5", "h6"}:
             self.heading_levels.append(int(tag[1]))
@@ -212,6 +231,7 @@ def audit(root: Path) -> int:
     indexable: dict[str, tuple[Path, HtmlAuditParser]] = {}
     titles: dict[str, Path] = {}
     descriptions: dict[str, Path] = {}
+    important_total = 0
 
     for html in html_files:
         rel = html.relative_to(root)
@@ -233,6 +253,10 @@ def audit(root: Path) -> int:
             errors.append(f"{rel}: html lang must be en-GB")
         if not parser.title:
             errors.append(f"{rel}: missing non-empty <title>")
+        elif parser.title in titles:
+            errors.append(f"{rel}: duplicate title also used by {titles[parser.title]}")
+        else:
+            titles[parser.title] = rel
         if len(parser.h1_texts) != 1 or not parser.h1_texts[0]:
             errors.append(f"{rel}: expected exactly one non-empty H1 in main, found {len(parser.h1_texts)}")
         for previous, current in zip(parser.heading_levels, parser.heading_levels[1:]):
@@ -241,6 +265,16 @@ def audit(root: Path) -> int:
                 break
         for duplicate in sorted(parser.duplicate_ids):
             errors.append(f"{rel}: duplicate id #{duplicate}")
+        if parser.images_missing_alt:
+            errors.append(f"{rel}: {parser.images_missing_alt} image(s) are missing alt attributes")
+        if parser.images_missing_dimensions:
+            errors.append(f"{rel}: {parser.images_missing_dimensions} image(s) are missing width/height")
+        for issue in parser.video_issues:
+            errors.append(f"{rel}: {issue}")
+        if len(parser.stylesheets) != 1:
+            errors.append(f"{rel}: expected exactly one compiled stylesheet, found {len(parser.stylesheets)}")
+        elif not parser.stylesheets[0].endswith(".bundle.css"):
+            errors.append(f"{rel}: stylesheet must be a generated route bundle: {parser.stylesheets[0]}")
         if parser.inline_script:
             errors.append(f"{rel}: executable inline <script> found")
         if parser.inline_style_block:
@@ -250,23 +284,23 @@ def audit(root: Path) -> int:
         for handler in parser.inline_handlers:
             errors.append(f"{rel}: inline event handler found: {handler}")
 
+        if parser.canonical and parser.canonical != expected_canonical(root, html):
+            errors.append(f"{rel}: canonical mismatch; expected {expected_canonical(root, html)}")
+        if parser.meta_description and len(parser.meta_description) < 70:
+            warnings.append(f"{rel}: meta description is unusually short ({len(parser.meta_description)} chars)")
+        if parser.meta_description:
+            if parser.meta_description in descriptions:
+                errors.append(f"{rel}: duplicate meta description also used by {descriptions[parser.meta_description]}")
+            else:
+                descriptions[parser.meta_description] = rel
+
         if not parser.noindex:
             if not parser.meta_description:
                 errors.append(f"{rel}: indexable page missing meta description")
-            elif len(parser.meta_description) < 70:
-                warnings.append(f"{rel}: meta description is unusually short ({len(parser.meta_description)} chars)")
             if not parser.canonical:
                 errors.append(f"{rel}: indexable page missing canonical link")
             elif not parser.canonical.startswith(f"{PRODUCTION_ORIGIN}/"):
                 errors.append(f"{rel}: canonical must use production HTTPS origin: {parser.canonical}")
-            elif parser.canonical != expected_canonical(root, html):
-                errors.append(f"{rel}: canonical mismatch; expected {expected_canonical(root, html)}")
-            if parser.title in titles:
-                errors.append(f"{rel}: duplicate indexable title also used by {titles[parser.title]}")
-            titles[parser.title] = rel
-            if parser.meta_description in descriptions:
-                errors.append(f"{rel}: duplicate indexable meta description also used by {descriptions[parser.meta_description]}")
-            descriptions[parser.meta_description] = rel
             indexable[parser.canonical] = (rel, parser)
             if rel.as_posix() == "index.html":
                 if "Organization" not in types:
@@ -300,12 +334,19 @@ def audit(root: Path) -> int:
     for css in sorted(root.rglob("*.css")):
         rel = css.relative_to(root)
         text = css.read_text(encoding="utf-8-sig")
+        if not css.name.endswith(".bundle.css"):
+            important_count = len(IMPORTANT_RE.findall(text))
+            important_total += important_count
+            if css.name.startswith("it-support") and important_count:
+                errors.append(f"{rel}: IT Support CSS must not introduce !important")
         imports = [m.group(1) for m in CSS_IMPORT_RE.finditer(text)]
         refs = [m.group(2) for m in CSS_URL_RE.finditer(text)] + imports
-        if css.stat().st_size > WARN_CSS_BYTES:
+        if css.stat().st_size > WARN_CSS_BYTES and not css.name.endswith(".bundle.css"):
             warnings.append(f"{rel}: CSS exceeds working 50 KiB budget")
         if imports:
-            warnings.append(f"{rel}: CSS @import creates a request chain; prefer <link> in HTML")
+            errors.append(f"{rel}: CSS @import creates a render-blocking request chain")
+        if "backdrop-filter:" in text and "-webkit-backdrop-filter:" not in text:
+            errors.append(f"{rel}: backdrop-filter is missing its WebKit compatibility declaration")
         weights = sorted({int(m.group(1)) for m in FONT_WEIGHT_RE.finditer(text) if int(m.group(1)) not in {400, 600, 700}})
         if weights:
             warnings.append(f"{rel}: non-canonical Manrope weights detected: {', '.join(map(str, weights))}")
@@ -321,6 +362,12 @@ def audit(root: Path) -> int:
             target = local_target(root, css, raw)
             if target is not None and not target.exists():
                 errors.append(f"{rel}: missing CSS asset -> {raw}")
+
+    if important_total > MAX_LEGACY_IMPORTANT:
+        errors.append(
+            f"CSS specificity debt increased to {important_total} !important declarations; "
+            f"legacy ceiling is {MAX_LEGACY_IMPORTANT}"
+        )
 
     for js in sorted(root.rglob("*.js")):
         rel = js.relative_to(root)
@@ -365,6 +412,16 @@ def audit(root: Path) -> int:
     for listed in sitemap_urls:
         if listed not in indexable:
             errors.append(f"sitemap.xml: URL is not an indexable canonical page: {listed}")
+
+    security_txt = root / ".well-known" / "security.txt"
+    if not security_txt.is_file():
+        errors.append(".well-known/security.txt: missing")
+    else:
+        security_text = security_txt.read_text(encoding="utf-8-sig")
+        if "Contact: mailto:hello@stapleit.co.uk" not in security_text:
+            errors.append(".well-known/security.txt: missing security contact")
+        if f"Canonical: {PRODUCTION_ORIGIN}/.well-known/security.txt" not in security_text:
+            errors.append(".well-known/security.txt: missing production canonical")
 
     print(f"Staple IT site audit: {len(html_files)} HTML files, {checked_refs} references checked, {json_ld_count} JSON-LD block(s), {len(indexable)} indexable page(s)")
     if warnings:

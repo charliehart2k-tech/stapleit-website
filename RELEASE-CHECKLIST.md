@@ -21,6 +21,7 @@ Use these gates for every rebuilt route and at major homepage milestones.
 
 - Approved navigation and footer are preserved.
 - Manrope follows the 400/600/700 system; no synthetic intermediate weights or stray font families.
+- Manrope loads from the local audited font file and each route loads exactly one generated CSS bundle.
 - Shared type and spacing tokens in `tokens.css` are used as the baseline.
 - Body copy remains comfortably readable and important text is not shrunk to make a layout fit.
 - Copy line length is controlled where practical.
@@ -74,6 +75,7 @@ Confirm:
 - Repeated glass surfaces use restrained blur, especially on phones/tablets.
 - Autoplay video remains exceptional.
 - New JS/CSS is scoped and small.
+- Generated CSS bundles match their source modules and remain inside the gzip budgets in `tools/build-css.py`.
 - `tools/audit-site.py` has no blocking errors.
 - Core Web Vitals are checked before production launch.
 
@@ -128,6 +130,7 @@ Progressive enhancements must fail cleanly when unsupported. Viewport-triggered 
 Before production:
 
 - run `python3 tools/audit-site.py --root site` (or Windows equivalent) and resolve blocking errors;
+- run `python3 tools/build-css.py --check` and refuse stale generated CSS;
 - staging deployment also runs the static audit automatically and refuses to deploy on blocking failures;
 - canonical domain is correct;
 - redirects are intentional and tested;
