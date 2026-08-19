@@ -43,9 +43,11 @@
   width:100%;
   height:100%;
   object-fit:cover;
-  object-position:center;
+  object-position:52% 50%;
   opacity:.95;
   filter:saturate(1.18) contrast(1.05) brightness(.92);
+  transform:scale(1.46);
+  transform-origin:52% 50%;
   pointer-events:none;
 }
 
@@ -304,7 +306,6 @@
 
 .support-card>*{position:relative;z-index:2}
 
-.support-step-card,
 .support-package-card,
 .support-cta-panel{
   border:1px solid rgba(255,255,255,.12);
@@ -377,20 +378,120 @@
 .support-step-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:18px;
+  gap:22px;
   align-items:stretch;
 }
 
 .support-step-card{
+  --step-start:var(--solutions);
+  --step-end:var(--red);
   position:relative;
-  min-height:510px;
+  min-width:0;
+  min-height:520px;
   height:100%;
-  padding:32px 30px;
-  display:grid;
-  grid-template-rows:auto 6.6rem 1fr;
-  align-content:start;
+  padding:34px 12px;
+  display:flex;
+  align-items:center;
+  isolation:isolate;
+}
+
+.support-step-card--two{
+  --step-start:var(--blue-bright);
+  --step-end:var(--security);
+}
+
+.support-step-card--three{
+  --step-start:var(--support);
+  --step-end:var(--blue-bright);
+}
+
+.support-step-card::before,
+.support-step-card::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:7%;
+  bottom:7%;
+  left:18%;
+  right:18%;
+  border-radius:var(--radius-lg);
+  background:linear-gradient(145deg,var(--step-start),var(--step-end));
+  transform:skewX(9deg);
+  transition:left 520ms var(--ease),right 520ms var(--ease),transform 520ms var(--ease),filter 520ms ease,opacity 520ms ease;
+}
+
+.support-step-card::after{
+  z-index:-1;
+  filter:blur(34px);
+  opacity:.34;
+}
+
+.support-step-content{
+  position:relative;
+  z-index:2;
+  width:100%;
+  min-height:430px;
+  padding:32px 28px;
   overflow:hidden;
+  border:1px solid rgba(255,255,255,.14);
   border-radius:var(--radius-xl);
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.02) 38%,rgba(0,0,0,.34) 100%),
+    rgba(4,5,7,.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 28px 72px rgba(0,0,0,.42);
+  backdrop-filter:blur(19px) saturate(120%);
+  -webkit-backdrop-filter:blur(19px) saturate(120%);
+  transition:transform 520ms var(--ease),border-color 320ms ease,background 320ms ease;
+}
+
+.support-step-content::after{
+  content:"";
+  position:absolute;
+  inset:-45% -80%;
+  z-index:0;
+  pointer-events:none;
+  background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,.095) 50%,transparent 58%);
+  transform:translateX(-36%) rotate(-4deg);
+  transition:transform 820ms cubic-bezier(.16,1,.3,1);
+}
+
+.support-step-content>*{position:relative;z-index:1}
+
+.support-step-orbit{
+  position:absolute;
+  z-index:3;
+  inset:0;
+  pointer-events:none;
+}
+
+.support-step-orbit::before,
+.support-step-orbit::after{
+  content:"";
+  position:absolute;
+  width:76px;
+  height:76px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,.055);
+  box-shadow:0 18px 36px rgba(0,0,0,.22);
+  backdrop-filter:blur(14px) saturate(125%);
+  -webkit-backdrop-filter:blur(14px) saturate(125%);
+  opacity:0;
+  transition:opacity 300ms ease,transform 520ms var(--ease);
+}
+
+.support-step-orbit::before{
+  top:2px;
+  left:20%;
+  transform:translate3d(-14px,18px,0) rotate(-7deg);
+}
+
+.support-step-orbit::after{
+  right:16%;
+  bottom:0;
+  transform:translate3d(14px,-18px,0) rotate(7deg);
 }
 
 .support-step-number{
@@ -399,11 +500,11 @@
   justify-content:center;
   width:54px;
   height:54px;
-  margin-bottom:30px;
-  border:1px solid color-mix(in srgb,var(--support-card-accent) 35%,transparent);
+  margin-bottom:26px;
+  border:1px solid color-mix(in srgb,var(--step-start) 42%,rgba(255,255,255,.16));
   border-radius:var(--radius-md);
-  background:color-mix(in srgb,var(--support-card-accent) 7.5%,transparent);
-  color:var(--support-card-accent);
+  background:color-mix(in srgb,var(--step-start) 12%,rgba(0,0,0,.28));
+  color:#fff;
   font-family:var(--font-display);
   font-size:1rem;
   font-weight:700;
@@ -432,6 +533,34 @@
   font-size:1rem;
   line-height:1.72;
   letter-spacing:0;
+}
+
+@media(hover:hover) and (pointer:fine){
+  .support-step-card:hover::before,
+  .support-step-card:hover::after{
+    left:9%;
+    right:9%;
+    transform:skewX(0deg);
+  }
+
+  .support-step-card:hover::after{
+    filter:blur(42px);
+    opacity:.48;
+  }
+
+  .support-step-card:hover .support-step-content{
+    transform:translateX(-9px);
+    border-color:rgba(255,255,255,.22);
+    background:
+      linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.025) 38%,rgba(0,0,0,.30) 100%),
+      rgba(4,5,7,.70);
+  }
+
+  .support-step-card:hover .support-step-content::after{transform:translateX(36%) rotate(4deg)}
+  .support-step-card:hover .support-step-orbit::before,
+  .support-step-card:hover .support-step-orbit::after{opacity:1}
+  .support-step-card:hover .support-step-orbit::before{transform:translate3d(0,-14px,0) rotate(-3deg)}
+  .support-step-card:hover .support-step-orbit::after{transform:translate3d(0,14px,0) rotate(3deg)}
 }
 
 /* Packages ---------------------------------------------------------------- */
@@ -917,6 +1046,7 @@
 @media(max-width:1080px){
   .support-hero{padding:34px 0 46px}
   .support-hero-shell{min-height:0;grid-template-columns:1fr;border-radius:32px}
+  .support-hero-shell>.support-liquid-motion{transform:scale(1.34)}
   .support-hero-copy{padding:52px 44px 38px;justify-content:flex-start}
   .support-hero-copy h1{max-width:9ch;font-size:clamp(3.8rem,9vw,5.7rem)}
   .support-standard{padding:40px 44px 46px;border-left:0;border-top:1px solid rgba(255,255,255,.09)}
@@ -932,7 +1062,9 @@
 
   .support-onboarding{padding:var(--space-8) 0}
   .support-step-grid{grid-template-columns:1fr;gap:14px}
-  .support-step-card{min-height:0;grid-template-rows:auto auto 1fr}
+  .support-step-card{min-height:0;padding:26px 34px}
+  .support-step-card::before,.support-step-card::after{left:12%;right:12%}
+  .support-step-content{min-height:0}
 
   .support-packages{padding-block:var(--space-8)}
   .support-package-grid{grid-template-columns:1fr;gap:14px}
@@ -959,7 +1091,7 @@
   .support-main{min-height:calc(100dvh - 74px)}
   .support-hero{padding:14px 0 28px}
   .support-hero-shell{border-radius:var(--radius-lg);backdrop-filter:blur(16px) saturate(116%);-webkit-backdrop-filter:blur(16px) saturate(116%)}
-  .support-hero-shell>.support-liquid-motion{opacity:.86;filter:saturate(1.12) contrast(1.04) brightness(.84)}
+  .support-hero-shell>.support-liquid-motion{opacity:.86;filter:saturate(1.12) contrast(1.04) brightness(.84);transform:scale(1.30)}
   .support-hero-copy{padding:34px 18px 28px}
   .support-hero-copy h1{max-width:100%;font-size:clamp(2.7rem,12.5vw,4rem);line-height:1;letter-spacing:-.018em}
   .support-hero-unlimited{max-width:100%}
@@ -982,7 +1114,11 @@
 
   .support-onboarding{padding:var(--space-7) 0}
   .support-step-grid{gap:12px}
-  .support-step-card{padding:24px 20px;display:block;border-radius:var(--radius-lg);backdrop-filter:blur(10px) saturate(108%);-webkit-backdrop-filter:blur(10px) saturate(108%)}
+  .support-step-card{padding:18px 8px 22px}
+  .support-step-card::before,.support-step-card::after{top:10%;bottom:10%;left:16%;right:16%;border-radius:var(--radius-md);transform:skewX(5deg)}
+  .support-step-card::after{filter:blur(26px);opacity:.28}
+  .support-step-content{min-height:0;padding:24px 20px;border-radius:var(--radius-lg);backdrop-filter:blur(12px) saturate(112%);-webkit-backdrop-filter:blur(12px) saturate(112%)}
+  .support-step-orbit{display:none}
   .support-step-number{width:48px;height:48px;margin-bottom:22px;border-radius:15px;font-size:.9rem}
   .support-step-card h3{max-width:none;font-size:clamp(1.85rem,8.5vw,2.35rem)}
   .support-step-copy{gap:15px;margin-top:15px}
@@ -1014,7 +1150,6 @@
   .support-cta-btn{justify-content:center}
 
   .support-card::before{filter:blur(28px) saturate(124%)}
-  .support-step-card,
   .support-package-card,
   .support-cta-panel{
     backdrop-filter:blur(10px) saturate(108%);
@@ -1035,5 +1170,11 @@
   .support-card,
   .support-card::before,
   .support-card::after{transition:none;transform:none}
+  .support-step-card::before,
+  .support-step-card::after,
+  .support-step-content,
+  .support-step-content::after,
+  .support-step-orbit::before,
+  .support-step-orbit::after{transition:none}
   .support-dialog[open]{animation:none}
 }

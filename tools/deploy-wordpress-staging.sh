@@ -202,6 +202,8 @@ grep -Fq "assets/css/it-support-extras.css?v=$VERSION" "$THEME/static-it-support
 grep -Fq "assets/js/it-support.js?v=$VERSION" "$THEME/static-it-support.php"
 grep -Fq '<dialog class="support-dialog' "$THEME/static-it-support.php"
 grep -Fq 'data-pack-late' "$THEME/static-it-support.php"
+grep -Fq 'class="support-step-card support-step-card--one"' "$THEME/static-it-support.php"
+grep -Fq 'class="support-step-content"' "$THEME/static-it-support.php"
 
 if grep -Fq 'assets/css/it-support-packages.css' "$THEME/static-it-support.php"; then
   echo "Legacy IT Support package override stylesheet is still referenced; refusing deployment." >&2
@@ -215,6 +217,11 @@ fi
 
 if grep -Fq 'support-modal-backdrop' "$THEME/static-it-support.php"; then
   echo "Legacy IT Support modal markup is still present; refusing deployment." >&2
+  exit 1
+fi
+
+if grep -Fq 'support-step-card support-card' "$THEME/static-it-support.php"; then
+  echo "Legacy IT Support onboarding card material is still present; refusing deployment." >&2
   exit 1
 fi
 
