@@ -181,7 +181,7 @@
     }
 
     [1, 2, 3].forEach((step, index) => {
-      window.setTimeout(() => setProgress(step), index * 280);
+      window.setTimeout(() => setProgress(step), index * 1100);
     });
   };
 
@@ -195,9 +195,9 @@
     start();
     observer.disconnect();
   }, {
-    threshold: .2,
-    rootMargin: '0px 0px -8% 0px'
+    threshold: .55,
+    rootMargin: '0px 0px -10% 0px'
   });
 
-  observer.observe(section);
+  observer.observe(progress);
 })();
