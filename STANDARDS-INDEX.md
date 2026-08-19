@@ -18,7 +18,7 @@ Do not silently invent a new convention. If a genuine design or engineering deci
 
 The animated Staple-palette spectrum outline on navigation pills is explicitly approved and must be preserved. The same restrained spectrum language may be reused on selected interactive buttons where it improves hierarchy without turning the surface itself into a multicolour fill. This exception supersedes older wording that prohibited colour treatment on navigation; reduced-motion behaviour remains mandatory.
 
-The IT Support hero deliberately uses the Staple spectrum treatment for the `Unlimited` word, canonical Signal Red for the `£35` price, and no separate `Core support cover` card. The `Unlimited` line is centred over `IT Support`, while the complete left-column proposition (heading, price and primary action) is vertically centred as one unit within the desktop hero pane. Its typography follows the same hero, lead-copy and UI scale used by the homepage rather than route-specific one-off sizes. The second column is headed `Everything in your support package as standard`; the exact visible casing is `as standard` in lowercase, at the same heading size as the preceding words, and it uses Support Green with no separate eyebrow label. Default support inclusions use the normal body-copy scale and are grouped into compact, unboxed content clusters inside the single hero glass pane. The primary hero action is `See packages`, linking to the package section. This approved direction supersedes the older IT Support hero description in `DESIGN-SYSTEM.md` where the two differ.
+The IT Support hero uses a web-optimised H.264 derivative of the supplied `it-support-liquid.mp4` as a contained background video inside the single glass pane, following the homepage hero's autoplay, muted, looping, readability-shade and reduced-motion pattern. The hero deliberately uses the Staple spectrum treatment for the `Unlimited` word, canonical Signal Red for the `£35` price, and no separate `Core support cover` card. `Unlimited` shares the same left edge as `IT Support`, while the complete left-column proposition (heading, price and primary action) is vertically centred as one unit within the desktop hero pane. Its typography follows the same hero, lead-copy and UI scale used by the homepage rather than route-specific one-off sizes. The second column is headed `Everything in your support package as standard`; the exact visible casing is `as standard` in lowercase, at the same heading size as the preceding words, and it uses Support Green with no separate eyebrow label. Default support inclusions use the normal body-copy scale and are grouped into compact, unboxed content clusters inside the single hero glass pane. The primary hero action is `See packages`, linking to the package section. This approved direction supersedes the older IT Support hero description in `DESIGN-SYSTEM.md` where the two differ.
 
 ## Governing documents
 
@@ -81,7 +81,7 @@ Current known static-audit warning:
 
 - `site/assets/media/liquid-wave.mp4` is approximately `1.81 MiB` and is the explicitly approved hero-video exception.
 
-The previous non-canonical Manrope weight warnings in the homepage CSS have been removed. The hero video may remain until a visually equivalent smaller source is approved.
+The previous non-canonical Manrope weight warnings in the homepage CSS have been removed. The homepage hero video may remain until a visually equivalent smaller source is approved.
 
 ## Release rule
 
