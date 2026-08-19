@@ -14,9 +14,11 @@ When two instructions appear to conflict, use this order:
 
 Do not silently invent a new convention. If a genuine design or engineering decision changes, update the relevant governing document in the same change.
 
-### Current approved visual exception
+### Current approved visual exceptions
 
-The animated Staple-palette spectrum outline on navigation pills is explicitly approved and must be preserved. The same restrained outline language may be reused on selected interactive buttons where it improves hierarchy without turning the surface itself into a multicolour fill. This exception supersedes older wording that prohibited colour treatment on navigation; reduced-motion behaviour remains mandatory.
+The animated Staple-palette spectrum outline on navigation pills is explicitly approved and must be preserved. The same restrained spectrum language may be reused on selected interactive buttons where it improves hierarchy without turning the surface itself into a multicolour fill. This exception supersedes older wording that prohibited colour treatment on navigation; reduced-motion behaviour remains mandatory.
+
+The IT Support hero now deliberately uses the Staple spectrum treatment for the `Unlimited` word, canonical Signal Red for the `£35` price, and no separate `Core support cover` card. The hero's second column is the semantic `Included as STANDARD` baseline: the `STANDARD` emphasis uses Support Green and the default support inclusions are grouped into compact, unboxed content clusters inside the single hero glass pane. The primary hero action is `See packages`, linking to the package section. This approved direction supersedes the older IT Support hero description in `DESIGN-SYSTEM.md` where the two differ.
 
 ## Governing documents
 
