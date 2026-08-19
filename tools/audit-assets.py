@@ -5,7 +5,9 @@ import argparse
 import sys
 import zlib
 
-SUPPORTED = {".png", ".webp", ".jpg", ".jpeg", ".gif"}
+RASTER_FORMATS = {".png", ".webp", ".jpg", ".jpeg", ".gif"}
+VIDEO_FORMATS = {".mp4"}
+SUPPORTED = RASTER_FORMATS | VIDEO_FORMATS
 
 
 def validate_png(path: Path, data: bytes) -> str | None:
@@ -91,12 +93,65 @@ def validate_gif(path: Path, data: bytes) -> str | None:
     return None
 
 
+def validate_mp4(path: Path, data: bytes) -> str | None:
+    if len(data) < 24:
+        return "MP4 is too small to contain a valid ISO base media container"
+    if data[4:8] != b"ftyp":
+        return "MP4 is missing the leading ftyp box"
+
+    offset = 0
+    boxes: list[bytes] = []
+
+    while offset < len(data):
+        if offset + 8 > len(data):
+            return "MP4 has a truncated top-level box header"
+
+        size_32 = int.from_bytes(data[offset:offset + 4], "big")
+        box_type = data[offset + 4:offset + 8]
+        header_size = 8
+
+        if size_32 == 1:
+            if offset + 16 > len(data):
+                return f"MP4 box {box_type.decode('ascii', 'replace')} has a truncated extended-size header"
+            box_size = int.from_bytes(data[offset + 8:offset + 16], "big")
+            header_size = 16
+        elif size_32 == 0:
+            box_size = len(data) - offset
+        else:
+            box_size = size_32
+
+        if box_size < header_size:
+            return f"MP4 box {box_type.decode('ascii', 'replace')} has an invalid size"
+
+        box_end = offset + box_size
+        if box_end > len(data):
+            return f"MP4 box {box_type.decode('ascii', 'replace')} is truncated"
+
+        boxes.append(box_type)
+        offset = box_end
+
+        if size_32 == 0:
+            break
+
+    if offset != len(data):
+        return "MP4 top-level box structure does not consume the complete file"
+    if not boxes or boxes[0] != b"ftyp":
+        return "MP4 is missing the leading ftyp box"
+    for required in (b"moov", b"mdat"):
+        if required not in boxes:
+            return f"MP4 is missing the required {required.decode('ascii')} box"
+    if boxes.index(b"moov") > boxes.index(b"mdat"):
+        return "MP4 moov box follows mdat; web video must be fast-start optimised"
+    return None
+
+
 VALIDATORS = {
     ".png": validate_png,
     ".webp": validate_webp,
     ".jpg": validate_jpeg,
     ".jpeg": validate_jpeg,
     ".gif": validate_gif,
+    ".mp4": validate_mp4,
 }
 
 
@@ -106,7 +161,8 @@ def audit(root: Path) -> int:
         print(f"ERROR: asset root not found: {root}", file=sys.stderr)
         return 2
 
-    checked = 0
+    raster_checked = 0
+    video_checked = 0
     errors: list[str] = []
 
     for path in sorted(root.rglob("*")):
@@ -116,7 +172,10 @@ def audit(root: Path) -> int:
         if suffix not in SUPPORTED:
             continue
 
-        checked += 1
+        if suffix in RASTER_FORMATS:
+            raster_checked += 1
+        else:
+            video_checked += 1
         rel = path.relative_to(root)
         try:
             data = path.read_bytes()
@@ -132,19 +191,22 @@ def audit(root: Path) -> int:
         if problem:
             errors.append(f"{rel}: {problem}")
 
-    print(f"Staple IT asset audit: {checked} raster image(s) checked")
+    print(
+        "Staple IT asset audit: "
+        f"{raster_checked} raster image(s) and {video_checked} MP4 video(s) checked"
+    )
     if errors:
         print(f"\nErrors ({len(errors)}):")
         for item in errors:
             print(f"  ERROR {item}")
         return 1
 
-    print("\nPASS: raster image signatures and container structure validated.")
+    print("\nPASS: raster image and MP4 container integrity validated.")
     return 0
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate raster image integrity for the Staple IT repository.")
+    parser = argparse.ArgumentParser(description="Validate image and MP4 integrity for the Staple IT repository.")
     parser.add_argument("--root", default=None)
     args = parser.parse_args()
     root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parents[1] / "site" / "assets"

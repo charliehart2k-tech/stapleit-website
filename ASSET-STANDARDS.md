@@ -119,7 +119,7 @@ Optimisation must not destroy transparency, logo sharpness or correct colour.
 
 ## 9. Integrity validation
 
-Every committed PNG/WebP/JPEG/GIF must pass:
+Every committed PNG/WebP/JPEG/GIF/MP4 must pass:
 
 ```bash
 python3 tools/audit-assets.py --root site/assets
@@ -132,6 +132,8 @@ The asset audit validates:
 - WebP RIFF/container sizing;
 - JPEG start/end markers;
 - GIF header/trailer integrity.
+- MP4 ISO base media box structure, including required `ftyp`, `moov` and `mdat` boxes;
+- MP4 fast-start ordering, with `moov` before `mdat` for reliable web playback.
 
 This gate exists specifically to prevent malformed or corrupted raster assets from reaching staging.
 

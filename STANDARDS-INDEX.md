@@ -47,7 +47,7 @@ The repository currently enforces:
 - no runtime JavaScript inline-style injection/mutation;
 - no `eval()` / `new Function()` dynamic code execution;
 - working per-file CSS and JavaScript size budgets;
-- raster image integrity checks;
+- raster image and MP4 container integrity checks;
 - blocking deployment when static/asset audits fail.
 
 The active CI definition is `.github/workflows/site-gates.yml`.
