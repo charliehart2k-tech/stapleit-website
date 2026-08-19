@@ -74,7 +74,7 @@ if [[ -f "$THEME/front-page.php" && -d "$THEME/assets" ]]; then
     theme_backup_items+=(404.php)
   fi
   tar -czf "$BACKUP_DIR/stapleit-theme-$STAMP.tar.gz" \
-    -C "$THEME" "${theme_backup_items[@]}" 2>/dev/null || true
+    -C "$THEME" "${theme_backup_items[@]}"
   echo "Rollback backup: $BACKUP_DIR/stapleit-theme-$STAMP.tar.gz"
 fi
 

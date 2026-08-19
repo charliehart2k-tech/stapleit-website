@@ -45,6 +45,11 @@ jobs:
           bash -n tools/deploy-wordpress-staging.sh
           bash -n tools/audit-vps.sh
 
+      - name: Validate WordPress PHP
+        run: |
+          php -l wordpress/functions.php
+          php -l wordpress/mu-plugins/stapleit-static-routes.php
+
       - name: Run content security SEO and AEO gates
         run: python3 tools/audit-site.py --root site
 
