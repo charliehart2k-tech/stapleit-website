@@ -208,6 +208,7 @@ grep -Fq '<dialog class="support-dialog' "$THEME/static-it-support.php"
 grep -Fq 'data-pack-late' "$THEME/static-it-support.php"
 grep -Fq 'class="support-step-card support-step-card--one"' "$THEME/static-it-support.php"
 grep -Fq 'class="support-step-content"' "$THEME/static-it-support.php"
+grep -Fq 'class="support-onboarding-accent"' "$THEME/static-it-support.php"
 
 if grep -Fq 'assets/css/it-support-packages.css' "$THEME/static-it-support.php"; then
   echo "Legacy IT Support package override stylesheet is still referenced; refusing deployment." >&2
@@ -231,6 +232,11 @@ fi
 
 if grep -Fq 'support-step-orbit' "$THEME/static-it-support.php"; then
   echo "Detached IT Support onboarding glass chips are still present; refusing deployment." >&2
+  exit 1
+fi
+
+if grep -Fq 'support-step-number" aria-hidden' "$THEME/static-it-support.php"; then
+  echo "IT Support process numbers are hidden from assistive technology; refusing deployment." >&2
   exit 1
 fi
 
