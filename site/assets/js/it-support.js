@@ -1,4 +1,38 @@
 (() => {
+  const hero = document.querySelector('[data-support-hero]');
+  const intro = hero?.querySelector('[data-support-hero-intro]');
+  if (!hero || !intro || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let fallbackTimer = 0;
+  let finished = false;
+
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    window.clearTimeout(fallbackTimer);
+    hero.classList.remove('hero-intro-ready', 'hero-intro-running');
+    hero.classList.add('hero-intro-complete');
+  };
+
+  hero.classList.add('hero-intro-ready');
+  window.requestAnimationFrame(() => {
+    if (finished) return;
+    hero.classList.add('hero-intro-running');
+  });
+
+  intro.addEventListener('animationend', event => {
+    if (event.target === intro && event.animationName === 'supportIntroLayer') finish();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) finish();
+  }, { once: true });
+
+  window.addEventListener('pagehide', finish, { once: true });
+  fallbackTimer = window.setTimeout(finish, 4200);
+})();
+
+(() => {
   const dialog = document.getElementById('support-dialog');
   const closeButton = document.getElementById('support-dialog-close');
   const title = document.getElementById('support-dialog-title');

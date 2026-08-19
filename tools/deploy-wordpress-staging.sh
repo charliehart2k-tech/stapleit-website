@@ -172,8 +172,13 @@ grep -Fq 'class="contact-section"' "$THEME/front-page.php"
 grep -Fq "assets/css/home.bundle.css?v=$VERSION" "$THEME/front-page.php"
 grep -Fq "assets/fonts/manrope-latin.woff2" "$THEME/front-page.php"
 grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
-grep -Fq 'class="support-css-ambient"' "$THEME/static-it-support.php"
-grep -Fq 'support-css-ambient' "$THEME/assets/css/it-support.css"
+grep -Fq 'class="support-hero-intro"' "$THEME/static-it-support.php"
+grep -Fq 'support-hero-intro-title' "$THEME/assets/css/it-support.css"
+grep -Fq 'data-support-hero-intro' "$THEME/assets/js/it-support.js"
+if grep -Fq 'support-css-ambient' "$THEME/static-it-support.php"; then
+  echo "Retired IT Support ambient blob is still referenced; refusing deployment." >&2
+  exit 1
+fi
 if grep -Fq 'support-liquid-motion' "$THEME/static-it-support.php"; then
   echo "Retired IT Support MP4 hero is still referenced; refusing deployment." >&2
   exit 1

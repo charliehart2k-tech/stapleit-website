@@ -150,10 +150,13 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 
 ### IT Support hero
 
-- Uses the same large rounded proportions as the homepage hero, but the pane itself is pure translucent black glass: no grey fill, no white radial wash and no coloured background treatment; depth comes from transparency, blur, a neutral edge and restrained black shadowing.
+- Uses the same large rounded proportions as the homepage hero and settles as pure translucent black glass after its opening SVG text-mask transition.
+- The automated opening mask shows `Unlimited IT Support` at large scale in a restrained blue-to-purple moving gradient, then scales towards the real left-column heading while the semantic hero content fades into place.
+- The intro uses no video, third-party runtime or scroll-jacking, runs once on page load and is skipped for reduced motion. Without JavaScript, the normal hero remains fully visible.
 - Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
-- `Unlimited` keeps the approved liquid moving-highlight treatment but is constrained to canonical Support Green (`#22C55E`) with lighter and darker green tonal variation rather than the multi-colour Staple palette.
-- Pricing sits immediately beneath as `from £35, per staff member, per month`, with `£35` in canonical Support Green.
+- `Unlimited` keeps the approved restrained blue-to-purple moving-highlight treatment after the intro completes.
+- Pricing sits immediately beneath as `from £35 per staff member, per month`, with `£35` in Signal Red.
+- The CTA is centred beneath the left-column proposition and links to the onboarding chapter.
 - The support-summary card starts directly with `Core support cover`; small pre-heading labels are deliberately omitted.
 - The route remains `noindex,nofollow` while it is under construction.
 

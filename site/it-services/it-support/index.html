@@ -81,13 +81,35 @@
 
 <main class="support-main" id="main">
 <section class="support-hero" aria-labelledby="support-hero-title">
-<div class="support-hero-shell liquid-glass">
-<div aria-hidden="true" class="support-css-ambient"></div>
+<div class="support-hero-shell liquid-glass" data-support-hero>
+<div class="support-hero-intro" data-support-hero-intro aria-hidden="true">
+<svg class="support-hero-intro-svg" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet" focusable="false" role="presentation">
+<defs>
+<linearGradient id="support-intro-gradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1560" y2="620">
+<stop offset="0" stop-color="#1D4ED8"/>
+<stop offset=".28" stop-color="#7C3AED"/>
+<stop offset=".5" stop-color="#D8B4FE"/>
+<stop offset=".72" stop-color="#A855F7"/>
+<stop offset="1" stop-color="#1D4ED8"/>
+</linearGradient>
+<mask id="support-intro-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="620">
+<rect width="1200" height="620" fill="#000"/>
+<g class="support-hero-intro-title">
+<text class="support-hero-intro-text" x="600" y="285" text-anchor="middle">Unlimited</text>
+<text class="support-hero-intro-text" x="600" y="455" text-anchor="middle">IT Support</text>
+</g>
+</mask>
+</defs>
+<rect class="support-hero-intro-colour" x="-180" y="0" width="1560" height="620" fill="url(#support-intro-gradient)" mask="url(#support-intro-mask)"/>
+</svg>
+</div>
 <div aria-hidden="true" class="support-liquid-shade"></div>
 <div class="support-hero-copy">
+<div class="support-hero-proposition">
 <h1 id="support-hero-title"><span class="support-hero-unlimited">Unlimited</span><span class="support-hero-title">IT Support</span></h1>
 <p class="support-hero-price">from <strong>£35</strong> per staff member, per month</p>
 <a class="support-hero-cta" href="#getting-started">Scroll down to find out more <span aria-hidden="true">↓</span></a>
+</div>
 </div>
 <section class="support-standard" aria-labelledby="support-standard-title">
 <h2 id="support-standard-title">Everything you need, <span class="support-standard-accent">as standard</span></h2>
