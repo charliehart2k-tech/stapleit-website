@@ -655,6 +655,13 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   flex-direction:column;
   justify-content:flex-start;
   border-left:1px solid rgba(255,255,255,.09);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.025),rgba(2,5,10,.68) 28%,rgba(0,0,0,.82) 100%);
+  box-shadow:
+    inset 1px 0 0 rgba(255,255,255,.035),
+    inset 0 1px 0 rgba(255,255,255,.035);
+  backdrop-filter:blur(18px) saturate(125%);
+  -webkit-backdrop-filter:blur(18px) saturate(125%);
 }
 
 .support-standard h2{
@@ -1551,6 +1558,7 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
 
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .support-hero-shell{background-color:#050505}
+  .support-standard{background:#05070a}
   .support-step-content{background-color:#08090b}
   .support-package-card,
   .support-cta-panel{background-color:#050607}
