@@ -225,6 +225,11 @@ if grep -Fq 'support-step-card support-card' "$THEME/static-it-support.php"; the
   exit 1
 fi
 
+if grep -Fq 'support-step-orbit' "$THEME/static-it-support.php"; then
+  echo "Detached IT Support onboarding glass chips are still present; refusing deployment." >&2
+  exit 1
+fi
+
 grep -Fq "'/it-services/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 grep -Fq "'/about-us/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 grep -Fq "'/get-in-touch/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
