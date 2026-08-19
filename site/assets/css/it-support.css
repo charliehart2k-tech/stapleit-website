@@ -17,9 +17,9 @@
 
 .support-hero-shell{
   position:relative;
-  min-height:640px;
+  min-height:620px;
   display:grid;
-  grid-template-columns:minmax(330px,.78fr) minmax(0,1.32fr);
+  grid-template-columns:minmax(360px,.82fr) minmax(0,1.28fr);
   align-items:stretch;
   overflow:hidden;
   isolation:isolate;
@@ -40,7 +40,7 @@
   position:relative;
   z-index:1;
   min-width:0;
-  padding:72px 38px 72px 62px;
+  padding:64px 28px 64px 52px;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -54,7 +54,7 @@
   padding-bottom:.08em;
   overflow:visible;
   color:var(--white);
-  font-size:clamp(4.15rem,6.3vw,6.35rem);
+  font-size:clamp(3.7rem,5vw,4.65rem);
   line-height:1;
   letter-spacing:-.024em;
 }
@@ -89,7 +89,7 @@
   margin:30px 0 0;
   color:var(--text);
   font-family:var(--font-display);
-  font-size:clamp(1.35rem,2vw,1.85rem);
+  font-size:clamp(1.3rem,1.8vw,1.7rem);
   font-weight:600;
   line-height:1.32;
   letter-spacing:0;
@@ -123,7 +123,7 @@
   content:"";
   position:absolute;
   inset:-1px;
-  z-index:-1;
+  z-index:0;
   border-radius:inherit;
   padding:1.5px;
   pointer-events:none;
@@ -135,6 +135,7 @@
   animation:supportSpectrum 4.8s linear infinite;
 }
 
+.support-hero-cta>*{position:relative;z-index:1}
 .support-hero-cta span{font-size:1rem;transform:translateY(-1px)}
 .support-hero-cta:focus-visible{outline:2px solid var(--focus-ring);outline-offset:4px}
 
@@ -151,7 +152,7 @@
   position:relative;
   z-index:1;
   min-width:0;
-  padding:54px 48px 50px 46px;
+  padding:50px 42px 46px 40px;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -229,8 +230,8 @@
   position:relative;
   padding-left:15px;
   color:#d9dfe6;
-  font-size:.86rem;
-  line-height:1.48;
+  font-size:.9rem;
+  line-height:1.5;
 }
 
 .support-standard-group li::before{
