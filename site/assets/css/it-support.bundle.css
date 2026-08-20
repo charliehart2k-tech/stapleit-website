@@ -517,12 +517,9 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   position:absolute;
   z-index:6;
   inset:0;
-  display:grid;
-  place-items:center;
   overflow:hidden;
   visibility:hidden;
   opacity:0;
-  background:#000;
   pointer-events:none;
 }
 
@@ -530,22 +527,21 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   width:100%;
   height:100%;
   display:block;
+  will-change:opacity;
 }
 
 .support-hero-intro-text{
   font-family:var(--font-display);
-  font-size:156px;
+  font-size:176px;
   font-weight:700;
   letter-spacing:-.035em;
-  fill:#fff;
 }
 
-.support-hero-intro-title{
-  --intro-x:-340px;
-  --intro-y:0px;
-  --intro-scale:.48;
+.support-hero-intro-reveal{
   transform-box:fill-box;
   transform-origin:center;
+  transform:scale(0);
+  will-change:transform;
 }
 
 .support-hero-shell.hero-intro-ready .support-hero-intro{
@@ -558,24 +554,24 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   opacity:0;
 }
 
-.support-hero-shell.hero-intro-running .support-hero-intro{
-  animation:supportIntroLayer 3.6s cubic-bezier(.16,1,.3,1) both;
-}
-
-.support-hero-shell.hero-intro-running .support-hero-intro-title{
-  animation:supportIntroTitle 3.6s cubic-bezier(.16,1,.3,1) both;
-}
-
 .support-hero-shell.hero-intro-running .support-hero-intro-colour{
-  animation:supportIntroColour 3.6s ease-in-out both;
+  animation:supportIntroColour 5.2s cubic-bezier(.37,0,.63,1) both;
 }
 
-.support-hero-shell.hero-intro-running .support-hero-copy{
-  animation:supportHeroContentReveal .9s 2.28s cubic-bezier(.16,1,.3,1) both;
+.support-hero-shell.hero-intro-running .support-hero-intro-reveal{
+  animation:supportIntroReveal 5.2s linear both;
+}
+
+.support-hero-shell.hero-intro-running .support-hero-intro-svg{
+  animation:supportIntroMaskFade 5.2s linear both;
 }
 
 .support-hero-shell.hero-intro-running .support-standard{
-  animation:supportHeroContentReveal .9s 2.42s cubic-bezier(.16,1,.3,1) both;
+  animation:supportIntroStandardReveal 5.2s linear both;
+}
+
+.support-hero-shell.hero-intro-running .support-hero-copy{
+  animation:supportIntroCopyReveal 5.2s linear both;
 }
 
 .support-hero-shell>.support-liquid-shade{
@@ -1672,25 +1668,33 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   100%{background-position:0% 50%}
 }
 
-@keyframes supportIntroLayer{
-  0%,76%{opacity:1}
+@keyframes supportIntroColour{
+  0%{transform:translate3d(-130px,0,0)}
+  48%{transform:translate3d(90px,0,0)}
+  100%{transform:translate3d(-10px,0,0)}
+}
+
+@keyframes supportIntroReveal{
+  0%{transform:scale(0)}
+  24%{transform:scale(0);animation-timing-function:cubic-bezier(.65,0,.22,1)}
+  80%,100%{transform:scale(1)}
+}
+
+@keyframes supportIntroMaskFade{
+  0%,80%{opacity:1}
   100%{opacity:0}
 }
 
-@keyframes supportIntroTitle{
-  0%,28%{transform:translate3d(0,0,0) scale(1)}
-  76%,100%{transform:translate3d(var(--intro-x),var(--intro-y),0) scale(var(--intro-scale))}
+@keyframes supportIntroStandardReveal{
+  0%{opacity:0;transform:translate3d(0,14px,0)}
+  34%{opacity:0;transform:translate3d(0,14px,0);animation-timing-function:cubic-bezier(.22,.61,.36,1)}
+  82%,100%{opacity:1;transform:none}
 }
 
-@keyframes supportIntroColour{
-  0%{transform:translate3d(-80px,0,0)}
-  55%{transform:translate3d(80px,0,0)}
-  100%{transform:translate3d(-20px,0,0)}
-}
-
-@keyframes supportHeroContentReveal{
-  from{opacity:0;transform:translateY(10px)}
-  to{opacity:1;transform:none}
+@keyframes supportIntroCopyReveal{
+  0%{opacity:0;transform:translate3d(0,10px,0)}
+  48%{opacity:0;transform:translate3d(0,10px,0);animation-timing-function:cubic-bezier(.22,.61,.36,1)}
+  88%,100%{opacity:1;transform:none}
 }
 
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -1706,7 +1710,6 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
 @media(max-width:1080px){
   .support-hero{padding:34px 0 46px}
   .support-hero-shell{min-height:0;grid-template-columns:1fr;border-radius:32px}
-  .support-hero-intro-title{--intro-x:-330px;--intro-y:-190px;--intro-scale:.56}
   .support-hero-copy{padding:52px 44px 38px;justify-content:flex-start}
   .support-hero-copy h1{max-width:9ch;font-size:clamp(3.8rem,9vw,5.7rem)}
   .support-standard{padding:40px 44px 46px;border-left:0;border-top:1px solid rgba(255,255,255,.09)}
@@ -1753,8 +1756,7 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   .support-main{min-height:calc(100dvh - 74px)}
   .support-hero{padding:14px 0 28px}
   .support-hero-shell{border-radius:var(--radius-lg);backdrop-filter:blur(16px) saturate(116%);-webkit-backdrop-filter:blur(16px) saturate(116%)}
-  .support-hero-intro-title{--intro-x:-390px;--intro-y:-250px;--intro-scale:.42}
-  .support-hero-intro-text{font-size:144px}
+  .support-hero-intro-text{font-size:168px}
   .support-hero-copy{padding:34px 18px 28px}
   .support-hero-proposition{max-width:100%}
   .support-hero-copy h1{max-width:100%;font-size:clamp(2.7rem,12.5vw,4rem);line-height:1;letter-spacing:-.018em}

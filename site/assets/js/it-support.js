@@ -1,7 +1,8 @@
 (() => {
   const hero = document.querySelector('[data-support-hero]');
   const intro = hero?.querySelector('[data-support-hero-intro]');
-  if (!hero || !intro || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const svg = intro?.querySelector('[data-support-hero-intro-svg]');
+  if (!hero || !intro || !svg || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   let fallbackTimer = 0;
   let finished = false;
@@ -20,8 +21,8 @@
     hero.classList.add('hero-intro-running');
   });
 
-  intro.addEventListener('animationend', event => {
-    if (event.target === intro && event.animationName === 'supportIntroLayer') finish();
+  svg.addEventListener('animationend', event => {
+    if (event.animationName === 'supportIntroMaskFade') finish();
   });
 
   document.addEventListener('visibilitychange', () => {
@@ -29,7 +30,7 @@
   }, { once: true });
 
   window.addEventListener('pagehide', finish, { once: true });
-  fallbackTimer = window.setTimeout(finish, 4200);
+  fallbackTimer = window.setTimeout(finish, 6000);
 })();
 
 (() => {

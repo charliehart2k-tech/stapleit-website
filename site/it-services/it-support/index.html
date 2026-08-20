@@ -83,7 +83,7 @@
 <section class="support-hero" aria-labelledby="support-hero-title">
 <div class="support-hero-shell liquid-glass" data-support-hero>
 <div class="support-hero-intro" data-support-hero-intro aria-hidden="true">
-<svg class="support-hero-intro-svg" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet" focusable="false" role="presentation">
+<svg class="support-hero-intro-svg" data-support-hero-intro-svg viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet" focusable="false" role="presentation">
 <defs>
 <linearGradient id="support-intro-gradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1560" y2="620">
 <stop offset="0" stop-color="#1D4ED8"/>
@@ -92,15 +92,22 @@
 <stop offset=".72" stop-color="#A855F7"/>
 <stop offset="1" stop-color="#1D4ED8"/>
 </linearGradient>
-<mask id="support-intro-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="620">
-<rect width="1200" height="620" fill="#000"/>
-<g class="support-hero-intro-title" fill="#fff">
+<g id="support-intro-title-shape" class="support-hero-intro-title">
 <text class="support-hero-intro-text" x="600" y="285" text-anchor="middle">Unlimited</text>
 <text class="support-hero-intro-text" x="600" y="455" text-anchor="middle">IT Support</text>
 </g>
+<mask id="support-intro-text-mask" maskUnits="userSpaceOnUse" mask-type="luminance" x="0" y="0" width="1200" height="620">
+<rect width="1200" height="620" fill="#000"/>
+<use href="#support-intro-title-shape" fill="#fff"/>
+</mask>
+<mask id="support-intro-cover-mask" maskUnits="userSpaceOnUse" mask-type="luminance" x="0" y="0" width="1200" height="620">
+<rect width="1200" height="620" fill="#fff"/>
+<use href="#support-intro-title-shape" fill="#000"/>
+<circle class="support-hero-intro-reveal" cx="600" cy="310" r="900" fill="#000"/>
 </mask>
 </defs>
-<rect class="support-hero-intro-colour" x="-180" y="0" width="1560" height="620" fill="url(#support-intro-gradient)" mask="url(#support-intro-mask)"/>
+<rect class="support-hero-intro-colour" x="-180" y="0" width="1560" height="620" fill="url(#support-intro-gradient)" mask="url(#support-intro-text-mask)"/>
+<rect class="support-hero-intro-cover" width="1200" height="620" fill="#000" mask="url(#support-intro-cover-mask)"/>
 </svg>
 </div>
 <div aria-hidden="true" class="support-liquid-shade"></div>
