@@ -47,18 +47,51 @@
   overflow:hidden;
   visibility:visible;
   opacity:1;
-  background:#000;
   pointer-events:none;
-  animation:supportIntroLayerFade 4.8s linear both;
+  animation:supportIntroLayerRetire 5.45s linear both;
 }
 
+.support-hero-intro-blinds{
+  position:absolute;
+  z-index:1;
+  inset:-1px;
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  overflow:hidden;
+}
+
+.support-hero-intro-blinds span{
+  min-width:0;
+  background:linear-gradient(180deg,#030304 0%,#000 48%,#040408 100%);
+  box-shadow:
+    inset 1px 0 rgba(255,255,255,.016),
+    inset -1px 0 rgba(111,86,255,.025),
+    0 0 22px rgba(79,70,229,.08);
+  transform:scaleX(1.025);
+  transform-origin:center;
+  will-change:transform,opacity;
+  animation:supportIntroBlindOpen 1.72s cubic-bezier(.76,0,.24,1) calc(3.18s + var(--blind-delay)) both;
+}
+
+.support-hero-intro-blinds span:nth-child(1),
+.support-hero-intro-blinds span:nth-child(10){--blind-delay:.24s}
+.support-hero-intro-blinds span:nth-child(2),
+.support-hero-intro-blinds span:nth-child(9){--blind-delay:.18s}
+.support-hero-intro-blinds span:nth-child(3),
+.support-hero-intro-blinds span:nth-child(8){--blind-delay:.12s}
+.support-hero-intro-blinds span:nth-child(4),
+.support-hero-intro-blinds span:nth-child(7){--blind-delay:.06s}
+.support-hero-intro-blinds span:nth-child(5),
+.support-hero-intro-blinds span:nth-child(6){--blind-delay:0s}
+
 .support-hero-intro-svg{
+  position:absolute;
+  z-index:2;
+  inset:0;
   width:100%;
   height:100%;
   display:block;
-  transform-origin:center;
-  will-change:opacity,transform;
-  animation:supportIntroTitleFade 4.8s linear both;
+  pointer-events:none;
 }
 
 .support-hero-intro-text{
@@ -69,12 +102,19 @@
 }
 
 .support-hero-intro-colour{
-  animation:supportIntroColour 4.8s cubic-bezier(.37,0,.63,1) both;
+  animation:supportIntroColour 5.45s cubic-bezier(.37,0,.63,1) both;
+}
+
+.support-hero-intro-wordmark{
+  transform-box:fill-box;
+  transform-origin:center;
+  will-change:opacity,transform;
+  animation:supportIntroWordmarkRetire 3.12s cubic-bezier(.4,0,.2,1) both;
 }
 
 .support-hero-copy,
 .support-standard{
-  animation:supportIntroContentFade 4.8s linear both;
+  animation:supportIntroContentReveal 5.45s linear both;
 }
 
 .support-hero-shell>.support-liquid-shade{
@@ -1177,19 +1217,25 @@
   100%{transform:translate3d(-10px,0,0)}
 }
 
-@keyframes supportIntroTitleFade{
-  0%,56%{opacity:1;transform:scale(1)}
-  72%,100%{opacity:0;transform:scale(1.012)}
+@keyframes supportIntroWordmarkRetire{
+  0%,72%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.008)}
 }
 
-@keyframes supportIntroLayerFade{
-  0%,68%{visibility:visible;opacity:1}
-  100%{visibility:hidden;opacity:0}
+@keyframes supportIntroBlindOpen{
+  0%{opacity:1;transform:scaleX(1.025)}
+  68%{opacity:1}
+  100%{opacity:0;transform:scaleX(0)}
 }
 
-@keyframes supportIntroContentFade{
-  0%{opacity:0}
-  76%{opacity:0;animation-timing-function:cubic-bezier(.22,.61,.36,1)}
+@keyframes supportIntroLayerRetire{
+  0%,98%{visibility:visible}
+  100%{visibility:hidden}
+}
+
+@keyframes supportIntroContentReveal{
+  0%,57%{opacity:0}
+  73%{opacity:1;animation-timing-function:cubic-bezier(.22,.61,.36,1)}
   100%{opacity:1}
 }
 

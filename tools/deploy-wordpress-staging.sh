@@ -175,8 +175,10 @@ grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
 grep -Fq 'class="support-hero-intro"' "$THEME/static-it-support.php"
 grep -Fq 'id="support-intro-text-mask"' "$THEME/static-it-support.php"
 grep -Fq 'class="support-hero-intro-title" fill="#fff"' "$THEME/static-it-support.php"
-grep -Fq 'supportIntroTitleFade' "$THEME/assets/css/it-support.css"
-grep -Fq 'supportIntroLayerFade' "$THEME/assets/css/it-support.css"
+grep -Fq 'class="support-hero-intro-blinds"' "$THEME/static-it-support.php"
+grep -Fq 'supportIntroBlindOpen' "$THEME/assets/css/it-support.css"
+grep -Fq 'supportIntroWordmarkRetire' "$THEME/assets/css/it-support.css"
+grep -Fq 'supportIntroLayerRetire' "$THEME/assets/css/it-support.css"
 if grep -Fq 'data-support-hero-intro' "$THEME/static-it-support.php" || grep -Fq 'hero-intro-running' "$THEME/assets/js/it-support.js"; then
   echo "Retired JavaScript-triggered IT Support intro is still referenced; refusing deployment." >&2
   exit 1
