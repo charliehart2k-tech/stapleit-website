@@ -104,6 +104,13 @@
 <stop offset=".72" stop-color="#A855F7"/>
 <stop offset="1" stop-color="#1D4ED8"/>
 </linearGradient>
+<filter id="support-intro-glow" x="-28%" y="-38%" width="156%" height="176%" color-interpolation-filters="sRGB">
+<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
+<feFlood flood-color="#8B5CF6" flood-opacity=".72" result="glow-colour"/>
+<feComposite in="glow-colour" in2="blur" operator="in" result="glow"/>
+<feGaussianBlur in="SourceGraphic" stdDeviation="2.4" result="near-blur"/>
+<feMerge><feMergeNode in="glow"/><feMergeNode in="near-blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+</filter>
 <mask id="support-intro-text-mask" maskUnits="userSpaceOnUse" mask-type="luminance" x="0" y="0" width="1200" height="620">
 <rect width="1200" height="620" fill="#000"/>
 <g class="support-hero-intro-title" fill="#fff">
@@ -112,7 +119,7 @@
 </g>
 </mask>
 </defs>
-<g class="support-hero-intro-wordmark">
+<g class="support-hero-intro-wordmark" filter="url(#support-intro-glow)">
 <rect class="support-hero-intro-colour" x="-180" y="0" width="1560" height="620" fill="url(#support-intro-gradient)" mask="url(#support-intro-text-mask)"/>
 </g>
 </svg>
@@ -209,6 +216,7 @@
 </header>
 <div class="support-package-grid">
 <article class="support-package-card support-package-basic support-card">
+<svg class="support-package-icon" aria-hidden="true" focusable="false" height="24" width="24"><use href="/assets/images/icons/it-support.svg#helpdesk"></use></svg>
 <h3>Basic</h3>
 <p class="support-package-price"><span>from</span><strong>£35</strong><span>per staff member, per month</span></p>
 <div class="support-package-copy"><p>Straightforward IT support for smaller businesses that want reliable day-to-day help without paying for things they don’t need.</p></div>
@@ -228,6 +236,7 @@
 
 <article class="support-package-card support-package-standard support-card">
 <p class="support-package-badge">Most popular</p>
+<svg class="support-package-icon" aria-hidden="true" focusable="false" height="24" width="24"><use href="/assets/images/icons/it-support.svg#monitoring"></use></svg>
 <h3>Standard</h3>
 <p class="support-package-price"><span>from</span><strong>£55</strong><span>per staff member, per month</span></p>
 <div class="support-package-copy"><p>Everything in Basic, with additional security and protection for your staff, devices and business data. A good fit for most small and growing businesses.</p></div>
@@ -246,6 +255,7 @@
 </article>
 
 <article class="support-package-card support-package-premium support-card">
+<svg class="support-package-icon" aria-hidden="true" focusable="false" height="24" width="24"><use href="/assets/images/icons/it-support.svg#security"></use></svg>
 <h3>Premium</h3>
 <p class="support-package-price"><span>from</span><strong>£75</strong><span>per staff member, per month</span></p>
 <div class="support-package-copy"><p>Our highest level of cover, with additional security, compliance and data protection included. Designed for businesses with greater security requirements or more sensitive data.</p></div>

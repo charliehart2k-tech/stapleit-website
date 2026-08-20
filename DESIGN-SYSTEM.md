@@ -151,7 +151,7 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 ### IT Support hero
 
 - Uses the same large rounded proportions as the homepage hero and settles as pure translucent black glass after its opening SVG text-mask transition.
-- The CSS-only opening mask begins on first paint and shows `Unlimited IT Support` at large scale as clean letterforms containing a restrained blue-to-purple moving field. The display title retires fully before ten black vertical shutters open smoothly from the centre out to reveal the real hero. The permanent semantic heading is only exposed through the opening shutters, preventing a pre-intro hero flash or overlapping copy; no travelling title, expanding aperture or generic wipe is used.
+- The CSS-only opening mask begins on first paint and shows `Unlimited IT Support` at large scale as clean letterforms containing a restrained blue-to-purple moving field and a purpose-built soft SVG glow. The display title retires fully before ten dimensional black shutters open smoothly from the centre out to reveal the real hero. The permanent semantic heading is only exposed through the opening shutters, preventing a pre-intro hero flash or overlapping copy; no travelling title, expanding aperture or generic wipe is used.
 - The intro uses no video, third-party runtime or scroll-jacking, runs once on page load and is skipped for reduced motion. Without JavaScript, the normal hero remains fully visible.
 - Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
 - `Unlimited` keeps the approved restrained blue-to-purple moving-highlight treatment after the intro completes.
@@ -165,6 +165,8 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - The managed-support feature chapter uses six matching black-glass cards in a three-by-two desktop grid, collapsing to two columns on tablet and one column on phone.
 - Feature and onboarding cards use Support Green as their interaction accent, including the same soft bloom, travelling sheen and small lift language as the approved homepage cards.
 - The onboarding chapter presents `01`, `02`, `03` in order as three matching step cards. It becomes a single vertical sequence below the tablet breakpoint.
+- On desktop the onboarding rail advances at a measured pace when the chapter enters view and remains directly controllable by hover or keyboard focus. Tablet and phone layouts replace the detached horizontal rail with an in-flow vertical timeline aligned to the stacked cards.
+- Support cards use restrained cursor/focus-responsive light and sheen on fine-pointer devices. Touch and reduced-motion devices keep the same material without decorative movement; interaction must not flood the card with colour and scroll entry may animate only compositor-friendly presentation properties.
 - Small pre-heading/kicker labels and repetitive closing straplines are omitted so the chapters read cleanly and directly.
 - Desktop card typography is vertically aligned: feature headings reserve a common heading row, onboarding titles reserve a common title row, and package badges do not push package titles or prices out of alignment.
 - IT Support packages always read left-to-right as `Basic`, `Standard`, `Premium` on desktop and in that same order when stacked.

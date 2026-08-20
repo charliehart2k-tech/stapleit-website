@@ -163,23 +163,52 @@
   const cards = section ? [...section.querySelectorAll('.support-step-card[data-step]')] : [];
   if (!section || !progress || cards.length === 0) return;
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const desktopLayout = window.matchMedia('(min-width: 981px)');
+  const timelineTimers = [];
+  let timelinePlayed = false;
+
   const setProgress = step => {
-    const value = String(step);
+    const value = String(Math.max(1, Math.min(cards.length, step)));
     section.dataset.progress = value;
     progress.dataset.progress = value;
+  };
+
+  const stopTimeline = () => {
+    while (timelineTimers.length) window.clearTimeout(timelineTimers.pop());
+  };
+
+  const playTimeline = () => {
+    if (timelinePlayed || reducedMotion.matches || !desktopLayout.matches) return;
+    timelinePlayed = true;
+    setProgress(1);
+    timelineTimers.push(window.setTimeout(() => setProgress(2), 1200));
+    timelineTimers.push(window.setTimeout(() => setProgress(3), 2400));
   };
 
   setProgress(1);
 
   cards.forEach(card => {
     const step = Number(card.dataset.step);
-    card.addEventListener('pointerenter', () => setProgress(step));
-    card.addEventListener('focusin', () => setProgress(step));
+    const selectStep = () => {
+      timelinePlayed = true;
+      stopTimeline();
+      setProgress(step);
+    };
+    card.addEventListener('pointerenter', selectStep);
+    card.addEventListener('focusin', selectStep);
   });
 
   if (!('IntersectionObserver' in window)) return;
 
-  const desktopLayout = window.matchMedia('(min-width: 981px)');
+  const sectionObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      playTimeline();
+      sectionObserver.disconnect();
+    }
+  }, { threshold: .36, rootMargin: '0px 0px -8% 0px' });
+  sectionObserver.observe(section);
+
   const observer = new IntersectionObserver(entries => {
     if (desktopLayout.matches) return;
 
@@ -194,4 +223,14 @@
   });
 
   cards.forEach(card => observer.observe(card));
+})();
+
+(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  document.querySelectorAll('.support-step-card.motion-ready, .support-card.motion-ready').forEach(element => {
+    element.addEventListener('transitionend', event => {
+      if (event.propertyName === 'opacity') element.classList.add('motion-settled');
+    }, { once: true });
+  });
 })();
