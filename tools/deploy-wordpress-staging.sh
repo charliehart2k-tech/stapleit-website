@@ -173,14 +173,18 @@ grep -Fq "assets/css/home.bundle.css?v=$VERSION" "$THEME/front-page.php"
 grep -Fq "assets/fonts/manrope-latin.woff2" "$THEME/front-page.php"
 grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
 grep -Fq 'class="support-hero-intro"' "$THEME/static-it-support.php"
-grep -Fq 'data-support-hero-intro-svg' "$THEME/static-it-support.php"
-grep -Fq 'id="support-intro-cover-mask"' "$THEME/static-it-support.php"
-grep -Fq 'class="support-hero-intro-reveal"' "$THEME/static-it-support.php"
-grep -Fq '<use href="#support-intro-title-shape" fill="#fff"' "$THEME/static-it-support.php"
-grep -Fq 'href="#support-intro-title-shape" fill="#000" stroke="#000"' "$THEME/static-it-support.php"
-grep -Fq 'support-hero-intro-reveal' "$THEME/assets/css/it-support.css"
-grep -Fq 'data-support-hero-intro' "$THEME/assets/js/it-support.js"
-grep -Fq 'supportIntroMaskFade' "$THEME/assets/js/it-support.js"
+grep -Fq 'id="support-intro-text-mask"' "$THEME/static-it-support.php"
+grep -Fq 'class="support-hero-intro-title" fill="#fff"' "$THEME/static-it-support.php"
+grep -Fq 'supportIntroTitleFade' "$THEME/assets/css/it-support.css"
+grep -Fq 'supportIntroLayerFade' "$THEME/assets/css/it-support.css"
+if grep -Fq 'data-support-hero-intro' "$THEME/static-it-support.php" || grep -Fq 'hero-intro-running' "$THEME/assets/js/it-support.js"; then
+  echo "Retired JavaScript-triggered IT Support intro is still referenced; refusing deployment." >&2
+  exit 1
+fi
+if grep -Fq 'support-intro-cover-mask' "$THEME/static-it-support.php" || grep -Fq 'support-hero-intro-reveal' "$THEME/static-it-support.php"; then
+  echo "Retired IT Support aperture expansion is still referenced; refusing deployment." >&2
+  exit 1
+fi
 if grep -Fq 'support-css-ambient' "$THEME/static-it-support.php"; then
   echo "Retired IT Support ambient blob is still referenced; refusing deployment." >&2
   exit 1

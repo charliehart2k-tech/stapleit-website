@@ -45,16 +45,20 @@
   z-index:6;
   inset:0;
   overflow:hidden;
-  visibility:hidden;
-  opacity:0;
+  visibility:visible;
+  opacity:1;
+  background:#000;
   pointer-events:none;
+  animation:supportIntroLayerFade 4.8s linear both;
 }
 
 .support-hero-intro-svg{
   width:100%;
   height:100%;
   display:block;
-  will-change:opacity;
+  transform-origin:center;
+  will-change:opacity,transform;
+  animation:supportIntroTitleFade 4.8s linear both;
 }
 
 .support-hero-intro-text{
@@ -64,39 +68,13 @@
   letter-spacing:-.035em;
 }
 
-.support-hero-intro-reveal{
-  stroke-width:0;
-  will-change:stroke-width;
+.support-hero-intro-colour{
+  animation:supportIntroColour 4.8s cubic-bezier(.37,0,.63,1) both;
 }
 
-.support-hero-shell.hero-intro-ready .support-hero-intro{
-  visibility:visible;
-  opacity:1;
-}
-
-.support-hero-shell.hero-intro-ready .support-hero-copy,
-.support-hero-shell.hero-intro-ready .support-standard{
-  opacity:0;
-}
-
-.support-hero-shell.hero-intro-running .support-hero-intro-colour{
-  animation:supportIntroColour 5.2s cubic-bezier(.37,0,.63,1) both;
-}
-
-.support-hero-shell.hero-intro-running .support-hero-intro-reveal{
-  animation:supportIntroReveal 5.2s linear both;
-}
-
-.support-hero-shell.hero-intro-running .support-hero-intro-svg{
-  animation:supportIntroMaskFade 5.2s linear both;
-}
-
-.support-hero-shell.hero-intro-running .support-standard{
-  animation:supportIntroStandardReveal 5.2s linear both;
-}
-
-.support-hero-shell.hero-intro-running .support-hero-copy{
-  animation:supportIntroCopyReveal 5.2s linear both;
+.support-hero-copy,
+.support-standard{
+  animation:supportIntroContentFade 4.8s linear both;
 }
 
 .support-hero-shell>.support-liquid-shade{
@@ -1199,27 +1177,20 @@
   100%{transform:translate3d(-10px,0,0)}
 }
 
-@keyframes supportIntroReveal{
-  0%{stroke-width:0}
-  24%{stroke-width:0;animation-timing-function:cubic-bezier(.65,0,.22,1)}
-  80%,100%{stroke-width:1700px}
+@keyframes supportIntroTitleFade{
+  0%,56%{opacity:1;transform:scale(1)}
+  72%,100%{opacity:0;transform:scale(1.012)}
 }
 
-@keyframes supportIntroMaskFade{
-  0%,80%{opacity:1}
-  100%{opacity:0}
+@keyframes supportIntroLayerFade{
+  0%,68%{visibility:visible;opacity:1}
+  100%{visibility:hidden;opacity:0}
 }
 
-@keyframes supportIntroStandardReveal{
-  0%{opacity:0;transform:translate3d(0,14px,0)}
-  34%{opacity:0;transform:translate3d(0,14px,0);animation-timing-function:cubic-bezier(.22,.61,.36,1)}
-  82%,100%{opacity:1;transform:none}
-}
-
-@keyframes supportIntroCopyReveal{
-  0%{opacity:0;transform:translate3d(0,10px,0)}
-  48%{opacity:0;transform:translate3d(0,10px,0);animation-timing-function:cubic-bezier(.22,.61,.36,1)}
-  88%,100%{opacity:1;transform:none}
+@keyframes supportIntroContentFade{
+  0%{opacity:0}
+  76%{opacity:0;animation-timing-function:cubic-bezier(.22,.61,.36,1)}
+  100%{opacity:1}
 }
 
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -1361,8 +1332,8 @@
 
 @media(prefers-reduced-motion:reduce){
   .support-hero-intro{display:none}
-  .support-hero-shell.hero-intro-ready .support-hero-copy,
-  .support-hero-shell.hero-intro-ready .support-standard{opacity:1;animation:none}
+  .support-hero-copy,
+  .support-standard{opacity:1;animation:none;transform:none}
   .support-hero-unlimited,
   .support-hero-cta::before{animation:none;background-position:50% 50%}
   .support-card,

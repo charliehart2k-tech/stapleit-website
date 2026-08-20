@@ -1,39 +1,4 @@
 (() => {
-  const hero = document.querySelector('[data-support-hero]');
-  const intro = hero?.querySelector('[data-support-hero-intro]');
-  const svg = intro?.querySelector('[data-support-hero-intro-svg]');
-  if (!hero || !intro || !svg || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  let fallbackTimer = 0;
-  let finished = false;
-
-  const finish = () => {
-    if (finished) return;
-    finished = true;
-    window.clearTimeout(fallbackTimer);
-    hero.classList.remove('hero-intro-ready', 'hero-intro-running');
-    hero.classList.add('hero-intro-complete');
-  };
-
-  hero.classList.add('hero-intro-ready');
-  window.requestAnimationFrame(() => {
-    if (finished) return;
-    hero.classList.add('hero-intro-running');
-  });
-
-  svg.addEventListener('animationend', event => {
-    if (event.animationName === 'supportIntroMaskFade') finish();
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) finish();
-  }, { once: true });
-
-  window.addEventListener('pagehide', finish, { once: true });
-  fallbackTimer = window.setTimeout(finish, 6000);
-})();
-
-(() => {
   const dialog = document.getElementById('support-dialog');
   const closeButton = document.getElementById('support-dialog-close');
   const title = document.getElementById('support-dialog-title');

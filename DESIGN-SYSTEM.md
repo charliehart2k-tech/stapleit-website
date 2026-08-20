@@ -151,7 +151,7 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 ### IT Support hero
 
 - Uses the same large rounded proportions as the homepage hero and settles as pure translucent black glass after its opening SVG text-mask transition.
-- The automated opening mask shows `Unlimited IT Support` at large scale as a restrained blue-to-purple aperture in a black SVG cover. The aperture expands from the contours of the fixed letterforms to uncover the real hero while the semantic heading appears directly in its permanent position; circular wipes and travelling-title movement are not used.
+- The CSS-only opening mask begins on first paint and shows `Unlimited IT Support` at large scale as clean letterforms containing a restrained blue-to-purple moving field. The display title retires fully before the black intro layer crossfades into the real hero and permanent semantic heading; no travelling title, expanding aperture, pre-intro hero flash or overlapping copy is used.
 - The intro uses no video, third-party runtime or scroll-jacking, runs once on page load and is skipped for reduced motion. Without JavaScript, the normal hero remains fully visible.
 - Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
 - `Unlimited` keeps the approved restrained blue-to-purple moving-highlight treatment after the intro completes.
