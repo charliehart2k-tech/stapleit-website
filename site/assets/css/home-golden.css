@@ -133,9 +133,9 @@
    Final text + spacing conformity. Major chapters share one scale and body
    rhythm while preserving their deliberately different compositions.
    -------------------------------------------------------------------------- */
-.audience-header h2,.trust-sticky h2,.google-review-hero h2,.audit-hero h2,.contact-hero h2{font-size:var(--home-chapter)!important;font-weight:700!important;line-height:.94!important;letter-spacing:-.048em!important}
-.audience-item h3,.trust-proof h3,.google-review-copy h3,.contact-panel h3{font-size:var(--home-card-title)!important;font-weight:700!important;line-height:1.06!important;letter-spacing:-.032em!important}
-.service-slide p,.audience-item p,.trust-proof p,.audit-lead{font-size:var(--home-copy)!important;line-height:1.6!important}
+.audience-header h2,.trust-sticky h2,.google-review-hero h2,.audit-hero h2,.contact-hero h2{font-weight:700!important;line-height:.94!important;letter-spacing:-.048em!important}
+.audience-item h3,.trust-proof h3,.google-review-copy h3,.contact-panel h3{font-weight:700!important;line-height:1.06!important;letter-spacing:-.032em!important}
+.service-slide p,.audience-item p,.trust-proof p,.audit-lead{line-height:1.6!important}
 .service-points li,.audit-consent,.audit-explainer-copy,.contact-row{font-family:var(--font-body)!important}
 .service-cta,.audit-submit,.google-review-link,.contact-whatsapp{font-weight:600!important}
 .mobile-nav-group>summary::after{font-weight:600!important}
@@ -145,8 +145,7 @@
 .contact-section{padding-top:var(--space-7)!important;padding-bottom:112px!important}
 
 @media(max-width:700px){
-  .audience-header h2,.trust-sticky h2,.google-review-hero h2,.audit-hero h2,.contact-hero h2{font-size:clamp(2.75rem,11.2vw,3.45rem)!important;line-height:.96!important}
-  .audience-item h3,.trust-proof h3,.google-review-copy h3,.contact-panel h3{font-size:clamp(1.55rem,6.4vw,1.9rem)!important}
+  .audience-header h2,.trust-sticky h2,.google-review-hero h2,.audit-hero h2,.contact-hero h2{line-height:.96!important}
   .audience-section,.trust-section,.google-review-section,.audit-section,.contact-section{padding-top:var(--space-7)!important;padding-bottom:var(--space-7)!important}
   .google-review-hero{grid-template-columns:1fr;gap:16px;padding-bottom:26px}
   .google-review-hero>p:last-child{margin:0;font-size:15px}

@@ -77,6 +77,11 @@ Canonical type tokens live in `site/assets/css/tokens.css`:
 - `--type-section` — major chapter headings;
 - `--type-hero` — page-level hero headings.
 
+These shared semantic roles are the type system. Route aliases that duplicate
+them, such as homepage-only chapter, card-title or copy variables, are not
+permitted. Normal body copy resolves to 17px on larger screens and 16px on
+small screens; compact decision and inclusion lists must remain at least 15px.
+
 Editorial rules:
 
 - write in UK English;

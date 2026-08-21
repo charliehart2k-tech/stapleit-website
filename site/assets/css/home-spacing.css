@@ -133,8 +133,8 @@
   .service-grid-card .service-slide{padding:24px 19px!important}
   .service-grid-card .service-slide-content{min-height:0!important}
   .service-grid-card .service-slide h2{font-size:clamp(1.85rem,7.8vw,2.25rem)!important;line-height:1.08!important}
-  .service-grid-card .service-slide p{font-size:14px!important;line-height:1.56!important}
-  .service-grid-card .service-points li{font-size:13.5px!important;line-height:1.42!important}
+  .service-grid-card .service-slide p{line-height:1.56!important}
+  .service-grid-card .service-points li{line-height:1.45!important}
   .service-grid-card .service-cta{min-height:48px!important;margin-top:24px!important;font-size:13px!important}
 
   .audience-item{backdrop-filter:blur(12px) saturate(110%)!important;-webkit-backdrop-filter:blur(12px) saturate(110%)!important}
@@ -152,7 +152,7 @@
 
   .audit-form{padding:28px 20px!important}
   .audit-field input{min-height:58px!important;font-size:16px!important}
-  .audit-consent{font-size:14px!important;line-height:1.5!important}
+  .audit-consent{line-height:1.5!important}
   .audit-submit{min-height:50px!important}
 
   .contact-grid{gap:14px!important}

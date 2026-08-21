@@ -202,7 +202,6 @@
   .home-services-card .service-slide p{
     align-self:start!important;
     max-width:38rem!important;
-    font-size:clamp(1.16rem,1.45vw,1.28rem)!important;
     line-height:1.62!important;
     letter-spacing:-.012em!important;
   }
@@ -215,7 +214,6 @@
     padding-block:8px!important;
   }
   .home-services-card .service-points li{
-    font-size:clamp(1rem,1.18vw,1.08rem)!important;
     line-height:1.5!important;
   }
   .home-services-card .service-cta{

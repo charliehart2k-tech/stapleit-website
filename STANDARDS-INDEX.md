@@ -46,6 +46,8 @@ The repository currently enforces:
 - required governing standards being present;
 - static content/security/reference/SEO/AEO checks;
 - canonical Manrope weight checks;
+- canonical shared type tokens, a 16px body-copy floor and a 15px minimum for compact decision copy;
+- no duplicate homepage-only aliases for chapter, card-heading or body-copy type roles;
 - no runtime JavaScript inline-style injection/mutation;
 - no `eval()` / `new Function()` dynamic code execution;
 - working per-file CSS and JavaScript size budgets;

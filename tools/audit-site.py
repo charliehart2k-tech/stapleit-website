@@ -26,7 +26,44 @@ JS_INLINE_STYLE_RE = re.compile(
 )
 JS_DYNAMIC_CODE_RE = re.compile(r"(?:\beval\s*\(|\bnew\s+Function\s*\()", re.I)
 IMPORTANT_RE = re.compile(r"!important\b", re.I)
-MAX_LEGACY_IMPORTANT = 932
+TYPE_TOKEN_ALIAS_RE = re.compile(r"--home-(?:chapter|card-title|copy)\b", re.I)
+CSS_NUMBER = r"(?:\d+(?:\.\d+)?|\.\d+)"
+TYPE_BODY_LITERAL_RE = re.compile(rf"--type-body\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
+CSS_RULE_RE = re.compile(r"(?P<selectors>[^{}]+)\{(?P<declarations>[^{}]*)\}", re.S)
+FONT_SIZE_LITERAL_RE = re.compile(rf"font-size\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
+READABLE_TYPE_MIN_PX = {
+    ".service-slide p": 15.5,
+    ".service-points li": 15.0,
+    ".audience-item p": 15.5,
+    ".trust-proof p": 15.5,
+    ".audit-consent": 14.0,
+}
+MAX_LEGACY_IMPORTANT = 907
+
+
+def css_pixels(value: str, unit: str) -> float:
+    numeric = float(value)
+    return numeric * 16 if unit.lower() == "rem" else numeric
+
+
+def readable_type_issues(text: str) -> list[str]:
+    issues: set[str] = set()
+    for rule in CSS_RULE_RE.finditer(text):
+        selectors = rule.group("selectors")
+        declarations = rule.group("declarations")
+        sizes = [
+            css_pixels(match.group("value"), match.group("unit"))
+            for match in FONT_SIZE_LITERAL_RE.finditer(declarations)
+        ]
+        if not sizes:
+            continue
+        for selector, minimum in READABLE_TYPE_MIN_PX.items():
+            if selector not in selectors:
+                continue
+            for size in sizes:
+                if size < minimum:
+                    issues.add(f"{selector} resolves from a {size:g}px literal; minimum is {minimum:g}px")
+    return sorted(issues)
 
 
 class HtmlAuditParser(HTMLParser):
@@ -367,6 +404,15 @@ def audit(root: Path) -> int:
             important_total += important_count
             if css.name.startswith("it-support") and important_count:
                 errors.append(f"{rel}: IT Support CSS must not introduce !important")
+            aliases = sorted(set(TYPE_TOKEN_ALIAS_RE.findall(text)))
+            if aliases:
+                errors.append(f"{rel}: duplicate homepage type token alias found: {', '.join(aliases)}")
+            for match in TYPE_BODY_LITERAL_RE.finditer(text):
+                size = css_pixels(match.group("value"), match.group("unit"))
+                if size < 16:
+                    errors.append(f"{rel}: --type-body falls below the 16px readability floor")
+            for issue in readable_type_issues(text):
+                errors.append(f"{rel}: {issue}")
         imports = [m.group(1) for m in CSS_IMPORT_RE.finditer(text)]
         refs = [m.group(2) for m in CSS_URL_RE.finditer(text)] + imports
         if css.stat().st_size > WARN_CSS_BYTES and not css.name.endswith(".bundle.css"):
