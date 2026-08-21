@@ -139,10 +139,12 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - Individual neutral liquid-glass buttons.
 - No visible chevrons/down arrows.
 - Manrope 700.
+- Desktop navigation uses the 15px `--type-ui` token; compact mobile navigation never drops below 13px.
 - Minimum interactive height: 44px.
-- Desktop-to-menu breakpoint: 1080px.
+- Desktop-to-menu breakpoint: 1260px, preserving the 15px label standard instead of compressing the seven-item navigation.
 - Mobile/tablet menu uses a compact grid with an expandable IT Services group, not one long stack of links.
 - Client Portal is a normal primary navigation item.
+- The current destination carries a subdued, slowly moving Staple-spectrum outline; hover and keyboard focus strengthen the same two-pixel outline without colouring the control surface. The outline becomes static when reduced motion is requested and is removed in forced-colour mode.
 
 ### Homepage hero
 
@@ -252,7 +254,7 @@ Reference checks for every completed route:
 
 Current breakpoints:
 
-- navigation changes to menu at 1080px and below;
+- navigation changes to menu at 1260px and below;
 - homepage hero/content row stacks at 980px and below;
 - homepage service cards remain a two-column grid down to 700px, then stack to one column;
 - trust sticky/two-column composition collapses for touch/tablet layouts;

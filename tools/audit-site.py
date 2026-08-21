@@ -28,6 +28,7 @@ JS_DYNAMIC_CODE_RE = re.compile(r"(?:\beval\s*\(|\bnew\s+Function\s*\()", re.I)
 IMPORTANT_RE = re.compile(r"!important\b", re.I)
 TYPE_TOKEN_ALIAS_RE = re.compile(r"--home-(?:chapter|card-title|copy)\b", re.I)
 CSS_NUMBER = r"(?:\d+(?:\.\d+)?|\.\d+)"
+TYPE_UI_LITERAL_RE = re.compile(rf"--type-ui\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
 TYPE_BODY_LITERAL_RE = re.compile(rf"--type-body\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
 CSS_RULE_RE = re.compile(r"(?P<selectors>[^{}]+)\{(?P<declarations>[^{}]*)\}", re.S)
 FONT_SIZE_LITERAL_RE = re.compile(rf"font-size\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
@@ -37,8 +38,13 @@ READABLE_TYPE_MIN_PX = {
     ".audience-item p": 15.5,
     ".trust-proof p": 15.5,
     ".audit-consent": 14.0,
+    ".menu-toggle": 13.0,
+    ".mobile-menu-primary>.nav-pill": 13.0,
+    ".mobile-nav-group>summary": 13.0,
+    ".mobile-nav-grid .nav-pill": 13.0,
+    ".mobile-menu-utility a": 13.0,
 }
-MAX_LEGACY_IMPORTANT = 907
+MAX_LEGACY_IMPORTANT = 902
 
 
 def css_pixels(value: str, unit: str) -> float:
@@ -407,6 +413,10 @@ def audit(root: Path) -> int:
             aliases = sorted(set(TYPE_TOKEN_ALIAS_RE.findall(text)))
             if aliases:
                 errors.append(f"{rel}: duplicate homepage type token alias found: {', '.join(aliases)}")
+            for match in TYPE_UI_LITERAL_RE.finditer(text):
+                size = css_pixels(match.group("value"), match.group("unit"))
+                if size < 15:
+                    errors.append(f"{rel}: --type-ui falls below the 15px readability floor")
             for match in TYPE_BODY_LITERAL_RE.finditer(text):
                 size = css_pixels(match.group("value"), match.group("unit"))
                 if size < 16:

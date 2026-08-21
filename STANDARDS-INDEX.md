@@ -16,7 +16,7 @@ Do not silently invent a new convention. If a genuine design or engineering deci
 
 ### Current approved visual exceptions
 
-The animated Staple-palette spectrum outline on navigation pills is explicitly approved and must be preserved. The same restrained spectrum language may be reused on selected interactive buttons where it improves hierarchy without turning the surface itself into a multicolour fill. This exception supersedes older wording that prohibited colour treatment on navigation; reduced-motion behaviour remains mandatory.
+The animated Staple-palette spectrum outline on navigation pills is explicitly approved and must be preserved. The current destination uses a subdued slow outline, while hover and keyboard focus strengthen the same two-pixel treatment; reduced-motion and forced-colour fallbacks remain mandatory. The same restrained spectrum language may be reused on selected interactive buttons where it improves hierarchy without turning the surface itself into a multicolour fill. This exception supersedes older wording that prohibited colour treatment on navigation.
 
 The IT Support hero opens with a CSS-only SVG text mask rather than video. `Unlimited IT Support` initially occupies the pane as clean, fully readable letterforms containing a restrained blue-to-purple moving field and soft SVG glow. The sequence begins on the first stylesheet paint, so the completed hero never flashes before the intro. The title retires as ten flat black louvres collapse cleanly from the centre out, exposing the real hero through widening gaps without rotating, slicing or distorting the finished copy. There is no travelling title, aperture expansion, circular wipe, stroke bloom or sustained overlap between the display title and permanent heading. The transition is automated, one-shot, limited to opacity, louvre transforms and masked gradient movement, and skipped on stacked tablet/phone layouts and whenever reduced motion is requested; required copy always remains in semantic HTML and becomes readable without JavaScript. The settled `Unlimited` word keeps the same restrained blue-to-purple movement, while `£35` remains Signal Red. The complete left-column proposition is vertically centred, and its CTA is centred beneath the proposition rather than against the full pane. The second column is headed `Everything you need, as standard`; `as standard` is lowercase, the same heading size as the preceding words and Support Green. Default inclusions use the body-copy scale in compact, unboxed clusters. The primary hero action is `Scroll down to find out more`, linking to the onboarding chapter. Below the hero, measured staggered reveals and restrained focus/hover light provide depth without obscuring copy; mobile uses an aligned vertical onboarding timeline and bottom-sheet package dialogs, while touch, reduced-motion and forced-colour modes receive simplified equivalents.
 
@@ -46,7 +46,7 @@ The repository currently enforces:
 - required governing standards being present;
 - static content/security/reference/SEO/AEO checks;
 - canonical Manrope weight checks;
-- canonical shared type tokens, a 16px body-copy floor and a 15px minimum for compact decision copy;
+- canonical shared type tokens, a 15px UI-token floor, a 16px body-copy floor, a 15px minimum for compact decision copy and a 13px mobile-navigation floor;
 - no duplicate homepage-only aliases for chapter, card-heading or body-copy type roles;
 - no runtime JavaScript inline-style injection/mutation;
 - no `eval()` / `new Function()` dynamic code execution;

@@ -70,10 +70,10 @@
   /* One type system: Manrope 400 / 600 / 700 only. */
   --font-display:"Manrope","Segoe UI",Arial,sans-serif;
   --font-body:"Manrope","Segoe UI",Arial,sans-serif;
-  --type-ui:.875rem;
+  --type-ui:.9375rem;
   --type-small:.8125rem;
   --type-body:1.0625rem;
-  --type-lead:clamp(1.0625rem,1.25vw,1.2rem);
+  --type-lead:clamp(1.125rem,1.4vw,1.3rem);
   --type-card:clamp(1.9rem,2.3vw,2.35rem);
   --type-section:clamp(4.65rem,6.15vw,6.45rem);
   --type-hero:clamp(4.5rem,7vw,7.2rem);

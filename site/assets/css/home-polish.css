@@ -113,7 +113,7 @@
 /* --------------------------------------------------------------------------
    Collapsed nav for tablet + phone. Three useful choices immediately visible.
    -------------------------------------------------------------------------- */
-@media(max-width:1080px){
+@media(max-width:1260px){
   .mobile-menu:not([hidden]){
     display:block!important;
     max-height:calc(100dvh - 88px - env(safe-area-inset-top));
@@ -203,7 +203,6 @@
     border-radius:11px!important;
     color:#9099a5!important;
     font-family:var(--font-display)!important;
-    font-size:11.5px!important;
     font-weight:700!important;
     line-height:1.15!important;
     text-align:center!important;
@@ -230,10 +229,9 @@
   .site-header{padding-top:max(8px,env(safe-area-inset-top))!important}
   .nav-shell{min-height:58px!important;padding:6px 7px 6px 11px!important;gap:8px!important;border-radius:20px!important}
   .brand img{width:124px!important}
-  .menu-toggle{min-height:40px!important;padding-inline:13px!important;font-size:12.5px!important}
+  .menu-toggle{min-height:40px!important;padding-inline:13px!important}
   .mobile-menu:not([hidden]){width:var(--page)!important;padding:9px!important;border-radius:20px!important}
-  .mobile-nav-group>summary,.mobile-menu-primary>a{min-height:44px!important;font-size:11.8px!important;padding-inline:6px!important}
-  .mobile-nav-grid>a{font-size:12px!important}
+  .mobile-nav-group>summary,.mobile-menu-primary>a{min-height:44px!important;padding-inline:6px!important}
 
   /* Hero */
   .home-hero{padding:18px 0 26px!important}
@@ -401,7 +399,7 @@
   :root{--page:calc(100% - 20px)}
   .brand img{width:118px!important}
   .mobile-menu-primary{grid-template-columns:repeat(3,minmax(0,1fr))!important}
-  .mobile-nav-group>summary,.mobile-menu-primary>a{font-size:11px!important;padding-inline:4px!important}
+  .mobile-nav-group>summary,.mobile-menu-primary>a{padding-inline:4px!important}
   .contact-title-line{white-space:normal!important}
 }
 

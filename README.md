@@ -18,7 +18,7 @@ Current approved homepage includes:
 - final Free IT Audit conversion chapter with responsive contact form and direct phone/email panel;
 - Client Portal navigation entry with an intentionally `noindex` placeholder route until the real portal destination is supplied;
 - global liquid-glass footer across active route shells;
-- responsive navigation switching to the mobile menu at 1080px and below.
+- responsive navigation switching to the mobile menu at 1260px and below.
 
 Treat these homepage patterns as approved. Reuse the design language; do not copy every layout verbatim onto later pages.
 
