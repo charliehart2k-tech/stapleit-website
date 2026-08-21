@@ -121,6 +121,16 @@ else
     fi
   done
 
+  for relative in functions.php cora-safety.php; do
+    if [[ ! -s "$THEME/$relative" ]]; then
+      fail "Missing deployed WordPress theme file: $relative"
+    elif cmp -s "$REPO/wordpress/$relative" "$THEME/$relative"; then
+      pass "Deployed WordPress theme file matches Git: $relative"
+    else
+      fail "Deployed WordPress theme file differs from Git: $relative"
+    fi
+  done
+
   if [[ -s "$THEME/404.php" ]] && grep -Fq 'class="reset-stage reset-404"' "$THEME/404.php"; then
     pass "Custom WordPress 404 template is deployed"
   else
@@ -188,6 +198,14 @@ if [[ "$ollama_state" == "active" ]]; then
     pass "Ollama is bound to loopback"
   else
     fail "Ollama is not confirmed on a loopback-only listener"
+  fi
+  cora_model="$(wp_read eval 'echo defined( "STAPLEIT_OLLAMA_MODEL" ) ? STAPLEIT_OLLAMA_MODEL : "";' 2>/dev/null || true)"
+  if [[ -z "$cora_model" ]]; then
+    warn "STAPLEIT_OLLAMA_MODEL is not defined in the active WordPress configuration"
+  elif ollama show "$cora_model" >/dev/null 2>&1; then
+    pass "Cora model is installed: $cora_model"
+  else
+    fail "Cora model is configured but unavailable to Ollama: $cora_model"
   fi
 else
   warn "Ollama is not active; Cora will use the catalogue fallback"
