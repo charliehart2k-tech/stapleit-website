@@ -15,6 +15,11 @@
       ? 'Thanks — your enquiry has been received. We’ll get back to you within one working day.'
       : 'Thanks — your audit request has been received. We’ll get back to you within one working day.';
     const defaultLabel = submit.textContent;
+    const requirements = form.querySelector('textarea[name="requirements"]');
+    if (requirements instanceof HTMLTextAreaElement) {
+      const plannerSummary = sessionStorage.getItem('stapleitPlannerSummary');
+      if (plannerSummary && !requirements.value) requirements.value = plannerSummary;
+    }
 
     const setStatus = (state, message) => {
       status.hidden = false;
@@ -59,6 +64,7 @@
         }
 
         setStatus('success', payload.message || fallbackMessage);
+        if (action === 'stapleit_audit') sessionStorage.removeItem('stapleitPlannerSummary');
         form.reset();
       } catch (error) {
         setStatus(

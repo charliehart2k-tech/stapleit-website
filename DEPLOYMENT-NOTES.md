@@ -64,3 +64,14 @@ The report intentionally excludes WordPress salts, database credentials, databas
 ## Rollback backup retention
 
 Each successful staging deployment keeps the five newest theme rollback releases and removes older release groups. The retention applies only inside `/home/deploy/stapleit-theme-backups` and includes the matching legacy static-template and route-handler copies. Override the default for a specific deployment with `BACKUP_RETENTION`, but never set it below two.
+# Local support adviser
+
+The IT Support service adviser always has a dependency-free catalogue-matching fallback. To enable private local-model inference, install Ollama on the VPS, keep it bound to loopback and define the model in `wp-config.php`:
+
+```php
+define( 'STAPLEIT_OLLAMA_MODEL', 'qwen2.5:7b-instruct-q5_0' );
+```
+
+Use the Apache-2.0 7B Qwen2.5 model, not the separately licensed 3B or 72B variants. WordPress calls `http://127.0.0.1:11434`; that port must not be published through Nginx, Cloudflare or the host firewall. If the model is absent, slow or returns malformed JSON, visitors receive the explicitly labelled catalogue match instead. No third-party AI API or browser credential is used.
+
+Planner analytics are first-party daily aggregate counters stored in the WordPress options table for 90 days. They contain only allowlisted event names and counts: no prompts, answers, IP addresses, cookies, device identifiers or contact details.

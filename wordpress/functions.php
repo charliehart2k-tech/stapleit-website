@@ -85,6 +85,124 @@ add_action( 'wp_ajax_nopriv_stapleit_audit', 'stapleit_handle_audit_ajax' );
 add_action( 'wp_ajax_stapleit_audit', 'stapleit_handle_audit_ajax' );
 add_action( 'wp_ajax_nopriv_stapleit_support_enquiry', 'stapleit_handle_support_enquiry_ajax' );
 add_action( 'wp_ajax_stapleit_support_enquiry', 'stapleit_handle_support_enquiry_ajax' );
+add_action( 'wp_ajax_nopriv_stapleit_support_adviser', 'stapleit_handle_support_adviser_ajax' );
+add_action( 'wp_ajax_stapleit_support_adviser', 'stapleit_handle_support_adviser_ajax' );
+add_action( 'wp_ajax_nopriv_stapleit_track_planner_event', 'stapleit_track_planner_event' );
+add_action( 'wp_ajax_stapleit_track_planner_event', 'stapleit_track_planner_event' );
+
+function stapleit_track_planner_event() {
+    $allowed = array(
+        'package_finder_started', 'package_finder_completed',
+        'pack_finder_started', 'pack_finder_completed',
+        'cost_estimate_updated', 'adviser_used', 'planner_handoff_clicked',
+    );
+    $event = sanitize_key( (string) ( $_POST['event'] ?? '' ) );
+    if ( ! in_array( $event, $allowed, true ) ) {
+        wp_send_json( array( 'ok' => false ), 400 );
+    }
+
+    $day     = gmdate( 'Y-m-d' );
+    $metrics = get_option( 'stapleit_planner_metrics', array() );
+    $metrics = is_array( $metrics ) ? $metrics : array();
+    $metrics[ $day ] = isset( $metrics[ $day ] ) && is_array( $metrics[ $day ] ) ? $metrics[ $day ] : array();
+    $metrics[ $day ][ $event ] = min( 1000000, (int) ( $metrics[ $day ][ $event ] ?? 0 ) + 1 );
+    $cutoff = gmdate( 'Y-m-d', time() - ( 90 * DAY_IN_SECONDS ) );
+    $metrics = array_filter( $metrics, function ( $key ) use ( $cutoff ) { return $key >= $cutoff; }, ARRAY_FILTER_USE_KEY );
+    update_option( 'stapleit_planner_metrics', $metrics, false );
+    wp_send_json( array( 'ok' => true ) );
+}
+
+function stapleit_support_catalogue_match( $prompt ) {
+    $text = strtolower( $prompt );
+    $matches = array();
+    $rules = array(
+        'Server pack' => array( 'server', 'active directory', 'file share' ),
+        'Azure pack' => array( 'azure', 'virtual machine', 'cloud infrastructure' ),
+        'Network pack' => array( 'wifi', 'wi-fi', 'access point', 'firewall', 'switch', 'network' ),
+        'Security pack' => array( 'security', 'phishing', 'cyber', 'ransomware', 'antivirus' ),
+        'Governance & compliance pack' => array( 'compliance', 'policy', 'insurance', 'audit', 'regulator', 'questionnaire' ),
+        'Cyber Essentials pack' => array( 'cyber essentials', 'certification' ),
+        'AI pack' => array( 'copilot', 'chatgpt', 'artificial intelligence', ' ai ' ),
+        'Strategy pack' => array( 'roadmap', 'budget', 'strategy', 'review' ),
+        'Disaster recovery pack' => array( 'disaster', 'recovery', 'business continuity', 'restore' ),
+    );
+    foreach ( $rules as $service => $needles ) {
+        foreach ( $needles as $needle ) {
+            if ( strpos( ' ' . $text . ' ', $needle ) !== false ) { $matches[] = $service; break; }
+        }
+    }
+    if ( ! $matches ) $matches[] = 'A tailored IT support review';
+    $package = preg_match( '/compliance|advanced|sensitive|regulated|premium/', $text ) ? 'Premium package'
+        : ( preg_match( '/security|backup|phishing|identity|password/', $text ) ? 'Standard package' : 'Basic package' );
+    array_unshift( $matches, $package );
+    return array_values( array_unique( array_slice( $matches, 0, 5 ) ) );
+}
+
+function stapleit_handle_support_adviser_ajax() {
+    $prompt = trim( sanitize_textarea_field( (string) ( $_POST['prompt'] ?? '' ) ) );
+    if ( strlen( $prompt ) < 12 || strlen( $prompt ) > 1000 ) {
+        wp_send_json( array( 'ok' => false, 'message' => 'Please add a little more detail, using no more than 1,000 characters.' ), 400 );
+    }
+    $rate_key = 'stapleit_adviser_' . hash_hmac( 'sha256', stapleit_request_ip(), wp_salt( 'nonce' ) );
+    $uses = (int) get_transient( $rate_key );
+    if ( $uses >= 12 ) wp_send_json( array( 'ok' => false, 'message' => 'The adviser has had several requests. Please wait a few minutes and try again.' ), 429 );
+    set_transient( $rate_key, $uses + 1, 10 * MINUTE_IN_SECONDS );
+
+    $fallback = stapleit_support_catalogue_match( $prompt );
+    $result = array(
+        'ok' => true,
+        'mode' => 'catalogue-match',
+        'heading' => 'A practical starting point',
+        'summary' => 'These services match the words you used. A free audit will confirm what is genuinely necessary.',
+        'services' => $fallback,
+    );
+
+    $model = defined( 'STAPLEIT_OLLAMA_MODEL' ) ? STAPLEIT_OLLAMA_MODEL : '';
+    if ( $model !== '' ) {
+        $catalogue = 'Packages: Sole trader POA; Basic £35/user/month for 5+; Standard £55/user/month for 5+; Premium £75/user/month for 5+. Add-ons, all price on application: Server, Azure, Network, Security, Governance & compliance, Cyber Essentials, AI, Strategy, Disaster recovery.';
+        $response = wp_remote_post( 'http://127.0.0.1:11434/api/chat', array(
+            'timeout' => 12,
+            'headers' => array( 'Content-Type' => 'application/json' ),
+            'body' => wp_json_encode( array(
+                'model' => sanitize_text_field( $model ), 'stream' => false, 'format' => 'json',
+                'messages' => array(
+                    array( 'role' => 'system', 'content' => 'You are the Staple IT catalogue adviser. Recommend only from the supplied catalogue. Never invent prices, inclusions, guarantees or compliance claims. Return JSON with heading, summary and services (maximum five short catalogue names).' ),
+                    array( 'role' => 'user', 'content' => $catalogue . "\nVisitor request: " . $prompt ),
+                ),
+                'options' => array( 'temperature' => 0.2, 'num_predict' => 220 ),
+            ) ),
+        ) );
+        if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+            $outer = json_decode( wp_remote_retrieve_body( $response ), true );
+            $ai = json_decode( (string) ( $outer['message']['content'] ?? '' ), true );
+            if ( is_array( $ai ) && ! empty( $ai['heading'] ) && ! empty( $ai['summary'] ) && ! empty( $ai['services'] ) && is_array( $ai['services'] ) ) {
+                $result = array(
+                    'ok' => true, 'mode' => 'local-ai',
+                    'heading' => sanitize_text_field( $ai['heading'] ),
+                    'summary' => sanitize_text_field( $ai['summary'] ),
+                    'services' => array_values( array_slice( array_map( 'sanitize_text_field', $ai['services'] ), 0, 5 ) ),
+                );
+            }
+        }
+    }
+    wp_send_json( $result );
+}
+
+add_action( 'wp_dashboard_setup', function () {
+    wp_add_dashboard_widget( 'stapleit_planner_metrics', 'IT Support planner — last 30 days', function () {
+        $metrics = get_option( 'stapleit_planner_metrics', array() );
+        $totals = array();
+        $cutoff = gmdate( 'Y-m-d', time() - ( 30 * DAY_IN_SECONDS ) );
+        foreach ( is_array( $metrics ) ? $metrics : array() as $day => $events ) {
+            if ( $day < $cutoff || ! is_array( $events ) ) continue;
+            foreach ( $events as $event => $count ) $totals[ $event ] = (int) ( $totals[ $event ] ?? 0 ) + (int) $count;
+        }
+        if ( ! $totals ) { echo '<p>No planner activity recorded yet.</p>'; return; }
+        echo '<table class="widefat striped"><tbody>';
+        foreach ( $totals as $event => $count ) echo '<tr><th>' . esc_html( ucwords( str_replace( '_', ' ', $event ) ) ) . '</th><td>' . esc_html( (string) $count ) . '</td></tr>';
+        echo '</tbody></table><p>Anonymous first-party event counts only; no answers, prompts, cookies, IP addresses or device identifiers are stored.</p>';
+    } );
+} );
 
 function stapleit_handle_audit_ajax() {
     stapleit_handle_enquiry_ajax( 'audit' );
