@@ -22,7 +22,11 @@
     ".support-pack-choices label": 44,
     ".support-pack-finder-button": 44,
     ".support-pack-result>a": 44,
-    ".support-pack-fallback-link": 44
+    ".support-pack-fallback-link": 44,
+    ".cora-toggle": 44,
+    ".cora-close": 44,
+    ".cora-suggestion": 44,
+    ".cora-send": 44
   },
   "approved_home_media_widths_px": [
     370,
@@ -41,6 +45,7 @@
     "glass.css",
     "nav.css",
     "reset-shell.css",
+    "cora.css",
     "home-hero.css",
     "trust-liquid.css",
     "home-conversion.css",

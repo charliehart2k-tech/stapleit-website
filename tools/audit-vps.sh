@@ -108,6 +108,7 @@ else
     assets/css/home.bundle.css \
     assets/css/it-support.bundle.css \
     assets/css/site-shell.bundle.css \
+    assets/css/cora.css \
     assets/fonts/manrope-latin.woff2 \
     assets/media/liquid-wave.mp4 \
     assets/media/it-support-liquid.mp4; do
@@ -174,6 +175,23 @@ for service in nginx mariadb cloudflared; do
     warn "$service is not active or not installed under that unit name"
   fi
 done
+
+ollama_state="$(systemctl is-active ollama 2>/dev/null || true)"
+if [[ "$ollama_state" == "active" ]]; then
+  pass "ollama is active"
+  if have curl && curl --fail --silent --max-time 5 http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
+    pass "Ollama responds on loopback"
+  else
+    fail "Ollama is active but its loopback API is unavailable"
+  fi
+  if have ss && ss -lnt 2>/dev/null | grep -qE '127\.0\.0\.1:11434|\[::1\]:11434'; then
+    pass "Ollama is bound to loopback"
+  else
+    fail "Ollama is not confirmed on a loopback-only listener"
+  fi
+else
+  warn "Ollama is not active; Cora will use the catalogue fallback"
+fi
 
 php_fpm_unit="$(systemctl list-units --type=service --all --no-legend 'php*-fpm.service' 2>/dev/null | awk 'NR==1{print $1}')"
 if [[ -n "$php_fpm_unit" ]] && systemctl is-active --quiet "$php_fpm_unit"; then

@@ -46,6 +46,189 @@
 })();
 
 (() => {
+  if (document.querySelector('[data-cora]')) return;
+
+  const element = (tag, className, text = '') => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  };
+
+  const root = element('aside', 'cora');
+  root.dataset.cora = '';
+  root.setAttribute('aria-label', 'Chat to Cora');
+
+  const panel = element('section', 'cora-panel');
+  panel.id = 'cora-panel';
+  panel.hidden = true;
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'false');
+  panel.setAttribute('aria-labelledby', 'cora-title');
+
+  const header = element('header', 'cora-header');
+  const headerOrb = element('span', 'cora-orb');
+  headerOrb.setAttribute('aria-hidden', 'true');
+  const identity = element('div', 'cora-identity');
+  const title = element('strong', '', 'Cora');
+  title.id = 'cora-title';
+  const subtitle = element('span', '', 'Staple IT service guide');
+  identity.append(title, subtitle);
+  const close = element('button', 'cora-close', '×');
+  close.type = 'button';
+  close.setAttribute('aria-label', 'Close Cora');
+  header.append(headerOrb, identity, close);
+
+  const messages = element('div', 'cora-messages');
+  messages.setAttribute('role', 'log');
+  messages.setAttribute('aria-live', 'polite');
+  messages.setAttribute('aria-relevant', 'additions');
+
+  const suggestions = element('div', 'cora-suggestions');
+  const suggestionCopy = [
+    'Which support package suits us?',
+    'How could you improve our security?',
+    'We need help with Microsoft 365'
+  ];
+  suggestionCopy.forEach(copy => {
+    const button = element('button', 'cora-suggestion', copy);
+    button.type = 'button';
+    suggestions.append(button);
+  });
+
+  const form = element('form', 'cora-form');
+  const input = element('textarea', '');
+  input.name = 'message';
+  input.rows = 1;
+  input.maxLength = 800;
+  input.required = true;
+  input.placeholder = 'Ask Cora about your IT…';
+  input.setAttribute('aria-label', 'Message Cora');
+  const send = element('button', 'cora-send', 'Send');
+  send.type = 'submit';
+  const privacy = element('p', 'cora-privacy', 'Your chat is processed on Staple IT’s server and is not retained in this browser. Cora provides guidance, not a final technical assessment.');
+  form.append(input, send, privacy);
+
+  const toggle = element('button', 'cora-toggle');
+  toggle.type = 'button';
+  toggle.setAttribute('aria-controls', panel.id);
+  toggle.setAttribute('aria-expanded', 'false');
+  const toggleOrb = element('span', 'cora-orb');
+  toggleOrb.setAttribute('aria-hidden', 'true');
+  toggle.append(toggleOrb, document.createTextNode('Chat to Cora'));
+
+  panel.append(header, messages, suggestions, form);
+  root.append(panel, toggle);
+  document.body.append(root);
+
+  const conversation = [];
+  const tracked = new Set();
+  let previousFocus = null;
+
+  const track = eventName => {
+    if (tracked.has(eventName)) return;
+    tracked.add(eventName);
+    const body = new URLSearchParams({ action: 'stapleit_track_planner_event', event: eventName });
+    if (navigator.sendBeacon) navigator.sendBeacon('/wp-admin/admin-ajax.php', body);
+    else fetch('/wp-admin/admin-ajax.php', { method: 'POST', body, credentials: 'same-origin', keepalive: true }).catch(() => {});
+  };
+
+  const addMessage = (role, copy, status = '') => {
+    const message = element('div', `cora-message cora-message--${role}`, copy);
+    messages.append(message);
+    if (status) messages.append(element('p', 'cora-message-status', status));
+    messages.scrollTop = messages.scrollHeight;
+  };
+
+  addMessage('assistant', 'Hi, I’m Cora. Tell me what is not working, what you want to improve, or roughly how your business uses IT. I’ll help you find the right place to start.');
+
+  const setOpen = open => {
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    root.classList.toggle('is-opening', open);
+    if (open) {
+      track('cora_opened');
+      previousFocus = document.activeElement;
+      window.requestAnimationFrame(() => input.focus());
+    } else if (previousFocus instanceof HTMLElement) {
+      previousFocus.focus();
+      previousFocus = null;
+    }
+  };
+
+  toggle.addEventListener('click', () => setOpen(panel.hidden));
+  close.addEventListener('click', () => setOpen(false));
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-cora-open]')) setOpen(true);
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !panel.hidden) setOpen(false);
+  });
+
+  suggestions.addEventListener('click', event => {
+    const button = event.target.closest('.cora-suggestion');
+    if (!(button instanceof HTMLButtonElement)) return;
+    input.value = button.textContent;
+    input.focus();
+  });
+
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!form.reportValidity() || send.disabled) return;
+    const prompt = input.value.trim();
+    if (!prompt) return;
+
+    addMessage('user', prompt);
+    track('cora_conversation_started');
+    conversation.push({ role: 'user', content: prompt });
+    input.value = '';
+    send.disabled = true;
+    send.textContent = '…';
+    subtitle.textContent = 'Cora is thinking…';
+
+    try {
+      const body = new URLSearchParams({
+        action: 'stapleit_cora_chat',
+        prompt,
+        history: JSON.stringify(conversation.slice(-6, -1))
+      });
+      const response = await fetch('/wp-admin/admin-ajax.php', {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body,
+        credentials: 'same-origin'
+      });
+      const payload = await response.json();
+      if (!response.ok || payload?.ok === false || !payload?.reply) {
+        throw new Error(payload?.message || 'Cora cannot respond at the moment.');
+      }
+      conversation.push({ role: 'assistant', content: payload.reply });
+      if (conversation.length > 8) conversation.splice(0, conversation.length - 8);
+      addMessage(
+        'assistant',
+        payload.reply,
+        payload.mode === 'local-ai' ? 'Private local AI' : 'Instant Staple IT guide'
+      );
+      suggestions.hidden = true;
+    } catch (error) {
+      addMessage('assistant', error instanceof Error ? error.message : 'Cora cannot respond at the moment. Please call 01372 309 707 or email hello@stapleit.co.uk.');
+    } finally {
+      send.disabled = false;
+      send.textContent = 'Send';
+      subtitle.textContent = 'Staple IT service guide';
+      input.focus();
+    }
+  });
+})();
+
+(() => {
   const holidays = new Set([
     '2026-01-01','2026-04-03','2026-04-06','2026-05-04','2026-05-25','2026-08-31','2026-12-25','2026-12-28',
     '2027-01-01','2027-03-26','2027-03-29','2027-05-03','2027-05-31','2027-08-30','2027-12-27','2027-12-28'

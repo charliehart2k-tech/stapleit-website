@@ -297,7 +297,7 @@
   const endpoint = '/wp-admin/admin-ajax.php';
   const sent = new Set();
   window.stapleitTrack = eventName => {
-    if (!/^(package_finder_started|package_finder_completed|pack_finder_started|pack_finder_completed|cost_estimate_updated|adviser_used|planner_handoff_clicked)$/.test(eventName) || sent.has(eventName)) return;
+    if (!/^(package_finder_started|package_finder_completed|pack_finder_started|pack_finder_completed|cost_estimate_updated|planner_handoff_clicked)$/.test(eventName) || sent.has(eventName)) return;
     sent.add(eventName);
     const body = new URLSearchParams({ action: 'stapleit_track_planner_event', event: eventName });
     if (navigator.sendBeacon) navigator.sendBeacon(endpoint, body);
@@ -393,43 +393,6 @@
   form.addEventListener('submit', event => event.preventDefault());
   form.classList.add('is-enhanced');
   show(0, false);
-})();
-
-(() => {
-  const form = document.querySelector('[data-support-adviser]');
-  if (!(form instanceof HTMLFormElement)) return;
-  const prompt = form.querySelector('textarea[name="prompt"]');
-  const submit = form.querySelector('[data-adviser-submit]');
-  const status = form.querySelector('[data-adviser-status]');
-  const result = form.querySelector('[data-adviser-result]');
-  const heading = form.querySelector('[data-adviser-heading]');
-  const copy = form.querySelector('[data-adviser-copy]');
-  const services = form.querySelector('[data-adviser-services]');
-  if (!(prompt instanceof HTMLTextAreaElement) || !(submit instanceof HTMLButtonElement) || !status || !result || !heading || !copy || !services) return;
-  form.addEventListener('submit', async event => {
-    event.preventDefault();
-    if (!form.reportValidity()) return;
-    submit.disabled = true;
-    status.hidden = false;
-    status.textContent = 'Matching your needs…';
-    try {
-      const body = new URLSearchParams({ action: 'stapleit_support_adviser', prompt: prompt.value });
-      const response = await fetch('/wp-admin/admin-ajax.php', { method: 'POST', headers: { Accept: 'application/json' }, body, credentials: 'same-origin' });
-      const payload = await response.json();
-      if (!response.ok || payload?.ok === false) throw new Error(payload?.message || 'The adviser is unavailable.');
-      heading.textContent = payload.heading;
-      copy.textContent = payload.summary;
-      services.replaceChildren(...payload.services.map(service => { const item = document.createElement('li'); item.textContent = service; return item; }));
-      result.hidden = false;
-      status.textContent = payload.mode === 'local-ai' ? 'Private local AI recommendation' : 'Instant catalogue recommendation';
-      window.stapleitPlanner = window.stapleitPlanner || {};
-      window.stapleitPlanner.adviser = `${payload.heading}: ${payload.services.join(', ')}`;
-      window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
-      window.stapleitTrack?.('adviser_used');
-    } catch (error) {
-      status.textContent = error instanceof Error ? error.message : 'The adviser is unavailable. Please use the questions above.';
-    } finally { submit.disabled = false; }
-  });
 })();
 
 (() => {
