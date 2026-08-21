@@ -285,6 +285,31 @@ def audit(root: Path) -> int:
         for handler in parser.inline_handlers:
             errors.append(f"{rel}: inline event handler found: {handler}")
 
+        if rel.as_posix() == "it-services/it-support/index.html":
+            required_support_copy = (
+                'class="support-package-minimum">Minimum 5 staff members',
+                "Requires Microsoft 365 Business Premium or equivalent licensing",
+                "LastPass password management included",
+                "Exclaimer email signature management included",
+                "Microsoft 365 Business Premium included",
+                "Huntress endpoint protection",
+                "additional Microsoft licensing required to enable those features is charged separately",
+                "included licence quantities and service levels are confirmed in your written proposal",
+            )
+            for fragment in required_support_copy:
+                if fragment not in text:
+                    errors.append(f"{rel}: required package qualifier is missing: {fragment}")
+
+            retired_support_claims = (
+                "Microsoft Defender Suite — included in your monthly price",
+                "Microsoft Purview Suite — included in your monthly price",
+                "No unexpected support or call-out charges",
+                "licensing is billed separately at cost",
+            )
+            for fragment in retired_support_claims:
+                if fragment in text:
+                    errors.append(f"{rel}: retired or unsafe package claim is present: {fragment}")
+
         if parser.canonical and parser.canonical != expected_canonical(root, html):
             errors.append(f"{rel}: canonical mismatch; expected {expected_canonical(root, html)}")
         if parser.meta_description and len(parser.meta_description) < 70:

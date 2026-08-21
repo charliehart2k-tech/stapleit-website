@@ -185,7 +185,14 @@ grep -Fq 'data-enquiry-action="stapleit_support_enquiry"' "$THEME/static-it-supp
 grep -Fq 'Sole Trader IT Support' "$THEME/static-it-support.php"
 grep -Fq 'Azure Pack' "$THEME/static-it-support.php"
 grep -Fq 'Governance &amp; Compliance Pack' "$THEME/static-it-support.php"
-grep -Fq '<em>Minimum 5 staff members</em>' "$THEME/static-it-support.php"
+grep -Fq 'class="support-package-minimum">Minimum 5 staff members' "$THEME/static-it-support.php"
+grep -Fq 'Requires Microsoft 365 Business Premium or equivalent licensing' "$THEME/static-it-support.php"
+grep -Fq 'LastPass password management included' "$THEME/static-it-support.php"
+grep -Fq 'Exclaimer email signature management included' "$THEME/static-it-support.php"
+grep -Fq 'Microsoft 365 Business Premium included' "$THEME/static-it-support.php"
+grep -Fq 'Huntress endpoint protection' "$THEME/static-it-support.php"
+grep -Fq 'additional Microsoft licensing required to enable those features is charged separately' "$THEME/static-it-support.php"
+grep -Fq 'included licence quantities and service levels are confirmed in your written proposal' "$THEME/static-it-support.php"
 grep -Fq 'From day-to-day IT support for common problems to fully managed security and protection' "$THEME/static-it-support.php"
 grep -Fq 'supportIntroBlindOpen' "$THEME/assets/css/it-support.css"
 grep -Fq 'supportIntroWordmarkRetire' "$THEME/assets/css/it-support.css"
@@ -206,6 +213,14 @@ if grep -Fq 'support-css-ambient' "$THEME/static-it-support.php"; then
 fi
 if grep -Fq 'support-liquid-motion' "$THEME/static-it-support.php"; then
   echo "Retired IT Support MP4 hero is still referenced; refusing deployment." >&2
+  exit 1
+fi
+if grep -Fq 'Microsoft Defender Suite — included in your monthly price' "$THEME/static-it-support.php" || grep -Fq 'Microsoft Purview Suite — included in your monthly price' "$THEME/static-it-support.php"; then
+  echo "Unsafe Microsoft Suite inclusion claim is still present; refusing deployment." >&2
+  exit 1
+fi
+if grep -Fq 'No unexpected support or call-out charges' "$THEME/static-it-support.php"; then
+  echo "Retired package cost claim is still present; refusing deployment." >&2
   exit 1
 fi
 grep -Fq 'assets/images/icons/it-support.svg#helpdesk' "$THEME/static-it-support.php"
