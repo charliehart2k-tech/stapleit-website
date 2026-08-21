@@ -5,12 +5,20 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import json
 from pathlib import Path
+import re
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CSS_ROOT = ROOT / "site" / "assets" / "css"
+DESIGN_BASELINES_PATH = ROOT / "DESIGN-BASELINES.json"
+REDUCED_MOTION_RE = re.compile(
+    r"@media\s*\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)",
+    re.I,
+)
+NAV_SPECTRUM_KEYFRAMES_RE = re.compile(r"@keyframes\s+navSpectrumOutline\b", re.I)
 
 SHELL = [
     "tokens.css",
@@ -86,9 +94,38 @@ def main() -> int:
     args = parser.parse_args()
 
     failures: list[str] = []
+    baselines: dict = {}
+    try:
+        baselines = json.loads(DESIGN_BASELINES_PATH.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        failures.append(f"required design baseline is missing: {DESIGN_BASELINES_PATH}")
+    except (OSError, json.JSONDecodeError) as exc:
+        failures.append(f"invalid design baseline {DESIGN_BASELINES_PATH}: {exc}")
+
+    if not isinstance(baselines, dict) or baselines.get("version") != 1:
+        failures.append("DESIGN-BASELINES.json must be a version 1 JSON object")
+        baselines = {}
+
+    registered_home_sources = baselines.get("home_bundle_sources")
+    if registered_home_sources != BUNDLES["home.bundle.css"]:
+        failures.append(
+            "home.bundle.css source order differs from DESIGN-BASELINES.json"
+        )
+
+    nav_spectrum_source = CSS_ROOT / "nav-rainbow.css"
+    if nav_spectrum_source.is_file():
+        nav_spectrum_text = nav_spectrum_source.read_text(encoding="utf-8")
+        if not NAV_SPECTRUM_KEYFRAMES_RE.search(nav_spectrum_text):
+            failures.append("nav-rainbow.css is missing navSpectrumOutline")
+        if not REDUCED_MOTION_RE.search(nav_spectrum_text):
+            failures.append("nav-rainbow.css is missing reduced-motion coverage")
+
     for name, sources in BUNDLES.items():
         output = CSS_ROOT / name
         expected = render(name, sources)
+        expected_text = expected.decode("utf-8")
+        if "@keyframes" in expected_text and not REDUCED_MOTION_RE.search(expected_text):
+            failures.append(f"{name} contains animation without route-level reduced-motion coverage")
         compressed_size = len(gzip.compress(expected, compresslevel=9, mtime=0))
         if compressed_size > MAX_GZIP_BYTES[name]:
             failures.append(

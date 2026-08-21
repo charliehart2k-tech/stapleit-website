@@ -234,7 +234,7 @@
   .service-grid-card .service-slide p{margin-top:14px!important;line-height:1.56!important}
   .service-grid-card .service-points{margin-top:16px!important;gap:8px!important}
   .service-grid-card .service-points li{line-height:1.45!important}
-  .service-grid-card .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;padding-inline:13px!important;justify-content:center!important;font-size:12.5px!important}
+  .service-grid-card .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;padding-inline:13px!important;justify-content:center!important;font-size:var(--type-ui)!important}
 }
 
 /* --------------------------------------------------------------------------

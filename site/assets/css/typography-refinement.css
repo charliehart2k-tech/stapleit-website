@@ -83,6 +83,9 @@ body{letter-spacing:0}
   letter-spacing:0!important;
 }
 
+.contact-panel-intro{font-size:var(--type-body)}
+.contact-row dd{font-size:var(--type-ui)}
+
 /* Keep the semantic homepage H1 visible and in charge of its own rendering.
  * The previous nav stylesheet repainted this text with pseudo-elements. */
 .home-hero-copy{

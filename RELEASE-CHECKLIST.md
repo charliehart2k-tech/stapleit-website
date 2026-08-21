@@ -19,16 +19,19 @@ Use these gates for every rebuilt route and at major homepage milestones.
 
 ## Gate 2 — Design and typography
 
+- Complete the objective and human checks in `DESIGN-QUALITY-GATES.md`.
 - Approved navigation and footer are preserved.
 - Manrope follows the 400/600/700 system; no synthetic intermediate weights or stray font families.
 - Manrope loads from the local audited font file and each route loads exactly one generated CSS bundle.
 - Shared type and spacing tokens in `tokens.css` are used as the baseline.
+- Type and spacing tokens are declared only in `tokens.css`; route-specific aliases do not duplicate the system.
 - Body copy remains comfortably readable and important text is not shrunk to make a layout fit.
 - Copy line length is controlled where practical.
 - Glass remains monochrome unless colour communicates state or is an explicitly approved brand treatment.
 - No internal glass shelf, unapproved coloured glow, spotlight effect or decorative clutter has crept back in.
 - Approved palette-glow exceptions follow `DESIGN-SYSTEM.md`.
 - Spacing, radius and card hierarchy match the current design system.
+- No source file exceeds the specificity ceiling in `DESIGN-BASELINES.json`.
 
 ## Gate 3 — Responsive and accessibility
 

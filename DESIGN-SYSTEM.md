@@ -4,6 +4,8 @@ This is the active visual and engineering reference for the Staple IT website re
 
 The original website material under `reference/` remains the source of truth for content and information architecture. This document defines how that content is presented in the rebuilt site.
 
+Objective release limits and the required human visual review are defined in `DESIGN-QUALITY-GATES.md`; machine-readable floors and debt ceilings live in `DESIGN-BASELINES.json`.
+
 ## 1. Approved visual direction
 
 The site is dark, clean, premium and restrained.

@@ -221,7 +221,7 @@
     justify-self:start!important;
     min-height:54px!important;
     padding-inline:26px!important;
-    font-size:14px!important;
+    font-size:var(--type-ui)!important;
   }
 }
 

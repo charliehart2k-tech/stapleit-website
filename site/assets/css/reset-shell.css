@@ -24,7 +24,7 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   .footer-shell{gap:10px}
   .footer-brand-panel{padding:20px}.footer-logo img{width:188px}.footer-tagline{margin-top:14px;font-size:.9rem;line-height:1.62}
   .footer-nav-group{padding:17px 16px}.footer-nav-group a{width:100%;min-height:44px;margin:0;padding:7px 0;font-size:.88rem}
-  .footer-legal-bar{padding:15px 16px;border-radius:17px}.footer-legal-bar p{font-size:.72rem;line-height:1.6}
+  .footer-legal-bar{padding:15px 16px;border-radius:17px}.footer-legal-bar p{font-size:.75rem;line-height:1.6}
 }
 
 @media(max-width:380px){

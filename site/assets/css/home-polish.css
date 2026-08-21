@@ -195,7 +195,7 @@
   }
 
   .mobile-menu-utility a{
-    min-height:36px!important;
+    min-height:44px!important;
     display:flex!important;
     align-items:center!important;
     justify-content:center!important;
@@ -229,7 +229,7 @@
   .site-header{padding-top:max(8px,env(safe-area-inset-top))!important}
   .nav-shell{min-height:58px!important;padding:6px 7px 6px 11px!important;gap:8px!important;border-radius:20px!important}
   .brand img{width:124px!important}
-  .menu-toggle{min-height:40px!important;padding-inline:13px!important}
+  .menu-toggle{min-height:44px!important;padding-inline:13px!important}
   .mobile-menu:not([hidden]){width:var(--page)!important;padding:9px!important;border-radius:20px!important}
   .mobile-nav-group>summary,.mobile-menu-primary>a{min-height:44px!important;padding-inline:6px!important}
 
@@ -240,14 +240,14 @@
   .home-hero h1{max-width:9ch!important;font-size:clamp(2.6rem,10.9vw,3.15rem)!important;line-height:.97!important;letter-spacing:-.043em!important}
   .hero-tagline{max-width:none!important;margin-top:16px!important;font-size:clamp(1rem,4.35vw,1.15rem)!important;line-height:1.36!important}
   .hero-actions{margin-top:20px!important}
-  .hero-actions .button{width:100%!important;min-height:48px!important;font-size:13px!important}
+  .hero-actions .button{width:100%!important;min-height:48px!important;font-size:var(--type-ui)!important}
   .status-panel{margin:0 13px 14px!important;padding:18px 17px!important;border-radius:20px!important}
-  .status-kicker{font-size:11.5px!important}
+  .status-kicker{font-size:var(--type-small)!important}
   .status-title{margin-top:10px!important;font-size:clamp(1.72rem,7.4vw,2.05rem)!important;line-height:1.03!important}
-  .status-message{margin-top:7px!important;font-size:12px!important}
+  .status-message{margin-top:7px!important;font-size:var(--type-ui)!important}
   .status-hours{margin-top:13px!important;padding-top:11px!important}
-  .status-hours span{font-size:10.5px!important}
-  .status-hours strong{font-size:11.5px!important}
+  .status-hours span{font-size:.75rem!important}
+  .status-hours strong{font-size:var(--type-small)!important}
 
   /* Statement + services */
   .home-intro{padding:8px 0 54px!important}
@@ -278,7 +278,7 @@
   .service-slide p{margin-top:14px!important;line-height:1.56!important}
   .service-points{margin-top:16px!important;gap:8px!important}
   .service-points li{line-height:1.45!important}
-  .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;margin-top:auto!important;padding-inline:13px!important;justify-content:center!important;font-size:12.5px!important}
+  .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;margin-top:auto!important;padding-inline:13px!important;justify-content:center!important;font-size:var(--type-ui)!important}
 
   /* Shared chapter heading scale */
   .audience-header h2,.trust-sticky h2,.audit-hero h2,.contact-hero h2{
@@ -290,7 +290,7 @@
   .audience-section{padding:66px 0 72px!important}
   .audience-header{grid-template-columns:1fr!important;gap:16px!important;padding-bottom:26px!important}
   .audience-header h2{max-width:9ch!important}
-  .audience-header>p:last-child{max-width:none!important;margin:0!important;font-size:15px!important;line-height:1.56!important}
+  .audience-header>p:last-child{max-width:none!important;margin:0!important;font-size:var(--type-body)!important;line-height:1.56!important}
   .audience-grid{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;overflow:visible!important;padding:0!important}
   .audience-item{min-height:0!important;padding:23px 20px!important;border-radius:22px!important}
   .audience-item h3{max-width:none!important;min-height:0!important;line-height:1.06!important}
@@ -358,11 +358,11 @@
   .audit-form-heading{display:block!important;max-width:none!important;margin:0 0 21px!important;padding:0!important}
   .audit-form-heading h3{max-width:none!important;margin:0!important;font-size:clamp(1.95rem,8.1vw,2.35rem)!important;line-height:1!important}
   .audit-fields{display:grid!important;grid-template-columns:1fr!important;gap:14px!important}
-  .audit-field>span{font-size:12.8px!important}
+  .audit-field>span{font-size:var(--type-ui)!important}
   .audit-field input{min-height:53px!important;padding-inline:15px!important;border-radius:15px!important;font-size:16px!important}
   .audit-consent{margin-top:15px!important;padding:14px!important;align-items:flex-start!important;border-radius:15px!important}
   .audit-submit{width:100%!important;min-height:51px!important;margin-top:17px!important;justify-content:center!important}
-  .audit-form-status{margin-top:14px!important;font-size:12.5px!important}
+  .audit-form-status{margin-top:14px!important;font-size:var(--type-ui)!important}
   .audit-explainer{width:100%!important;margin:16px 0 0!important;border-radius:17px!important}
 
   /* Contact: fixed two-line headline, then one clean panel and map. */
@@ -374,15 +374,15 @@
   .contact-panel,.contact-map-card{border-radius:21px!important}
   .contact-panel{padding:19px!important}
   .contact-panel h3{font-size:clamp(1.55rem,6.6vw,1.9rem)!important;line-height:1.02!important}
-  .contact-panel-intro{margin:7px 0 17px!important;font-size:12.5px!important}
+  .contact-panel-intro{margin:7px 0 17px!important;font-size:var(--type-body)!important}
   .contact-list{gap:8px!important}
   .contact-row{min-height:56px!important;gap:9px!important;padding:10px 11px!important}
-  .contact-row dt{font-size:11.5px!important}
-  .contact-row dd{max-width:66%!important;font-size:12px!important;overflow-wrap:anywhere!important}
+  .contact-row dt{font-size:var(--type-small)!important}
+  .contact-row dd{max-width:66%!important;font-size:var(--type-ui)!important;overflow-wrap:anywhere!important}
   .contact-address dd{max-width:66%!important}
   .contact-map-card{grid-template-rows:260px auto!important}
   .contact-map-shell,.contact-map-shell iframe{min-height:260px!important}
-  .contact-map-footer{min-height:0!important;padding:11px 13px!important;gap:5px!important;font-size:11.5px!important}
+  .contact-map-footer{min-height:0!important;padding:11px 13px!important;gap:5px!important;font-size:var(--type-small)!important}
 
   /* Footer */
   .site-footer{margin-top:40px!important;padding-bottom:max(14px,env(safe-area-inset-bottom))!important}
@@ -390,7 +390,7 @@
   .footer-brand-panel{grid-column:1/-1!important}
   .footer-nav-group:last-child{grid-column:1/-1!important}
   .footer-panel{padding:18px!important;border-radius:19px!important}
-  .footer-nav-group a{min-height:38px!important;font-size:12px!important}
+  .footer-nav-group a{min-height:44px!important;font-size:var(--type-small)!important}
   .footer-logo img{width:180px!important}
   .footer-legal-bar{margin-top:10px!important;padding:15px 16px!important}
 }

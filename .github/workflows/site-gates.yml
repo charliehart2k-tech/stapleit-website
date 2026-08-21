@@ -28,6 +28,8 @@ jobs:
             STANDARDS-INDEX.md
             BRAND-PALETTE.md
             DESIGN-SYSTEM.md
+            DESIGN-QUALITY-GATES.md
+            DESIGN-BASELINES.json
             CODE-STANDARDS.md
             ASSET-STANDARDS.md
             SEO-AEO-SCHEMA.md

@@ -111,11 +111,14 @@ A green-looking browser is not sufficient.
 
 The repository gate checks are defined by:
 
+- `DESIGN-QUALITY-GATES.md`
+- `DESIGN-BASELINES.json`
 - `RELEASE-CHECKLIST.md`
 - `PRODUCTION-GATES.md`
 - `.github/workflows/site-gates.yml`
 - `tools/audit-site.py`
 - `tools/audit-assets.py`
+- `tools/build-css.py`
 
 Warnings are not to be ignored. A change must not add new unexplained warnings. Existing warnings are technical debt and should be resolved when the affected area is touched, unless explicitly documented as an approved exception.
 

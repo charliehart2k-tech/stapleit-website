@@ -10,6 +10,8 @@ import re
 import sys
 
 PRODUCTION_ORIGIN = "https://stapleit.co.uk"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DESIGN_BASELINES_PATH = REPO_ROOT / "DESIGN-BASELINES.json"
 ALLOWED_EXTERNAL_HOSTS = {"stapleit.co.uk", "www.google.com"}
 RESOURCE_TAGS = {"link", "img", "source", "video", "audio", "iframe"}
 RUNTIME_ENDPOINTS = {"/wp-admin/admin-ajax.php"}
@@ -28,10 +30,17 @@ JS_DYNAMIC_CODE_RE = re.compile(r"(?:\beval\s*\(|\bnew\s+Function\s*\()", re.I)
 IMPORTANT_RE = re.compile(r"!important\b", re.I)
 TYPE_TOKEN_ALIAS_RE = re.compile(r"--home-(?:chapter|card-title|copy)\b", re.I)
 CSS_NUMBER = r"(?:\d+(?:\.\d+)?|\.\d+)"
-TYPE_UI_LITERAL_RE = re.compile(rf"--type-ui\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
-TYPE_BODY_LITERAL_RE = re.compile(rf"--type-body\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
+CANONICAL_TOKEN_DECL_RE = re.compile(r"(?P<name>--(?:type|space)-[a-z0-9-]+)\s*:", re.I)
+TYPE_TOKEN_LITERAL_RE = re.compile(
+    rf"(?P<name>--type-(?:small|ui|body|lead|card|section|hero))\s*:\s*"
+    rf"(?:clamp\(\s*)?(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b",
+    re.I,
+)
 CSS_RULE_RE = re.compile(r"(?P<selectors>[^{}]+)\{(?P<declarations>[^{}]*)\}", re.S)
 FONT_SIZE_LITERAL_RE = re.compile(rf"font-size\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
+MIN_HEIGHT_LITERAL_RE = re.compile(rf"min-height\s*:\s*(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b", re.I)
+MEDIA_PRELUDE_RE = re.compile(r"@media(?P<conditions>[^{}]+)\{", re.I)
+MEDIA_WIDTH_RE = re.compile(r"\((?:min|max)-width\s*:\s*(?P<value>\d+)px\)", re.I)
 READABLE_TYPE_MIN_PX = {
     ".service-slide p": 15.5,
     ".service-points li": 15.0,
@@ -43,13 +52,34 @@ READABLE_TYPE_MIN_PX = {
     ".mobile-nav-group>summary": 13.0,
     ".mobile-nav-grid .nav-pill": 13.0,
     ".mobile-menu-utility a": 13.0,
+    ".hero-actions .button": 15.0,
+    ".service-cta": 15.0,
+    ".audit-field>span": 14.0,
+    ".audit-form-status": 14.0,
+    ".contact-whatsapp": 15.0,
+    ".footer-legal-bar p": 12.0,
+    ".status-hours span": 12.0,
+    ".audit-explainer-toggle": 14.0,
+    ".audit-explainer-copy>p": 14.0,
+    ".audit-coverage li": 13.0,
 }
-MAX_LEGACY_IMPORTANT = 902
 
 
 def css_pixels(value: str, unit: str) -> float:
     numeric = float(value)
     return numeric * 16 if unit.lower() == "rem" else numeric
+
+
+def selector_contains_element(selectors: str, target: str) -> bool:
+    for selector in selectors.split(","):
+        offset = selector.find(target)
+        while offset >= 0:
+            suffix = selector[offset + len(target):]
+            is_longer_name = bool(suffix) and (suffix[0].isalnum() or suffix[0] in {"-", "_"})
+            if not suffix.startswith("::") and not is_longer_name:
+                return True
+            offset = selector.find(target, offset + len(target))
+    return False
 
 
 def readable_type_issues(text: str) -> list[str]:
@@ -64,12 +94,100 @@ def readable_type_issues(text: str) -> list[str]:
         if not sizes:
             continue
         for selector, minimum in READABLE_TYPE_MIN_PX.items():
-            if selector not in selectors:
+            if not selector_contains_element(selectors, selector):
                 continue
             for size in sizes:
                 if size < minimum:
                     issues.add(f"{selector} resolves from a {size:g}px literal; minimum is {minimum:g}px")
     return sorted(issues)
+
+
+def interactive_height_issues(text: str, floors: dict[str, float]) -> list[str]:
+    issues: set[str] = set()
+    for rule in CSS_RULE_RE.finditer(text):
+        selectors = rule.group("selectors")
+        declarations = rule.group("declarations")
+        heights = [
+            css_pixels(match.group("value"), match.group("unit"))
+            for match in MIN_HEIGHT_LITERAL_RE.finditer(declarations)
+        ]
+        if not heights:
+            continue
+        for selector, minimum in floors.items():
+            if not selector_contains_element(selectors, selector):
+                continue
+            for height in heights:
+                if height < minimum:
+                    issues.add(
+                        f"{selector} resolves from a {height:g}px min-height literal; "
+                        f"minimum is {minimum:g}px"
+                    )
+    return sorted(issues)
+
+
+def load_design_baselines(errors: list[str]) -> dict:
+    try:
+        data = json.loads(DESIGN_BASELINES_PATH.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        errors.append(f"{DESIGN_BASELINES_PATH.name}: required design baseline is missing")
+        return {}
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{DESIGN_BASELINES_PATH.name}: invalid design baseline ({exc})")
+        return {}
+
+    required = {
+        "type_token_floor_px": dict,
+        "interactive_min_height_px": dict,
+        "approved_home_media_widths_px": list,
+        "home_bundle_sources": list,
+        "important_max_by_source": dict,
+        "source_css_important_max": (int, float),
+    }
+    if not isinstance(data, dict) or data.get("version") != 1:
+        errors.append(f"{DESIGN_BASELINES_PATH.name}: expected a version 1 JSON object")
+        return {}
+    for key, expected_type in required.items():
+        if not isinstance(data.get(key), expected_type):
+            errors.append(f"{DESIGN_BASELINES_PATH.name}: {key} has the wrong type")
+            return {}
+    numeric_maps = ("type_token_floor_px", "interactive_min_height_px")
+    for key in numeric_maps:
+        if not all(
+            isinstance(name, str) and isinstance(value, (int, float)) and value >= 0
+            for name, value in data[key].items()
+        ):
+            errors.append(f"{DESIGN_BASELINES_PATH.name}: {key} contains an invalid entry")
+            return {}
+    if not all(
+        isinstance(name, str) and isinstance(value, int) and value >= 0
+        for name, value in data["important_max_by_source"].items()
+    ):
+        errors.append(
+            f"{DESIGN_BASELINES_PATH.name}: important_max_by_source contains an invalid entry"
+        )
+        return {}
+    if not isinstance(data["source_css_important_max"], int) or data["source_css_important_max"] < 0:
+        errors.append(
+            f"{DESIGN_BASELINES_PATH.name}: source_css_important_max must be a non-negative integer"
+        )
+        return {}
+    if sum(data["important_max_by_source"].values()) != data["source_css_important_max"]:
+        errors.append(
+            f"{DESIGN_BASELINES_PATH.name}: per-source specificity ceilings do not match the total"
+        )
+        return {}
+    if not all(isinstance(value, int) and value > 0 for value in data["approved_home_media_widths_px"]):
+        errors.append(
+            f"{DESIGN_BASELINES_PATH.name}: approved_home_media_widths_px contains an invalid width"
+        )
+        return {}
+    if not all(isinstance(value, str) and value.endswith(".css") for value in data["home_bundle_sources"]):
+        errors.append(f"{DESIGN_BASELINES_PATH.name}: home_bundle_sources contains an invalid file")
+        return {}
+    if len(set(data["home_bundle_sources"])) != len(data["home_bundle_sources"]):
+        errors.append(f"{DESIGN_BASELINES_PATH.name}: home_bundle_sources contains a duplicate")
+        return {}
+    return data
 
 
 class HtmlAuditParser(HTMLParser):
@@ -269,6 +387,23 @@ def audit(root: Path) -> int:
     root = root.resolve()
     errors: list[str] = []
     warnings: list[str] = []
+    baselines = load_design_baselines(errors)
+    type_token_floors = {
+        str(name): float(value)
+        for name, value in baselines.get("type_token_floor_px", {}).items()
+    }
+    interactive_height_floors = {
+        str(selector): float(value)
+        for selector, value in baselines.get("interactive_min_height_px", {}).items()
+    }
+    approved_home_media_widths = {
+        int(value) for value in baselines.get("approved_home_media_widths_px", [])
+    }
+    important_max_by_source = {
+        str(name): int(value)
+        for name, value in baselines.get("important_max_by_source", {}).items()
+    }
+    source_css_important_max = int(baselines.get("source_css_important_max", 0))
     html_files = sorted(root.rglob("*.html"))
     checked_refs = 0
     json_ld_count = 0
@@ -408,20 +543,53 @@ def audit(root: Path) -> int:
         if not css.name.endswith(".bundle.css"):
             important_count = len(IMPORTANT_RE.findall(text))
             important_total += important_count
+            important_limit = important_max_by_source.get(css.name, 0)
+            if important_count > important_limit:
+                errors.append(
+                    f"{rel}: specificity debt increased to {important_count} !important declarations; "
+                    f"source ceiling is {important_limit}"
+                )
             if css.name.startswith("it-support") and important_count:
                 errors.append(f"{rel}: IT Support CSS must not introduce !important")
             aliases = sorted(set(TYPE_TOKEN_ALIAS_RE.findall(text)))
             if aliases:
                 errors.append(f"{rel}: duplicate homepage type token alias found: {', '.join(aliases)}")
-            for match in TYPE_UI_LITERAL_RE.finditer(text):
-                size = css_pixels(match.group("value"), match.group("unit"))
-                if size < 15:
-                    errors.append(f"{rel}: --type-ui falls below the 15px readability floor")
-            for match in TYPE_BODY_LITERAL_RE.finditer(text):
-                size = css_pixels(match.group("value"), match.group("unit"))
-                if size < 16:
-                    errors.append(f"{rel}: --type-body falls below the 16px readability floor")
+            token_declarations = sorted(
+                {match.group("name") for match in CANONICAL_TOKEN_DECL_RE.finditer(text)}
+            )
+            if token_declarations and css.name != "tokens.css":
+                errors.append(
+                    f"{rel}: canonical type/space tokens may only be declared in tokens.css: "
+                    f"{', '.join(token_declarations)}"
+                )
+            if css.name == "tokens.css":
+                declared_type_tokens: set[str] = set()
+                for match in TYPE_TOKEN_LITERAL_RE.finditer(text):
+                    name = match.group("name").lower()
+                    declared_type_tokens.add(name)
+                    size = css_pixels(match.group("value"), match.group("unit"))
+                    minimum = type_token_floors.get(name)
+                    if minimum is not None and size < minimum:
+                        errors.append(
+                            f"{rel}: {name} falls to {size:g}px; minimum is {minimum:g}px"
+                        )
+                missing_type_tokens = sorted(set(type_token_floors) - declared_type_tokens)
+                if missing_type_tokens:
+                    errors.append(
+                        f"{rel}: canonical type token declaration missing: "
+                        f"{', '.join(missing_type_tokens)}"
+                    )
+            if css.name.startswith("home-"):
+                for media in MEDIA_PRELUDE_RE.finditer(text):
+                    for match in MEDIA_WIDTH_RE.finditer(media.group("conditions")):
+                        width = int(match.group("value"))
+                        if width not in approved_home_media_widths:
+                            errors.append(
+                                f"{rel}: unregistered homepage media-query width {width}px"
+                            )
             for issue in readable_type_issues(text):
+                errors.append(f"{rel}: {issue}")
+            for issue in interactive_height_issues(text, interactive_height_floors):
                 errors.append(f"{rel}: {issue}")
         imports = [m.group(1) for m in CSS_IMPORT_RE.finditer(text)]
         refs = [m.group(2) for m in CSS_URL_RE.finditer(text)] + imports
@@ -433,7 +601,7 @@ def audit(root: Path) -> int:
             errors.append(f"{rel}: backdrop-filter is missing its WebKit compatibility declaration")
         weights = sorted({int(m.group(1)) for m in FONT_WEIGHT_RE.finditer(text) if int(m.group(1)) not in {400, 600, 700}})
         if weights:
-            warnings.append(f"{rel}: non-canonical Manrope weights detected: {', '.join(map(str, weights))}")
+            errors.append(f"{rel}: non-canonical Manrope weights detected: {', '.join(map(str, weights))}")
         for raw in refs:
             checked_refs += 1
             if not raw or raw.startswith("#"):
@@ -447,10 +615,10 @@ def audit(root: Path) -> int:
             if target is not None and not target.exists():
                 errors.append(f"{rel}: missing CSS asset -> {raw}")
 
-    if important_total > MAX_LEGACY_IMPORTANT:
+    if important_total > source_css_important_max:
         errors.append(
             f"CSS specificity debt increased to {important_total} !important declarations; "
-            f"legacy ceiling is {MAX_LEGACY_IMPORTANT}"
+            f"source ceiling is {source_css_important_max}"
         )
 
     for js in sorted(root.rglob("*.js")):

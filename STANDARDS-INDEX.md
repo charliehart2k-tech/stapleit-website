@@ -29,6 +29,8 @@ The hero contains no background blob or video after the SVG intro retires; the s
 | `AGENTS.md` | Mandatory operating procedure for engineers and AI agents |
 | `BRAND-PALETTE.md` | Canonical Staple IT and service colours |
 | `DESIGN-SYSTEM.md` | Visual language, glass, typography, motion, responsive, accessibility, performance and security baseline |
+| `DESIGN-QUALITY-GATES.md` | Enforceable design, typography, layout, motion and CSS quality criteria |
+| `DESIGN-BASELINES.json` | Machine-readable type, touch, breakpoint, bundle-order and specificity limits |
 | `CODE-STANDARDS.md` | HTML, CSS, JavaScript, PHP and repository coding conventions |
 | `ASSET-STANDARDS.md` | Image, logo, video, transparency, optimisation and integrity rules |
 | `SEO-AEO-SCHEMA.md` | SEO, AEO/GEO/ASEO and structured-data rules |
@@ -45,9 +47,13 @@ The repository currently enforces:
 - shell syntax for the staging deploy script;
 - required governing standards being present;
 - static content/security/reference/SEO/AEO checks;
-- canonical Manrope weight checks;
-- canonical shared type tokens, a 15px UI-token floor, a 16px body-copy floor, a 15px minimum for compact decision copy and a 13px mobile-navigation floor;
+- blocking canonical Manrope weight checks;
+- canonical shared type/spacing token ownership, semantic type floors and protected readable-copy floors;
 - no duplicate homepage-only aliases for chapter, card-heading or body-copy type roles;
+- per-file and total `!important` ceilings that can decrease but cannot drift upward;
+- registered homepage media-query widths and homepage bundle source order;
+- 44px minimum-height protection for key interactive controls;
+- route-level reduced-motion coverage for animated bundles and preservation of the approved navigation spectrum fallback;
 - no runtime JavaScript inline-style injection/mutation;
 - no `eval()` / `new Function()` dynamic code execution;
 - working per-file CSS and JavaScript size budgets;
@@ -63,6 +69,8 @@ Before pushing a substantive change:
 ```bash
 python3 tools/audit-site.py --root site
 python3 tools/audit-assets.py --root site/assets
+python3 tools/audit-repository.py --root .
+python3 tools/build-css.py --check
 bash -n tools/deploy-wordpress-staging.sh
 bash -n tools/audit-vps.sh
 bash -n tools/prune-theme-backups.sh

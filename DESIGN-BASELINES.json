@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "type_token_floor_px": {
+    "--type-small": 13,
+    "--type-ui": 15,
+    "--type-body": 16,
+    "--type-lead": 18,
+    "--type-card": 24.8,
+    "--type-section": 44,
+    "--type-hero": 72
+  },
+  "interactive_min_height_px": {
+    ".button": 44,
+    ".nav-pill": 44,
+    ".menu-toggle": 44,
+    ".mobile-menu-utility a": 44,
+    ".service-cta": 44,
+    ".audit-submit": 44,
+    ".google-review-link": 44,
+    ".contact-whatsapp": 44,
+    ".footer-nav-group a": 44
+  },
+  "approved_home_media_widths_px": [
+    370,
+    400,
+    430,
+    640,
+    700,
+    701,
+    980,
+    981,
+    1260
+  ],
+  "home_bundle_sources": [
+    "tokens.css",
+    "base.css",
+    "glass.css",
+    "nav.css",
+    "reset-shell.css",
+    "home-hero.css",
+    "trust-liquid.css",
+    "home-conversion.css",
+    "audit-enhancements.css",
+    "home-polish.css",
+    "home-golden.css",
+    "home-services-grid.css",
+    "trust-note.css",
+    "partners.css",
+    "home-spacing.css",
+    "typography-refinement.css",
+    "nav-rainbow.css"
+  ],
+  "source_css_important_max": 902,
+  "important_max_by_source": {
+    "audit-enhancements.css": 27,
+    "base.css": 1,
+    "home-conversion.css": 7,
+    "home-golden.css": 160,
+    "home-hero.css": 4,
+    "home-polish.css": 339,
+    "home-services-grid.css": 128,
+    "home-spacing.css": 123,
+    "nav-rainbow.css": 3,
+    "partners.css": 2,
+    "reset-shell.css": 1,
+    "trust-liquid.css": 30,
+    "trust-note.css": 67,
+    "typography-refinement.css": 10
+  }
+}
