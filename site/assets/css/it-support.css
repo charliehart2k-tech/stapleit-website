@@ -304,7 +304,7 @@
   background-size:260% 260%;
 }
 
-/* Included-as-standard matrix -------------------------------------------- */
+/* Included-as-standard --------------------------------------------------- */
 .support-standard{
   position:relative;
   z-index:2;
@@ -418,7 +418,6 @@
   }
 }
 
-/* Shared card material and interaction ------------------------------------ */
 .support-card{
   --support-card-accent:var(--support);
   isolation:isolate;
@@ -562,8 +561,6 @@
   line-height:1.62;
 }
 
-.support-onboarding-accent{color:var(--white)}
-
 .support-step-progress{
   --progress-inset:calc((100% - 48px)/6);
   position:relative;
@@ -694,7 +691,7 @@
     radial-gradient(circle at 34% 30%,color-mix(in srgb,var(--step-accent) 34%,transparent),transparent 58%),
     radial-gradient(circle at 72% 72%,color-mix(in srgb,var(--step-accent-alt) 24%,transparent),transparent 54%);
   filter:blur(42px) saturate(128%);
-  opacity:.045;
+  opacity:.11;
   transform:translate3d(-8%,6%,0) rotate(-4deg) scale(.92);
   transition:opacity 1300ms ease,transform 1500ms cubic-bezier(.16,1,.3,1),filter 1300ms ease;
 }
@@ -760,7 +757,7 @@
 .support-onboarding[data-progress="1"] .support-step-card:nth-child(1)::before,
 .support-onboarding[data-progress="2"] .support-step-card:nth-child(2)::before,
 .support-onboarding[data-progress="3"] .support-step-card:nth-child(3)::before{
-  opacity:.16;
+  opacity:.29;
 }
 
 @media(hover:hover) and (pointer:fine){
@@ -800,7 +797,7 @@
 
 .support-package-grid{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:18px;
   align-items:stretch;
 }
@@ -1378,6 +1375,8 @@
   #support-packs-grid>.motion-ready.motion-in:nth-child(3n),
   #support-services-grid>.motion-ready.motion-in:nth-child(3){transition-delay:210ms}
 
+  .support-package-grid>.motion-ready.motion-in:nth-child(4){transition-delay:315ms}
+
   .support-step-grid>.motion-ready.motion-settled,
   .support-package-grid>.motion-ready.motion-settled,
   #support-packs-grid>.motion-ready.motion-settled,
@@ -1645,6 +1644,8 @@
   .support-hero-shell::before,
   .support-cta-panel::before{animation:none}
   .support-hero-unlimited,
+  .support-onboarding-accent,
+  .support-packages-accent,
   .support-hero-cta::before{animation:none;background-position:50% 50%}
   .support-hero-cta span,
   .support-standard-group,

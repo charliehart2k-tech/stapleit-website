@@ -152,7 +152,7 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 
 - Uses the same large rounded proportions as the homepage hero and settles as pure translucent black glass after its opening SVG text-mask transition.
 - The CSS-only opening mask begins on first paint and shows `Unlimited IT Support` at large scale as clean letterforms containing a restrained blue-to-purple moving field and a purpose-built soft SVG glow. The display title retires fully before ten dimensional black shutters open smoothly from the centre out to reveal the real hero. The permanent semantic heading is only exposed through the opening shutters, preventing a pre-intro hero flash or overlapping copy; no travelling title, expanding aperture or generic wipe is used.
-- The intro uses no video, third-party runtime or scroll-jacking, runs once on page load and is skipped for reduced motion. Without JavaScript, the normal hero remains fully visible.
+- The intro uses no video, third-party runtime or scroll-jacking, runs once on page load and is skipped for reduced motion. On stacked mobile layouts its mask and shutters are constrained to the proposition pane rather than stretching over the full combined hero and inclusions height. Without JavaScript, the normal hero remains fully visible.
 - Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
 - `Unlimited` keeps the approved restrained blue-to-purple moving-highlight treatment after the intro completes.
 - Pricing sits immediately beneath as `from £35 per staff member, per month`, with `£35` in Signal Red.
@@ -165,13 +165,14 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - The managed-support feature chapter uses six matching black-glass cards in a three-by-two desktop grid, collapsing to two columns on tablet and one column on phone.
 - Feature and onboarding cards use Support Green as their interaction accent, including the same soft bloom, travelling sheen and small lift language as the approved homepage cards.
 - The onboarding chapter presents `01`, `02`, `03` in order as three matching step cards. It becomes a single vertical sequence below the tablet breakpoint.
+- The words `simple` in the onboarding heading and `support` in the package heading use a restrained Support Green moving fill and soft glow derived from the settled `Unlimited` treatment; the copy remains readable and static when reduced motion is requested.
 - On desktop the onboarding rail advances at a measured pace when the chapter enters view and remains directly controllable by hover or keyboard focus. Tablet and phone layouts replace the detached horizontal rail with an in-flow vertical timeline aligned to the stacked cards.
 - Support cards use restrained cursor/focus-responsive light and sheen on fine-pointer devices. Touch and reduced-motion devices keep the same material without decorative movement; interaction must not flood the card with colour and scroll entry may animate only compositor-friendly presentation properties.
 - Small pre-heading/kicker labels and repetitive closing straplines are omitted so the chapters read cleanly and directly.
 - Desktop card typography is vertically aligned: feature headings reserve a common heading row, onboarding titles reserve a common title row, and package badges do not push package titles or prices out of alignment.
-- IT Support packages always read left-to-right as `Basic`, `Standard`, `Premium` on desktop and in that same order when stacked.
+- IT Support packages read left-to-right as `Sole trader`, `Basic`, `Standard`, `Premium` on desktop and in that same order when stacked. The four-column desktop composition becomes two columns before the cards become cramped and one column on tablet/phone.
 - Package pricing uses the same `per staff member, per month` wording as the IT Support hero.
-- Package tier accents are deliberate UI semantics: `Basic` uses `--tier-basic` red, `Standard` uses `--tier-standard` blue and `Premium` uses `--tier-premium` purple. The glass material remains predominantly black.
+- Package tier accents are deliberate UI semantics: `Sole trader` uses the route-local neutral grey `--tier-sole`, `Basic` uses `--tier-basic` red, `Standard` uses `--tier-standard` blue and `Premium` uses `--tier-premium` purple. The glass material remains predominantly black. The Sole trader tier may remain price-on-application without an inclusions control until its commercial scope is approved; do not open an empty dialog.
 - `Standard` is explicitly marked `Most popular`; the badge and blue treatment reinforce the tier but popularity must never be communicated by colour alone.
 - Every IT Support card, including the hero summary, uses the shared one-time opacity/vertical reveal and homepage-equivalent hover bloom/sheen interaction. Reduced motion and no-IntersectionObserver paths remain fully readable.
 - Cross-document page transitions are inherited from the same shared `base.css` View Transition treatment used by the homepage.
