@@ -26,6 +26,7 @@ SHELL = [
     "glass.css",
     "nav.css",
     "reset-shell.css",
+    "cora.css",
 ]
 
 SUPPORT_SHELL = [
@@ -35,6 +36,7 @@ SUPPORT_SHELL = [
     "nav.css",
     "nav-rainbow.css",
     "reset-shell.css",
+    "cora.css",
 ]
 
 BUNDLES = {

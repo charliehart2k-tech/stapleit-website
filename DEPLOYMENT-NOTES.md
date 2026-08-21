@@ -64,14 +64,57 @@ The report intentionally excludes WordPress salts, database credentials, databas
 ## Rollback backup retention
 
 Each successful staging deployment keeps the five newest theme rollback releases and removes older release groups. The retention applies only inside `/home/deploy/stapleit-theme-backups` and includes the matching legacy static-template and route-handler copies. Override the default for a specific deployment with `BACKUP_RETENTION`, but never set it below two.
-# Local support adviser
+# Cora local AI
 
-The IT Support service adviser always has a dependency-free catalogue-matching fallback. To enable private local-model inference, install Ollama on the VPS, keep it bound to loopback and define the model in `wp-config.php`:
+Cora appears on every route through the shared CSS and `app.js`. She always has a dependency-free catalogue fallback, but genuine conversation requires Ollama on the WordPress VPS. The recommended 7B Q5 model needs roughly 5.3 GB for its model plus runtime and operating-system headroom; use a VPS with at least 8 GB available RAM and verify capacity before pulling it.
+
+Install Ollama using its official Linux installer, keep the service on loopback and pull the Apache-2.0 Qwen2.5 7B model:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+sudo systemctl edit ollama
+```
+
+Add this systemd override:
+
+```ini
+[Service]
+Environment="OLLAMA_HOST=127.0.0.1:11434"
+Environment="OLLAMA_KEEP_ALIVE=10m"
+Environment="OLLAMA_NUM_PARALLEL=1"
+```
+
+Then activate and verify it:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now ollama
+ollama pull qwen2.5:7b-instruct-q5_0
+curl --fail --silent http://127.0.0.1:11434/api/tags
+sudo ss -lntp | grep 11434
+```
+
+The `ss` result must show `127.0.0.1:11434`, never `0.0.0.0:11434` or a public address. Do not create an Nginx, Cloudflare Tunnel or firewall route to Ollama.
+
+Add the model constant above the `/* That's all, stop editing! */` line in the live `wp-config.php`:
 
 ```php
 define( 'STAPLEIT_OLLAMA_MODEL', 'qwen2.5:7b-instruct-q5_0' );
 ```
 
-Use the Apache-2.0 7B Qwen2.5 model, not the separately licensed 3B or 72B variants. WordPress calls `http://127.0.0.1:11434`; that port must not be published through Nginx, Cloudflare or the host firewall. If the model is absent, slow or returns malformed JSON, visitors receive the explicitly labelled catalogue match instead. No third-party AI API or browser credential is used.
+If WordPress defines `WP_HTTP_BLOCK_EXTERNAL`, allow loopback HTTP explicitly or its request to Ollama will be blocked. WordPress calls only `http://127.0.0.1:11434`; the model URL and credentials are never exposed to the browser.
+
+After deploying the current Git commit, prove the full path through WordPress:
+
+```bash
+curl --fail --silent --show-error \
+  --request POST 'https://staging.stapleitdev.co.uk/wp-admin/admin-ajax.php' \
+  --data-urlencode 'action=stapleit_cora_chat' \
+  --data-urlencode 'prompt=We have ten staff and need help with Microsoft 365 security.'
+```
+
+The JSON must contain `"ok":true`, `"mode":"local-ai"` and a useful `reply`. `"mode":"catalogue-match"` means the website is working but WordPress could not reach or use Ollama; check the constant, `systemctl status ollama`, available memory and the WordPress/PHP error log. Do not call Cora live AI until this returns `local-ai`.
+
+Use the Apache-2.0 7B Qwen2.5 model, not the separately licensed 3B or 72B variants. If Ollama is absent, slow or returns an invalid response, visitors receive the explicitly labelled catalogue match instead. No third-party AI API or browser credential is used. Cora rate-limits each connection, accepts only a short six-message history, does not log prompts in WordPress and refuses requests for credentials through her system instruction.
 
 Planner analytics are first-party daily aggregate counters stored in the WordPress options table for 90 days. They contain only allowlisted event names and counts: no prompts, answers, IP addresses, cookies, device identifiers or contact details.
