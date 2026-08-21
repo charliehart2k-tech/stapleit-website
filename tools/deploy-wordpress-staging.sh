@@ -197,10 +197,15 @@ grep -Fq 'From day-to-day IT support for common problems to fully managed securi
 grep -Fq 'supportIntroBlindOpen' "$THEME/assets/css/it-support.css"
 grep -Fq 'supportIntroWordmarkRetire' "$THEME/assets/css/it-support.css"
 grep -Fq 'supportIntroLayerRetire' "$THEME/assets/css/it-support.css"
+grep -Fq 'supportIntroVeilRetire' "$THEME/assets/css/it-support.css"
 grep -Fq 'supportDialogSheetIn' "$THEME/assets/css/it-support.css"
 grep -Fq 'motion-settled' "$THEME/assets/js/it-support.js"
 if grep -Fq 'data-support-hero-intro' "$THEME/static-it-support.php" || grep -Fq 'hero-intro-running' "$THEME/assets/js/it-support.js"; then
   echo "Retired JavaScript-triggered IT Support intro is still referenced; refusing deployment." >&2
+  exit 1
+fi
+if grep -Fq 'rotateY(var(--blind-turn))' "$THEME/assets/css/it-support.css"; then
+  echo "Retired 3D IT Support shutters are still present; refusing deployment." >&2
   exit 1
 fi
 if grep -Fq 'support-intro-cover-mask' "$THEME/static-it-support.php" || grep -Fq 'support-hero-intro-reveal' "$THEME/static-it-support.php"; then

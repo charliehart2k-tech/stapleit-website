@@ -105,10 +105,10 @@
 <stop offset="1" stop-color="#1D4ED8"/>
 </linearGradient>
 <filter id="support-intro-glow" x="-28%" y="-38%" width="156%" height="176%" color-interpolation-filters="sRGB">
-<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
-<feFlood flood-color="#8B5CF6" flood-opacity=".72" result="glow-colour"/>
+<feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur"/>
+<feFlood flood-color="#8B5CF6" flood-opacity=".46" result="glow-colour"/>
 <feComposite in="glow-colour" in2="blur" operator="in" result="glow"/>
-<feGaussianBlur in="SourceGraphic" stdDeviation="2.4" result="near-blur"/>
+<feGaussianBlur in="SourceGraphic" stdDeviation="1.25" result="near-blur"/>
 <feMerge><feMergeNode in="glow"/><feMergeNode in="near-blur"/><feMergeNode in="SourceGraphic"/></feMerge>
 </filter>
 <mask id="support-intro-text-mask" maskUnits="userSpaceOnUse" mask-type="luminance" x="0" y="0" width="1200" height="620">
