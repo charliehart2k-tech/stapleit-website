@@ -328,3 +328,7 @@
   .audit-form::before,.audit-form::after,.audit-explainer::before,#contact-title .accent-orange{animation:none!important}
   #contact-title .accent-orange{background:none!important;-webkit-text-fill-color:#fff;color:#fff!important}
 }
+.audit-field--wide{grid-column:1/-1}
+.audit-field textarea{width:100%;min-height:118px;padding:14px 15px;border:1px solid rgba(255,255,255,.16);border-radius:15px;background:rgba(0,0,0,.46);color:#fff;font:inherit;line-height:1.5;resize:vertical}
+.audit-field textarea:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.audit-field small{color:var(--muted);font-size:.86em;font-weight:400}

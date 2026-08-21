@@ -1,0 +1,10 @@
+{
+  "name": "stapleit-site-gates",
+  "private": true,
+  "scripts": {
+    "test:visual": "playwright test tests/visual/it-support.visual.spec.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0"
+  }
+}

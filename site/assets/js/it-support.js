@@ -250,6 +250,14 @@
 
     resultsSummary.textContent = resultSummaryText(likelyCount, considerCount);
     resultsEmpty.hidden = likelyCount + considerCount > 0;
+    const packSummary = resultRows
+      .filter(row => !row.hidden)
+      .map(row => `${row.querySelector('h4')?.textContent?.trim()}: ${row.querySelector('[data-pack-result-status]')?.textContent?.trim()}`)
+      .filter(Boolean);
+    window.stapleitPlanner = window.stapleitPlanner || {};
+    window.stapleitPlanner.packs = packSummary;
+    window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
+    window.stapleitTrack?.('pack_finder_completed');
     stage.hidden = true;
     results.hidden = false;
     delete form.dataset.packDirection;
@@ -262,6 +270,7 @@
 
   nextButton.addEventListener('click', () => {
     if (!selectedAnswer(questions[currentQuestion])) return;
+    if (currentQuestion === 0) window.stapleitTrack?.('pack_finder_started');
     if (currentQuestion === questions.length - 1) {
       showResults();
       return;
@@ -282,6 +291,173 @@
   showQuestion(0, { focus: false });
 
   if (reducedMotion.matches) delete form.dataset.packDirection;
+})();
+
+(() => {
+  const endpoint = '/wp-admin/admin-ajax.php';
+  const sent = new Set();
+  window.stapleitTrack = eventName => {
+    if (!/^(package_finder_started|package_finder_completed|pack_finder_started|pack_finder_completed|cost_estimate_updated|adviser_used|planner_handoff_clicked)$/.test(eventName) || sent.has(eventName)) return;
+    sent.add(eventName);
+    const body = new URLSearchParams({ action: 'stapleit_track_planner_event', event: eventName });
+    if (navigator.sendBeacon) navigator.sendBeacon(endpoint, body);
+    else fetch(endpoint, { method: 'POST', body, credentials: 'same-origin', keepalive: true }).catch(() => {});
+  };
+})();
+
+(() => {
+  const form = document.querySelector('[data-package-finder]');
+  if (!(form instanceof HTMLFormElement)) return;
+  const questions = [...form.querySelectorAll('[data-package-question]')];
+  const count = form.querySelector('[data-package-count]');
+  const progress = form.querySelector('[data-package-progress]');
+  const back = form.querySelector('[data-package-back]');
+  const next = form.querySelector('[data-package-next]');
+  const result = form.querySelector('[data-package-result]');
+  const title = form.querySelector('[data-package-title]');
+  const reason = form.querySelector('[data-package-reason]');
+  const review = form.querySelector('[data-package-review]');
+  const staff = form.querySelector('[data-cost-staff]');
+  const tier = form.querySelector('[data-cost-tier]');
+  const total = form.querySelector('[data-cost-total]');
+  const note = form.querySelector('[data-cost-note]');
+  if (!questions.length || !count || !(progress instanceof HTMLProgressElement) || !(back instanceof HTMLButtonElement) || !(next instanceof HTMLButtonElement) || !result || !title || !reason || !(review instanceof HTMLButtonElement) || !(staff instanceof HTMLInputElement) || !(tier instanceof HTMLSelectElement) || !total || !note) return;
+
+  const rates = { basic: 35, standard: 55, premium: 75 };
+  let current = 0;
+  const answer = question => question.querySelector('input:checked')?.value || '';
+  const updateControls = () => {
+    count.textContent = `Question ${current + 1} of ${questions.length}`;
+    progress.value = current + 1;
+    back.hidden = current === 0;
+    next.disabled = !answer(questions[current]);
+    next.textContent = current === questions.length - 1 ? 'See my recommendation' : 'Continue';
+  };
+  const show = (index, focus = true) => {
+    current = Math.max(0, Math.min(questions.length - 1, index));
+    questions.forEach((question, questionIndex) => { question.hidden = questionIndex !== current; });
+    result.hidden = true;
+    updateControls();
+    if (focus) requestAnimationFrame(() => questions[current].querySelector('legend')?.focus());
+  };
+  const calculate = () => {
+    const people = Math.max(5, Math.min(500, Number.parseInt(staff.value, 10) || 5));
+    staff.value = String(people);
+    const monthly = people * rates[tier.value];
+    total.textContent = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 }).format(monthly);
+    window.stapleitPlanner = window.stapleitPlanner || {};
+    window.stapleitPlanner.package = `${tier.options[tier.selectedIndex].text.split(' — ')[0]} for ${people} staff, estimated ${total.textContent} per month`;
+    window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
+  };
+  const showResult = () => {
+    const team = answer(questions[0]);
+    const protection = answer(questions[1]);
+    const evidence = answer(questions[2]);
+    if (team === '1' || team === '4') {
+      title.textContent = team === '1' ? 'Tailored sole-trader support' : 'A tailored support plan';
+      reason.textContent = 'Our published per-person packages start at five staff, so a short conversation will give you a more honest answer than a made-up online price.';
+      staff.closest('[data-cost-calculator]').hidden = true;
+      note.textContent = 'Price on application. We will confirm the scope before you commit to anything.';
+      window.stapleitPlanner = window.stapleitPlanner || {};
+      window.stapleitPlanner.package = `${title.textContent} — price on application`;
+    } else {
+      let recommended = protection;
+      if (evidence === 'yes' && recommended === 'basic') recommended = 'standard';
+      tier.value = recommended;
+      staff.value = team === '25' ? '25' : '10';
+      staff.closest('[data-cost-calculator]').hidden = false;
+      title.textContent = `${recommended[0].toUpperCase()}${recommended.slice(1)} is the sensible starting point`;
+      reason.textContent = evidence === 'yes'
+        ? 'Your need to provide security evidence makes managed protection and regular reviews important, as well as day-to-day support.'
+        : recommended === 'basic' ? 'Your answers point to straightforward day-to-day support without unnecessary extras.'
+          : recommended === 'standard' ? 'You want day-to-day support with stronger security, backup and identity protection.'
+            : 'You want the most complete package, including Microsoft 365 Business Premium and enhanced protection.';
+      calculate();
+    }
+    questions.forEach(question => { question.hidden = true; });
+    result.hidden = false;
+    window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
+    window.stapleitTrack?.('package_finder_completed');
+    requestAnimationFrame(() => title.focus());
+  };
+  questions.forEach(question => question.addEventListener('change', updateControls));
+  next.addEventListener('click', () => {
+    if (!answer(questions[current])) return;
+    if (current === 0) window.stapleitTrack?.('package_finder_started');
+    if (current === questions.length - 1) showResult(); else show(current + 1);
+  });
+  back.addEventListener('click', () => show(current - 1));
+  review.addEventListener('click', () => show(questions.length - 1));
+  staff.addEventListener('change', () => { calculate(); window.stapleitTrack?.('cost_estimate_updated'); });
+  tier.addEventListener('change', () => { calculate(); window.stapleitTrack?.('cost_estimate_updated'); });
+  form.addEventListener('submit', event => event.preventDefault());
+  form.classList.add('is-enhanced');
+  show(0, false);
+})();
+
+(() => {
+  const form = document.querySelector('[data-support-adviser]');
+  if (!(form instanceof HTMLFormElement)) return;
+  const prompt = form.querySelector('textarea[name="prompt"]');
+  const submit = form.querySelector('[data-adviser-submit]');
+  const status = form.querySelector('[data-adviser-status]');
+  const result = form.querySelector('[data-adviser-result]');
+  const heading = form.querySelector('[data-adviser-heading]');
+  const copy = form.querySelector('[data-adviser-copy]');
+  const services = form.querySelector('[data-adviser-services]');
+  if (!(prompt instanceof HTMLTextAreaElement) || !(submit instanceof HTMLButtonElement) || !status || !result || !heading || !copy || !services) return;
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    submit.disabled = true;
+    status.hidden = false;
+    status.textContent = 'Matching your needs…';
+    try {
+      const body = new URLSearchParams({ action: 'stapleit_support_adviser', prompt: prompt.value });
+      const response = await fetch('/wp-admin/admin-ajax.php', { method: 'POST', headers: { Accept: 'application/json' }, body, credentials: 'same-origin' });
+      const payload = await response.json();
+      if (!response.ok || payload?.ok === false) throw new Error(payload?.message || 'The adviser is unavailable.');
+      heading.textContent = payload.heading;
+      copy.textContent = payload.summary;
+      services.replaceChildren(...payload.services.map(service => { const item = document.createElement('li'); item.textContent = service; return item; }));
+      result.hidden = false;
+      status.textContent = payload.mode === 'local-ai' ? 'Private local AI recommendation' : 'Instant catalogue recommendation';
+      window.stapleitPlanner = window.stapleitPlanner || {};
+      window.stapleitPlanner.adviser = `${payload.heading}: ${payload.services.join(', ')}`;
+      window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
+      window.stapleitTrack?.('adviser_used');
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : 'The adviser is unavailable. Please use the questions above.';
+    } finally { submit.disabled = false; }
+  });
+})();
+
+(() => {
+  const handoff = document.querySelector('[data-planner-handoff]');
+  const consent = handoff?.querySelector('[data-planner-consent]');
+  const audit = handoff?.querySelector('[data-planner-audit]');
+  if (!handoff || !(consent instanceof HTMLInputElement) || !(audit instanceof HTMLAnchorElement)) return;
+  const summary = () => {
+    const planner = window.stapleitPlanner || {};
+    const lines = ['IT Support planner summary'];
+    if (planner.package) lines.push(`Package: ${planner.package}`);
+    if (planner.packs?.length) lines.push(`Possible add-ons: ${planner.packs.join('; ')}`);
+    if (planner.adviser) lines.push(`Service adviser: ${planner.adviser}`);
+    return lines.length > 1 ? lines.join('\n') : '';
+  };
+  window.addEventListener('stapleit:planner-update', () => { handoff.hidden = !summary(); });
+  audit.addEventListener('click', event => {
+    if (!consent.checked) {
+      event.preventDefault();
+      consent.setCustomValidity('Please confirm that you want to include these recommendations.');
+      consent.reportValidity();
+      return;
+    }
+    consent.setCustomValidity('');
+    sessionStorage.setItem('stapleitPlannerSummary', summary());
+    window.stapleitTrack?.('planner_handoff_clicked');
+  });
+  consent.addEventListener('change', () => consent.setCustomValidity(''));
 })();
 
 (() => {
