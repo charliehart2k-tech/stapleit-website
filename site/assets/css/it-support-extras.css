@@ -31,18 +31,6 @@ body.support-dialog-open{overflow:hidden}
   }
 }
 
-.support-onboarding[data-progress="1"] .support-step-card:nth-child(1) .support-step-content,
-.support-onboarding[data-progress="2"] .support-step-card:nth-child(2) .support-step-content,
-.support-onboarding[data-progress="3"] .support-step-card:nth-child(3) .support-step-content{
-  border-color:color-mix(in srgb,var(--step-accent) 23%,rgba(255,255,255,.14));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.075),
-    inset 0 -18px 32px rgba(0,0,0,.24),
-    0 32px 86px color-mix(in srgb,var(--step-accent) 11%,transparent),
-    0 0 52px color-mix(in srgb,var(--step-accent) 6%,transparent),
-    0 22px 58px rgba(0,0,0,.34);
-}
-
 .support-package-sole{--support-card-accent:var(--tier-sole)}
 
 .support-dialog--sole{--support-card-accent:var(--tier-sole)}
@@ -288,10 +276,6 @@ body.support-dialog-open{overflow:hidden}
 
 @media(max-width:1180px) and (min-width:981px){
   .support-package-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-
-@media(max-width:1080px){
-  .support-hero-intro{inset:0 0 auto;height:clamp(400px,48vw,500px)}
 }
 
 .support-packs{
@@ -591,7 +575,6 @@ body.support-dialog-open{overflow:hidden}
 }
 
 @media(max-width:700px){
-  .support-hero-intro{height:clamp(320px,96vw,390px)}
   .support-packs{padding-block:var(--space-7)}
   .support-extras{padding-top:0;padding-bottom:var(--space-7)}
 
@@ -635,7 +618,6 @@ body.support-dialog-open{overflow:hidden}
 }
 
 @media(forced-colors:active){
-  .support-hero-intro{display:none}
   .support-hero-copy,
   .support-standard{opacity:1;animation:none}
   .support-hero-proposition>*,
@@ -646,7 +628,10 @@ body.support-dialog-open{overflow:hidden}
   .support-package-card,
   .support-extra-card,
   .support-cta-panel{forced-color-adjust:auto;background:Canvas;border-color:CanvasText}
+  .support-step-content::before,
+  .support-step-content::after{display:none}
   .support-standard-icon{color:CanvasText}
+  .support-hero-unlimited,
   .support-onboarding-accent,
   .support-packages-accent{
     background:none;

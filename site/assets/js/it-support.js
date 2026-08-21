@@ -212,8 +212,8 @@
     if (timelinePlayed || reducedMotion.matches || !desktopLayout.matches) return;
     timelinePlayed = true;
     setProgress(1);
-    timelineTimers.push(window.setTimeout(() => setProgress(2), 1200));
-    timelineTimers.push(window.setTimeout(() => setProgress(3), 2400));
+    timelineTimers.push(window.setTimeout(() => setProgress(2), 1800));
+    timelineTimers.push(window.setTimeout(() => setProgress(3), 3600));
   };
 
   setProgress(1);

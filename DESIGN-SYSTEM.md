@@ -159,11 +159,11 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 
 ### IT Support hero
 
-- Uses the same large rounded proportions as the homepage hero and settles as pure translucent black glass after its opening SVG text-mask transition.
-- The CSS-only opening mask begins on first paint and shows `Unlimited IT Support` at large scale as clean letterforms containing a restrained blue-to-purple moving field and a purpose-built soft SVG glow. The display title retires as ten flat black louvres collapse cleanly from the centre out to reveal the real hero. Louvres shrink without 3D rotation, so they never distort, slice or obscure the finished copy; no travelling title, expanding aperture or generic wipe is used.
-- The intro uses no video, third-party runtime or scroll-jacking, runs once on wide screens and is skipped for stacked tablet/phone layouts and reduced motion. The semantic hero is always present underneath and becomes readable without JavaScript.
+- Uses the same large rounded proportions as the homepage hero and remains pure translucent black glass.
+- Opens directly on the semantic `Unlimited IT Support` proposition. There is no duplicate display title, mask, blind sequence, video, third-party runtime or scroll-jacking.
+- The two settled panes use one short opacity/vertical entrance that completes in under a second without delaying reading. Reduced-motion and forced-colour modes show the final layout immediately.
 - Primary copy is `Unlimited IT Support` with `Unlimited` on its own line and `IT Support` directly beneath it.
-- `Unlimited` keeps the approved restrained blue-to-purple moving-highlight treatment after the intro completes.
+- `Unlimited` uses the approved restrained blue-to-purple moving-highlight treatment in the settled hero.
 - Pricing sits immediately beneath as `from £35 per staff member, per month`, with `£35` in Signal Red.
 - The CTA is centred beneath the left-column proposition and links to the onboarding chapter.
 - The support-summary card starts directly with `Core support cover`; small pre-heading labels are deliberately omitted.
@@ -172,7 +172,7 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 ### IT Support chapters
 
 - The managed-support feature chapter uses six matching black-glass cards in a three-by-two desktop grid, collapsing to two columns on tablet and one column on phone.
-- Feature and onboarding cards use Support Green as their interaction accent, including the same soft bloom, travelling sheen and small lift language as the approved homepage cards.
+- Feature cards use Support Green. The three onboarding cards use the established sequence accents—Solutions Orange, approved bright blue and Support Green—and apply the same soft bloom, travelling sheen and small lift language as the approved homepage service cards.
 - The onboarding chapter presents `01`, `02`, `03` in order as three matching step cards. It becomes a single vertical sequence below the tablet breakpoint.
 - The words `simple` in the onboarding heading and `support` in the package heading use a restrained Support Green moving fill and soft glow derived from the settled `Unlimited` treatment; the copy remains readable and static when reduced motion is requested.
 - On desktop the onboarding rail advances at a measured pace when the chapter enters view and remains directly controllable by hover or keyboard focus. Tablet and phone layouts replace the detached horizontal rail with an in-flow vertical timeline aligned to the stacked cards.
