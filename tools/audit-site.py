@@ -28,7 +28,10 @@ JS_INLINE_STYLE_RE = re.compile(
 )
 JS_DYNAMIC_CODE_RE = re.compile(r"(?:\beval\s*\(|\bnew\s+Function\s*\()", re.I)
 IMPORTANT_RE = re.compile(r"!important\b", re.I)
-TYPE_TOKEN_ALIAS_RE = re.compile(r"--home-(?:chapter|card-title|copy)\b", re.I)
+TYPE_TOKEN_ALIAS_RE = re.compile(
+    r"--(?:home-(?:chapter|card-title|copy)|support-(?:chapter|card-title|copy|lead))\b",
+    re.I,
+)
 CSS_NUMBER = r"(?:\d+(?:\.\d+)?|\.\d+)"
 CANONICAL_TOKEN_DECL_RE = re.compile(r"(?P<name>--(?:type|space)-[a-z0-9-]+)\s*:", re.I)
 TYPE_TOKEN_LITERAL_RE = re.compile(
@@ -553,7 +556,7 @@ def audit(root: Path) -> int:
                 errors.append(f"{rel}: IT Support CSS must not introduce !important")
             aliases = sorted(set(TYPE_TOKEN_ALIAS_RE.findall(text)))
             if aliases:
-                errors.append(f"{rel}: duplicate homepage type token alias found: {', '.join(aliases)}")
+                errors.append(f"{rel}: duplicate route type token alias found: {', '.join(aliases)}")
             token_declarations = sorted(
                 {match.group("name") for match in CANONICAL_TOKEN_DECL_RE.finditer(text)}
             )

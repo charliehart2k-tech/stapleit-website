@@ -6,15 +6,13 @@ body.support-dialog-open{overflow:hidden}
  * stylesheet budget while retaining one generated route bundle. */
 .support-main{
   --tier-sole:#9aa3ad;
-  --support-chapter:clamp(4.65rem,6.15vw,6.45rem);
-  --support-card-title:clamp(1.9rem,2.3vw,2.35rem);
-  --support-copy:16.5px;
-  --support-lead:clamp(1.15rem,1.8vw,1.4rem);
 }
 
 .support-onboarding-accent,
 .support-packages-accent{
   display:inline-block;
+  margin-bottom:-.15em;
+  padding-bottom:.15em;
   color:var(--support);
   filter:drop-shadow(0 0 16px rgba(34,197,94,.24));
 }
@@ -60,7 +58,7 @@ body.support-dialog-open{overflow:hidden}
 
 .support-package-sole h3{
   color:#b5bdc7;
-  font-size:var(--support-card-title);
+  font-size:var(--type-card);
 }
 
 .support-package-price--poa span:first-child{
@@ -89,7 +87,7 @@ body.support-dialog-open{overflow:hidden}
 .support-sole-intro p{
   margin:0;
   color:#dce2e9;
-  font-size:var(--support-copy);
+  font-size:var(--type-body);
   line-height:1.65;
 }
 
@@ -258,7 +256,7 @@ body.support-dialog-open{overflow:hidden}
   padding-left:18px;
   color:#dfe5ec;
   font-family:var(--font-display);
-  font-size:var(--support-copy);
+  font-size:var(--type-body);
   font-weight:600;
   line-height:1.55;
   overflow-wrap:break-word;
@@ -280,7 +278,7 @@ body.support-dialog-open{overflow:hidden}
   min-width:0;
   margin:0;
   color:#cbd3dd;
-  font-size:var(--support-copy);
+  font-size:var(--type-body);
   line-height:1.65;
   overflow-wrap:break-word;
 }
@@ -395,7 +393,7 @@ body.support-dialog-open{overflow:hidden}
   padding-bottom:.04em;
   overflow:visible;
   color:var(--white);
-  font-size:var(--support-card-title);
+  font-size:var(--type-card);
   line-height:1.12;
   letter-spacing:-.014em;
   overflow-wrap:break-word;
@@ -406,7 +404,7 @@ body.support-dialog-open{overflow:hidden}
   max-width:40ch;
   margin:var(--space-3) 0 0;
   color:#d7dde5;
-  font-size:var(--support-copy);
+  font-size:var(--type-body);
   line-height:1.68;
   overflow-wrap:break-word;
 }
@@ -483,7 +481,7 @@ body.support-dialog-open{overflow:hidden}
 .support-extra-copy p{
   margin:0;
   color:#d7dde5;
-  font-size:var(--support-copy);
+  font-size:var(--type-body);
   line-height:1.68;
 }
 
@@ -499,7 +497,7 @@ body.support-dialog-open{overflow:hidden}
   position:relative;
   padding-left:17px;
   color:#d7dde5;
-  font-size:var(--support-copy);
+  font-size:var(--type-body);
   line-height:1.68;
   overflow-wrap:break-word;
 }
@@ -636,13 +634,6 @@ body.support-dialog-open{overflow:hidden}
 }
 
 @media(max-width:700px){
-  .support-main{
-    --support-chapter:clamp(2.65rem,11vw,3.2rem);
-    --support-card-title:clamp(1.9rem,8.1vw,2.35rem);
-    --support-copy:1rem;
-    --support-lead:clamp(1.0625rem,4.4vw,1.16rem);
-  }
-
   .support-hero-intro{height:clamp(320px,96vw,390px)}
   .support-packs{padding-block:var(--space-7)}
   .support-extras{padding-top:0;padding-bottom:var(--space-7)}
@@ -664,8 +655,8 @@ body.support-dialog-open{overflow:hidden}
     -webkit-backdrop-filter:blur(10px) saturate(108%);
   }
 
-  .support-extra-card h3{max-width:none;font-size:var(--support-card-title);line-height:1.12}
-  .support-package-sole h3{font-size:var(--support-card-title);line-height:1.12}
+  .support-extra-card h3{max-width:none;font-size:var(--type-card);line-height:1.12}
+  .support-package-sole h3{font-size:var(--type-card);line-height:1.12}
   .support-extra-summary{max-width:none;margin-top:13px}
   .support-extra-price{margin-top:13px}
   .support-extra-details{padding-top:18px}
