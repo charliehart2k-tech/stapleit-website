@@ -325,6 +325,20 @@ sudo chown -R deploy:www-data "$THEME"
 find "$THEME" -type d -exec chmod 755 {} \;
 find "$THEME" -type f -exec chmod 644 {} \;
 
+mapfile -t php_fpm_units < <(
+  systemctl list-units --type=service --state=running --plain --no-legend 'php*-fpm.service' \
+    | awk '{print $1}'
+)
+if (( ${#php_fpm_units[@]} == 0 )); then
+  fail "no active PHP-FPM service was found; deployed PHP could remain stale in OPcache"
+fi
+for php_fpm_unit in "${php_fpm_units[@]}"; do
+  sudo systemctl reload "$php_fpm_unit"
+  sudo systemctl is-active --quiet "$php_fpm_unit" \
+    || fail "$php_fpm_unit did not remain active after reload"
+  echo "Reloaded $php_fpm_unit to activate deployed PHP."
+done
+
 BACKUP_DIR="$BACKUP_DIR" BACKUP_RETENTION="$BACKUP_RETENTION" \
   bash "$REPO/tools/prune-theme-backups.sh"
 

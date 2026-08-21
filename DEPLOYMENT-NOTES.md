@@ -64,6 +64,8 @@ The report intentionally excludes WordPress salts, database credentials, databas
 ## Rollback backup retention
 
 Each successful staging deployment keeps the five newest theme rollback releases and removes older release groups. The retention applies only inside `/home/deploy/stapleit-theme-backups` and includes the matching legacy static-template and route-handler copies. Override the default for a specific deployment with `BACKUP_RETENTION`, but never set it below two.
+
+The deployment refuses to complete unless an active PHP-FPM service is found, reloaded and confirmed active after the theme files are copied. This makes PHP and `wp-config.php`-dependent changes visible immediately instead of leaving stale OPcache workers serving the previous configuration.
 # Cora local AI
 
 Cora appears on every route through the shared CSS and `app.js`. She always has a dependency-free catalogue fallback, but genuine conversation requires Ollama on the WordPress VPS. The current 4 GB VPS uses the Apache-2.0 Qwen2.5 1.5B Q5 model (roughly 1.1 GB). Do not use the 5.3 GB 7B build on this host: the kernel will terminate its runner under memory pressure. A future 7B deployment requires a VPS with at least 8 GB available RAM, not merely 8 GB installed.
