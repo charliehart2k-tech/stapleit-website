@@ -798,14 +798,15 @@
 .support-package-grid{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:18px;
+  gap:16px;
   align-items:stretch;
 }
 
 .support-package-card{
   position:relative;
-  min-height:470px;
-  padding:58px 30px 32px;
+  min-width:0;
+  min-height:500px;
+  padding:76px 24px 28px;
   display:flex;
   flex-direction:column;
   overflow:hidden;
@@ -846,16 +847,17 @@
   max-width:100%;
   margin:0;
   color:var(--support-card-accent);
-  font-size:clamp(2.35rem,3.7vw,3.45rem);
-  line-height:1.1;
-  letter-spacing:-.014em;
+  font-size:clamp(1.9rem,2.55vw,2.65rem);
+  line-height:1.04;
+  letter-spacing:-.026em;
+  text-wrap:balance;
 }
 
 .support-package-price{
   display:grid;
   gap:2px;
-  margin:26px 0 28px;
-  padding-bottom:26px;
+  margin:22px 0 24px;
+  padding-bottom:22px;
   border-bottom:1px solid rgba(255,255,255,.09);
   color:#cdd4dd;
   font-family:var(--font-display);
@@ -873,7 +875,7 @@
 
 .support-package-price strong{
   color:var(--support-card-accent);
-  font-size:clamp(2.45rem,4vw,3.6rem);
+  font-size:clamp(2.4rem,3.5vw,3.25rem);
   font-weight:700;
   line-height:1;
   letter-spacing:-.045em;
@@ -890,15 +892,15 @@
 .support-package-copy p{
   margin:0;
   color:#d7dde5;
-  font-size:1rem;
-  line-height:1.72;
+  font-size:.96rem;
+  line-height:1.65;
   letter-spacing:0;
 }
 
 .support-package-badge{
   position:absolute;
-  top:13px;
-  left:50%;
+  top:22px;
+  left:24px;
   min-width:126px;
   min-height:32px;
   margin:0;
@@ -906,7 +908,7 @@
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  transform:translateX(-50%);
+  transform:none;
   border:1px solid rgba(79,133,255,.72);
   border-radius:999px;
   background:linear-gradient(180deg,rgba(79,133,255,.26),rgba(29,78,216,.16));
@@ -929,9 +931,7 @@
   }
 }
 
-/* Package details are semantic fallback content. JavaScript enhances the
- * summary into the shared native dialog; without JavaScript the details open
- * in place and all package information remains accessible. */
+/* Native details remain the no-JavaScript package fallback. */
 .support-package-details{
   margin-top:auto;
   padding-top:var(--space-4);
@@ -1095,6 +1095,8 @@
   font-size:clamp(1.8rem,3vw,2.6rem);
   line-height:1.06;
   letter-spacing:-.024em;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
 }
 
 .support-dialog-price{
@@ -1131,7 +1133,7 @@
   overflow-y:auto;
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-auto-rows:1fr;
+  grid-auto-rows:auto;
   align-items:stretch;
   gap:16px;
   background:rgba(0,0,0,.46);
@@ -1518,8 +1520,8 @@
   .support-step-content{min-height:0;padding:36px 32px 34px}
 
   .support-packages{padding-block:var(--space-8)}
-  .support-package-grid{grid-template-columns:1fr;gap:14px}
-  .support-package-card{min-height:0}
+  .support-package-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .support-package-card{min-height:470px}
 }
 
 /* Narrow dialog ----------------------------------------------------------- */
@@ -1585,14 +1587,14 @@
   .support-step-copy{gap:15px;margin-top:15px}
 
   .support-packages{padding-block:var(--space-7)}
-  .support-package-grid{gap:12px}
-  .support-package-card{padding:54px 20px 24px;border-radius:var(--radius-lg);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 20px 54px rgba(0,0,0,.38);backdrop-filter:blur(10px) saturate(108%);-webkit-backdrop-filter:blur(10px) saturate(108%)}
-  .support-package-card h3{max-width:calc(100% - 54px);font-size:clamp(2.2rem,10vw,2.9rem)}
+  .support-package-grid{grid-template-columns:1fr;gap:12px}
+  .support-package-card{min-height:0;padding:68px 20px 24px;border-radius:var(--radius-lg);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 20px 54px rgba(0,0,0,.38);backdrop-filter:blur(10px) saturate(108%);-webkit-backdrop-filter:blur(10px) saturate(108%)}
+  .support-package-card h3{max-width:100%;font-size:clamp(2.05rem,9.2vw,2.7rem)}
   .support-package-icon{top:18px;right:18px;width:42px;height:42px;padding:9px;border-radius:14px}
   .support-package-price{margin:22px 0 24px;padding-bottom:22px}
   .support-package-price strong{font-size:clamp(2.35rem,11vw,3.15rem)}
   .support-package-copy{gap:15px}
-  .support-package-badge{top:11px;min-width:120px}
+  .support-package-badge{top:18px;left:20px;min-width:120px}
   .support-package-details>summary{min-height:48px;padding-inline:18px}
   .support-package-fallback{gap:12px}
   .support-detail-group{padding:18px 16px}

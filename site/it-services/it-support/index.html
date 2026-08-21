@@ -215,10 +215,33 @@
 <p class="support-section-lead"><strong>From day-to-day IT support for common problems to fully managed security and protection, choose the level of cover that works for your business.</strong></p>
 </header>
 <div class="support-package-grid">
-<article class="support-package-card support-package-sole support-package-card--empty support-card">
+<article class="support-package-card support-package-sole support-card">
 <svg class="support-package-icon" aria-hidden="true" focusable="false" height="24" width="24"><use href="/assets/images/icons/it-support.svg#relationship"></use></svg>
 <h3>Sole trader</h3>
 <p class="support-package-price support-package-price--poa"><span>Price</span><strong>POA</strong></p>
+<div class="support-package-copy"><p>Flexible IT support for sole traders and individuals, shaped around the help you actually need.</p></div>
+<details class="support-package-details support-package-details--sole" data-tier="sole" data-dialog-title="Sole Trader IT Support" data-dialog-price="Price on application" data-dialog-form="true">
+<summary>View support options</summary>
+<div class="support-package-fallback support-sole-enquiry" data-dialog-move>
+<div class="support-sole-intro">
+<p>Flexible IT support for sole traders and individuals, tailored to your requirements.</p>
+<p>Whether you need help from time to time or ongoing support, we can put together a package that works for you.</p>
+<p><strong>Get in touch below to discuss your requirements.</strong></p>
+</div>
+<form class="support-enquiry-form" method="post" action="/wp-admin/admin-ajax.php" data-enquiry-form data-enquiry-action="stapleit_support_enquiry">
+<input type="hidden" name="action" value="stapleit_support_enquiry"/>
+<div class="support-enquiry-honeypot" aria-hidden="true"><label for="sole-support-website">Leave this field empty</label><input id="sole-support-website" name="website" type="text" tabindex="-1" autocomplete="off"/></div>
+<div class="support-enquiry-fields">
+<label class="support-enquiry-field" for="sole-support-name"><span>Name</span><input id="sole-support-name" name="name" type="text" autocomplete="name" maxlength="120" required/></label>
+<label class="support-enquiry-field" for="sole-support-email"><span>Email address</span><input id="sole-support-email" name="email" type="email" autocomplete="email" maxlength="254" required/></label>
+<label class="support-enquiry-field support-enquiry-field--wide" for="sole-support-requirements"><span>What would you like help with?</span><textarea id="sole-support-requirements" name="requirements" rows="5" maxlength="2000" required></textarea></label>
+</div>
+<label class="support-enquiry-consent"><input name="contact-consent" type="checkbox" value="yes" required/><span>Yes, I’m happy for Staple IT to contact me about sole trader IT support.</span></label>
+<button class="support-enquiry-submit" type="submit" data-enquiry-submit>Discuss my requirements</button>
+<p class="support-enquiry-status" role="status" aria-live="polite" data-enquiry-status hidden></p>
+</form>
+</div>
+</details>
 </article>
 
 <article class="support-package-card support-package-basic support-card">
@@ -284,16 +307,115 @@
 <p class="support-section-lead"><strong>Structured service packs available to any package. Each pack is priced on application and added as a line item on your monthly invoice.</strong></p>
 </header>
 <div class="support-catalogue-grid" id="support-packs-grid">
-<article class="support-extra-card support-card"><h3>Server Pack</h3><p class="support-extra-summary">For businesses running on-premises or cloud-based server infrastructure.</p><p class="support-extra-price">Price on application</p><details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy"><ul><li>Physical server support — Windows Server 2016+</li><li>Cloud server support — Azure VM management &amp; maintenance</li><li>Server backup &amp; recovery</li><li>Active Directory, DNS &amp; DHCP management</li><li>File share management &amp; permissions</li><li>Scheduled maintenance windows — typically out of hours</li><li>OS patching &amp; security updates for servers</li><li>Server health monitoring &amp; alerting</li></ul></div></details></article>
-<article class="support-extra-card support-card"><h3>Network Pack</h3><p class="support-extra-summary">For businesses that need their network actively monitored and managed.</p><p class="support-extra-price">Price on application</p><details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy"><ul><li>Firewall management — rules, policies &amp; security profiles</li><li>Managed switch management — VLANs &amp; port configuration</li><li>Wi-Fi management — access points, SSIDs &amp; guest network</li><li>VPN management — site-to-site &amp; remote access</li><li>DHCP &amp; DNS management</li><li>Network monitoring — uptime, throughput &amp; connectivity alerting</li><li>Quality of Service (QoS) configuration</li><li>Firmware updates for networking equipment</li><li>ISP liaison &amp; connectivity troubleshooting</li><li>Network security posture reviews &amp; recommendations</li></ul></div></details></article>
-<article class="support-extra-card support-card"><h3>Security Pack</h3><p class="support-extra-summary">For Basic and Standard customers that want an enhanced security posture. Included in Premium.</p><p class="support-extra-price">Price on application</p><details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy"><ul><li>Endpoint Detection &amp; Response (EDR)</li><li>Email security — anti-phishing, DMARC/DKIM/SPF</li><li>DNS filtering &amp; web content control</li><li>Dark web monitoring</li><li>Vulnerability scanning &amp; remediation</li></ul></div></details></article>
-<article class="support-extra-card support-card"><h3>Compliance Pack</h3><p class="support-extra-summary">For businesses working towards certification or needing documented policies and controls.</p><p class="support-extra-price">Price on application</p><details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy"><ul><li>Cyber Essentials assistance &amp; gap analysis</li><li>Acceptable Use Policy</li><li>IT Security Policy</li><li>BYOD Policy</li><li>Asset register &amp; network diagrams</li><li>Business Continuity &amp; DR documentation</li><li>Compliance reporting &amp; audit trails</li></ul></div></details></article>
-<article class="support-extra-card support-card"><h3>AI Pack</h3><p class="support-extra-summary">For businesses ready to adopt AI tools properly, safely and effectively.</p><p class="support-extra-price">Price on application</p><details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy"><ul><li>AI readiness assessment — environment, data posture &amp; licensing review</li><li>Platform selection guidance — Microsoft Copilot, ChatGPT, Claude</li><li>Deployment &amp; configuration of chosen AI platform</li><li>Copilot admin settings — data access policies &amp; plugin configuration</li><li>ChatGPT Team or Enterprise workspace setup</li><li>Claude Teams or Enterprise workspace setup</li><li>AI &amp; data security guidance</li><li>Staff acceptable use guidance for AI tools</li></ul></div></details></article>
-<article class="support-extra-card support-card"><h3>Strategy Pack</h3><p class="support-extra-summary">For businesses that want a proper technology partner, not just a helpdesk.</p><p class="support-extra-price">Price on application</p><details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy"><ul><li>Annual IT review &amp; health check</li><li>Technology roadmap development</li><li>Budget &amp; hardware refresh planning</li><li>Vendor &amp; procurement management</li><li>Proactive recommendations &amp; priority planning</li><li>IT due diligence for business change, acquisitions &amp; office moves</li></ul></div></details></article>
-<article class="support-extra-card support-card" data-pack-late><h3>Cyber Essentials Pack</h3><p class="support-extra-summary">For businesses working towards Cyber Essentials or Cyber Essentials Plus certification.</p><p class="support-extra-price">Price on application</p><details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy"><ul><li>Gap analysis across all five Cyber Essentials technical controls</li><li>Remediation support &amp; guidance to meet certification requirements</li><li>Firewall &amp; boundary controls review</li><li>Secure configuration assessment</li><li>User access control review</li><li>Malware protection assessment</li><li>Patch management &amp; software update review</li><li>Pre-assessment review before formal submission</li><li>Certification application support</li><li>Cyber Essentials Plus preparation &amp; technical verification support</li></ul></div></details></article>
-<article class="support-extra-card support-card" data-pack-late><h3>Disaster Recovery Pack</h3><p class="support-extra-summary">For businesses that need a tested, documented plan for when the worst happens.</p><p class="support-extra-price">Price on application</p><details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy"><ul><li>Recovery Time Objective (RTO) &amp; Recovery Point Objective (RPO) definition</li><li>Critical systems &amp; data identification</li><li>Documented recovery procedures for key failure scenarios</li><li>Disaster recovery plan — written, reviewed &amp; signed off</li><li>Periodic DR testing &amp; validation</li><li>Post-test reporting &amp; gap identification</li><li>DR plan review &amp; updates as your business changes</li></ul></div></details></article>
+<article class="support-extra-card support-card">
+<h3>Server Pack</h3><p class="support-extra-summary">For businesses running physical Windows Servers that need ongoing monitoring, maintenance and support.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>Server support</h4><ul><li>Physical Windows Server support</li><li>Support for supported Windows Server versions</li><li>Day-to-day server troubleshooting</li><li>User, file and permission management</li><li>Core Windows Server role support</li><li>Scheduled maintenance where required</li></ul></section>
+<section class="support-pack-group"><h4>Monitoring &amp; maintenance</h4><ul><li>24/7 server health monitoring</li><li>Performance and resource monitoring</li><li>Operating system patching</li><li>Security updates</li><li>Service and event monitoring</li><li>Proactive fault identification</li><li>Planned maintenance, including out-of-hours where required</li></ul></section>
+<section class="support-pack-group"><h4>Backup &amp; recovery</h4><ul><li>Server backup management</li><li>Backup monitoring</li><li>Recovery assistance</li><li>File and system restore support</li><li>Backup failure investigation</li><li>Recovery testing where agreed</li></ul></section>
+<section class="support-pack-group"><h4>Windows Server services</h4><ul><li>Active Directory support</li><li>Group Policy support</li><li>DNS management</li><li>DHCP management</li><li>File share management</li><li>User and group permissions</li><li>Print services where hosted on the server</li></ul></section>
+<section class="support-pack-group"><h4>Hardware &amp; lifecycle</h4><ul><li>Hardware health monitoring</li><li>Fault diagnosis</li><li>Warranty support</li><li>Hardware replacement advice</li><li>Server lifecycle planning</li><li>Upgrade and replacement recommendations</li></ul></section>
+<p class="support-pack-term"><strong>Major upgrades, migrations and replacement projects may be quoted separately.</strong></p>
+</div></details>
+</article>
+
+<article class="support-extra-card support-card">
+<h3>Azure Pack</h3><p class="support-extra-summary">For businesses using Microsoft Azure that want their cloud infrastructure monitored, maintained and managed properly.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>Azure management</h4><ul><li>Microsoft Azure administration and support</li><li>Azure virtual machine management</li><li>Resource monitoring</li><li>Access and permission management</li><li>Subscription and resource organisation</li><li>General Azure platform support</li></ul></section>
+<section class="support-pack-group"><h4>Monitoring &amp; maintenance</h4><ul><li>24/7 monitoring of supported Azure resources</li><li>Virtual machine health monitoring</li><li>Performance and resource monitoring</li><li>Operating system patching</li><li>Security updates</li><li>Planned maintenance</li><li>Proactive issue identification</li></ul></section>
+<section class="support-pack-group"><h4>Backup &amp; recovery</h4><ul><li>Azure Backup management</li><li>Backup monitoring</li><li>Virtual machine recovery support</li><li>File and workload restore assistance</li><li>Recovery configuration reviews</li><li>Backup failure investigation</li></ul></section>
+<section class="support-pack-group"><h4>Virtual machines</h4><ul><li>Windows virtual machine support</li><li>VM configuration and maintenance</li><li>Disk and storage management</li><li>VM sizing reviews</li><li>Start, stop and restart management</li><li>Performance troubleshooting</li></ul></section>
+<section class="support-pack-group"><h4>Storage &amp; access</h4><ul><li>Azure storage management</li><li>File and data storage support</li><li>Access and permissions management</li><li>Storage usage monitoring</li><li>Capacity planning</li><li>General resource configuration</li></ul></section>
+<section class="support-pack-group"><h4>Cost &amp; optimisation</h4><ul><li>Azure usage reviews</li><li>Cost monitoring</li><li>Resource sizing recommendations</li><li>Identification of unused or oversized resources</li><li>General cost optimisation</li><li>Recommendations as your Azure environment changes</li></ul></section>
+<section class="support-pack-group"><h4>Ongoing management</h4><ul><li>Regular Azure reviews</li><li>Documentation of supported resources</li><li>Change planning</li><li>Advice on new Azure services</li><li>Support with platform upgrades and migrations</li><li>Liaison with Microsoft or third-party suppliers where required</li></ul></section>
+<p class="support-pack-term"><strong>Major deployments, migrations, new architecture and project work may be quoted separately.</strong></p>
+</div></details>
+</article>
+
+<article class="support-extra-card support-card">
+<h3>Network Pack</h3><p class="support-extra-summary">For businesses that need their network actively monitored and managed.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>Network management</h4><ul><li>Firewall management — rules, policies &amp; security profiles</li><li>Managed switch management — VLANs &amp; port configuration</li><li>Wi-Fi management — access points, SSIDs &amp; guest network</li><li>VPN management — site-to-site &amp; remote access</li><li>DHCP &amp; DNS management</li><li>Network monitoring — uptime, throughput &amp; connectivity alerting</li><li>Quality of Service (QoS) configuration</li><li>Firmware updates for networking equipment</li><li>ISP liaison &amp; connectivity troubleshooting</li><li>Network security posture reviews &amp; recommendations</li></ul></section>
+</div></details>
+</article>
+
+<article class="support-extra-card support-card">
+<h3>Security Pack</h3><p class="support-extra-summary">For businesses that want stronger protection across their users, devices and online services.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>Endpoint security</h4><ul><li>Advanced endpoint protection</li><li>Endpoint Detection &amp; Response (EDR)</li><li>Malware and ransomware protection</li><li>Security policy management</li><li>Device security reviews</li></ul></section>
+<section class="support-pack-group"><h4>Identity security</h4><ul><li>Identity Threat Detection &amp; Response (ITDR)</li><li>Monitoring for suspicious account activity</li><li>Protection against compromised credentials</li><li>Privileged account monitoring</li><li>Identity and access security reviews</li><li>Multi-factor authentication and access control guidance</li></ul></section>
+<section class="support-pack-group"><h4>Email security</h4><ul><li>Anti-phishing protection</li><li>Email threat filtering</li><li>Spoofing protection</li><li>DMARC, DKIM and SPF configuration</li><li>Suspicious email investigation</li><li>Email security reviews</li></ul></section>
+<section class="support-pack-group"><h4>Web &amp; DNS protection</h4><ul><li>DNS filtering</li><li>Web content filtering</li><li>Malicious website blocking</li><li>Protection against unsafe downloads</li><li>Internet usage controls where required</li></ul></section>
+<section class="support-pack-group"><h4>Security monitoring &amp; response</h4><ul><li>Security alerts and investigation</li><li>Account compromise monitoring</li><li>Incident support</li><li>Threat investigation</li><li>Security reporting</li><li>Ongoing security improvement recommendations</li></ul></section>
+<p class="support-pack-term"><strong>Major remediation projects, incident response and third-party consultancy may be quoted separately.</strong></p>
+</div></details>
+</article>
+
+<article class="support-extra-card support-card">
+<h3>Governance &amp; Compliance Pack</h3><p class="support-extra-summary">For businesses that need better IT governance, documentation and support meeting customer, insurer or compliance requirements.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>Policies &amp; documentation</h4><ul><li>Acceptable Use Policy</li><li>IT Security Policy</li><li>BYOD Policy</li><li>Remote Working Policy</li><li>Password and access policies</li><li>Policy review and updates</li></ul></section>
+<section class="support-pack-group"><h4>IT documentation</h4><ul><li>Asset register</li><li>Systems documentation</li><li>Network diagrams</li><li>Key supplier information</li><li>Business-critical service records</li><li>IT process documentation</li></ul></section>
+<section class="support-pack-group"><h4>Governance</h4><ul><li>Regular IT governance reviews</li><li>Risk identification</li><li>Security and access reviews</li><li>Documentation of responsibilities</li><li>Improvement recommendations</li><li>Change tracking</li></ul></section>
+<section class="support-pack-group"><h4>Audit &amp; compliance support</h4><ul><li>Evidence gathering</li><li>Audit preparation</li><li>Compliance reporting</li><li>Customer questionnaire support</li><li>Cyber insurance questionnaire support</li><li>Assistance with IT-related due diligence</li></ul></section>
+<section class="support-pack-group"><h4>Business continuity</h4><ul><li>Business continuity documentation</li><li>Disaster recovery documentation</li><li>Critical system identification</li><li>Recovery planning</li><li>Review and testing support</li></ul></section>
+<p class="support-pack-term"><strong>Formal legal, regulatory or certification advice is not included unless specifically agreed.</strong></p>
+</div></details>
+</article>
+
+<article class="support-extra-card support-card">
+<h3>AI Pack</h3><p class="support-extra-summary">For businesses looking to introduce AI tools safely and practically without losing control of their data.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>AI readiness</h4><ul><li>Review of your current environment</li><li>Licensing and platform review</li><li>Data and security considerations</li><li>Identification of suitable use cases</li><li>Readiness recommendations</li></ul></section>
+<section class="support-pack-group"><h4>Platform selection</h4><ul><li>Microsoft Copilot guidance</li><li>ChatGPT Business or Enterprise guidance</li><li>Claude Team or Enterprise guidance</li><li>Comparison of suitable platforms</li><li>Licensing advice</li></ul></section>
+<section class="support-pack-group"><h4>Deployment &amp; setup</h4><ul><li>AI platform configuration</li><li>User and access setup</li><li>Workspace configuration</li><li>Security settings</li><li>Administrative controls</li><li>Integration guidance</li></ul></section>
+<section class="support-pack-group"><h4>Data &amp; security</h4><ul><li>Data protection guidance</li><li>Access control recommendations</li><li>AI security configuration</li><li>Review of data exposure risks</li><li>Safe usage guidance</li></ul></section>
+<section class="support-pack-group"><h4>Staff guidance</h4><ul><li>Acceptable use guidance</li><li>Staff onboarding</li><li>Practical usage recommendations</li><li>Prompting and best-practice guidance</li><li>Internal AI policy support</li></ul></section>
+<section class="support-pack-group"><h4>Ongoing support</h4><ul><li>Platform administration</li><li>Configuration reviews</li><li>User support</li><li>Licensing reviews</li><li>Advice as your AI usage develops</li></ul></section>
+<p class="support-pack-term"><strong>Third-party AI licences and larger implementation projects are quoted separately.</strong></p>
+</div></details>
+</article>
+
+<article class="support-extra-card support-card" data-pack-late>
+<h3>Cyber Essentials Pack</h3><p class="support-extra-summary">For businesses working towards Cyber Essentials or Cyber Essentials Plus certification.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>Readiness review</h4><ul><li>Review against the Cyber Essentials technical controls</li><li>Identification of gaps</li><li>Prioritised remediation plan</li><li>Practical recommendations</li></ul></section>
+<section class="support-pack-group"><h4>Technical controls</h4><ul><li>Firewall and boundary security review</li><li>Secure configuration review</li><li>User access control review</li><li>Malware protection review</li><li>Patch management review</li><li>Software support status review</li></ul></section>
+<section class="support-pack-group"><h4>Remediation support</h4><ul><li>Guidance on resolving identified issues</li><li>Configuration support</li><li>Security improvement recommendations</li><li>Preparation for reassessment</li></ul></section>
+<section class="support-pack-group"><h4>Certification preparation</h4><ul><li>Pre-assessment review</li><li>Evidence preparation</li><li>Application support</li><li>Questionnaire guidance</li><li>Final readiness checks</li></ul></section>
+<section class="support-pack-group"><h4>Cyber Essentials Plus</h4><ul><li>Preparation for technical verification</li><li>Support addressing failed checks</li><li>Remediation guidance</li><li>Re-testing preparation</li></ul></section>
+<p class="support-pack-term"><strong>Certification and assessor fees are charged separately where applicable.</strong></p>
+</div></details>
+</article>
+
+<article class="support-extra-card support-card" data-pack-late>
+<h3>Strategy Pack</h3><p class="support-extra-summary">For businesses that want ongoing IT planning rather than simply reacting when something breaks.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>IT reviews</h4><ul><li>Regular IT health reviews</li><li>Review of your current systems</li><li>Identification of risks and opportunities</li><li>Recommendations for improvement</li></ul></section>
+<section class="support-pack-group"><h4>Technology roadmap</h4><ul><li>Short and long-term technology planning</li><li>Upgrade planning</li><li>Hardware refresh planning</li><li>Software lifecycle planning</li><li>Cloud planning</li></ul></section>
+<section class="support-pack-group"><h4>Budget &amp; investment</h4><ul><li>IT budget planning</li><li>Forecasting future costs</li><li>Hardware replacement planning</li><li>Licence and subscription reviews</li><li>Investment prioritisation</li></ul></section>
+<section class="support-pack-group"><h4>Suppliers &amp; procurement</h4><ul><li>Supplier reviews</li><li>Vendor management</li><li>Procurement support</li><li>Quote comparison</li><li>Technology selection advice</li></ul></section>
+<section class="support-pack-group"><h4>Business change</h4><ul><li>Support with office moves</li><li>IT planning for growth</li><li>Mergers and acquisitions support</li><li>Due diligence</li><li>New office and site planning</li><li>Major business change support</li></ul></section>
+<section class="support-pack-group"><h4>Ongoing advice</h4><ul><li>Regular strategy meetings</li><li>Priority planning</li><li>Technology recommendations</li><li>Risk management</li><li>Advice before major IT decisions</li></ul></section>
+<p class="support-pack-term"><strong>Large transformation projects and implementation work may be quoted separately.</strong></p>
+</div></details>
+</article>
+
+<article class="support-extra-card support-card" data-pack-late>
+<h3>Disaster Recovery Pack</h3><p class="support-extra-summary">For businesses that need a clear plan for getting systems and data back when something goes seriously wrong.</p><p class="support-extra-price">Price on application</p>
+<details class="support-extra-details"><summary>View pack</summary><div class="support-extra-copy support-pack-copy">
+<section class="support-pack-group"><h4>Recovery planning</h4><ul><li>Identification of critical systems and data</li><li>Recovery priorities</li><li>Recovery Time Objective planning</li><li>Recovery Point Objective planning</li><li>Dependency mapping</li></ul></section>
+<section class="support-pack-group"><h4>Disaster recovery plan</h4><ul><li>Documented recovery procedures</li><li>Key contact information</li><li>Supplier and escalation details</li><li>Recovery responsibilities</li><li>Major failure scenarios</li></ul></section>
+<section class="support-pack-group"><h4>Backup &amp; recovery review</h4><ul><li>Review of current backup arrangements</li><li>Recovery capability assessment</li><li>Backup coverage checks</li><li>Restore process reviews</li><li>Identification of gaps</li></ul></section>
+<section class="support-pack-group"><h4>Testing</h4><ul><li>Planned disaster recovery testing</li><li>Recovery scenario testing</li><li>Restore testing</li><li>Validation of recovery procedures</li><li>Testing of critical services</li></ul></section>
+<section class="support-pack-group"><h4>Reporting &amp; improvement</h4><ul><li>Post-test reporting</li><li>Gap identification</li><li>Recommendations</li><li>Remediation planning</li><li>Updates to recovery documentation</li></ul></section>
+<section class="support-pack-group"><h4>Ongoing management</h4><ul><li>Regular DR plan reviews</li><li>Updates as systems change</li><li>Review of business-critical services</li><li>Recovery planning for new systems</li><li>Periodic re-testing</li></ul></section>
+<p class="support-pack-term"><strong>Additional infrastructure, recovery environments and major remediation work may be quoted separately.</strong></p>
+</div></details>
+</article>
 </div>
-<div class="support-packs-more" hidden><button class="support-packs-more-btn" id="support-packs-more" type="button" aria-expanded="false">Show 2 more packs</button></div>
+<div class="support-packs-more" hidden><button class="support-packs-more-btn" id="support-packs-more" type="button" aria-expanded="false">Show 3 more packs</button></div>
 </section>
 
 <section class="support-section support-extras" aria-labelledby="support-extras-title">
@@ -340,6 +462,7 @@
 <div class="footer-legal-bar"><p><strong>Hart Corporate Ltd, trading as Staple IT</strong> · 88 Eastdean Avenue, Epsom, KT18 7SN</p><p>Registered in England and Wales · Company number 17274041 · VAT number 522399484</p><p>© 2026 Staple IT. All rights reserved.</p></div>
 </footer>
 <script src="/assets/js/app.js"></script>
+<script src="/assets/js/forms.js"></script>
 <script src="/assets/js/it-support.js"></script>
 </body>
 </html>

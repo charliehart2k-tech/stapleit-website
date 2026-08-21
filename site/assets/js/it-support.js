@@ -9,6 +9,7 @@
   if (!(dialog instanceof HTMLDialogElement) || !closeButton || !title || !price || !body || !note) return;
 
   const tierClasses = [
+    'support-dialog--sole',
     'support-dialog--basic',
     'support-dialog--standard',
     'support-dialog--premium',
@@ -16,10 +17,17 @@
   ];
 
   let previousFocus = null;
+  let movedContentSource = null;
+  let movedContentNodes = [];
 
   const resetDialog = () => {
+    if (movedContentSource && movedContentNodes.length) {
+      movedContentSource.append(...movedContentNodes);
+    }
+    movedContentSource = null;
+    movedContentNodes = [];
     dialog.classList.remove(...tierClasses);
-    body.classList.remove('support-dialog-body--single');
+    body.classList.remove('support-dialog-body--single', 'support-dialog-body--form');
     body.replaceChildren();
     title.textContent = '';
     price.textContent = '';
@@ -28,7 +36,16 @@
     note.hidden = true;
   };
 
-  const openDialog = ({ heading, priceText = '', noteText = '', tier = 'service', content, single = false }) => {
+  const openDialog = ({
+    heading,
+    priceText = '',
+    noteText = '',
+    tier = 'service',
+    content,
+    single = false,
+    moveContent = false,
+    form = false
+  }) => {
     if (!heading || !content) return;
 
     previousFocus = document.activeElement;
@@ -36,6 +53,7 @@
 
     dialog.classList.add(`support-dialog--${tier}`);
     if (single) body.classList.add('support-dialog-body--single');
+    if (form) body.classList.add('support-dialog-body--form');
 
     title.textContent = heading;
     price.textContent = priceText;
@@ -43,9 +61,15 @@
     note.textContent = noteText;
     note.hidden = !noteText;
 
-    const clone = content.cloneNode(true);
-    clone.querySelectorAll?.('.support-package-note').forEach(element => element.remove());
-    body.append(...clone.childNodes);
+    if (moveContent) {
+      movedContentSource = content;
+      movedContentNodes = [...content.childNodes];
+      body.append(...movedContentNodes);
+    } else {
+      const clone = content.cloneNode(true);
+      clone.querySelectorAll?.('.support-package-note').forEach(element => element.remove());
+      body.append(...clone.childNodes);
+    }
 
     dialog.showModal();
     document.body.classList.add('support-dialog-open');
@@ -70,7 +94,9 @@
         noteText: details.dataset.dialogNote || '',
         tier: details.dataset.tier || 'service',
         content,
-        single: false
+        single: details.dataset.dialogForm === 'true',
+        moveContent: details.dataset.dialogForm === 'true',
+        form: details.dataset.dialogForm === 'true'
       });
     });
   });
@@ -88,7 +114,9 @@
       details.open = false;
 
       const wrapper = document.createElement('div');
-      wrapper.className = 'support-dialog-source';
+      wrapper.className = copy.classList.contains('support-pack-copy')
+        ? 'support-dialog-source support-dialog-source--pack'
+        : 'support-dialog-source';
       wrapper.append(copy.cloneNode(true));
 
       openDialog({
@@ -134,6 +162,7 @@
 
   moreButton.setAttribute('aria-controls', packGrid.id);
   moreButton.setAttribute('aria-expanded', 'false');
+  moreButton.textContent = `Show ${lateCards.length} more ${lateCards.length === 1 ? 'pack' : 'packs'}`;
 
   lateCards.forEach(card => {
     card.hidden = true;

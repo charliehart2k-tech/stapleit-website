@@ -83,12 +83,22 @@ add_action( 'init', function () {
  * REST rewrite routing. */
 add_action( 'wp_ajax_nopriv_stapleit_audit', 'stapleit_handle_audit_ajax' );
 add_action( 'wp_ajax_stapleit_audit', 'stapleit_handle_audit_ajax' );
+add_action( 'wp_ajax_nopriv_stapleit_support_enquiry', 'stapleit_handle_support_enquiry_ajax' );
+add_action( 'wp_ajax_stapleit_support_enquiry', 'stapleit_handle_support_enquiry_ajax' );
 
 function stapleit_handle_audit_ajax() {
-    $request = new WP_REST_Request( 'POST', '/stapleit/v1/audit' );
+    stapleit_handle_enquiry_ajax( 'audit' );
+}
+
+function stapleit_handle_support_enquiry_ajax() {
+    stapleit_handle_enquiry_ajax( 'sole_trader_support' );
+}
+
+function stapleit_handle_enquiry_ajax( $enquiry_type ) {
+    $request = new WP_REST_Request( 'POST', '/stapleit/v1/enquiry' );
     $request->set_body_params( wp_unslash( $_POST ) );
 
-    $response = stapleit_handle_audit_request( $request );
+    $response = stapleit_handle_enquiry_request( $request, $enquiry_type );
 
     if ( is_wp_error( $response ) ) {
         $error_data = $response->get_error_data();
@@ -128,10 +138,38 @@ function stapleit_request_ip() {
 }
 
 function stapleit_handle_audit_request( WP_REST_Request $request ) {
-    $name    = trim( sanitize_text_field( (string) $request->get_param( 'name' ) ) );
-    $email   = trim( sanitize_email( (string) $request->get_param( 'email' ) ) );
-    $consent = sanitize_text_field( (string) $request->get_param( 'contact-consent' ) );
-    $website = sanitize_text_field( (string) $request->get_param( 'website' ) );
+    return stapleit_handle_enquiry_request( $request, 'audit' );
+}
+
+function stapleit_handle_support_enquiry_request( WP_REST_Request $request ) {
+    return stapleit_handle_enquiry_request( $request, 'sole_trader_support' );
+}
+
+function stapleit_handle_enquiry_request( WP_REST_Request $request, $enquiry_type ) {
+    $is_support = $enquiry_type === 'sole_trader_support';
+    $config     = $is_support
+        ? array(
+            'label'           => 'Sole trader IT support',
+            'subject'         => '[Staple IT] Sole trader support enquiry — %s',
+            'opening'         => 'A new sole trader IT support enquiry has been submitted.',
+            'success'         => 'Thanks — your enquiry has been received. We’ll get back to you within one working day.',
+            'source'          => home_url( '/it-services/it-support/' ),
+            'require_details' => true,
+        )
+        : array(
+            'label'           => 'Free IT audit',
+            'subject'         => '[Staple IT] Free IT audit request — %s',
+            'opening'         => 'A new free IT audit request has been submitted.',
+            'success'         => 'Thanks — your audit request has been received. We’ll get back to you within one working day.',
+            'source'          => home_url( '/' ),
+            'require_details' => false,
+        );
+
+    $name         = trim( sanitize_text_field( (string) $request->get_param( 'name' ) ) );
+    $email        = trim( sanitize_email( (string) $request->get_param( 'email' ) ) );
+    $consent      = sanitize_text_field( (string) $request->get_param( 'contact-consent' ) );
+    $website      = sanitize_text_field( (string) $request->get_param( 'website' ) );
+    $requirements = trim( sanitize_textarea_field( (string) $request->get_param( 'requirements' ) ) );
 
     if ( $website !== '' ) {
         return new WP_REST_Response( array( 'ok' => true ), 200 );
@@ -142,17 +180,21 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
         strlen( $name ) > 120 ||
         ! is_email( $email ) ||
         strlen( $email ) > 254 ||
-        $consent !== 'yes'
+        $consent !== 'yes' ||
+        strlen( $requirements ) > 2000 ||
+        ( $config['require_details'] && $requirements === '' )
     ) {
         return new WP_Error(
             'stapleit_invalid_form',
-            'Please enter your name, a valid email address and confirm that Staple IT may contact you.',
+            $config['require_details']
+                ? 'Please enter your name, a valid email address, a short description of what you need and confirm that Staple IT may contact you.'
+                : 'Please enter your name, a valid email address and confirm that Staple IT may contact you.',
             array( 'status' => 400 )
         );
     }
 
     $ip       = stapleit_request_ip();
-    $rate_key = 'stapleit_audit_' . hash_hmac( 'sha256', $ip, wp_salt( 'nonce' ) );
+    $rate_key = 'stapleit_' . $enquiry_type . '_' . hash_hmac( 'sha256', $ip, wp_salt( 'nonce' ) );
 
     if ( get_transient( $rate_key ) ) {
         return new WP_Error(
@@ -167,7 +209,7 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
     $lead_id = wp_insert_post( array(
         'post_type'   => 'stapleit_lead',
         'post_status' => 'private',
-        'post_title'  => sprintf( 'Free IT audit — %s', $name ),
+        'post_title'  => sprintf( '%s — %s', $config['label'], $name ),
     ), true );
 
     if ( is_wp_error( $lead_id ) ) {
@@ -181,21 +223,35 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
 
     update_post_meta( $lead_id, '_stapleit_name', $name );
     update_post_meta( $lead_id, '_stapleit_email', $email );
+    update_post_meta( $lead_id, '_stapleit_enquiry_type', $config['label'] );
+    update_post_meta( $lead_id, '_stapleit_requirements', $requirements );
     update_post_meta( $lead_id, '_stapleit_consent', 'yes' );
     update_post_meta( $lead_id, '_stapleit_received_at', current_time( 'mysql' ) );
+    update_post_meta( $lead_id, '_stapleit_source', esc_url_raw( $config['source'] ) );
 
-    $subject = sprintf( '[Staple IT] Free IT audit request — %s', $name );
-    $message = implode( "\n", array(
-        'A new free IT audit request has been submitted.',
+    $subject       = sprintf( $config['subject'], $name );
+    $message_lines = array(
+        $config['opening'],
         '',
+        'Enquiry type: ' . $config['label'],
         'Name: ' . $name,
         'Email: ' . $email,
         'Consent to contact: Yes',
         'Received: ' . current_time( 'mysql' ),
-        'Source: ' . home_url( '/' ),
+        'Source: ' . $config['source'],
+    );
+
+    if ( $requirements !== '' ) {
+        $message_lines[] = '';
+        $message_lines[] = 'Requirements:';
+        $message_lines[] = $requirements;
+    }
+
+    $message_lines = array_merge( $message_lines, array(
         '',
         'The enquiry has also been saved in WordPress under Form Enquiries.',
     ) );
+    $message = implode( "\n", $message_lines );
 
     $headers = array(
         'Content-Type: text/plain; charset=UTF-8',
@@ -220,12 +276,12 @@ function stapleit_handle_audit_request( WP_REST_Request $request ) {
     }
 
     if ( ! $mail_sent ) {
-        error_log( sprintf( 'Staple IT audit enquiry %d saved but wp_mail() returned false%s.', $lead_id, $mail_error ? ': ' . $mail_error : '' ) );
+        error_log( sprintf( 'Staple IT %s enquiry %d saved but wp_mail() returned false%s.', $enquiry_type, $lead_id, $mail_error ? ': ' . $mail_error : '' ) );
     }
 
     return new WP_REST_Response( array(
         'ok'      => true,
-        'message' => 'Thanks — your audit request has been received. We’ll get back to you within one working day.',
+        'message' => $config['success'],
     ), 200 );
 }
 
@@ -233,6 +289,7 @@ add_filter( 'manage_stapleit_lead_posts_columns', function ( $columns ) {
     return array(
         'cb'             => $columns['cb'],
         'title'          => 'Enquiry',
+        'stapleit_type'  => 'Type',
         'stapleit_email' => 'Email',
         'stapleit_mail'  => 'Mail',
         'date'           => 'Received',
@@ -240,6 +297,11 @@ add_filter( 'manage_stapleit_lead_posts_columns', function ( $columns ) {
 } );
 
 add_action( 'manage_stapleit_lead_posts_custom_column', function ( $column, $post_id ) {
+    if ( $column === 'stapleit_type' ) {
+        $type = get_post_meta( $post_id, '_stapleit_enquiry_type', true );
+        echo esc_html( $type ? $type : 'Free IT audit' );
+    }
+
     if ( $column === 'stapleit_email' ) {
         $email = get_post_meta( $post_id, '_stapleit_email', true );
         if ( $email ) {
@@ -266,11 +328,14 @@ add_action( 'add_meta_boxes_stapleit_lead', function () {
 
 function stapleit_render_enquiry_details( WP_Post $post ) {
     $fields = array(
-        'Name'       => get_post_meta( $post->ID, '_stapleit_name', true ),
-        'Email'      => get_post_meta( $post->ID, '_stapleit_email', true ),
-        'Received'   => get_post_meta( $post->ID, '_stapleit_received_at', true ),
-        'Mail sent'  => get_post_meta( $post->ID, '_stapleit_mail_sent', true ),
-        'Mail error' => get_post_meta( $post->ID, '_stapleit_mail_error', true ),
+        'Type'         => get_post_meta( $post->ID, '_stapleit_enquiry_type', true ),
+        'Name'         => get_post_meta( $post->ID, '_stapleit_name', true ),
+        'Email'        => get_post_meta( $post->ID, '_stapleit_email', true ),
+        'Requirements' => get_post_meta( $post->ID, '_stapleit_requirements', true ),
+        'Source'       => get_post_meta( $post->ID, '_stapleit_source', true ),
+        'Received'     => get_post_meta( $post->ID, '_stapleit_received_at', true ),
+        'Mail sent'    => get_post_meta( $post->ID, '_stapleit_mail_sent', true ),
+        'Mail error'   => get_post_meta( $post->ID, '_stapleit_mail_error', true ),
     );
 
     echo '<table class="widefat striped"><tbody>';

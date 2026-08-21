@@ -12,6 +12,7 @@ import sys
 PRODUCTION_ORIGIN = "https://stapleit.co.uk"
 ALLOWED_EXTERNAL_HOSTS = {"stapleit.co.uk", "www.google.com"}
 RESOURCE_TAGS = {"link", "img", "source", "video", "audio", "iframe"}
+RUNTIME_ENDPOINTS = {"/wp-admin/admin-ajax.php"}
 WARN_ASSET_BYTES = 1_500_000
 ERROR_ASSET_BYTES = 5_000_000
 WARN_CSS_BYTES = 50_000
@@ -312,6 +313,8 @@ def audit(root: Path) -> int:
             checked_refs += 1
             if raw.strip().lower().startswith("javascript:"):
                 errors.append(f"{rel}: javascript: URL found in {tag}[{attr}]")
+                continue
+            if tag == "form" and attr == "action" and urlsplit(raw.strip()).path in RUNTIME_ENDPOINTS:
                 continue
             host = external_host(raw)
             if host:
