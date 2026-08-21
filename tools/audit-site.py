@@ -499,6 +499,42 @@ def audit(root: Path) -> int:
                 if fragment in text:
                     errors.append(f"{rel}: retired package UI is still present: {fragment}")
 
+            expected_pack_finder_keys = {
+                "server",
+                "azure",
+                "network",
+                "security",
+                "governance",
+                "cyber-essentials",
+                "ai",
+                "strategy",
+                "disaster-recovery",
+            }
+            pack_finder_patterns = {
+                "question": r'<fieldset\b[^>]*\bdata-pack-question\b[^>]*\bdata-pack-key="([^"]+)"',
+                "result": r'<article\b[^>]*\bdata-pack-result="([^"]+)"',
+                "catalogue card": r'<article\b[^>]*\bdata-pack-card="([^"]+)"',
+            }
+            for role, pattern in pack_finder_patterns.items():
+                matches = re.findall(pattern, text, re.I)
+                if len(matches) != len(expected_pack_finder_keys) or set(matches) != expected_pack_finder_keys:
+                    errors.append(
+                        f"{rel}: pack finder {role} keys must map exactly to the nine add-on packs"
+                    )
+
+            finder_start = text.find('<form class="support-pack-finder"')
+            finder_end = text.find("</form>", finder_start)
+            if finder_start < 0 or finder_end < 0:
+                errors.append(f"{rel}: guided add-on pack finder form is missing")
+            else:
+                finder_markup = text[finder_start:finder_end]
+                for answer in ("yes", "no", "unsure"):
+                    answer_count = finder_markup.count(f'value="{answer}"')
+                    if answer_count != len(expected_pack_finder_keys):
+                        errors.append(
+                            f"{rel}: pack finder requires one {answer!r} answer for every question"
+                        )
+
         if parser.canonical and parser.canonical != expected_canonical(root, html):
             errors.append(f"{rel}: canonical mismatch; expected {expected_canonical(root, html)}")
         if parser.meta_description and len(parser.meta_description) < 70:

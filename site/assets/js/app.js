@@ -218,6 +218,7 @@
     '.contact-panel',
     '.contact-map-card',
     '.support-section-heading',
+    '.support-pack-finder',
     '.support-step-card',
     '.support-card',
     '.footer-panel',

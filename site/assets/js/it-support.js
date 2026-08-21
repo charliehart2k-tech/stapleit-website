@@ -154,6 +154,137 @@
 })();
 
 (() => {
+  const form = document.querySelector('[data-pack-finder]');
+  if (!(form instanceof HTMLFormElement)) return;
+
+  const stage = form.querySelector('[data-pack-finder-stage]');
+  const questions = [...form.querySelectorAll('[data-pack-question]')];
+  const count = form.querySelector('[data-pack-finder-count]');
+  const progress = form.querySelector('[data-pack-finder-progress]');
+  const backButton = form.querySelector('[data-pack-finder-back]');
+  const nextButton = form.querySelector('[data-pack-finder-next]');
+  const results = form.querySelector('[data-pack-results]');
+  const resultsHeading = form.querySelector('#support-pack-results-title');
+  const resultsSummary = form.querySelector('[data-pack-results-summary]');
+  const resultsEmpty = form.querySelector('[data-pack-results-empty]');
+  const reviewButton = form.querySelector('[data-pack-finder-review]');
+  const resultRows = [...form.querySelectorAll('[data-pack-result]')];
+
+  if (
+    !stage || !questions.length || !count || !(progress instanceof HTMLProgressElement) ||
+    !(backButton instanceof HTMLButtonElement) || !(nextButton instanceof HTMLButtonElement) ||
+    !results || !resultsHeading || !resultsSummary || !resultsEmpty ||
+    !(reviewButton instanceof HTMLButtonElement) || resultRows.length !== questions.length
+  ) return;
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let currentQuestion = 0;
+
+  const selectedAnswer = question => question.querySelector('input[type="radio"]:checked')?.value || '';
+
+  const updateControls = () => {
+    count.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+    progress.value = currentQuestion + 1;
+    progress.textContent = `${currentQuestion + 1} of ${questions.length}`;
+    backButton.hidden = currentQuestion === 0;
+    nextButton.disabled = !selectedAnswer(questions[currentQuestion]);
+    nextButton.textContent = currentQuestion === questions.length - 1 ? 'See my results' : 'Continue';
+  };
+
+  const showQuestion = (index, { direction = 'forward', focus = true } = {}) => {
+    currentQuestion = Math.max(0, Math.min(questions.length - 1, index));
+    form.dataset.packDirection = direction;
+
+    questions.forEach((question, questionIndex) => {
+      question.hidden = questionIndex !== currentQuestion;
+    });
+
+    stage.hidden = false;
+    results.hidden = true;
+    updateControls();
+
+    if (focus) {
+      window.requestAnimationFrame(() => questions[currentQuestion].querySelector('legend')?.focus());
+    }
+  };
+
+  const resultSummaryText = (likelyCount, considerCount) => {
+    const packWord = countValue => countValue === 1 ? 'pack' : 'packs';
+
+    if (likelyCount && considerCount) {
+      return `${likelyCount} ${packWord(likelyCount)} look relevant, with ${considerCount} more worth discussing. You can explore the reasoning below.`;
+    }
+    if (likelyCount) {
+      return `${likelyCount} ${packWord(likelyCount)} look relevant to the way you work. You can explore the reasoning below.`;
+    }
+    if (considerCount) {
+      return `${considerCount} ${packWord(considerCount)} may be worth discussing because you selected Not sure.`;
+    }
+    return 'Nothing in your answers points clearly to an add-on pack at the moment.';
+  };
+
+  const showResults = () => {
+    let likelyCount = 0;
+    let considerCount = 0;
+
+    resultRows.forEach(row => {
+      const key = row.dataset.packResult;
+      const question = questions.find(candidate => candidate.dataset.packKey === key);
+      const answer = question ? selectedAnswer(question) : 'no';
+      const status = row.querySelector('[data-pack-result-status]');
+      const matched = answer === 'yes' || answer === 'unsure';
+
+      row.hidden = !matched;
+      if (!matched || !status) return;
+
+      if (answer === 'yes') {
+        likelyCount += 1;
+        row.dataset.match = 'likely';
+        status.textContent = 'Likely useful';
+      } else {
+        considerCount += 1;
+        row.dataset.match = 'consider';
+        status.textContent = 'Worth discussing';
+      }
+    });
+
+    resultsSummary.textContent = resultSummaryText(likelyCount, considerCount);
+    resultsEmpty.hidden = likelyCount + considerCount > 0;
+    stage.hidden = true;
+    results.hidden = false;
+    delete form.dataset.packDirection;
+    window.requestAnimationFrame(() => resultsHeading.focus({ preventScroll: false }));
+  };
+
+  questions.forEach(question => {
+    question.addEventListener('change', updateControls);
+  });
+
+  nextButton.addEventListener('click', () => {
+    if (!selectedAnswer(questions[currentQuestion])) return;
+    if (currentQuestion === questions.length - 1) {
+      showResults();
+      return;
+    }
+    showQuestion(currentQuestion + 1);
+  });
+
+  backButton.addEventListener('click', () => showQuestion(currentQuestion - 1, { direction: 'back' }));
+  reviewButton.addEventListener('click', () => showQuestion(questions.length - 1, { direction: 'back' }));
+
+  form.addEventListener('submit', event => event.preventDefault());
+
+  questions.forEach((question, index) => {
+    question.hidden = index !== 0;
+  });
+  results.hidden = true;
+  form.classList.add('is-enhanced');
+  showQuestion(0, { focus: false });
+
+  if (reducedMotion.matches) delete form.dataset.packDirection;
+})();
+
+(() => {
   const packGrid = document.getElementById('support-packs-grid');
   const moreWrap = document.querySelector('.support-packs-more');
   const moreButton = document.getElementById('support-packs-more');
@@ -171,7 +302,7 @@
 
   moreWrap.hidden = false;
 
-  moreButton.addEventListener('click', () => {
+  const revealLatePacks = ({ focusFirst = false } = {}) => {
     lateCards.forEach(card => {
       card.hidden = false;
       if (card.classList.contains('motion-ready')) card.classList.add('motion-in');
@@ -180,10 +311,21 @@
     moreButton.setAttribute('aria-expanded', 'true');
     moreWrap.hidden = true;
 
-    const firstRevealedControl = lateCards[0]?.querySelector('summary, button, a[href], [tabindex]:not([tabindex="-1"])');
+    const firstRevealedControl = focusFirst
+      ? lateCards[0]?.querySelector('summary, button, a[href], [tabindex]:not([tabindex="-1"])')
+      : null;
     if (firstRevealedControl instanceof HTMLElement) {
       window.requestAnimationFrame(() => firstRevealedControl.focus());
     }
+  };
+
+  moreButton.addEventListener('click', () => revealLatePacks({ focusFirst: true }));
+
+  document.querySelectorAll('a[href^="#support-pack-"]').forEach(link => {
+    link.addEventListener('click', () => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target instanceof HTMLElement && target.hidden) revealLatePacks();
+    });
   });
 })();
 

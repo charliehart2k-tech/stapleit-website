@@ -18,7 +18,11 @@
     ".audit-submit": 44,
     ".google-review-link": 44,
     ".contact-whatsapp": 44,
-    ".footer-nav-group a": 44
+    ".footer-nav-group a": 44,
+    ".support-pack-choices label": 44,
+    ".support-pack-finder-button": 44,
+    ".support-pack-result>a": 44,
+    ".support-pack-fallback-link": 44
   },
   "approved_home_media_widths_px": [
     370,
