@@ -468,7 +468,7 @@ def audit(root: Path) -> int:
 
         if rel.as_posix() == "it-services/it-support/index.html":
             required_support_copy = (
-                'class="support-package-minimum">Minimum 5 staff members',
+                'class="support-package-minimum">For teams of 5+',
                 "Requires Microsoft 365 Business Premium or equivalent licensing",
                 "LastPass password management included",
                 "Exclaimer email signature management included",
@@ -490,6 +490,14 @@ def audit(root: Path) -> int:
             for fragment in retired_support_claims:
                 if fragment in text:
                     errors.append(f"{rel}: retired or unsafe package claim is present: {fragment}")
+
+            retired_support_ui = (
+                'class="support-package-icon"',
+                'class="support-extra-price"',
+            )
+            for fragment in retired_support_ui:
+                if fragment in text:
+                    errors.append(f"{rel}: retired package UI is still present: {fragment}")
 
         if parser.canonical and parser.canonical != expected_canonical(root, html):
             errors.append(f"{rel}: canonical mismatch; expected {expected_canonical(root, html)}")

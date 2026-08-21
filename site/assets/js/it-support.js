@@ -106,6 +106,7 @@
     const copy = details.querySelector('.support-extra-copy');
     const card = details.closest('.support-extra-card');
     if (!summary || !copy || !card) return;
+    const isPack = copy.classList.contains('support-pack-copy');
 
     summary.setAttribute('aria-haspopup', 'dialog');
 
@@ -114,14 +115,14 @@
       details.open = false;
 
       const wrapper = document.createElement('div');
-      wrapper.className = copy.classList.contains('support-pack-copy')
+      wrapper.className = isPack
         ? 'support-dialog-source support-dialog-source--pack'
         : 'support-dialog-source';
       wrapper.append(copy.cloneNode(true));
 
       openDialog({
         heading: card.querySelector('h3')?.textContent?.trim() || 'Service details',
-        priceText: card.querySelector('.support-extra-price')?.textContent?.trim() || '',
+        priceText: isPack ? 'Priced on application' : '',
         tier: 'service',
         content: wrapper,
         single: true
