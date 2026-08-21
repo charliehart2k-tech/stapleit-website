@@ -66,9 +66,9 @@ The report intentionally excludes WordPress salts, database credentials, databas
 Each successful staging deployment keeps the five newest theme rollback releases and removes older release groups. The retention applies only inside `/home/deploy/stapleit-theme-backups` and includes the matching legacy static-template and route-handler copies. Override the default for a specific deployment with `BACKUP_RETENTION`, but never set it below two.
 # Cora local AI
 
-Cora appears on every route through the shared CSS and `app.js`. She always has a dependency-free catalogue fallback, but genuine conversation requires Ollama on the WordPress VPS. The recommended 7B Q5 model needs roughly 5.3 GB for its model plus runtime and operating-system headroom; use a VPS with at least 8 GB available RAM and verify capacity before pulling it.
+Cora appears on every route through the shared CSS and `app.js`. She always has a dependency-free catalogue fallback, but genuine conversation requires Ollama on the WordPress VPS. The current 4 GB VPS uses the Apache-2.0 Qwen2.5 1.5B Q5 model (roughly 1.1 GB). Do not use the 5.3 GB 7B build on this host: the kernel will terminate its runner under memory pressure. A future 7B deployment requires a VPS with at least 8 GB available RAM, not merely 8 GB installed.
 
-Install Ollama using its official Linux installer, keep the service on loopback and pull the Apache-2.0 Qwen2.5 7B model:
+Install Ollama using its official Linux installer, keep the service on loopback and pull the constrained 1.5B model:
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
@@ -82,6 +82,7 @@ Add this systemd override:
 Environment="OLLAMA_HOST=127.0.0.1:11434"
 Environment="OLLAMA_KEEP_ALIVE=10m"
 Environment="OLLAMA_NUM_PARALLEL=1"
+Environment="OLLAMA_CONTEXT_LENGTH=2048"
 ```
 
 Then activate and verify it:
@@ -89,7 +90,7 @@ Then activate and verify it:
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now ollama
-ollama pull qwen2.5:7b-instruct-q5_0
+ollama pull qwen2.5:1.5b-instruct-q5_0
 curl --fail --silent http://127.0.0.1:11434/api/tags
 sudo ss -lntp | grep 11434
 ```
@@ -99,7 +100,7 @@ The `ss` result must show `127.0.0.1:11434`, never `0.0.0.0:11434` or a public a
 Add the model constant above the `/* That's all, stop editing! */` line in the live `wp-config.php`:
 
 ```php
-define( 'STAPLEIT_OLLAMA_MODEL', 'qwen2.5:7b-instruct-q5_0' );
+define( 'STAPLEIT_OLLAMA_MODEL', 'qwen2.5:1.5b-instruct-q5_0' );
 ```
 
 If WordPress defines `WP_HTTP_BLOCK_EXTERNAL`, allow loopback HTTP explicitly or its request to Ollama will be blocked. WordPress calls only `http://127.0.0.1:11434`; the model URL and credentials are never exposed to the browser.
@@ -115,6 +116,6 @@ curl --fail --silent --show-error \
 
 The JSON must contain `"ok":true`, `"mode":"local-ai"` and a useful `reply`. `"mode":"catalogue-match"` means the website is working but WordPress could not reach or use Ollama; check the constant, `systemctl status ollama`, available memory and the WordPress/PHP error log. Do not call Cora live AI until this returns `local-ai`.
 
-Use the Apache-2.0 7B Qwen2.5 model, not the separately licensed 3B or 72B variants. If Ollama is absent, slow or returns an invalid response, visitors receive the explicitly labelled catalogue match instead. No third-party AI API or browser credential is used. Cora rate-limits each connection, accepts only a short six-message history, does not log prompts in WordPress and refuses requests for credentials through her system instruction.
+Use the Apache-2.0 1.5B Qwen2.5 model on the current VPS, not the separately licensed 3B or 72B variants. WordPress fixes the context at 2,048 tokens, limits output, uses low-temperature generation and applies a deterministic commercial safety gate before any model reply reaches the browser. The gate permits only complete published package prices, rejects unsupported Microsoft 365 Business Premium claims, invented booking or processing capabilities and requests for contact details. A rejected, absent, slow or invalid model response receives the explicitly labelled catalogue match instead. No third-party AI API or browser credential is used. Cora rate-limits each connection, accepts only a short six-message history, does not log prompts in WordPress and refuses requests for credentials through her system instruction.
 
 Planner analytics are first-party daily aggregate counters stored in the WordPress options table for 90 days. They contain only allowlisted event names and counts: no prompts, answers, IP addresses, cookies, device identifiers or contact details.
