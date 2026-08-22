@@ -62,6 +62,7 @@ BUNDLES = {
     + [
         "it-support.css",
         "it-support-extras.css",
+        "it-support-responsive.css",
     ],
 }
 

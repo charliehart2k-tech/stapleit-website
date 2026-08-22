@@ -185,7 +185,7 @@ Repeated cards should generally use less blur than major hero surfaces. Backdrop
 - Minimum staff counts and material licensing requirements are visible in the package card or the first full-width dialog block, not buried in a closing footnote. Package dialogs use a larger homepage-derived title and copy scale, generous group padding and a two/one-column responsive grid so long inclusions remain readable without clipped glyphs or compressed line boxes.
 - Package tier accents are deliberate UI semantics: `Sole trader` uses the route-local neutral grey `--tier-sole`, `Basic` uses `--tier-basic` red, `Standard` uses `--tier-standard` blue and `Premium` uses `--tier-premium` purple. The glass material remains predominantly black. Sole trader opens a real `Sole Trader IT Support` enquiry panel rather than an empty inclusions shell; its form reuses the secured WordPress enquiry architecture, identifies the enquiry type separately and remains available as native details content without JavaScript.
 - Add-on pack cards use a generous two-column editorial grid, keep concise summaries on the page and expose the full supplied scope in the shared accessible dialog. Their shared pricing basis is stated once in the chapter introduction rather than repeated as a pill on every card. Dialog groups are separated by restrained rules inside one outer pane, not rendered as nested cards. Long pack content uses a two-column group grid on wide screens and one column on narrow screens; headings and caveats must wrap without clipping.
-- The add-on chapter opens with a nine-question, plain-English pack finder that maps one question to each published pack. JavaScript presents one question at a time with explicit `Yes`, `No` and `Not sure` choices; results distinguish `Likely useful` from `Worth discussing`, explain the match and link to the complete pack detail. Recommendations remain advisory, answers stay in the browser, and the full catalogue plus useful fallback links remain available when JavaScript is unavailable. The finder is one restrained black-glass pane with rules and rows inside it, not a collection of nested cards.
+- The add-on chapter opens with a nine-question, plain-English pack finder that maps one question to each published pack. JavaScript presents one question at a time with explicit `Yes`, `No` and `Not sure` choices; results distinguish `Looks useful` from `Worth a chat`, explain the match and link to the complete pack detail. Recommendations remain advisory, answers stay in the browser, and the full catalogue plus useful fallback links remain available when JavaScript is unavailable. The finder is one restrained black-glass pane with rules and rows inside it, not a collection of nested cards.
 - `Standard` is explicitly marked `Most popular`; the text marker and restrained blue treatment reinforce the tier but popularity must never be communicated by colour alone.
 - Every IT Support card, including the hero summary, uses the shared one-time opacity/vertical reveal and homepage-equivalent hover bloom/sheen interaction. Reduced motion and no-IntersectionObserver paths remain fully readable.
 - Cross-document page transitions are inherited from the same shared `base.css` View Transition treatment used by the homepage.
@@ -248,10 +248,13 @@ Reference checks for every completed route:
 
 | Class | Reference viewport | Expected behaviour |
 |---|---:|---|
-| Small phone | 360 x 800 | Single-column content, readable heading scale, no horizontal overflow |
+| Compact phone | 320 x 720 | Single-column content, readable heading scale, no horizontal overflow |
+| Small phone | 360 x 800 | Single-column content with comfortable touch targets |
+| Standard phone | 390 x 844 | Stable mobile sheet/dialog and balanced copy widths |
 | Large phone | 430 x 932 | Single-column content, comfortable card padding |
 | Small tablet | 768 x 1024 | Menu navigation; stacked hero/content where needed |
-| Large tablet | 1024 x 1366 | Menu navigation; grids only where comfortable |
+| Large tablet | 820 x 1180 | Dense package/planner content remains single-column where clearer |
+| Portrait tablet | 1024 x 1366 | Menu navigation; grids only where comfortable |
 | Laptop | 1366 x 768 | Full navigation and primary desktop layout |
 | Desktop | 1920 x 1080 | Centred content; no uncontrolled stretching |
 
@@ -331,7 +334,7 @@ Before editing a route:
 3. decide which original content is required;
 4. reuse the approved nav/footer/tokens;
 5. add only the page-specific CSS/JS needed;
-6. test all six reference viewports;
+6. test all nine reference viewports;
 7. check keyboard navigation and interaction timing;
 8. run the static-site, asset, repository and generated-CSS audits;
 9. complete the relevant SEO/AEO/ASEO/schema work;

@@ -18,7 +18,7 @@ for (const [name, width, height] of viewports) {
     await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
     await expect(page.locator('h1')).toContainText('Unlimited');
     await expect(page.locator('[data-support-planner]')).toBeVisible();
-    await expect(page.locator('link[data-support-responsive]')).toHaveCount(1);
+    await expect(page.locator('link[data-support-responsive]')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Chat to Cora' })).toBeVisible();
     await page.getByRole('button', { name: 'Chat to Cora' }).click();
     await expect(page.getByRole('dialog', { name: 'Cora' })).toBeVisible();
@@ -68,7 +68,7 @@ for (const [name, width, height] of viewports) {
           const rect = document.querySelector('.cora-panel').getBoundingClientRect();
           return rect.left >= -1 && rect.right <= innerWidth + 1 && rect.top >= -1 && rect.bottom <= innerHeight + 1;
         })(),
-        exposesImplementationCopy: /private local ai|safety guardrail|staple it knowledge guide/i.test(publicCopy)
+        exposesImplementationCopy: /private local ai|safety guardrail|staple it knowledge guide|checking your answers against staple it’s service guide/i.test(publicCopy)
       };
     });
 
@@ -146,7 +146,7 @@ test('package recommendation stays deterministic while Cora explains it', async 
   const packageForm = page.locator('[data-package-finder]');
   await packageForm.getByLabel('5–19 people').check();
   await packageForm.getByRole('button', { name: 'Continue' }).click();
-  await packageForm.getByLabel('Support plus stronger security').check();
+  await packageForm.getByLabel('Support + stronger security & backup').check();
   await packageForm.getByRole('button', { name: 'Continue' }).click();
   await packageForm.getByLabel('No', { exact: true }).check();
   await packageForm.getByRole('button', { name: 'See my recommendation' }).click();

@@ -46,19 +46,6 @@
 })();
 
 (() => {
-  if (!document.querySelector('.support-main')) return;
-  if (document.querySelector('link[data-support-responsive]')) return;
-
-  const appScript = [...document.scripts].find(script => /\/assets\/js\/app\.js(?:\?|$)/.test(script.src));
-  const version = appScript ? new URL(appScript.src, window.location.href).search : '';
-  const stylesheet = document.createElement('link');
-  stylesheet.rel = 'stylesheet';
-  stylesheet.href = `/assets/css/it-support-responsive.css${version}`;
-  stylesheet.dataset.supportResponsive = '';
-  document.head.append(stylesheet);
-})();
-
-(() => {
   if (document.querySelector('[data-cora]')) return;
 
   const element = (tag, className, text = '') => {
@@ -86,7 +73,7 @@
   const identity = element('div', 'cora-identity');
   const title = element('strong', '', 'Cora');
   title.id = 'cora-title';
-  const subtitle = element('span', '', 'Ask about support, security or Microsoft 365');
+  const subtitle = element('span', '', 'Ask me about support, security or Microsoft 365');
   identity.append(title, subtitle);
   const close = element('button', 'cora-close', '×');
   close.type = 'button';
@@ -115,7 +102,7 @@
   input.setAttribute('aria-label', 'Message Cora');
   const send = element('button', 'cora-send', 'Send');
   send.type = 'submit';
-  const privacy = element('p', 'cora-privacy', 'Please don’t share passwords or sensitive information. We’ll confirm anything specific to your setup.');
+  const privacy = element('p', 'cora-privacy', 'Please don’t share passwords or sensitive information. Anything specific to your setup will be confirmed by a person.');
   form.append(input, send, privacy);
 
   const toggle = element('button', 'cora-toggle');
@@ -165,8 +152,8 @@
   const addThinking = () => {
     const thinking = element('div', 'cora-message cora-message--assistant cora-thinking');
     thinking.setAttribute('role', 'status');
-    thinking.setAttribute('aria-label', 'Cora is finding the best place to start');
-    const label = element('span', 'cora-thinking-label', 'Finding the best place to start');
+    thinking.setAttribute('aria-label', 'Cora is thinking about your question');
+    const label = element('span', 'cora-thinking-label', 'Thinking about that');
     const dots = element('span', 'cora-thinking-dots');
     dots.setAttribute('aria-hidden', 'true');
     dots.append(element('i', ''), element('i', ''), element('i', ''));
@@ -176,7 +163,7 @@
     return thinking;
   };
 
-  addMessage('assistant', 'Hi, I’m Cora. Tell me what is not working, what you want to improve, or roughly how your business uses IT. I’ll help you find the right place to start.');
+  addMessage('assistant', 'Hi, I’m Cora. Tell me what you need help with — a problem, something you want to improve, or just how your IT works today. I’ll point you in the right direction.');
   renderSuggestions(initialSuggestions);
 
   const setOpen = open => {
@@ -237,7 +224,7 @@
     send.disabled = true;
     send.classList.add('is-thinking');
     send.textContent = 'Thinking';
-    subtitle.textContent = 'Looking through Staple IT’s services…';
+    subtitle.textContent = 'Thinking about that…';
     const thinking = addThinking();
 
     try {
@@ -273,7 +260,7 @@
       send.disabled = false;
       send.classList.remove('is-thinking');
       send.textContent = 'Send';
-      subtitle.textContent = 'Ask about support, security or Microsoft 365';
+      subtitle.textContent = 'Ask me about support, security or Microsoft 365';
       input.focus();
     }
   });
@@ -327,7 +314,7 @@
     const open = weekday && !holidays.has(now.date) && now.hour >= 9 && now.hour < 17;
 
     panel.classList.toggle('offline', !open);
-    title.textContent = open ? 'We are open' : 'We are asleep';
+    title.textContent = open ? 'We’re open' : 'We’re closed';
 
     if (open) {
       const copy = document.createElement('span');

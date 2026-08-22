@@ -215,13 +215,13 @@
     const packWord = countValue => countValue === 1 ? 'pack' : 'packs';
 
     if (likelyCount && considerCount) {
-      return `${likelyCount} ${packWord(likelyCount)} look relevant, with ${considerCount} more worth discussing. You can explore the reasoning below.`;
+      return `${likelyCount} ${packWord(likelyCount)} look useful, with ${considerCount} more worth a chat. You can explore them below.`;
     }
     if (likelyCount) {
-      return `${likelyCount} ${packWord(likelyCount)} look relevant to the way you work. You can explore the reasoning below.`;
+      return `${likelyCount} ${packWord(likelyCount)} look useful for the way you work. You can explore them below.`;
     }
     if (considerCount) {
-      return `${considerCount} ${packWord(considerCount)} may be worth discussing because you selected Not sure.`;
+      return `${considerCount} ${packWord(considerCount)} may be worth a chat because you selected Not sure.`;
     }
     return 'Nothing in your answers points clearly to an add-on pack at the moment.';
   };
@@ -243,11 +243,11 @@
       if (answer === 'yes') {
         likelyCount += 1;
         row.dataset.match = 'likely';
-        status.textContent = 'Likely useful';
+        status.textContent = 'Looks useful';
       } else {
         considerCount += 1;
         row.dataset.match = 'consider';
-        status.textContent = 'Worth discussing';
+        status.textContent = 'Worth a chat';
       }
     });
 
@@ -321,7 +321,7 @@
     panel.dataset.requestKey = requestKey;
     panel.hidden = false;
     panel.classList.add('is-loading');
-    copy.textContent = 'Checking your answers against Staple IT’s service guide…';
+    copy.textContent = 'Looking at what you told us…';
 
     try {
       const body = new URLSearchParams({
@@ -341,7 +341,7 @@
       panel.dataset.mode = payload.mode || 'knowledge-guide';
       window.stapleitTrack?.(plannerType === 'package' ? 'package_ai_explained' : 'pack_ai_explained');
     } catch {
-      copy.textContent = 'Your recommendation above is complete. A Staple IT engineer can confirm the detail during a free IT audit.';
+      copy.textContent = 'The recommendation above still stands. We can confirm the detail with you during a free IT audit.';
       panel.dataset.mode = 'unavailable';
     } finally {
       panel.classList.remove('is-loading');
@@ -414,7 +414,7 @@
       staff.value = team === '25' ? '25' : '10';
       staff.closest('[data-cost-calculator]').hidden = false;
       note.textContent = 'Based on published per-person pricing. Add-ons and projects are priced separately; your written proposal confirms the final scope and price.';
-      title.textContent = `${recommended[0].toUpperCase()}${recommended.slice(1)} is the sensible starting point`;
+      title.textContent = `${recommended[0].toUpperCase()}${recommended.slice(1)} looks like your best starting point`;
       reason.textContent = evidence === 'yes'
         ? 'Your need to provide security evidence makes managed protection and regular reviews important, as well as day-to-day support.'
         : recommended === 'basic' ? 'Your answers point to straightforward day-to-day support without unnecessary extras.'

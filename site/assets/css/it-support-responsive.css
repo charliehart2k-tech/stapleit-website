@@ -11,7 +11,7 @@
 .support-main *::before,
 .support-main *::after{box-sizing:border-box}
 
-.support-main{max-width:100%;overflow-x:clip}
+.support-main{max-width:100%}
 
 .support-hero,
 .support-section,
@@ -41,16 +41,16 @@
 .support-step-card,
 .support-step-content{min-width:0;max-width:100%}
 
-.support-main h1,
-.support-main h2,
-.support-main h3,
-.support-main h4,
 .support-main p,
 .support-main li,
 .support-main label,
 .support-main button,
-.support-main a,
-.support-main span{overflow-wrap:anywhere}
+.support-main a{overflow-wrap:anywhere}
+
+.support-main h1,
+.support-main h2,
+.support-main h3,
+.support-main h4{overflow-wrap:normal;word-break:normal}
 
 .support-pack-finder-button,
 .support-hero-cta,
@@ -83,6 +83,7 @@
   .support-onboarding-cta{width:min(var(--page),calc(100% - 28px))}
 
   .support-hero-copy,
+  .support-hero-proposition,
   .support-standard,
   .support-step-content,
   .support-package-card,
@@ -90,6 +91,7 @@
   .support-cta-panel{max-width:100%}
 
   .support-hero-copy h1,
+  .support-hero-lead,
   .support-standard h2,
   .support-section-heading h2,
   .support-onboarding .support-section-heading h2,
@@ -99,6 +101,8 @@
   .support-package-result-panel h4,
   .support-pack-results-header h3{width:auto;max-width:100%;text-wrap:balance}
 
+  .support-hero-lead{max-width:31rem;margin-top:14px;font-size:1rem;line-height:1.62}
+  .support-hero-proposition>.support-hero-cta{width:100%;max-width:320px}
   .support-planner{padding-top:36px}
   .support-planner-header{gap:14px;margin-bottom:22px;padding-inline:0}
   .support-planner-header h3{font-size:clamp(2.25rem,11vw,3.15rem);line-height:1.04;letter-spacing:-.035em}
@@ -146,6 +150,8 @@
 
   .support-package-card,
   .support-extra-card{padding-inline:18px}
+  .support-package-highlights{gap:9px;margin-top:19px;padding-top:16px}
+  .support-package-highlights li{font-size:.95rem}
   .support-package-badge{right:18px;max-width:calc(100% - 36px);white-space:normal;text-align:right}
   .support-package-price-main{flex-wrap:wrap}
 
@@ -159,7 +165,8 @@
    * squeezed into a phone viewport. Blur and clip-path are deliberately
    * removed on phones to reduce compositor work and make the motion crisper. */
   .cora{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));max-width:calc(100vw - max(16px,env(safe-area-inset-left) + env(safe-area-inset-right)))}
-  .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px;clip-path:none;filter:none;transition:opacity 240ms ease,transform 420ms var(--cora-ease),visibility 0s linear 420ms;will-change:opacity,transform}
+  .support-planner::before,.support-package-finder::before,.support-packs .support-pack-finder::before{display:none}
+  .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px;clip-path:none;filter:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:opacity 240ms ease,transform 420ms var(--cora-ease),visibility 0s linear 420ms;will-change:opacity,transform}
   .cora.is-open .cora-panel{clip-path:none;filter:none;transition-delay:0s}
   .cora-header{padding-inline:15px}
   .cora-identity{min-width:0}

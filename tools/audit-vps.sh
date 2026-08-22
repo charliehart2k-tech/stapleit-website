@@ -36,11 +36,33 @@ have() {
   command -v "$1" >/dev/null 2>&1
 }
 
+as_deploy() {
+  if (( EUID == 0 )); then
+    sudo -n -u deploy "$@"
+  else
+    "$@"
+  fi
+}
+
+repo_git() {
+  as_deploy git -C "$REPO" "$@"
+}
+
+privileged() {
+  if (( EUID == 0 )); then
+    "$@"
+  else
+    sudo -n "$@"
+  fi
+}
+
 wp_read() {
   if ! have wp; then
     return 127
   fi
-  if sudo -n -u www-data true >/dev/null 2>&1; then
+  if (( EUID == 0 )); then
+    sudo -n -u www-data wp --path="$WP_ROOT" "$@"
+  elif sudo -n -u www-data true >/dev/null 2>&1; then
     sudo -n -u www-data wp --path="$WP_ROOT" "$@"
   else
     wp --path="$WP_ROOT" "$@"
@@ -64,17 +86,17 @@ section "Repository and release gates"
 if [[ ! -d "$REPO/.git" ]]; then
   fail "Git repository not found at $REPO"
 else
-  repo_head="$(git -C "$REPO" rev-parse HEAD 2>/dev/null || true)"
-  repo_short="$(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || true)"
-  repo_branch="$(git -C "$REPO" branch --show-current 2>/dev/null || true)"
-  remote_head="$(git -C "$REPO" ls-remote origin refs/heads/main 2>/dev/null | awk '{print $1}' || true)"
+  repo_head="$(repo_git rev-parse HEAD 2>/dev/null || true)"
+  repo_short="$(repo_git rev-parse --short HEAD 2>/dev/null || true)"
+  repo_branch="$(repo_git branch --show-current 2>/dev/null || true)"
+  remote_head="$(repo_git ls-remote origin refs/heads/main 2>/dev/null | awk '{print $1}' || true)"
   printf 'Branch: %s\n' "${repo_branch:-detached}"
   printf 'Local HEAD: %s\n' "${repo_head:-unknown}"
   printf 'Remote main: %s\n' "${remote_head:-unavailable}"
 
-  if [[ -n "$(git -C "$REPO" status --porcelain 2>/dev/null)" ]]; then
+  if [[ -n "$(repo_git status --porcelain 2>/dev/null)" ]]; then
     fail "VPS repository has uncommitted changes"
-    git -C "$REPO" status --short
+    repo_git status --short
   else
     pass "VPS repository working tree is clean"
   fi
@@ -89,7 +111,7 @@ else
 
   python3 "$REPO/tools/audit-site.py" --root "$REPO/site" || fail "Static site audit failed"
   python3 "$REPO/tools/audit-assets.py" --root "$REPO/site/assets" || fail "Asset integrity audit failed"
-  python3 "$REPO/tools/audit-repository.py" --root "$REPO" || fail "Repository secret/hygiene audit failed"
+  as_deploy python3 "$REPO/tools/audit-repository.py" --root "$REPO" || fail "Repository secret/hygiene audit failed"
   python3 "$REPO/tools/build-css.py" --check || fail "Generated CSS bundles are stale or over budget"
   php -l "$REPO/wordpress/functions.php" >/dev/null || fail "WordPress functions syntax check failed"
   php -l "$REPO/wordpress/cora-safety.php" >/dev/null || fail "Cora safety syntax check failed"
@@ -164,9 +186,16 @@ elif [[ ! -f "$WP_ROOT/wp-config.php" ]]; then
   fail "WordPress config not found at $WP_ROOT/wp-config.php"
 else
   wp_read core verify-checksums && pass "WordPress core checksums are valid" || fail "WordPress core checksum verification failed"
-  printf 'Environment: '
-  wp_read eval 'echo wp_get_environment_type();' 2>/dev/null || warn "Could not read WordPress environment type"
-  printf '\nHome URL: '
+  wp_environment="$(wp_read eval 'echo wp_get_environment_type();' 2>/dev/null || true)"
+  printf 'Environment: %s\n' "${wp_environment:-unavailable}"
+  if [[ "$wp_environment" == "staging" ]]; then
+    pass "WordPress environment type is staging"
+  elif [[ -n "$wp_environment" ]]; then
+    fail "WordPress environment type is $wp_environment, expected staging"
+  else
+    warn "Could not read WordPress environment type"
+  fi
+  printf 'Home URL: '
   wp_read option get home 2>/dev/null || warn "Could not read WordPress home URL"
   printf '\nSite URL: '
   wp_read option get siteurl 2>/dev/null || warn "Could not read WordPress site URL"
@@ -223,11 +252,11 @@ else
 fi
 
 if have nginx; then
-  sudo -n nginx -t 2>&1 || fail "Nginx configuration test failed"
+  privileged nginx -t 2>&1 || fail "Nginx configuration test failed"
 fi
 
 if have ufw; then
-  sudo -n ufw status verbose 2>/dev/null || warn "Could not read UFW status without interactive sudo"
+  privileged ufw status verbose 2>/dev/null || warn "Could not read UFW status with current privileges"
 else
   warn "UFW is not installed"
 fi
@@ -237,7 +266,7 @@ if have ss; then
 fi
 
 if have sshd; then
-  sshd_effective="$(sudo -n sshd -T 2>/dev/null || sshd -T 2>/dev/null || true)"
+  sshd_effective="$(privileged sshd -T 2>/dev/null || true)"
   if [[ -n "$sshd_effective" ]]; then
     printf '%s\n' "$sshd_effective" | grep -E '^(permitrootlogin|passwordauthentication|pubkeyauthentication) '
     printf '%s\n' "$sshd_effective" | grep -q '^permitrootlogin no$' \
@@ -350,7 +379,8 @@ else
     fail "Development WordPress login is publicly reachable (HTTP ${login_status:-unavailable})"
   fi
 
-  asset_headers="$(curl -fsSI --max-time 20 "$STAGING_URL/wp-content/themes/stapleit/assets/css/home.bundle.css" 2>/dev/null || true)"
+  asset_revision="${repo_short:-audit-$(date +%s)}"
+  asset_headers="$(curl -fsSI --max-time 20 "$STAGING_URL/wp-content/themes/stapleit/assets/css/home.bundle.css?v=$asset_revision" 2>/dev/null || true)"
   if printf '%s\n' "$asset_headers" | grep -Eqi '^cache-control:.*max-age=31536000.*immutable'; then
     pass "Revisioned theme assets use the immutable one-year cache policy"
   else

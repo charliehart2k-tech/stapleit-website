@@ -151,7 +151,7 @@ jobs:
         with:
           node-version: 22
       - name: Install pinned browser test dependency
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Serve static source

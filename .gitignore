@@ -2,6 +2,8 @@
 staging/runtime/
 staging/backups/
 dist/
+node_modules/
+test-results/
 
 # Python cache
 **/__pycache__/
