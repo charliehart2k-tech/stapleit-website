@@ -156,9 +156,11 @@
   .support-dialog-note{max-width:100%;overflow-wrap:anywhere}
 
   /* Cora behaves like a contained mobile sheet instead of a desktop card
-   * squeezed into a phone viewport. */
+   * squeezed into a phone viewport. Blur and clip-path are deliberately
+   * removed on phones to reduce compositor work and make the motion crisper. */
   .cora{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));max-width:calc(100vw - max(16px,env(safe-area-inset-left) + env(safe-area-inset-right)))}
-  .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px}
+  .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px;clip-path:none;filter:none;transition:opacity 240ms ease,transform 420ms var(--cora-ease),visibility 0s linear 420ms;will-change:opacity,transform}
+  .cora.is-open .cora-panel{clip-path:none;filter:none;transition-delay:0s}
   .cora-header{padding-inline:15px}
   .cora-identity{min-width:0}
   .cora-identity span{white-space:normal;overflow-wrap:anywhere}
@@ -190,6 +192,14 @@
   .cora-privacy{grid-column:1}
 }
 
+@media(max-width:840px) and (prefers-reduced-motion:no-preference){
+  .support-pack-finder.is-enhanced .support-pack-question:not([hidden]){animation-name:supportPlannerQuestionInNarrow}
+  .support-pack-finder.is-enhanced[data-pack-direction="back"] .support-pack-question:not([hidden]){animation-name:supportPlannerQuestionBackNarrow}
+  .support-package-result-panel:not([hidden]),
+  .support-pack-results:not([hidden]){animation-name:supportPlannerResultInNarrow}
+  .cora-message--new{animation-name:coraMessageInNarrow}
+}
+
 @media(prefers-reduced-motion:reduce){
   .support-package-finder,
   .support-pack-finder,
@@ -197,3 +207,8 @@
   .support-package-result-panel,
   .support-pack-results{scroll-behavior:auto}
 }
+
+@keyframes supportPlannerQuestionInNarrow{from{opacity:0;transform:translate3d(8px,0,0)}to{opacity:1;transform:none}}
+@keyframes supportPlannerQuestionBackNarrow{from{opacity:0;transform:translate3d(-8px,0,0)}to{opacity:1;transform:none}}
+@keyframes supportPlannerResultInNarrow{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
+@keyframes coraMessageInNarrow{from{opacity:0;transform:translate3d(0,7px,0)}to{opacity:1;transform:none}}
