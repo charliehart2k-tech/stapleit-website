@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Install the audited Staple IT staging Nginx hardening safely.
 
-The script is deliberately conservative: it only edits the configured staging
-site when exactly one server block contains both the expected server_name and
-WordPress document root. It backs up everything it changes, runs `nginx -t`,
-and restores the previous configuration automatically if validation fails.
+The installer finds the active staging server block by its unique server_name,
+backs up every file it changes, runs `nginx -t`, and restores the previous
+configuration automatically if validation or reload fails.
 """
 
 from __future__ import annotations
@@ -16,12 +15,12 @@ import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
+from typing import NoReturn
 
 REPO = Path(os.environ.get("REPO", "/srv/stapleit/repo"))
-SITE = Path(os.environ.get("NGINX_SITE", "/etc/nginx/sites-available/stapleit-dev"))
+EXPLICIT_SITE = os.environ.get("NGINX_SITE", "").strip()
 SNIPPET_DIR = Path("/etc/nginx/snippets")
 SERVER_NAME = os.environ.get("STAGING_SERVER_NAME", "staging.stapleitdev.co.uk")
-WP_ROOT = os.environ.get("WP_ROOT", "/var/www/stapleit")
 INCLUDE = "include /etc/nginx/snippets/stapleit-hardening.conf;"
 SOURCES = {
     SNIPPET_DIR / "stapleit-security-headers.conf": REPO / "ops/nginx/stapleit-security-headers.conf",
@@ -29,7 +28,7 @@ SOURCES = {
 }
 
 
-def fail(message: str) -> "NoReturn":
+def fail(message: str) -> NoReturn:
     print(f"ERROR: {message}", file=sys.stderr)
     raise SystemExit(1)
 
@@ -39,7 +38,7 @@ def run(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def matching_server_blocks(text: str) -> list[tuple[int, int]]:
-    """Return server block spans using a small quote/comment-aware scanner."""
+    """Return top-level server block spans using a quote/comment-aware scanner."""
     spans: list[tuple[int, int]] = []
     for match in re.finditer(r"(?m)^\s*server\s*\{", text):
         open_brace = text.find("{", match.start(), match.end())
@@ -77,6 +76,55 @@ def matching_server_blocks(text: str) -> list[tuple[int, int]]:
     return spans
 
 
+def server_name_matches(block: str) -> bool:
+    pattern = rf"(?m)^\s*server_name\s+[^;]*(?<![A-Za-z0-9.-]){re.escape(SERVER_NAME)}(?![A-Za-z0-9.-])[^;]*;"
+    return re.search(pattern, block) is not None
+
+
+def candidate_site_files() -> list[Path]:
+    if EXPLICIT_SITE:
+        return [Path(EXPLICIT_SITE)]
+
+    candidates: dict[Path, Path] = {}
+    for directory in (Path("/etc/nginx/sites-enabled"), Path("/etc/nginx/sites-available")):
+        if not directory.is_dir():
+            continue
+        for item in directory.iterdir():
+            if not (item.is_file() or item.is_symlink()):
+                continue
+            try:
+                resolved = item.resolve(strict=True)
+            except OSError:
+                continue
+            candidates.setdefault(resolved, resolved)
+    return sorted(candidates.values(), key=str)
+
+
+def find_target() -> tuple[Path, tuple[int, int], str]:
+    matches: list[tuple[Path, tuple[int, int], str]] = []
+    checked = 0
+    for site in candidate_site_files():
+        if not site.is_file():
+            continue
+        checked += 1
+        try:
+            text = site.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for span in matching_server_blocks(text):
+            block = text[span[0]:span[1]]
+            if server_name_matches(block):
+                matches.append((site, span, text))
+
+    if len(matches) != 1:
+        locations = ", ".join(str(item[0]) for item in matches) or "none"
+        fail(
+            f"expected exactly one Nginx server block for {SERVER_NAME}; found {len(matches)} "
+            f"across {checked} site file(s) ({locations}). No files were changed."
+        )
+    return matches[0]
+
+
 def restore(backups: dict[Path, Path | None]) -> None:
     for target, backup in backups.items():
         try:
@@ -91,27 +139,14 @@ def restore(backups: dict[Path, Path | None]) -> None:
 def main() -> int:
     if os.geteuid() != 0:
         fail("run this installer with sudo")
-    if not SITE.is_file():
-        fail(f"staging Nginx site not found: {SITE}")
     for source in SOURCES.values():
         if not source.is_file():
             fail(f"required repository file is missing: {source}")
 
-    original = SITE.read_text(encoding="utf-8")
-    spans = matching_server_blocks(original)
-    candidates: list[tuple[int, int]] = []
-    for start, end in spans:
-        block = original[start:end]
-        if re.search(rf"(?m)^\s*server_name\s+[^;]*\b{re.escape(SERVER_NAME)}\b[^;]*;", block) and re.search(
-            rf"(?m)^\s*root\s+{re.escape(WP_ROOT.rstrip('/'))}/?\s*;", block
-        ):
-            candidates.append((start, end))
-
-    if len(candidates) != 1:
-        fail(
-            f"expected exactly one server block for {SERVER_NAME} with root {WP_ROOT}; "
-            f"found {len(candidates)}. No files were changed."
-        )
+    site, target_span, original = find_target()
+    target_block = original[target_span[0]:target_span[1]]
+    root_match = re.search(r"(?m)^\s*root\s+([^;]+);", target_block)
+    detected_root = root_match.group(1).strip() if root_match else "inherited/not declared in this block"
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     backup_dir = Path(f"/root/stapleit-nginx-backup-{stamp}")
@@ -126,7 +161,7 @@ def main() -> int:
         else:
             backups[target] = None
 
-    back_up(SITE)
+    back_up(site)
     SNIPPET_DIR.mkdir(parents=True, exist_ok=True)
     for target, source in SOURCES.items():
         back_up(target)
@@ -137,8 +172,8 @@ def main() -> int:
         except PermissionError:
             pass
 
-    if INCLUDE not in original:
-        start, end = candidates[0]
+    if INCLUDE not in target_block:
+        start, end = target_span
         block = original[start:end]
         closing = block.rfind("}")
         if closing < 0:
@@ -146,8 +181,7 @@ def main() -> int:
             fail("could not locate the staging server block closing brace")
         insertion = "\n    # Staple IT audited staging hardening.\n    " + INCLUDE + "\n"
         updated_block = block[:closing] + insertion + block[closing:]
-        updated = original[:start] + updated_block + original[end:]
-        SITE.write_text(updated, encoding="utf-8")
+        site.write_text(original[:start] + updated_block + original[end:], encoding="utf-8")
 
     test = run("nginx", "-t")
     if test.returncode != 0:
@@ -166,8 +200,10 @@ def main() -> int:
         fail("Nginx reload failed; previous configuration was restored")
 
     print("PASS: Staple IT staging Nginx hardening is installed and Nginx reloaded.")
+    print(f"Server name: {SERVER_NAME}")
+    print(f"Site file: {site}")
+    print(f"Detected root: {detected_root}")
     print(f"Backup: {backup_dir}")
-    print(f"Site: {SITE}")
     return 0
 
 
