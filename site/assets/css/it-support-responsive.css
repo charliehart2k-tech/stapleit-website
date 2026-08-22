@@ -1,0 +1,199 @@
+/* IT Support viewport hardening.
+ *
+ * This file owns route-specific phone/tablet containment and readability.
+ * It is loaded only when .support-main is present, after the generated route
+ * bundle, so the desktop design remains unchanged while narrow layouts get a
+ * deliberately simpler composition.
+ */
+
+.support-main,
+.support-main *,
+.support-main *::before,
+.support-main *::after{box-sizing:border-box}
+
+.support-main{max-width:100%;overflow-x:clip}
+
+.support-hero,
+.support-section,
+.support-onboarding>.support-section-heading,
+.support-onboarding>.support-step-grid,
+.support-onboarding-cta,
+.support-planner,
+.support-planner-header,
+.support-package-finder,
+.support-pack-finder,
+.support-pack-finder-header,
+.support-pack-finder-stage,
+.support-pack-question,
+.support-pack-choices,
+.support-package-result-panel,
+.support-pack-results,
+.support-pack-results-list,
+.support-pack-result,
+.support-cost-calculator,
+.support-planner-handoff,
+.support-package-grid,
+.support-catalogue-grid,
+#support-packs-grid,
+#support-services-grid,
+.support-extra-card,
+.support-package-card,
+.support-step-card,
+.support-step-content{min-width:0;max-width:100%}
+
+.support-main h1,
+.support-main h2,
+.support-main h3,
+.support-main h4,
+.support-main p,
+.support-main li,
+.support-main label,
+.support-main button,
+.support-main a,
+.support-main span{overflow-wrap:anywhere}
+
+.support-pack-finder-button,
+.support-hero-cta,
+.support-cta-btn,
+.support-package-details>summary,
+.support-extra-details summary{white-space:normal}
+
+/* Tablet: favour reading width over squeezing dense cards side-by-side. */
+@media(max-width:840px){
+  .support-package-grid,
+  .support-catalogue-grid,
+  #support-packs-grid,
+  #support-services-grid{grid-template-columns:1fr}
+
+  .support-package-card{min-height:0}
+  .support-planner-header{grid-template-columns:1fr;gap:18px}
+  .support-planner-header h3{max-width:13ch;font-size:clamp(2.8rem,8vw,4.35rem)}
+  .support-planner-header>p:last-child{max-width:44rem;margin:0}
+
+  .support-pack-results-list{grid-template-columns:1fr}
+  .support-cost-calculator{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .support-cost-total{grid-column:1/-1;border-left:0;border-top:1px solid rgba(255,255,255,.075);padding:18px 0 0}
+}
+
+@media(max-width:700px){
+  .support-hero,
+  .support-section,
+  .support-onboarding>.support-section-heading,
+  .support-onboarding>.support-step-grid,
+  .support-onboarding-cta{width:min(var(--page),calc(100% - 28px))}
+
+  .support-hero-copy,
+  .support-standard,
+  .support-step-content,
+  .support-package-card,
+  .support-extra-card,
+  .support-cta-panel{max-width:100%}
+
+  .support-hero-copy h1,
+  .support-standard h2,
+  .support-section-heading h2,
+  .support-onboarding .support-section-heading h2,
+  .support-planner-header h3,
+  .support-pack-finder-header h3,
+  .support-pack-question legend,
+  .support-package-result-panel h4,
+  .support-pack-results-header h3{width:auto;max-width:100%;text-wrap:balance}
+
+  .support-planner{padding-top:36px}
+  .support-planner-header{gap:14px;margin-bottom:22px;padding-inline:0}
+  .support-planner-header h3{font-size:clamp(2.25rem,11vw,3.15rem);line-height:1.04;letter-spacing:-.035em}
+  .support-planner-header>p:last-child{font-size:1rem;line-height:1.6}
+
+  .support-package-finder,
+  .support-packs .support-pack-finder,
+  .support-planner .support-package-finder{width:100%;border-radius:20px}
+
+  .support-pack-finder-header{padding:24px 17px 21px}
+  .support-pack-finder-header h3{font-size:clamp(1.7rem,8.5vw,2.2rem);line-height:1.12}
+  .support-pack-finder-header p{font-size:1rem;line-height:1.58}
+
+  .support-planner .support-pack-finder-progress,
+  .support-pack-finder-progress{grid-template-columns:1fr;gap:9px;padding:20px 17px 0}
+
+  .support-pack-finder-progress p{white-space:normal}
+  .support-pack-finder-stage{padding:0 17px 22px}
+  .support-planner .support-pack-question,
+  .support-pack-finder.is-enhanced .support-pack-question{min-height:0;padding:24px 0 21px}
+  .support-pack-question legend{font-size:clamp(1.55rem,7.7vw,2rem);line-height:1.18}
+  .support-pack-question-help{font-size:1rem;line-height:1.6}
+  .support-pack-choices,
+  .support-planner .support-pack-choices--four{grid-template-columns:1fr;gap:9px;margin-top:20px}
+  .support-pack-choices label{width:100%;min-height:54px;padding:12px 14px}
+
+  .support-planner .support-pack-finder-actions,
+  .support-pack-finder-actions{margin:0 17px 20px;padding-top:18px;flex-direction:column-reverse;align-items:stretch}
+  .support-pack-finder-button,
+  .support-pack-finder-button--next{width:100%;max-width:100%;margin-left:0}
+
+  .support-package-result-panel,
+  .support-pack-results{padding:25px 17px 22px}
+  .support-package-result-panel h4,
+  .support-pack-results-header h3{font-size:clamp(1.8rem,9vw,2.35rem);line-height:1.12}
+  .support-pack-result{grid-template-columns:1fr;gap:8px}
+  .support-pack-result>a{width:auto;max-width:100%;white-space:normal}
+
+  .support-cost-calculator{grid-template-columns:1fr;gap:15px;padding:19px 0}
+  .support-cost-total{grid-column:1;margin-top:2px;padding:17px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.075)}
+  .support-cost-total strong{font-size:clamp(2rem,11vw,2.8rem)}
+  .support-cost-note{font-size:.95rem;line-height:1.6}
+  .support-planner-handoff{grid-template-columns:1fr;gap:14px;margin-top:26px;padding-inline:0}
+  .support-planner-handoff .support-pack-finder-button{width:100%}
+
+  .support-package-card,
+  .support-extra-card{padding-inline:18px}
+  .support-package-badge{right:18px;max-width:calc(100% - 36px);white-space:normal;text-align:right}
+  .support-package-price-main{flex-wrap:wrap}
+
+  .support-dialog-header{gap:16px}
+  .support-dialog-title-group{padding-right:0}
+  .support-dialog-close{flex:0 0 44px}
+  .support-dialog-body,
+  .support-dialog-note{max-width:100%;overflow-wrap:anywhere}
+
+  /* Cora behaves like a contained mobile sheet instead of a desktop card
+   * squeezed into a phone viewport. */
+  .cora{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));max-width:calc(100vw - max(16px,env(safe-area-inset-left) + env(safe-area-inset-right)))}
+  .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px}
+  .cora-header{padding-inline:15px}
+  .cora-identity{min-width:0}
+  .cora-identity span{white-space:normal;overflow-wrap:anywhere}
+  .cora-messages{padding:18px 15px 12px}
+  .cora-message,.cora-message--user{max-width:100%}
+  .cora-suggestions{max-width:100%;padding-inline:13px}
+  .cora-suggestion{max-width:min(82vw,300px);white-space:normal;text-align:left}
+  .cora-form{min-width:0;padding-inline:10px}
+  .cora-form textarea{min-width:0}
+}
+
+@media(max-width:390px){
+  .support-hero,
+  .support-section,
+  .support-onboarding>.support-section-heading,
+  .support-onboarding>.support-step-grid,
+  .support-onboarding-cta{width:calc(100% - 20px)}
+
+  .support-hero-copy{padding-inline:15px}
+  .support-standard{padding-inline:15px}
+  .support-step-grid{padding-left:36px}
+  .support-step-card::after{left:-36px}
+  .support-step-content{padding:26px 18px}
+  .support-package-card,
+  .support-extra-card{padding-inline:16px}
+
+  .cora-form{grid-template-columns:1fr}
+  .cora-send{width:100%}
+  .cora-privacy{grid-column:1}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .support-package-finder,
+  .support-pack-finder,
+  .support-pack-question,
+  .support-package-result-panel,
+  .support-pack-results{scroll-behavior:auto}
+}
