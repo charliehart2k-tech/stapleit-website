@@ -2,9 +2,12 @@
 """Install the audited Staple IT staging Nginx hardening safely.
 
 The installer discovers the live staging server block from `nginx -T` instead
-of assuming a sites-available layout. It backs up every file it changes, runs
-`nginx -t`, and restores the previous configuration automatically if validation
-or reload fails.
+of assuming a sites-available layout or public server_name. It supports the
+Cloudflare Tunnel origin pattern used on staging: a loopback-only default vhost
+with `server_name _;` and the WordPress document root.
+
+Every changed file is backed up, `nginx -t` is run before reload, and the
+previous configuration is restored automatically if validation or reload fails.
 """
 
 from __future__ import annotations
@@ -21,6 +24,7 @@ from typing import NoReturn
 REPO = Path(os.environ.get("REPO", "/srv/stapleit/repo"))
 SNIPPET_DIR = Path("/etc/nginx/snippets")
 SERVER_NAME = os.environ.get("STAGING_SERVER_NAME", "staging.stapleitdev.co.uk")
+WP_ROOT = os.environ.get("WP_ROOT", "/var/www/stapleit").rstrip("/")
 INCLUDE = "include /etc/nginx/snippets/stapleit-hardening.conf;"
 SOURCES = {
     SNIPPET_DIR / "stapleit-security-headers.conf": REPO / "ops/nginx/stapleit-security-headers.conf",
@@ -28,6 +32,9 @@ SOURCES = {
 }
 CONFIG_MARKER_RE = re.compile(r"(?m)^# configuration file (?P<path>.+):\s*$")
 SERVER_NAME_RE_TEMPLATE = r"(?m)^\s*server_name\s+[^;]*(?<![A-Za-z0-9.-]){server}(?![A-Za-z0-9.-])[^;]*;"
+LEGACY_SECURITY_INCLUDE_RE = re.compile(
+    r"(?m)^(?P<indent>\s*)include\s+(?:/etc/nginx/)?snippets/security-headers\.conf;\s*$"
+)
 
 
 def fail(message: str) -> NoReturn:
@@ -95,10 +102,31 @@ def server_name_matches(block: str) -> bool:
     return pattern.search(block) is not None
 
 
+def tunnel_origin_matches(block: str) -> bool:
+    """Match Staple IT's private Cloudflare Tunnel origin vhost safely."""
+    wildcard_name = re.search(r"(?m)^\s*server_name\s+_\s*;", block) is not None
+    root_match = re.search(r"(?m)^\s*root\s+([^;]+);", block)
+    root_ok = bool(root_match and root_match.group(1).strip().rstrip("/") == WP_ROOT)
+    loopback_default = re.search(
+        r"(?m)^\s*listen\s+(?:127\.0\.0\.1:\d+|\[::1\]:\d+)[^;]*\bdefault_server\b[^;]*;",
+        block,
+        re.I,
+    ) is not None
+    return wildcard_name and root_ok and loopback_default
+
+
+def target_matches(block: str) -> bool:
+    return server_name_matches(block) or tunnel_origin_matches(block)
+
+
 def block_score(block: str) -> int:
-    """Prefer the application-serving vhost over a simple redirect vhost."""
+    """Prefer the application-serving vhost over redirects or unrelated blocks."""
     score = 0
     lower = block.lower()
+    if server_name_matches(block):
+        score += 200
+    if tunnel_origin_matches(block):
+        score += 180
     if "fastcgi_pass" in lower:
         score += 120
     if "try_files" in lower:
@@ -117,8 +145,8 @@ def block_score(block: str) -> int:
 def choose_candidate(candidates: list[tuple[Path, int, int, str]]) -> tuple[Path, int, int, str]:
     if not candidates:
         fail(
-            f"could not find {SERVER_NAME} in the effective Nginx configuration returned by nginx -T. "
-            "No files were changed."
+            f"could not find either {SERVER_NAME} or the Staple IT loopback tunnel origin "
+            f"(server_name _; root {WP_ROOT}) in nginx -T. No files were changed."
         )
     if len(candidates) == 1:
         return candidates[0]
@@ -128,10 +156,7 @@ def choose_candidate(candidates: list[tuple[Path, int, int, str]]) -> tuple[Path
     tied = [item for item in ranked if block_score(item[3]) == best_score]
     if len(tied) != 1:
         details = ", ".join(f"{path} (score {block_score(block)})" for path, _, _, block in ranked)
-        fail(
-            f"found multiple equally plausible Nginx server blocks for {SERVER_NAME}: {details}. "
-            "No files were changed."
-        )
+        fail(f"found multiple equally plausible staging Nginx blocks: {details}. No files were changed.")
     return ranked[0]
 
 
@@ -147,7 +172,7 @@ def find_runtime_candidate() -> tuple[Path, str]:
     for path, content in nginx_sections(combined):
         for start, end in matching_server_blocks(content):
             block = content[start:end]
-            if server_name_matches(block):
+            if target_matches(block):
                 candidates.append((path, start, end, block))
 
     path, _, _, runtime_block = choose_candidate(candidates)
@@ -161,7 +186,7 @@ def choose_source_block(text: str) -> tuple[int, int, str]:
     pseudo = Path("source")
     for start, end in matching_server_blocks(text):
         block = text[start:end]
-        if server_name_matches(block):
+        if target_matches(block):
             candidates.append((pseudo, start, end, block))
     _, start, end, block = choose_candidate(candidates)
     return start, end, block
@@ -170,6 +195,10 @@ def choose_source_block(text: str) -> tuple[int, int, str]:
 def detected_root(block: str) -> str:
     match = re.search(r"(?m)^\s*root\s+([^;]+);", block)
     return match.group(1).strip() if match else "not declared in selected block"
+
+
+def target_description(block: str) -> str:
+    return SERVER_NAME if server_name_matches(block) else "Cloudflare Tunnel loopback origin"
 
 
 def restore(backups: dict[Path, Path | None]) -> None:
@@ -223,14 +252,22 @@ def main() -> int:
             pass
 
     if INCLUDE not in source_block:
-        closing = source_block.rfind("}")
-        if closing < 0:
-            restore(backups)
-            fail("could not locate the staging server block closing brace")
-        insertion = "\n    # Staple IT audited staging hardening.\n    " + INCLUDE + "\n"
-        updated_block = source_block[:closing] + insertion + source_block[closing:]
-        updated = original[:start] + updated_block + original[end:]
-        site_path.write_text(updated, encoding="utf-8")
+        legacy = LEGACY_SECURITY_INCLUDE_RE.search(source_block)
+        if legacy:
+            indent = legacy.group("indent")
+            replacement = (
+                f"{indent}# Staple IT audited staging hardening.\n"
+                f"{indent}{INCLUDE}"
+            )
+            updated_block = source_block[:legacy.start()] + replacement + source_block[legacy.end():]
+        else:
+            closing = source_block.rfind("}")
+            if closing < 0:
+                restore(backups)
+                fail("could not locate the staging server block closing brace")
+            insertion = "\n    # Staple IT audited staging hardening.\n    " + INCLUDE + "\n"
+            updated_block = source_block[:closing] + insertion + source_block[closing:]
+        site_path.write_text(original[:start] + updated_block + original[end:], encoding="utf-8")
 
     test = run("nginx", "-t")
     if test.returncode != 0:
@@ -249,7 +286,7 @@ def main() -> int:
         fail("Nginx reload failed; previous configuration was restored")
 
     print("PASS: Staple IT staging Nginx hardening is installed and Nginx reloaded.")
-    print(f"Server name: {SERVER_NAME}")
+    print(f"Target: {target_description(runtime_block)}")
     print(f"Site file: {site_path}")
     print(f"Detected root: {detected_root(runtime_block)}")
     print(f"Backup: {backup_dir}")
