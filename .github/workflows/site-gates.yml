@@ -123,8 +123,10 @@ jobs:
         run: |
           php -l wordpress/functions.php
           php -l wordpress/cora-safety.php
+          php -l wordpress/cora-knowledge.php
           php -l wordpress/mu-plugins/stapleit-static-routes.php
           php tests/php/cora-safety-test.php
+          php tests/php/cora-knowledge-test.php
 
       - name: Run content security SEO and AEO gates
         run: python3 tools/audit-site.py --root site

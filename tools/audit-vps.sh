@@ -121,7 +121,7 @@ else
     fi
   done
 
-  for relative in functions.php cora-safety.php; do
+  for relative in functions.php cora-safety.php cora-knowledge.php; do
     if [[ ! -s "$THEME/$relative" ]]; then
       fail "Missing deployed WordPress theme file: $relative"
     elif cmp -s "$REPO/wordpress/$relative" "$THEME/$relative"; then

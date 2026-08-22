@@ -41,6 +41,8 @@ for (const [name, width, height] of viewports) {
     expect(contract.questionVisible).toBe(true);
     expect(contract.smallestControl).toBeGreaterThanOrEqual(44);
     expect(contract.coraPanelInsideViewport).toBe(true);
+    await page.getByRole('button', { name: 'Close Cora' }).click();
+    await expect(page.getByRole('dialog', { name: 'Cora' })).toBeHidden();
     await page.screenshot({ path: `test-results/it-support-${name}.png`, fullPage: true, animations: 'disabled' });
   });
 }
@@ -57,3 +59,42 @@ for (const route of ['/', '/about-us/', '/it-services/it-support/']) {
     await expect(page.getByRole('button', { name: 'Close Cora' })).toBeVisible();
   });
 }
+
+test('package recommendation stays deterministic while Cora explains it', async ({ page }) => {
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    const body = route.request().postData() || '';
+    if (body.includes('action=stapleit_cora_planner_explain')) {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, mode: 'local-ai', reply: 'Standard fits because you selected stronger managed protection for a team of five or more. A free IT audit will confirm the final scope.' })
+      });
+      return;
+    }
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+  });
+
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const packageForm = page.locator('[data-package-finder]');
+  await packageForm.getByLabel('5–19 people').check();
+  await packageForm.getByRole('button', { name: 'Continue' }).click();
+  await packageForm.getByLabel('Support plus stronger security').check();
+  await packageForm.getByRole('button', { name: 'Continue' }).click();
+  await packageForm.getByLabel('No', { exact: true }).check();
+  await packageForm.getByRole('button', { name: 'See my recommendation' }).click();
+
+  await expect(page.locator('[data-package-title]')).toContainText('Standard');
+  await expect(page.locator('[data-package-ai-copy]')).toContainText('stronger managed protection');
+  const surfaces = await page.evaluate(() => {
+    const planner = document.querySelector('[data-support-planner]');
+    const form = planner?.querySelector(':scope > [data-package-finder]');
+    return {
+      formIsDirectChild: Boolean(form),
+      outerBorder: planner ? getComputedStyle(planner).borderTopStyle : '',
+      formBorder: form ? Number.parseFloat(getComputedStyle(form).borderTopWidth) : 0
+    };
+  });
+  expect(surfaces.formIsDirectChild).toBe(true);
+  expect(surfaces.outerBorder).toBe('none');
+  expect(surfaces.formBorder).toBeGreaterThan(0);
+});

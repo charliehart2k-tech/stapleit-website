@@ -61,18 +61,19 @@
 
   const panel = element('section', 'cora-panel');
   panel.id = 'cora-panel';
-  panel.hidden = true;
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-modal', 'false');
   panel.setAttribute('aria-labelledby', 'cora-title');
+  panel.setAttribute('aria-hidden', 'true');
+  panel.inert = true;
 
   const header = element('header', 'cora-header');
-  const headerOrb = element('span', 'cora-orb');
+  const headerOrb = element('span', 'cora-orb cora-orb--header');
   headerOrb.setAttribute('aria-hidden', 'true');
   const identity = element('div', 'cora-identity');
   const title = element('strong', '', 'Cora');
   title.id = 'cora-title';
-  const subtitle = element('span', '', 'Staple IT service guide');
+  const subtitle = element('span', '', 'Grounded in Staple IT’s services');
   identity.append(title, subtitle);
   const close = element('button', 'cora-close', '×');
   close.type = 'button';
@@ -85,16 +86,11 @@
   messages.setAttribute('aria-relevant', 'additions');
 
   const suggestions = element('div', 'cora-suggestions');
-  const suggestionCopy = [
+  const initialSuggestions = [
     'Which support package suits us?',
     'How could you improve our security?',
     'We need help with Microsoft 365'
   ];
-  suggestionCopy.forEach(copy => {
-    const button = element('button', 'cora-suggestion', copy);
-    button.type = 'button';
-    suggestions.append(button);
-  });
 
   const form = element('form', 'cora-form');
   const input = element('textarea', '');
@@ -106,16 +102,17 @@
   input.setAttribute('aria-label', 'Message Cora');
   const send = element('button', 'cora-send', 'Send');
   send.type = 'submit';
-  const privacy = element('p', 'cora-privacy', 'Your chat is processed on Staple IT’s server and is not retained in this browser. Cora provides guidance, not a final technical assessment.');
+  const privacy = element('p', 'cora-privacy', 'Private local AI · do not share passwords or sensitive data · an engineer confirms final advice.');
   form.append(input, send, privacy);
 
   const toggle = element('button', 'cora-toggle');
   toggle.type = 'button';
   toggle.setAttribute('aria-controls', panel.id);
   toggle.setAttribute('aria-expanded', 'false');
-  const toggleOrb = element('span', 'cora-orb');
+  const toggleOrb = element('span', 'cora-orb cora-orb--toggle');
   toggleOrb.setAttribute('aria-hidden', 'true');
-  toggle.append(toggleOrb, document.createTextNode('Chat to Cora'));
+  const toggleLabel = element('span', 'cora-toggle-label', 'Chat to Cora');
+  toggle.append(toggleOrb, toggleLabel);
 
   panel.append(header, messages, suggestions, form);
   root.append(panel, toggle);
@@ -124,6 +121,7 @@
   const conversation = [];
   const tracked = new Set();
   let previousFocus = null;
+  let responsePending = false;
 
   const track = eventName => {
     if (tracked.has(eventName)) return;
@@ -135,34 +133,67 @@
 
   const addMessage = (role, copy, status = '') => {
     const message = element('div', `cora-message cora-message--${role}`, copy);
+    message.classList.add('cora-message--new');
     messages.append(message);
     if (status) messages.append(element('p', 'cora-message-status', status));
     messages.scrollTop = messages.scrollHeight;
+    return message;
+  };
+
+  const renderSuggestions = copies => {
+    suggestions.replaceChildren();
+    copies.slice(0, 3).forEach(copy => {
+      const button = element('button', 'cora-suggestion', copy);
+      button.type = 'button';
+      suggestions.append(button);
+    });
+  };
+
+  const addThinking = () => {
+    const thinking = element('div', 'cora-message cora-message--assistant cora-thinking');
+    thinking.setAttribute('role', 'status');
+    thinking.setAttribute('aria-label', 'Cora is checking the Staple IT service guide');
+    const label = element('span', 'cora-thinking-label', 'Checking Staple IT’s guide');
+    const dots = element('span', 'cora-thinking-dots');
+    dots.setAttribute('aria-hidden', 'true');
+    dots.append(element('i', ''), element('i', ''), element('i', ''));
+    thinking.append(label, dots);
+    messages.append(thinking);
+    messages.scrollTop = messages.scrollHeight;
+    return thinking;
   };
 
   addMessage('assistant', 'Hi, I’m Cora. Tell me what is not working, what you want to improve, or roughly how your business uses IT. I’ll help you find the right place to start.');
+  renderSuggestions(initialSuggestions);
 
   const setOpen = open => {
-    panel.hidden = !open;
+    if (root.classList.contains('is-open') === open) return;
+    root.classList.toggle('is-open', open);
+    root.classList.toggle('is-closed', !open);
+    panel.setAttribute('aria-hidden', String(!open));
+    panel.inert = !open;
     toggle.setAttribute('aria-expanded', String(open));
-    root.classList.toggle('is-opening', open);
     if (open) {
       track('cora_opened');
       previousFocus = document.activeElement;
-      window.requestAnimationFrame(() => input.focus());
+      window.requestAnimationFrame(() => {
+        messages.scrollTop = messages.scrollHeight;
+        input.focus({ preventScroll: true });
+      });
     } else if (previousFocus instanceof HTMLElement) {
-      previousFocus.focus();
+      window.setTimeout(() => previousFocus?.focus({ preventScroll: true }), 260);
       previousFocus = null;
     }
   };
 
-  toggle.addEventListener('click', () => setOpen(panel.hidden));
+  root.classList.add('is-closed');
+  toggle.addEventListener('click', () => setOpen(!root.classList.contains('is-open')));
   close.addEventListener('click', () => setOpen(false));
   document.addEventListener('click', event => {
     if (event.target.closest('[data-cora-open]')) setOpen(true);
   });
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !panel.hidden) setOpen(false);
+    if (event.key === 'Escape' && root.classList.contains('is-open')) setOpen(false);
   });
 
   suggestions.addEventListener('click', event => {
@@ -181,7 +212,7 @@
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
-    if (!form.reportValidity() || send.disabled) return;
+    if (!form.reportValidity() || responsePending) return;
     const prompt = input.value.trim();
     if (!prompt) return;
 
@@ -189,15 +220,19 @@
     track('cora_conversation_started');
     conversation.push({ role: 'user', content: prompt });
     input.value = '';
+    responsePending = true;
     send.disabled = true;
-    send.textContent = '…';
-    subtitle.textContent = 'Cora is thinking…';
+    send.classList.add('is-thinking');
+    send.textContent = 'Thinking';
+    subtitle.textContent = 'Checking Staple IT’s service guide…';
+    const thinking = addThinking();
 
     try {
       const body = new URLSearchParams({
         action: 'stapleit_cora_chat',
         prompt,
-        history: JSON.stringify(conversation.slice(-6, -1))
+        history: JSON.stringify(conversation.slice(-6, -1)),
+        page: window.location.pathname
       });
       const response = await fetch('/wp-admin/admin-ajax.php', {
         method: 'POST',
@@ -209,20 +244,24 @@
       if (!response.ok || payload?.ok === false || !payload?.reply) {
         throw new Error(payload?.message || 'Cora cannot respond at the moment.');
       }
+      thinking.remove();
       conversation.push({ role: 'assistant', content: payload.reply });
       if (conversation.length > 8) conversation.splice(0, conversation.length - 8);
       addMessage(
         'assistant',
         payload.reply,
-        payload.mode === 'local-ai' ? 'Private local AI' : 'Instant Staple IT guide'
+        payload.mode === 'local-ai' ? 'Grounded in Staple IT’s service guide' : payload.mode === 'guardrail' ? 'Safety guardrail' : 'Staple IT knowledge guide'
       );
-      suggestions.hidden = true;
+      renderSuggestions(Array.isArray(payload.suggestions) ? payload.suggestions : initialSuggestions);
     } catch (error) {
+      thinking.remove();
       addMessage('assistant', error instanceof Error ? error.message : 'Cora cannot respond at the moment. Please call 01372 309 707 or email hello@stapleit.co.uk.');
     } finally {
+      responsePending = false;
       send.disabled = false;
+      send.classList.remove('is-thinking');
       send.textContent = 'Send';
-      subtitle.textContent = 'Staple IT service guide';
+      subtitle.textContent = 'Grounded in Staple IT’s services';
       input.focus();
     }
   });
