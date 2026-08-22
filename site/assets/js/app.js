@@ -46,6 +46,19 @@
 })();
 
 (() => {
+  if (!document.querySelector('.support-main')) return;
+  if (document.querySelector('link[data-support-responsive]')) return;
+
+  const appScript = [...document.scripts].find(script => /\/assets\/js\/app\.js(?:\?|$)/.test(script.src));
+  const version = appScript ? new URL(appScript.src, window.location.href).search : '';
+  const stylesheet = document.createElement('link');
+  stylesheet.rel = 'stylesheet';
+  stylesheet.href = `/assets/css/it-support-responsive.css${version}`;
+  stylesheet.dataset.supportResponsive = '';
+  document.head.append(stylesheet);
+})();
+
+(() => {
   if (document.querySelector('[data-cora]')) return;
 
   const element = (tag, className, text = '') => {
@@ -73,7 +86,7 @@
   const identity = element('div', 'cora-identity');
   const title = element('strong', '', 'Cora');
   title.id = 'cora-title';
-  const subtitle = element('span', '', 'Grounded in Staple IT’s services');
+  const subtitle = element('span', '', 'Ask about support, security or Microsoft 365');
   identity.append(title, subtitle);
   const close = element('button', 'cora-close', '×');
   close.type = 'button';
@@ -102,7 +115,7 @@
   input.setAttribute('aria-label', 'Message Cora');
   const send = element('button', 'cora-send', 'Send');
   send.type = 'submit';
-  const privacy = element('p', 'cora-privacy', 'Private local AI · do not share passwords or sensitive data · an engineer confirms final advice.');
+  const privacy = element('p', 'cora-privacy', 'Please don’t share passwords or sensitive information. We’ll confirm anything specific to your setup.');
   form.append(input, send, privacy);
 
   const toggle = element('button', 'cora-toggle');
@@ -152,8 +165,8 @@
   const addThinking = () => {
     const thinking = element('div', 'cora-message cora-message--assistant cora-thinking');
     thinking.setAttribute('role', 'status');
-    thinking.setAttribute('aria-label', 'Cora is checking the Staple IT service guide');
-    const label = element('span', 'cora-thinking-label', 'Checking Staple IT’s guide');
+    thinking.setAttribute('aria-label', 'Cora is finding the best place to start');
+    const label = element('span', 'cora-thinking-label', 'Finding the best place to start');
     const dots = element('span', 'cora-thinking-dots');
     dots.setAttribute('aria-hidden', 'true');
     dots.append(element('i', ''), element('i', ''), element('i', ''));
@@ -224,7 +237,7 @@
     send.disabled = true;
     send.classList.add('is-thinking');
     send.textContent = 'Thinking';
-    subtitle.textContent = 'Checking Staple IT’s service guide…';
+    subtitle.textContent = 'Looking through Staple IT’s services…';
     const thinking = addThinking();
 
     try {
@@ -250,11 +263,7 @@
       thinking.remove();
       conversation.push({ role: 'assistant', content: payload.reply });
       if (conversation.length > 8) conversation.splice(0, conversation.length - 8);
-      addMessage(
-        'assistant',
-        payload.reply,
-        payload.mode === 'local-ai' ? 'Grounded in Staple IT’s service guide' : payload.mode === 'guardrail' ? 'Safety guardrail' : 'Staple IT knowledge guide'
-      );
+      addMessage('assistant', payload.reply);
       renderSuggestions(Array.isArray(payload.suggestions) ? payload.suggestions : initialSuggestions);
     } catch (error) {
       thinking.remove();
@@ -264,7 +273,7 @@
       send.disabled = false;
       send.classList.remove('is-thinking');
       send.textContent = 'Send';
-      subtitle.textContent = 'Grounded in Staple IT’s services';
+      subtitle.textContent = 'Ask about support, security or Microsoft 365';
       input.focus();
     }
   });
