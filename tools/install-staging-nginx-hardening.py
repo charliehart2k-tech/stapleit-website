@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Install the audited Staple IT staging Nginx hardening safely.
 
-The installer finds the active staging server block by its unique server_name,
-backs up every file it changes, runs `nginx -t`, and restores the previous
-configuration automatically if validation or reload fails.
+The installer discovers the live staging server block from `nginx -T` instead
+of assuming a sites-available layout. It backs up every file it changes, runs
+`nginx -t`, and restores the previous configuration automatically if validation
+or reload fails.
 """
 
 from __future__ import annotations
@@ -18,7 +19,6 @@ from datetime import datetime, timezone
 from typing import NoReturn
 
 REPO = Path(os.environ.get("REPO", "/srv/stapleit/repo"))
-EXPLICIT_SITE = os.environ.get("NGINX_SITE", "").strip()
 SNIPPET_DIR = Path("/etc/nginx/snippets")
 SERVER_NAME = os.environ.get("STAGING_SERVER_NAME", "staging.stapleitdev.co.uk")
 INCLUDE = "include /etc/nginx/snippets/stapleit-hardening.conf;"
@@ -26,6 +26,8 @@ SOURCES = {
     SNIPPET_DIR / "stapleit-security-headers.conf": REPO / "ops/nginx/stapleit-security-headers.conf",
     SNIPPET_DIR / "stapleit-hardening.conf": REPO / "ops/nginx/stapleit-hardening.conf",
 }
+CONFIG_MARKER_RE = re.compile(r"(?m)^# configuration file (?P<path>.+):\s*$")
+SERVER_NAME_RE_TEMPLATE = r"(?m)^\s*server_name\s+[^;]*(?<![A-Za-z0-9.-]){server}(?![A-Za-z0-9.-])[^;]*;"
 
 
 def fail(message: str) -> NoReturn:
@@ -38,7 +40,7 @@ def run(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def matching_server_blocks(text: str) -> list[tuple[int, int]]:
-    """Return top-level server block spans using a quote/comment-aware scanner."""
+    """Return server block spans using a quote/comment-aware scanner."""
     spans: list[tuple[int, int]] = []
     for match in re.finditer(r"(?m)^\s*server\s*\{", text):
         open_brace = text.find("{", match.start(), match.end())
@@ -76,53 +78,98 @@ def matching_server_blocks(text: str) -> list[tuple[int, int]]:
     return spans
 
 
+def nginx_sections(text: str) -> list[tuple[Path, str]]:
+    matches = list(CONFIG_MARKER_RE.finditer(text))
+    sections: list[tuple[Path, str]] = []
+    for index, match in enumerate(matches):
+        start = match.end()
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
+        raw_path = match.group("path").strip()
+        if raw_path.startswith("/"):
+            sections.append((Path(raw_path), text[start:end].lstrip("\n")))
+    return sections
+
+
 def server_name_matches(block: str) -> bool:
-    pattern = rf"(?m)^\s*server_name\s+[^;]*(?<![A-Za-z0-9.-]){re.escape(SERVER_NAME)}(?![A-Za-z0-9.-])[^;]*;"
-    return re.search(pattern, block) is not None
+    pattern = re.compile(SERVER_NAME_RE_TEMPLATE.format(server=re.escape(SERVER_NAME)))
+    return pattern.search(block) is not None
 
 
-def candidate_site_files() -> list[Path]:
-    if EXPLICIT_SITE:
-        return [Path(EXPLICIT_SITE)]
+def block_score(block: str) -> int:
+    """Prefer the application-serving vhost over a simple redirect vhost."""
+    score = 0
+    lower = block.lower()
+    if "fastcgi_pass" in lower:
+        score += 120
+    if "try_files" in lower:
+        score += 50
+    if re.search(r"(?m)^\s*location\b", block):
+        score += 30
+    if re.search(r"(?m)^\s*root\s+[^;]+;", block):
+        score += 25
+    if re.search(r"(?m)^\s*listen\s+[^;]*(?:443|ssl)[^;]*;", block, re.I):
+        score += 20
+    if re.search(r"(?m)^\s*return\s+30(?:1|2|7|8)\b", block):
+        score -= 80
+    return score
 
-    candidates: dict[Path, Path] = {}
-    for directory in (Path("/etc/nginx/sites-enabled"), Path("/etc/nginx/sites-available")):
-        if not directory.is_dir():
-            continue
-        for item in directory.iterdir():
-            if not (item.is_file() or item.is_symlink()):
-                continue
-            try:
-                resolved = item.resolve(strict=True)
-            except OSError:
-                continue
-            candidates.setdefault(resolved, resolved)
-    return sorted(candidates.values(), key=str)
 
-
-def find_target() -> tuple[Path, tuple[int, int], str]:
-    matches: list[tuple[Path, tuple[int, int], str]] = []
-    checked = 0
-    for site in candidate_site_files():
-        if not site.is_file():
-            continue
-        checked += 1
-        try:
-            text = site.read_text(encoding="utf-8")
-        except (OSError, UnicodeDecodeError):
-            continue
-        for span in matching_server_blocks(text):
-            block = text[span[0]:span[1]]
-            if server_name_matches(block):
-                matches.append((site, span, text))
-
-    if len(matches) != 1:
-        locations = ", ".join(str(item[0]) for item in matches) or "none"
+def choose_candidate(candidates: list[tuple[Path, int, int, str]]) -> tuple[Path, int, int, str]:
+    if not candidates:
         fail(
-            f"expected exactly one Nginx server block for {SERVER_NAME}; found {len(matches)} "
-            f"across {checked} site file(s) ({locations}). No files were changed."
+            f"could not find {SERVER_NAME} in the effective Nginx configuration returned by nginx -T. "
+            "No files were changed."
         )
-    return matches[0]
+    if len(candidates) == 1:
+        return candidates[0]
+
+    ranked = sorted(candidates, key=lambda item: block_score(item[3]), reverse=True)
+    best_score = block_score(ranked[0][3])
+    tied = [item for item in ranked if block_score(item[3]) == best_score]
+    if len(tied) != 1:
+        details = ", ".join(f"{path} (score {block_score(block)})" for path, _, _, block in ranked)
+        fail(
+            f"found multiple equally plausible Nginx server blocks for {SERVER_NAME}: {details}. "
+            "No files were changed."
+        )
+    return ranked[0]
+
+
+def find_runtime_candidate() -> tuple[Path, str]:
+    dump = run("nginx", "-T")
+    combined = dump.stdout + "\n" + dump.stderr
+    if dump.returncode != 0:
+        print(dump.stdout, end="")
+        print(dump.stderr, end="", file=sys.stderr)
+        fail("nginx -T failed; cannot safely identify the live staging server block")
+
+    candidates: list[tuple[Path, int, int, str]] = []
+    for path, content in nginx_sections(combined):
+        for start, end in matching_server_blocks(content):
+            block = content[start:end]
+            if server_name_matches(block):
+                candidates.append((path, start, end, block))
+
+    path, _, _, runtime_block = choose_candidate(candidates)
+    if not path.exists():
+        fail(f"Nginx reported source file {path}, but that path does not exist. No files were changed.")
+    return path, runtime_block
+
+
+def choose_source_block(text: str) -> tuple[int, int, str]:
+    candidates: list[tuple[Path, int, int, str]] = []
+    pseudo = Path("source")
+    for start, end in matching_server_blocks(text):
+        block = text[start:end]
+        if server_name_matches(block):
+            candidates.append((pseudo, start, end, block))
+    _, start, end, block = choose_candidate(candidates)
+    return start, end, block
+
+
+def detected_root(block: str) -> str:
+    match = re.search(r"(?m)^\s*root\s+([^;]+);", block)
+    return match.group(1).strip() if match else "not declared in selected block"
 
 
 def restore(backups: dict[Path, Path | None]) -> None:
@@ -143,10 +190,9 @@ def main() -> int:
         if not source.is_file():
             fail(f"required repository file is missing: {source}")
 
-    site, target_span, original = find_target()
-    target_block = original[target_span[0]:target_span[1]]
-    root_match = re.search(r"(?m)^\s*root\s+([^;]+);", target_block)
-    detected_root = root_match.group(1).strip() if root_match else "inherited/not declared in this block"
+    site_path, runtime_block = find_runtime_candidate()
+    original = site_path.read_text(encoding="utf-8")
+    start, end, source_block = choose_source_block(original)
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     backup_dir = Path(f"/root/stapleit-nginx-backup-{stamp}")
@@ -156,12 +202,16 @@ def main() -> int:
     def back_up(target: Path) -> None:
         if target.exists():
             backup = backup_dir / target.name
+            counter = 1
+            while backup.exists():
+                backup = backup_dir / f"{target.name}.{counter}"
+                counter += 1
             shutil.copy2(target, backup)
             backups[target] = backup
         else:
             backups[target] = None
 
-    back_up(site)
+    back_up(site_path)
     SNIPPET_DIR.mkdir(parents=True, exist_ok=True)
     for target, source in SOURCES.items():
         back_up(target)
@@ -172,16 +222,15 @@ def main() -> int:
         except PermissionError:
             pass
 
-    if INCLUDE not in target_block:
-        start, end = target_span
-        block = original[start:end]
-        closing = block.rfind("}")
+    if INCLUDE not in source_block:
+        closing = source_block.rfind("}")
         if closing < 0:
             restore(backups)
             fail("could not locate the staging server block closing brace")
         insertion = "\n    # Staple IT audited staging hardening.\n    " + INCLUDE + "\n"
-        updated_block = block[:closing] + insertion + block[closing:]
-        site.write_text(original[:start] + updated_block + original[end:], encoding="utf-8")
+        updated_block = source_block[:closing] + insertion + source_block[closing:]
+        updated = original[:start] + updated_block + original[end:]
+        site_path.write_text(updated, encoding="utf-8")
 
     test = run("nginx", "-t")
     if test.returncode != 0:
@@ -201,8 +250,8 @@ def main() -> int:
 
     print("PASS: Staple IT staging Nginx hardening is installed and Nginx reloaded.")
     print(f"Server name: {SERVER_NAME}")
-    print(f"Site file: {site}")
-    print(f"Detected root: {detected_root}")
+    print(f"Site file: {site_path}")
+    print(f"Detected root: {detected_root(runtime_block)}")
     print(f"Backup: {backup_dir}")
     return 0
 
