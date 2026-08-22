@@ -209,8 +209,8 @@ function stapleit_cora_history_from_request() {
     foreach ( array_slice( $history_raw, -6 ) as $message ) {
         $role    = is_array( $message ) ? sanitize_key( (string) ( $message['role'] ?? '' ) ) : '';
         $content = is_array( $message ) ? trim( sanitize_textarea_field( (string) ( $message['content'] ?? '' ) ) ) : '';
-        if ( in_array( $role, array( 'user', 'assistant' ), true ) && $content !== '' && strlen( $content ) <= 800 && stapleit_cora_prompt_guard_response( $content ) === '' ) {
-            $history[] = array( 'role' => $role, 'content' => $content );
+        if ( stapleit_cora_history_message_is_safe( $role, $content ) ) {
+            $history[] = array( 'role' => 'user', 'content' => $content );
         }
     }
     return $history;

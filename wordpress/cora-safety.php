@@ -42,6 +42,19 @@ function stapleit_cora_prompt_guard_response( $prompt ) {
     return '';
 }
 
+function stapleit_cora_history_message_is_safe( $role, $content ) {
+    $role    = (string) $role;
+    $content = trim( (string) $content );
+
+    /* Conversation history comes from the browser and is therefore untrusted.
+     * Only prior visitor turns are accepted; a client must never be able to
+     * manufacture a privileged-looking assistant turn. */
+    return $role === 'user' &&
+        $content !== '' &&
+        strlen( $content ) <= 800 &&
+        stapleit_cora_prompt_guard_response( $content ) === '';
+}
+
 function stapleit_cora_reply_is_safe( $reply ) {
     $reply = trim( (string) $reply );
     if ( $reply === '' || strlen( $reply ) > 2000 ) {

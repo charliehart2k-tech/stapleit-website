@@ -228,10 +228,13 @@
     const thinking = addThinking();
 
     try {
+      const priorUserTurns = conversation
+        .filter(message => message.role === 'user')
+        .slice(-6, -1);
       const body = new URLSearchParams({
         action: 'stapleit_cora_chat',
         prompt,
-        history: JSON.stringify(conversation.slice(-6, -1)),
+        history: JSON.stringify(priorUserTurns),
         page: window.location.pathname
       });
       const response = await fetch('/wp-admin/admin-ajax.php', {
