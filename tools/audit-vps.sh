@@ -91,6 +91,11 @@ else
   python3 "$REPO/tools/audit-assets.py" --root "$REPO/site/assets" || fail "Asset integrity audit failed"
   python3 "$REPO/tools/audit-repository.py" --root "$REPO" || fail "Repository secret/hygiene audit failed"
   python3 "$REPO/tools/build-css.py" --check || fail "Generated CSS bundles are stale or over budget"
+  php -l "$REPO/wordpress/functions.php" >/dev/null || fail "WordPress functions syntax check failed"
+  php -l "$REPO/wordpress/cora-safety.php" >/dev/null || fail "Cora safety syntax check failed"
+  php -l "$REPO/wordpress/cora-knowledge.php" >/dev/null || fail "Cora knowledge syntax check failed"
+  php "$REPO/tests/php/cora-safety-test.php" || fail "Cora safety contract failed"
+  php "$REPO/tests/php/cora-knowledge-test.php" || fail "Cora knowledge contract failed"
   bash -n "$REPO/tools/deploy-wordpress-staging.sh" || fail "Deployment script syntax check failed"
 fi
 
@@ -110,8 +115,7 @@ else
     assets/css/site-shell.bundle.css \
     assets/css/cora.css \
     assets/fonts/manrope-latin.woff2 \
-    assets/media/liquid-wave.mp4 \
-    assets/media/it-support-liquid.mp4; do
+    assets/media/liquid-wave.mp4; do
     if [[ ! -s "$THEME/$relative" ]]; then
       fail "Missing deployed asset: $relative"
     elif [[ -f "$REPO/site/$relative" ]] && cmp -s "$REPO/site/$relative" "$THEME/$relative"; then
@@ -208,7 +212,7 @@ if [[ "$ollama_state" == "active" ]]; then
     fail "Cora model is configured but unavailable to Ollama: $cora_model"
   fi
 else
-  warn "Ollama is not active; Cora will use the catalogue fallback"
+  warn "Ollama is not active; Cora will use the deterministic knowledge-guide fallback"
 fi
 
 php_fpm_unit="$(systemctl list-units --type=service --all --no-legend 'php*-fpm.service' 2>/dev/null | awk 'NR==1{print $1}')"
