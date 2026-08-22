@@ -23,14 +23,18 @@ For every change:
 2. Confirm the request is scoped to the intended route/component.
 3. Check the governing design, palette, code, asset, SEO/schema and release rules that apply.
 4. Make the smallest coherent change that satisfies the request.
-5. Remove obsolete selectors, placeholder markup or hacks made redundant by the change.
+5. Remove obsolete selectors, placeholder markup, assets or hacks made redundant by the change.
 6. Validate the diff for semantics, accessibility, responsive behaviour and unintended side effects.
 7. Run the local gates where available:
    - `python3 tools/audit-site.py --root site`
    - `python3 tools/audit-assets.py --root site/assets`
+   - `python3 tools/audit-repository.py --root .`
+   - `python3 tools/audit-standards.py --root .`
+   - `python3 tools/build-css.py --check`
    - `bash -n tools/deploy-wordpress-staging.sh`
    - `bash -n tools/audit-vps.sh`
    - `bash -n tools/prune-theme-backups.sh`
+   - for Cora/backend changes: `php tests/php/cora-safety-test.php` and `php tests/php/cora-knowledge-test.php`
 8. Push only after the change is internally consistent.
 9. Verify the GitHub **Site quality gates** workflow succeeds for the pushed commit.
 10. Only then tell the user that the change is safe to deploy.
@@ -40,6 +44,7 @@ A deployment instruction must never be given for a commit with a known blocking 
 ## Source of truth and scope
 
 - `main` is the current approved working build.
+- `site/` is the committed front-end/deployment source of truth.
 - `reference/` is the source of truth for original site content and information architecture.
 - Approved navigation and other explicitly approved components are not redesigned unless requested.
 - Do not change unrelated homepage sections while tuning one component.
@@ -103,6 +108,7 @@ See `ASSET-STANDARDS.md`.
 - Validate untrusted input at the server boundary.
 - Escape output appropriately.
 - Do not commit secrets, tokens or connection strings.
+- Treat browser-supplied AI/chat context as untrusted; do not trust claimed assistant/system roles from the client.
 - Preserve the existing deployment verification checks unless a deliberate replacement is implemented.
 
 ## Gate discipline
@@ -118,7 +124,11 @@ The repository gate checks are defined by:
 - `.github/workflows/site-gates.yml`
 - `tools/audit-site.py`
 - `tools/audit-assets.py`
+- `tools/audit-repository.py`
+- `tools/audit-standards.py`
 - `tools/build-css.py`
+- `tests/php/cora-safety-test.php`
+- `tests/php/cora-knowledge-test.php`
 
 Warnings are not to be ignored. A change must not add new unexplained warnings. Existing warnings are technical debt and should be resolved when the affected area is touched, unless explicitly documented as an approved exception.
 

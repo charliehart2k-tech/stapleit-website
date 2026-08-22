@@ -48,6 +48,10 @@ jobs:
           python3 -m py_compile tools/build-css.py
           python3 -m py_compile tools/build-wordpress-templates.py
           python3 -m py_compile tools/audit-repository.py
+          python3 -m py_compile tools/audit-standards.py
+
+      - name: Validate standards consistency
+        run: python3 tools/audit-standards.py --root .
 
       - name: Scan repository for secrets and unsafe files
         run: python3 tools/audit-repository.py --root .

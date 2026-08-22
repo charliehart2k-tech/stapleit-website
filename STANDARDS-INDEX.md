@@ -22,7 +22,7 @@ The IT Support hero opens directly on its semantic content with no video, duplic
 
 The hero contains no background blob or video; the restrained black glass keeps the content dominant. The `Getting started is simple` chapter is a connected three-step composition: compact numbered nodes sit on a restrained palette rail above three equal-height neutral black-glass cards. `simple` and the `support` word in the package heading use a restrained moving Support Green fill and soft glow. Orange, blue and Support Green appear only as contained organic blooms, node edges and interaction accents rather than solid backing slabs. Each step remains one readable pane with no detached decorative glass chips; its resting depth, hover bloom, travelling sheen and small lift mirror the approved homepage service cards using the step's own accent. The route follows the homepage chapter/card/body hierarchy, with the canonical 17px desktop / 16px mobile body role, safe line boxes, visible overflow and descender allowance on display text. The package sequence adds a neutral grey `Sole trader` tailored-pricing card ahead of Basic, Standard and Premium. Sole trader has a real enquiry control and a `Sole Trader IT Support` panel containing a dedicated WordPress-backed form; it is stored, rate-limited and mail-observed through the same architecture as the homepage IT Audit while remaining a distinct enquiry type. Core package cards use contained heading and price scales, four/two/one-column breakpoints and balanced wrapping. They omit decorative icons and boxed price labels; only the quiet `Most popular` marker is retained where it helps comparison. Minimum staff counts and material licence requirements stay visible, while inclusion dialogs use a roomy two/one-column editorial layout without nested cards or compressed commercial qualifiers. Add-on packs use a generous two-column grid, state their shared pricing basis once in the chapter introduction and place complete grouped scope and caveats in the shared accessible dialog. A one-question-at-a-time pack finder maps all nine packs to plain-English `Yes`, `No` and `Not sure` decisions, keeps answers in the browser and returns advisory results with reasons and direct catalogue links; the full pack content remains the source of truth and stays usable without JavaScript. A lightweight monochrome grain tile adds depth to the route's major black-glass surfaces, while a single external line-icon sprite supports the four `as standard` headings without replacing their visible text. The chapter uses Manrope, falls back to an opaque near-black surface where backdrop blur is unavailable and removes motion when reduced motion is requested.
 
-The IT Support planner uses one progressive workflow for package questions, published-price estimation and add-on guidance. Each questionnaire is one neutral black-glass surface whose hover/focus bloom and travelling sheen reuse the approved homepage service-card interaction; headings and supporting copy sit outside that surface so a panel is never nested inside another panel. Recommendations remain advisory and are transferred into the free-audit form only after an explicit visitor choice. Package and pack results are calculated deterministically on the server, shown immediately and may then receive a plain-English Cora explanation; the model cannot replace the fixed result, change its certainty or publish a new price. Cora is the single shared conversational service guide on every route; the closed control reads `Chat to Cora` and uses the same slow Staple spectrum edge as the approved navigation treatment around a neutral black-glass panel. The mounted panel uses a reversible opacity, clip and small-transform transition, becomes `inert` and `aria-hidden` when closed, and never auto-opens, traps scrolling or replaces a human assessment. The browser never calls a model directly: WordPress may use an Ollama model bound to loopback and otherwise returns a clearly labelled deterministic knowledge guide. Cora is grounded through the versioned, curated `wordpress/cora-knowledge.php` source rather than live scraping or an implied fine-tune. Deterministic input guards intercept secrets, prompt-injection requests and active-incident wording; the output gate rejects invented or incomplete prices, incorrect Microsoft 365 Business Premium inclusions, unsupported contact, booking, processing or inspection claims, invented package tiers, external URLs and unapproved telephone numbers. Cora uses a 2,048-token context, low-temperature output and only the retrieved Staple IT facts. First-party planner analytics store allowlisted daily aggregate event counts only, with no prompts, answers, cookies, IP addresses or device identifiers. The six canonical reference viewports are exercised by the automated visual-contract job, which blocks horizontal overflow, undersized controls, hidden initial questions and body-copy regression while retaining screenshots as CI evidence.
+The IT Support planner uses one progressive workflow for package questions, published-price estimation and add-on guidance. Each questionnaire is one neutral black-glass surface whose hover/focus bloom and travelling sheen reuse the approved homepage service-card interaction; headings and supporting copy sit outside that surface so a panel is never nested inside another panel. Recommendations remain advisory and are transferred into the free-audit form only after an explicit visitor choice. The browser calculates and shows the deterministic package/pack result immediately for a responsive progressive-enhancement experience; before any AI explanation, WordPress independently reconstructs the recommendation from allowlisted answers and supplies that fixed result to Cora. The model cannot replace the result, change its certainty or publish a new price. Cora is the single shared conversational service guide on every route; the closed control reads `Chat to Cora` and uses the same slow Staple spectrum edge as the approved navigation treatment around a neutral black-glass panel. The mounted panel uses a reversible opacity, clip and small-transform transition, becomes `inert` and `aria-hidden` when closed, and never auto-opens, traps scrolling or replaces a human assessment. The browser never calls a model directly: WordPress may use an Ollama model bound to loopback and otherwise returns a clearly labelled deterministic `knowledge-guide` fallback. Cora is grounded through the versioned, curated `wordpress/cora-knowledge.php` source rather than live scraping or an implied fine-tune. Deterministic input guards intercept secrets, prompt-injection requests and active-incident wording. Browser-supplied conversation history is untrusted and only prior visitor turns are accepted; claimed assistant/system history is discarded. The output gate rejects invented or incomplete prices in supported currency patterns, incorrect Microsoft 365 Business Premium inclusions, unsupported contact, booking, processing or inspection claims, invented package tiers, external URLs, unapproved telephone/email details, unsupported SLA times and 24/7 staffed-support claims. Cora uses a 2,048-token context, low-temperature output and only the retrieved Staple IT facts. First-party planner analytics store allowlisted daily aggregate event counts only, with no prompts, answers, cookies, IP addresses or device identifiers. The six canonical reference viewports are exercised by the automated visual-contract job, which blocks horizontal overflow, undersized controls, hidden initial questions and body-copy regression while retaining screenshots as CI evidence.
 
 ## Governing documents
 
@@ -45,9 +45,10 @@ The IT Support planner uses one progressive workflow for package questions, publ
 
 The repository currently enforces:
 
-- Python syntax for the audit tooling;
-- shell syntax for the staging deploy script;
+- Python syntax for the audit/build tooling;
+- shell syntax for deployment/VPS/backup tooling;
 - required governing standards being present;
+- repository-wide secret and unsafe-file scanning;
 - static content/security/reference/SEO/AEO checks;
 - blocking canonical Manrope weight checks;
 - canonical shared type/spacing token ownership, semantic type floors and protected readable-copy floors;
@@ -59,8 +60,13 @@ The repository currently enforces:
 - no runtime JavaScript inline-style injection/mutation;
 - no `eval()` / `new Function()` dynamic code execution;
 - working per-file CSS and JavaScript size budgets;
+- generated CSS bundle integrity and compressed route budgets;
 - raster image and MP4 container integrity checks;
-- blocking deployment when static/asset audits fail.
+- WordPress/PHP syntax plus Cora safety and knowledge contracts;
+- safe deployment-path and rollback-retention checks;
+- Nginx hardening/CSP baseline checks;
+- six-viewport Chromium visual/interaction contracts for IT Support and Cora;
+- blocking deployment when static, asset or Cora contract audits fail.
 
 The active CI definition is `.github/workflows/site-gates.yml`.
 
@@ -73,6 +79,11 @@ python3 tools/audit-site.py --root site
 python3 tools/audit-assets.py --root site/assets
 python3 tools/audit-repository.py --root .
 python3 tools/build-css.py --check
+php -l wordpress/functions.php
+php -l wordpress/cora-safety.php
+php -l wordpress/cora-knowledge.php
+php tests/php/cora-safety-test.php
+php tests/php/cora-knowledge-test.php
 bash -n tools/deploy-wordpress-staging.sh
 bash -n tools/audit-vps.sh
 bash -n tools/prune-theme-backups.sh
@@ -91,13 +102,11 @@ Then inspect the diff and confirm:
 
 CI distinguishes warnings from blocking errors, but warnings are still engineering debt.
 
-A new change must not add an unexplained warning.
+A new change must not add an unexplained warning. Approved exceptions must describe the current file/state accurately and must be removed when they are no longer true.
 
-Current known static-audit warning:
+There is currently no approved oversized-media warning: `site/assets/media/liquid-wave.mp4` is approximately `1.36 MB`, below the repository's `1.5 MB` video warning/target threshold. Autoplay video remains exceptional and this file should not be made heavier without a measured reason.
 
-- `site/assets/media/liquid-wave.mp4` is approximately `1.81 MiB` and is the explicitly approved hero-video exception.
-
-The previous non-canonical Manrope weight warnings in the homepage CSS have been removed. The homepage hero video may remain until a visually equivalent smaller source is approved.
+The previous non-canonical Manrope weight warnings in the homepage CSS have been removed.
 
 ## Release rule
 

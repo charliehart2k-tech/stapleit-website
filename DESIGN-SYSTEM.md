@@ -97,7 +97,7 @@ Editorial rules:
 - body copy must remain comfortably readable; never make text tiny simply to force a layout to fit;
 - prices and recurring terms must use one wording within a page. The homepage uses `From £35 per staff member, per month`.
 
-Current staging loads Manrope through a direct Google Fonts stylesheet link, not a CSS `@import`. Production may self-host it later if zero third-party font delivery is preferred.
+Manrope is self-hosted from `site/assets/fonts/manrope-latin.woff2` and loaded through the shared external stylesheet. Do not reintroduce Google Fonts, CSS `@import` font chains or another runtime font dependency without an explicit approved change.
 
 ## 4. Spacing and radius rhythm
 
@@ -276,25 +276,25 @@ Meaningful enhancement content should exist in semantic markup rather than being
 
 - no framework for static content that HTML/CSS/small JS can handle;
 - no casual external runtime libraries;
-- avoid duplicate image/video assets;
-- load fonts with direct stylesheet links rather than CSS `@import` chains;
+- avoid duplicate or retired image/video assets;
+- self-host fonts; do not introduce CSS `@import` chains or third-party font delivery;
 - preload only genuinely critical resources;
 - lazy-load below-the-fold imagery/iframes where appropriate;
 - keep hero video exceptional and pause it when the tab is hidden or reduced motion is requested;
 - prefer CSS glass over JavaScript/WebGL glass;
 - keep repeated backdrop-filter surfaces modest on mobile/tablet;
 - avoid permanent `will-change` on ordinary cards/content;
-- run `tools/audit-site.py` at milestones and before every deployment.
+- run `tools/audit-site.py`, `tools/audit-assets.py`, `tools/audit-repository.py` and `tools/build-css.py --check` at milestones and before deployment.
 
 Working budgets:
 
 - normal image: aim below 250 KB where visually acceptable;
-- decorative hero video: aim below 2.5 MB;
+- decorative hero/background video: target below 1.5 MB where visual quality can be preserved;
 - page-specific CSS: normally well below 50 KB uncompressed;
 - page-specific JS: normally well below 30 KB uncompressed;
 - third-party runtime JavaScript: zero by default.
 
-The static audit warns when individual CSS/JS files exceed these working budgets. The current hero video is an approved large-asset exception and is expected to appear as a warning in the audit.
+The static audit warns when individual source CSS/JS files or media exceed their working thresholds. The current `liquid-wave.mp4` is about 1.36 MB and is below the 1.5 MB warning threshold; it remains an exceptional autoplay asset rather than a licence to add more video.
 
 ## 11. Security baseline
 
@@ -308,12 +308,12 @@ The static audit warns when individual CSS/JS files exceed these working budgets
 - keep `.well-known/security.txt` current;
 - HTTPS only in production.
 
-The static release audit enforces the no-runtime-inline-style and no-dynamic-code rules for site JavaScript.
+The static release audit enforces the no-runtime-inline-style and no-dynamic-code rules for site JavaScript. Repository-wide secret/hygiene scanning is a separate blocking gate.
 
-Recommended production headers while Google Fonts and the approved Google Maps iframe are in use:
+Recommended production headers while the approved Google Maps iframe is in use:
 
 ```text
-Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; script-src 'self'; connect-src 'self'; frame-src https://www.google.com
+Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; frame-src https://www.google.com
 X-Content-Type-Options: nosniff
 Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
@@ -333,7 +333,7 @@ Before editing a route:
 5. add only the page-specific CSS/JS needed;
 6. test all six reference viewports;
 7. check keyboard navigation and interaction timing;
-8. run the static-site audit;
+8. run the static-site, asset, repository and generated-CSS audits;
 9. complete the relevant SEO/AEO/ASEO/schema work;
 10. keep the diff scoped to the route/section being rebuilt.
 
