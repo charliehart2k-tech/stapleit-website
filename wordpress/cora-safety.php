@@ -49,7 +49,7 @@ function stapleit_cora_reply_is_safe( $reply ) {
     }
 
     /* The only public package prices. Every accepted price must retain its
-     * per-person and per-month basis; a bare "£55 per month" is misleading. */
+     * per-person and per-month basis; any other monetary amount is rejected. */
     $without_approved_prices = preg_replace(
         '/£\s*(?:35|55|75)\s+per\s+staff\s+member\s*,?\s+per\s+month\b/iu',
         '',
@@ -60,7 +60,7 @@ function stapleit_cora_reply_is_safe( $reply ) {
     }
 
     if ( preg_match(
-        '/£\s*\d|(?:\bGBP\b|\bpounds?\b)\s*\d|\b\d+(?:[.,]\d{1,2})?\s*(?:GBP|pounds?|per\s+(?:staff\s+member|user)|a\s+month|monthly)\b/iu',
+        '/[$€£]\s*\d|(?:\b(?:GBP|USD|EUR)\b|\b(?:pounds?|dollars?|euros?)\b)\s*\d|\b\d+(?:[.,]\d{1,2})?\s*(?:GBP|USD|EUR|pounds?|dollars?|euros?|per\s+(?:staff\s+member|user)|a\s+month|monthly)\b/iu',
         $without_approved_prices
     ) ) {
         return false;
