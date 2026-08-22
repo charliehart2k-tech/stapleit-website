@@ -49,6 +49,7 @@ jobs:
           python3 -m py_compile tools/build-wordpress-templates.py
           python3 -m py_compile tools/audit-repository.py
           python3 -m py_compile tools/audit-standards.py
+          python3 -m py_compile tools/install-staging-nginx-hardening.py
 
       - name: Validate standards consistency
         run: python3 tools/audit-standards.py --root .
@@ -87,6 +88,7 @@ jobs:
           test -s ops/nginx/stapleit-hardening.conf
           grep -Fq 'add_header Content-Security-Policy' ops/nginx/stapleit-security-headers.conf
           grep -Fq "frame-ancestors 'none'" ops/nginx/stapleit-security-headers.conf
+          grep -Fq 'location = /.well-known/security.txt' ops/nginx/stapleit-hardening.conf
           grep -Fq 'location = /xmlrpc.php' ops/nginx/stapleit-hardening.conf
           grep -Fq 'max-age=31536000, immutable' ops/nginx/stapleit-hardening.conf
           if rg -q 'fonts\.(googleapis|gstatic)' ops/nginx; then
@@ -154,7 +156,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Serve static source
         run: python3 -m http.server 4173 --directory site &
-      - name: Verify six reference viewports
+      - name: Verify reference viewports and component bounds
         run: npm run test:visual
       - name: Upload visual evidence
         if: always()
