@@ -12,18 +12,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function stapleit_cora_knowledge_version() {
-    return '2026-08-22.1';
+    return '2026-08-22.2';
 }
 
 function stapleit_cora_knowledge_records() {
     return array(
         'identity' => array(
             'keywords' => array( 'staple it', 'where', 'epsom', 'surrey', 'hours', 'open', 'contact', 'phone', 'email' ),
-            'content'  => 'Staple IT is an Epsom, Surrey IT provider for businesses, charities and individuals. Public support hours are Monday to Friday, 9am to 5pm. The public telephone number is 01372 309 707 and the contact form is the correct place for an enquiry.',
+            'content'  => 'Staple IT is an Epsom, Surrey IT provider for businesses, charities and individuals. Public staffed support hours are Monday to Friday, 9am to 5pm. 24/7 references on the website describe monitoring, not a 24/7 staffed helpdesk. The public telephone number is 01372 309 707, the public email address is hello@stapleit.co.uk, and the contact form is the correct place for an enquiry.',
         ),
         'packages' => array(
             'keywords' => array( 'package', 'price', 'cost', 'support', 'staff', 'team', 'basic', 'standard', 'premium', 'sole trader' ),
-            'content'  => 'Sole trader support is tailored and price on application. Basic starts from £35 per staff member, per month for teams of five or more. Standard starts from £55 per staff member, per month for teams of five or more and adds stronger security, backup and identity protection. Premium starts from £75 per staff member, per month for teams of five or more and includes Microsoft 365 Business Premium plus enhanced Microsoft security and data protection. A written proposal confirms final scope, eligibility and price.',
+            'content'  => 'Sole trader support is tailored and price on application. Basic starts from £35 per staff member, per month for teams of five or more. Standard starts from £55 per staff member, per month for teams of five or more and adds stronger security, backup and identity protection; Microsoft 365 Business Premium or equivalent licensing is required and is sold separately unless specifically included. Premium starts from £75 per staff member, per month for teams of five or more and includes Microsoft 365 Business Premium plus enhanced Microsoft security and data protection. Microsoft Defender Suite and Microsoft Purview Suite features are managed and supported where required, but any additional Microsoft licensing required to enable those features is charged separately. A written proposal confirms final scope, eligibility and price.',
         ),
         'onboarding' => array(
             'keywords' => array( 'move', 'switch', 'provider', 'onboard', 'onboarding', 'changeover', 'start', 'audit', 'review' ),
@@ -31,11 +31,11 @@ function stapleit_cora_knowledge_records() {
         ),
         'managed_support' => array(
             'keywords' => array( 'helpdesk', 'unlimited', 'monitor', 'patch', 'device', 'warranty', 'portal', 'engineer', 'remote support' ),
-            'content'  => 'Published managed support includes unlimited helpdesk support, UK-based engineers, a dedicated point of contact and clear response times. The published standard service areas include 24/7 monitoring, remote device management, Windows and software updates, mobile device management, next-generation antivirus, device and software management, hardware and warranty tracking, a client support portal, managed onboarding, regular check-ins, fixed monthly pricing and a three-month rolling agreement.',
+            'content'  => 'Published managed support includes unlimited helpdesk support during the public staffed support window, UK-based engineers, a dedicated point of contact and clear response times. The published standard service areas include 24/7 monitoring, remote device management, Windows and software updates, mobile device management, next-generation antivirus, device and software management, hardware and warranty tracking, a client support portal, managed onboarding, regular check-ins, fixed monthly pricing and a three-month rolling agreement. Do not describe 24/7 monitoring as a 24/7 staffed helpdesk.',
         ),
         'microsoft' => array(
-            'keywords' => array( 'microsoft', 'm365', '365', 'business premium', 'entra', 'sharepoint', 'teams', 'onedrive', 'copilot' ),
-            'content'  => 'Staple IT supports Microsoft 365 administration, identity protection and security. Microsoft 365 Business Premium is published as included only with the Premium support package; it is not a separately priced public add-on. Licensing suitability and quantities are confirmed in the written proposal.',
+            'keywords' => array( 'microsoft', 'm365', '365', 'business premium', 'entra', 'sharepoint', 'teams', 'onedrive', 'copilot', 'defender', 'purview' ),
+            'content'  => 'Staple IT supports Microsoft 365 administration, identity protection and security. Microsoft 365 Business Premium is published as included only with the Premium support package; it is not a separately priced public add-on. Standard requires Microsoft 365 Business Premium or equivalent licensing, sold separately unless specifically included. Premium can include management and support of Microsoft Defender Suite and Microsoft Purview Suite features where required, but any additional Microsoft licensing needed to enable those advanced features is charged separately. Licensing suitability and quantities are confirmed in the written proposal.',
         ),
         'security' => array(
             'keywords' => array( 'security', 'secure', 'secur', 'phishing', 'password', 'identity', 'antivirus', 'ransomware', 'cyber', 'breach', 'compromise' ),
@@ -44,6 +44,42 @@ function stapleit_cora_knowledge_records() {
         'packs' => array(
             'keywords' => array( 'server', 'azure', 'wifi', 'wi-fi', 'network', 'firewall', 'compliance', 'policy', 'cyber essentials', 'ai', 'strategy', 'roadmap', 'disaster', 'recovery', 'add-on', 'pack' ),
             'content'  => 'Optional packs are Server, Azure, Network, Security, Governance and compliance, Cyber Essentials, AI, Strategy and Disaster recovery. Every optional pack is price on application and is recommended only when the customer environment or goals make it relevant. Other available services include on-site support, procurement, VoIP and bespoke project work, all price on application.',
+        ),
+        'pack_server' => array(
+            'keywords' => array( 'server', 'windows server', 'active directory', 'group policy', 'file server', 'physical server' ),
+            'content'  => 'The Server pack is for businesses running physical Windows Servers. It covers ongoing support, 24/7 server health monitoring, patching and security updates, backup oversight and recovery assistance, and core Windows Server services such as Active Directory, Group Policy, DNS, DHCP, file shares, permissions and supported print services.',
+        ),
+        'pack_azure' => array(
+            'keywords' => array( 'azure', 'virtual machine', 'virtual machines', 'vnet', 'cloud infrastructure', 'azure vm' ),
+            'content'  => 'The Azure pack is for businesses running systems or virtual machines in Microsoft Azure. Azure resources benefit from dedicated monitoring, maintenance, access control and cost reviews. Using Microsoft 365 by itself does not necessarily mean a business uses Azure.',
+        ),
+        'pack_network' => array(
+            'keywords' => array( 'network', 'wifi', 'wi-fi', 'firewall', 'switch', 'switches', 'access point', 'access points', 'router' ),
+            'content'  => 'The Network pack is for managed network infrastructure such as firewalls, switches and Wi-Fi access points. It adds active monitoring, configuration and ongoing management for that network equipment.',
+        ),
+        'pack_security' => array(
+            'keywords' => array( 'security pack', 'stronger security', 'phishing', 'web protection', 'email protection', 'identity protection' ),
+            'content'  => 'The Security pack adds stronger protection and monitoring across devices, accounts, email and web use. It is an optional pack and is price on application; a review confirms whether the existing support package already provides enough protection.',
+        ),
+        'pack_governance' => array(
+            'keywords' => array( 'governance', 'compliance', 'policy', 'policies', 'documentation', 'insurer', 'customer questionnaire', 'evidence' ),
+            'content'  => 'The Governance and compliance pack helps with IT policies, documentation, evidence and responses to customer or insurer checks. Formal legal, regulatory or certification advice is not included unless specifically agreed.',
+        ),
+        'pack_cyber_essentials' => array(
+            'keywords' => array( 'cyber essentials', 'cyber essentials plus', 'ce+', 'certification', 'certify' ),
+            'content'  => 'The Cyber Essentials pack supports readiness, remediation and application preparation for Cyber Essentials or Cyber Essentials Plus. Staple IT can help prepare and remediate, but Cora cannot certify compliance or guarantee a certification result.',
+        ),
+        'pack_ai' => array(
+            'keywords' => array( 'ai pack', 'artificial intelligence', 'copilot', 'chatgpt', 'claude', 'ai platform', 'ai adoption' ),
+            'content'  => 'The AI pack is for businesses introducing AI tools safely and practically. It covers readiness, platform choice, secure setup, staff guidance and ongoing administration, including guidance around Microsoft Copilot, ChatGPT Business or Enterprise and Claude Team or Enterprise where suitable.',
+        ),
+        'pack_strategy' => array(
+            'keywords' => array( 'strategy', 'roadmap', 'budget', 'budgeting', 'supplier', 'technology roadmap', 'planning' ),
+            'content'  => 'The Strategy pack adds regular IT reviews, budgeting, supplier support and a practical technology roadmap so improvements and growth can be planned rather than handled only when something breaks.',
+        ),
+        'pack_disaster_recovery' => array(
+            'keywords' => array( 'disaster recovery', 'business continuity', 'recovery plan', 'restore', 'rto', 'rpo' ),
+            'content'  => 'The Disaster recovery pack creates and tests a structured recovery plan for critical systems and data. Final recovery objectives, scope and testing arrangements are agreed after a review rather than guaranteed by Cora.',
         ),
         'consultancy' => array(
             'keywords' => array( 'consultancy', 'roadmap', 'budget', 'planning', 'governance', 'policy', 'supplier', 'strategy' ),
@@ -54,8 +90,8 @@ function stapleit_cora_knowledge_records() {
             'content'  => 'Staple IT solutions include cloud and Microsoft 365 work, automation, compliance workflows, procurement, VoIP and other fixed-scope or bespoke projects. Project scope and pricing are confirmed after a review and are not publicly fixed.',
         ),
         'boundaries' => array(
-            'keywords' => array( 'guarantee', 'book', 'appointment', 'legal', 'medical', 'password', 'code', 'payment', 'card', 'personal data' ),
-            'content'  => 'Cora is a service guide, not an engineer inspecting a live environment. Cora cannot diagnose systems, guarantee outcomes, certify compliance, submit enquiries, book calls or process orders. Visitors must not share passwords, security codes, payment details or sensitive personal information. Human review confirms every final recommendation.',
+            'keywords' => array( 'guarantee', 'book', 'appointment', 'legal', 'medical', 'password', 'code', 'payment', 'card', 'personal data', 'sla', 'response time' ),
+            'content'  => 'Cora is a service guide, not an engineer inspecting a live environment. Cora cannot diagnose systems, guarantee outcomes, certify compliance, submit enquiries, book calls or process orders. Cora must not invent exact SLA response times that are not present in the supplied knowledge. Visitors must not share passwords, security codes, API tokens, payment details or sensitive personal information. Human review confirms every final recommendation.',
         ),
     );
 }
@@ -82,7 +118,7 @@ function stapleit_cora_relevant_knowledge( $prompt, $page_path = '' ) {
             continue;
         }
         $selected[] = $key;
-        if ( count( $selected ) >= 6 ) {
+        if ( count( $selected ) >= 7 ) {
             break;
         }
     }
@@ -104,6 +140,12 @@ function stapleit_cora_follow_up_suggestions( $prompt ) {
     }
     if ( preg_match( '/server|azure|wifi|wi-fi|network|firewall/', $prompt ) ) {
         return array( 'Which add-on might fit?', 'What would you review first?', 'How does monitoring work?' );
+    }
+    if ( preg_match( '/ai|copilot|chatgpt|claude/', $prompt ) ) {
+        return array( 'Which AI platform might fit?', 'How would you keep our data safe?', 'What would an AI readiness review cover?' );
+    }
+    if ( preg_match( '/strategy|roadmap|budget|supplier/', $prompt ) ) {
+        return array( 'What would the roadmap cover?', 'Can you help plan our budget?', 'How often would we review it?' );
     }
     return array( 'Which package suits our team?', 'What happens during onboarding?', 'Could we start with a free audit?' );
 }

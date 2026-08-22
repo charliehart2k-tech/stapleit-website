@@ -15,14 +15,19 @@ function stapleit_cora_prompt_guard_response( $prompt ) {
     $prompt = trim( (string) $prompt );
 
     $sensitive_patterns = array(
-        '/\b(?:password|passcode|api[_ -]?key|secret|security\s+code|verification\s+code|otp|one[- ]time\s+code)\s*(?:is|:|=)\s*\S+/iu',
-        '/-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----/iu',
+        '/\b(?:password|passcode|api[_ -]?key|secret|security\s+code|verification\s+code|otp|one[- ]time\s+code|client[_ -]?secret|account[_ -]?key|shared[_ -]?access[_ -]?key)\s*(?:is|:|=)\s*\S+/iu',
+        '/-----BEGIN\s+(?:RSA\s+|EC\s+|OPENSSH\s+)?PRIVATE\s+KEY-----/iu',
         '/\b(?:cvv|cvc)\s*(?:is|:|=)?\s*\d{3,4}\b/iu',
         '/\b(?:\d[ -]*?){13,19}\b/u',
+        '/\b(?:github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,})\b/u',
+        '/\bsk-[A-Za-z0-9_-]{20,}\b/u',
+        '/\bAKIA[0-9A-Z]{16}\b/u',
+        '/\bBearer\s+[A-Za-z0-9._~+\/-]{20,}=*\b/iu',
+        '/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/u',
     );
     foreach ( $sensitive_patterns as $pattern ) {
         if ( preg_match( $pattern, $prompt ) ) {
-            return 'Please do not share passwords, security codes, payment details or other secrets here. If you think an account or device is compromised, call Staple IT on 01372 309 707.';
+            return 'Please do not share passwords, security codes, API tokens, payment details or other secrets here. If you think an account or device is compromised, call Staple IT on 01372 309 707.';
         }
     }
 
@@ -73,6 +78,9 @@ function stapleit_cora_reply_is_safe( $reply ) {
         '/\b(?:Gold|Silver|Bronze|Enterprise|Professional|Pro|Essential|Ultimate)\s+(?:support\s+)?package\b/iu',
         '/\b(?:I|Cora|we)\s+(?:have|has|can)\s+(?:checked|inspected|scanned|accessed|connected\s+to)\b/iu',
         '/\b(?:certif(?:y|ies|ied)|ensure|assure)\b[^.!?\n]{0,70}\b(?:compliance|compliant|secure|security)\b/iu',
+        '/\b24\s*(?:\/|x)\s*7\s+(?:support|helpdesk|service\s+desk|engineer|availability)\b/iu',
+        '/\b(?:24[- ]hour|round[- ]the[- ]clock)\s+(?:support|helpdesk|service\s+desk|engineer|availability)\b/iu',
+        '/\b(?:respond|response)\b[^.!?\n]{0,35}\b(?:within|in)\s+\d+\s*(?:minutes?|hours?)\b/iu',
         '/https?:\/\/|www\./iu',
     );
     foreach ( $blocked_claims as $pattern ) {
@@ -83,6 +91,11 @@ function stapleit_cora_reply_is_safe( $reply ) {
 
     $without_public_phone = preg_replace( '/(?:\+44\s*\(?0?\)?\s*1372|0\s*1372)\s*309\s*707\b/u', '', $reply );
     if ( ! is_string( $without_public_phone ) || preg_match( '/(?:\+44\s*\d|\b0\d{2,4}[\s-]*\d{3,4}[\s-]*\d{3,4}\b)/u', $without_public_phone ) ) {
+        return false;
+    }
+
+    $without_public_email = preg_replace( '/\bhello@stapleit\.co\.uk\b/iu', '', $reply );
+    if ( ! is_string( $without_public_email ) || preg_match( '/\b[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}\b/iu', $without_public_email ) ) {
         return false;
     }
 
