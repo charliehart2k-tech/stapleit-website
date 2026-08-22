@@ -1,22 +1,27 @@
-/* Cora is a shared, progressively enhanced site assistant. The panel stays
- * neutral black glass; the approved Staple spectrum is reserved for its edge. */
+/* Cora shares the homepage's restrained black-glass and slow Staple-spectrum
+ * language. The assistant stays mounted so opening and closing can both be
+ * animated; aria-hidden and inert provide the matching accessibility state. */
 .cora{
-  --cora-spectrum:linear-gradient(115deg,var(--brand-blue) 0%,var(--blue-bright) 12%,var(--brand-security) 26%,var(--brand-red) 40%,var(--brand-solutions) 54%,var(--brand-consultancy) 68%,var(--brand-support) 82%,var(--blue-bright) 92%,var(--brand-blue) 100%);
+  --cora-spectrum:linear-gradient(115deg,var(--brand-blue) 0%,var(--blue-bright) 13%,var(--brand-security) 27%,var(--brand-red) 41%,var(--brand-solutions) 55%,var(--brand-consultancy) 68%,var(--brand-support) 82%,var(--blue-bright) 93%,var(--brand-blue) 100%);
+  --cora-ease:cubic-bezier(.16,1,.3,1);
   position:fixed;
   right:clamp(16px,2.6vw,36px);
   bottom:clamp(16px,2.6vw,32px);
-  z-index:80;
+  z-index:120;
+  width:0;
+  height:0;
   font-family:var(--font-display);
+  pointer-events:none;
 }
 
 .cora-toggle,
 .cora-panel{
-  position:relative;
+  position:absolute;
+  right:0;
+  bottom:0;
   isolation:isolate;
-  border:1px solid rgba(255,255,255,.13);
-  background:#050608;
   color:#fff;
-  box-shadow:0 22px 64px rgba(0,0,0,.54),0 0 34px rgba(111,99,255,.08);
+  pointer-events:auto;
 }
 
 .cora-toggle::before,
@@ -26,103 +31,324 @@
   inset:-1px;
   z-index:-1;
   border-radius:inherit;
-  padding:2px;
+  padding:1.5px;
   pointer-events:none;
   background:var(--cora-spectrum);
-  background-size:320% 320%;
+  background-size:340% 340%;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;
   mask-composite:exclude;
-  animation:coraSpectrumFlow 10s ease-in-out alternate infinite;
+  animation:coraSpectrumFlow 12s ease-in-out alternate infinite;
 }
 
 .cora-toggle{
-  min-height:52px;
+  min-width:152px;
+  min-height:54px;
   display:flex;
   align-items:center;
-  gap:10px;
-  margin-left:auto;
-  padding:12px 18px;
+  justify-content:center;
+  gap:11px;
+  padding:12px 19px;
+  border:1px solid rgba(255,255,255,.11);
   border-radius:999px;
+  background:rgba(3,4,7,.92);
+  box-shadow:0 18px 52px rgba(0,0,0,.54),0 0 34px rgba(79,133,255,.08);
+  color:#f7f9fc;
   font:700 var(--type-ui)/1.3 var(--font-display);
+  white-space:nowrap;
   cursor:pointer;
-  transition:transform var(--motion-fast) ease,box-shadow var(--motion-fast) ease;
+  transform-origin:100% 100%;
+  transition:opacity 260ms ease,transform 460ms var(--cora-ease),visibility 0s linear 0s,box-shadow 360ms ease;
+}
+
+.cora-toggle::after{
+  content:"";
+  position:absolute;
+  inset:-18px -22px;
+  z-index:-2;
+  border-radius:999px;
+  background:radial-gradient(ellipse at center,rgba(79,133,255,.14),rgba(168,85,247,.055) 42%,transparent 70%);
+  filter:blur(14px);
+  opacity:.42;
+  transform:scale(.88);
+  animation:coraToggleBreath 5.8s ease-in-out infinite;
+  pointer-events:none;
 }
 
 .cora-orb{
-  width:12px;
-  height:12px;
+  position:relative;
+  width:13px;
+  height:13px;
   flex:0 0 auto;
-  border-radius:50%;
+  overflow:hidden;
+  border-radius:46% 54% 58% 42% / 52% 46% 54% 48%;
   background:var(--cora-spectrum);
   background-size:300% 300%;
-  animation:coraSpectrumFlow 8s ease-in-out alternate infinite;
-  box-shadow:0 0 18px rgba(111,99,255,.38);
+  box-shadow:0 0 16px rgba(111,99,255,.44),0 0 6px rgba(255,255,255,.14) inset;
+  animation:coraSpectrumFlow 9s ease-in-out alternate infinite,coraOrbDrift 6.4s ease-in-out infinite;
+}
+
+.cora-orb::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:inherit;
+  background:rgba(255,255,255,.18);
+  filter:blur(3px);
+  opacity:.45;
 }
 
 .cora-panel{
-  width:min(400px,calc(100vw - 32px));
-  height:min(610px,calc(100dvh - 96px));
+  width:min(420px,calc(100vw - 32px));
+  height:min(640px,calc(100dvh - 32px));
   display:grid;
   grid-template-rows:auto minmax(0,1fr) auto auto;
-  margin-bottom:14px;
   overflow:hidden;
-  border-radius:24px;
+  border:1px solid rgba(255,255,255,.115);
+  border-radius:28px;
   background:
-    radial-gradient(circle at 88% 3%,rgba(111,99,255,.09),transparent 28%),
-    linear-gradient(155deg,rgba(255,255,255,.055),rgba(5,6,8,.98) 38%);
-  backdrop-filter:blur(22px) saturate(112%);
-  -webkit-backdrop-filter:blur(22px) saturate(112%);
+    radial-gradient(circle at 94% -4%,rgba(79,133,255,.11),transparent 31%),
+    radial-gradient(circle at 4% 104%,rgba(168,85,247,.055),transparent 34%),
+    linear-gradient(165deg,rgba(255,255,255,.052),rgba(5,6,9,.975) 36%,rgba(1,2,4,.985));
+  box-shadow:0 34px 96px rgba(0,0,0,.66),0 0 62px rgba(79,133,255,.075),inset 0 1px 0 rgba(255,255,255,.07);
+  backdrop-filter:blur(24px) saturate(115%);
+  -webkit-backdrop-filter:blur(24px) saturate(115%);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translate3d(0,8px,0) scale(.965);
   transform-origin:100% 100%;
+  clip-path:inset(18% 0 0 34% round 28px);
+  filter:blur(6px);
+  transition:opacity 300ms ease,transform 520ms var(--cora-ease),clip-path 560ms var(--cora-ease),filter 360ms ease,visibility 0s linear 560ms;
+  will-change:opacity,transform,clip-path;
 }
 
-.cora-panel[hidden]{display:none}
-.cora.is-opening .cora-panel{animation:coraPanelIn 420ms cubic-bezier(.2,.8,.2,1) both}
+.cora-panel::before{opacity:.72}
+.cora-panel::after{
+  content:"";
+  position:absolute;
+  inset:-30% -20% auto 24%;
+  z-index:0;
+  height:46%;
+  border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(79,133,255,.105),rgba(168,85,247,.04) 42%,transparent 72%);
+  filter:blur(30px);
+  pointer-events:none;
+}
 
-.cora-header{display:flex;align-items:center;gap:12px;padding:18px 18px 16px;border-bottom:1px solid rgba(255,255,255,.09)}
+.cora-panel>*{position:relative;z-index:1}
+
+.cora.is-open .cora-panel{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:none;
+  clip-path:inset(0 round 28px);
+  filter:none;
+  transition-delay:0s;
+}
+
+.cora.is-open .cora-toggle{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translate3d(0,14px,0) scale(.92);
+  transition:opacity 180ms ease,transform 320ms ease,visibility 0s linear 320ms;
+}
+
+.cora-header{
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:17px 18px 15px 20px;
+  border-bottom:1px solid rgba(255,255,255,.075);
+}
+
+.cora-orb--header{width:18px;height:18px;box-shadow:0 0 24px rgba(79,133,255,.3)}
 .cora-identity{min-width:0;flex:1}
-.cora-identity strong{display:block;font-size:1.05rem;line-height:1.3}
-.cora-identity span{display:block;margin-top:2px;color:#9faab6;font-size:.78rem;line-height:1.4}
-.cora-close{width:44px;height:44px;border:1px solid rgba(255,255,255,.12);border-radius:50%;background:rgba(255,255,255,.035);color:#dce3ea;font:600 1.25rem/1 var(--font-display);cursor:pointer}
-.cora-close:focus-visible,.cora-toggle:focus-visible,.cora-form textarea:focus-visible,.cora-send:focus-visible,.cora-suggestion:focus-visible{outline:2px solid var(--blue-bright);outline-offset:3px}
+.cora-identity strong{display:block;color:#fff;font-size:1.08rem;font-weight:700;line-height:1.25;letter-spacing:-.01em}
+.cora-identity span{display:block;margin-top:3px;color:#98a3b0;font-size:var(--type-small);line-height:1.4}
 
-.cora-messages{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:20px 18px;scrollbar-color:rgba(255,255,255,.22) transparent}
-.cora-message{max-width:88%;margin:0 0 12px;padding:12px 14px;border:1px solid rgba(255,255,255,.09);border-radius:16px;color:#dce3ea;font-size:.94rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
-.cora-message--assistant{margin-right:auto;border-bottom-left-radius:5px;background:rgba(255,255,255,.038)}
-.cora-message--user{margin-left:auto;border-color:rgba(76,125,255,.25);border-bottom-right-radius:5px;background:rgba(48,83,174,.16);color:#f5f7fa}
-.cora-message-status{margin:4px 0 0;color:#8f9aa6;font-size:.75rem;line-height:1.4}
+.cora-close{
+  width:44px;
+  height:44px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:50%;
+  background:rgba(255,255,255,.025);
+  color:#dce3ea;
+  font:400 1.25rem/1 var(--font-display);
+  cursor:pointer;
+  transition:transform 320ms var(--cora-ease),border-color 220ms ease,background 220ms ease;
+}
 
-.cora-suggestions{display:flex;gap:8px;padding:0 18px 12px;overflow-x:auto;scrollbar-width:none}
+.cora-messages{
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:22px 20px 16px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.18) transparent;
+}
+
+.cora-message{
+  max-width:92%;
+  margin:0 0 15px;
+  color:#d5dbe3;
+  font-size:1rem;
+  line-height:1.62;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+.cora-message--assistant{margin-right:auto;padding:0 6px 0 0}
+.cora-message--assistant::before{
+  content:"";
+  width:18px;
+  height:1px;
+  display:block;
+  margin:0 0 10px;
+  background:linear-gradient(90deg,var(--blue-bright),var(--brand-security));
+  box-shadow:0 0 12px rgba(79,133,255,.28);
+}
+
+.cora-message--user{
+  max-width:84%;
+  margin-left:auto;
+  padding:11px 14px;
+  border:1px solid rgba(79,133,255,.18);
+  border-radius:16px 16px 5px 16px;
+  background:linear-gradient(145deg,rgba(48,83,174,.17),rgba(35,43,78,.11));
+  color:#f4f7fa;
+  box-shadow:0 14px 32px rgba(0,0,0,.16);
+}
+
+.cora-message-status{margin:-7px 0 16px;color:#778391;font-size:var(--type-small);line-height:1.4;letter-spacing:.01em}
+.cora-message--new{animation:coraMessageIn 560ms var(--cora-ease) both}
+
+.cora-thinking{min-height:45px;display:flex;align-items:center;gap:10px;color:#9ca7b3;font-size:.82rem}
+.cora-thinking::before{margin:0;width:14px}
+.cora-thinking-dots{display:inline-flex;align-items:center;gap:4px}
+.cora-thinking-dots i{width:4px;height:4px;border-radius:50%;background:#7fa0ff;box-shadow:0 0 9px rgba(79,133,255,.4);animation:coraThinking 1.25s ease-in-out infinite}
+.cora-thinking-dots i:nth-child(2){animation-delay:140ms}
+.cora-thinking-dots i:nth-child(3){animation-delay:280ms}
+
+.cora-suggestions{
+  display:flex;
+  gap:8px;
+  padding:0 18px 13px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);
+  mask-image:linear-gradient(90deg,#000 90%,transparent);
+}
 .cora-suggestions::-webkit-scrollbar{display:none}
-.cora-suggestion{min-height:44px;flex:0 0 auto;padding:9px 13px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:transparent;color:#cfd7df;font:600 .78rem/1.3 var(--font-display);cursor:pointer}
 
-.cora-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:14px 14px 10px;border-top:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.32)}
-.cora-form textarea{width:100%;min-height:48px;max-height:120px;padding:12px 13px;border:1px solid rgba(255,255,255,.13);border-radius:14px;background:rgba(0,0,0,.52);color:#fff;font:400 16px/1.45 var(--font-display);resize:none}
-.cora-send{min-width:72px;min-height:48px;padding:10px 15px;border:1px solid rgba(76,125,255,.34);border-radius:14px;background:rgba(48,83,174,.18);color:#fff;font:700 var(--type-ui)/1.3 var(--font-display);cursor:pointer}
-.cora-send:disabled{opacity:.45;cursor:wait}
-.cora-privacy{grid-column:1/-1;margin:0;padding:0 4px;color:#7f8994;font-size:.7rem;line-height:1.4}
+.cora-suggestion{
+  min-height:44px;
+  flex:0 0 auto;
+  padding:9px 13px;
+  border:1px solid rgba(255,255,255,.105);
+  border-radius:999px;
+  background:rgba(255,255,255,.018);
+  color:#c7d0da;
+  font:600 var(--type-small)/1.3 var(--font-display);
+  cursor:pointer;
+  opacity:0;
+  transform:translate3d(8px,0,0);
+  transition:transform 260ms var(--cora-ease),border-color 220ms ease,background 220ms ease,color 220ms ease;
+}
+
+.cora.is-open .cora-suggestion{animation:coraSuggestionIn 500ms var(--cora-ease) forwards}
+.cora.is-open .cora-suggestion:nth-child(2){animation-delay:70ms}
+.cora.is-open .cora-suggestion:nth-child(3){animation-delay:140ms}
+
+.cora-form{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:9px;
+  padding:13px 14px 10px;
+  border-top:1px solid rgba(255,255,255,.075);
+  background:rgba(0,0,0,.27);
+}
+
+.cora-form textarea{
+  width:100%;
+  min-height:48px;
+  max-height:120px;
+  padding:12px 13px;
+  overflow-y:auto;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:14px;
+  background:rgba(255,255,255,.018);
+  color:#fff;
+  font:400 16px/1.45 var(--font-display);
+  resize:none;
+  field-sizing:content;
+  caret-color:var(--blue-bright);
+  transition:border-color 220ms ease,background 220ms ease,box-shadow 220ms ease;
+}
+.cora-form textarea::placeholder{color:#727e8b}
+.cora-form textarea:focus{border-color:rgba(79,133,255,.42);background:rgba(79,133,255,.025);box-shadow:0 0 0 4px rgba(79,133,255,.06)}
+
+.cora-send{
+  min-width:70px;
+  min-height:48px;
+  padding:10px 14px;
+  border:1px solid rgba(79,133,255,.29);
+  border-radius:14px;
+  background:linear-gradient(160deg,rgba(48,83,174,.24),rgba(78,41,130,.12));
+  color:#fff;
+  font:700 var(--type-ui)/1.3 var(--font-display);
+  cursor:pointer;
+  transition:transform 260ms var(--cora-ease),border-color 220ms ease,box-shadow 220ms ease,opacity 220ms ease;
+}
+.cora-send:disabled{opacity:.58;cursor:wait}
+.cora-send.is-thinking{font-size:0}
+.cora-send.is-thinking::after{content:"";width:17px;height:17px;display:block;margin:auto;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:coraSpin .9s linear infinite}
+.cora-privacy{grid-column:1/-1;margin:0;padding:0 3px;color:#697480;font-size:var(--type-small);line-height:1.45}
+
+.cora-close:focus-visible,.cora-toggle:focus-visible,.cora-form textarea:focus-visible,.cora-send:focus-visible,.cora-suggestion:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
 
 @media(hover:hover) and (pointer:fine){
-  .cora-toggle:hover{transform:translateY(-2px);box-shadow:0 26px 70px rgba(0,0,0,.58),0 0 38px rgba(111,99,255,.14)}
-  .cora-suggestion:hover,.cora-close:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
+  .cora-toggle:hover{transform:translateY(-3px) scale(1.01);box-shadow:0 24px 66px rgba(0,0,0,.58),0 0 42px rgba(79,133,255,.13)}
+  .cora-toggle:hover::before{animation-duration:5s}
+  .cora-close:hover{transform:rotate(6deg) scale(1.04);border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.055)}
+  .cora-suggestion:hover{transform:translateY(-1px);border-color:rgba(79,133,255,.28);background:rgba(79,133,255,.055);color:#f3f6f9}
+  .cora-send:not(:disabled):hover{transform:translateY(-1px);border-color:rgba(79,133,255,.48);box-shadow:0 12px 28px rgba(25,48,110,.2)}
 }
 
 @media(max-width:600px){
-  .cora{right:12px;bottom:12px}
-  .cora-panel{width:calc(100vw - 24px);height:min(680px,calc(100dvh - 78px));margin-bottom:10px;border-radius:20px}
-  .cora-toggle{min-height:50px;padding:11px 16px}
+  .cora{right:12px;left:12px;bottom:12px;width:auto}
+  .cora-panel{width:100%;height:min(680px,calc(100dvh - 24px));border-radius:23px;clip-path:inset(20% 0 0 42% round 23px)}
+  .cora.is-open .cora-panel{clip-path:inset(0 round 23px)}
+  .cora-toggle{min-height:50px;padding:10px 16px}
+  .cora-header{min-height:70px;padding:14px 14px 12px 17px}
+  .cora-messages{padding:19px 17px 13px}
+  .cora-suggestions{padding-inline:15px}
+  .cora-form{padding-inline:11px}
+}
+
+@media(max-height:680px) and (min-width:601px){
+  .cora-panel{height:calc(100dvh - 24px)}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .cora-toggle::before,.cora-panel::before,.cora-orb{animation:none;background-position:50% 50%}
-  .cora.is-opening .cora-panel{animation:none}
-  .cora-toggle{transition:none}
+  .cora-toggle::before,.cora-panel::before,.cora-orb,.cora-toggle::after,.cora-thinking-dots i,.cora-send.is-thinking::after{animation:none;background-position:50% 50%}
+  .cora-panel,.cora-toggle,.cora-close,.cora-suggestion,.cora-send{transition:none}
+  .cora-message--new,.cora.is-open .cora-suggestion{animation:none;opacity:1;transform:none}
 }
 
 @media(forced-colors:active){
   .cora-toggle,.cora-panel,.cora-close,.cora-suggestion,.cora-form textarea,.cora-send{forced-color-adjust:auto;border-color:CanvasText;background:Canvas;color:CanvasText}
-  .cora-toggle::before,.cora-panel::before,.cora-orb{display:none}
+  .cora-toggle::before,.cora-panel::before,.cora-toggle::after,.cora-orb{display:none}
 }
 
 @keyframes coraSpectrumFlow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
-@keyframes coraPanelIn{from{opacity:0;transform:translate3d(0,12px,0) scale(.98)}to{opacity:1;transform:none}}
+@keyframes coraToggleBreath{0%,100%{opacity:.32;transform:scale(.86)}50%{opacity:.56;transform:scale(1.03)}}
+@keyframes coraOrbDrift{0%,100%{border-radius:46% 54% 58% 42% / 52% 46% 54% 48%;transform:rotate(0deg)}50%{border-radius:58% 42% 45% 55% / 44% 58% 42% 56%;transform:rotate(8deg)}}
+@keyframes coraMessageIn{from{opacity:0;transform:translate3d(0,9px,0);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+@keyframes coraSuggestionIn{from{opacity:0;transform:translate3d(8px,0,0)}to{opacity:1;transform:none}}
+@keyframes coraThinking{0%,70%,100%{opacity:.28;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
+@keyframes coraSpin{to{transform:rotate(360deg)}}

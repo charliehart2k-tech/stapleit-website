@@ -169,12 +169,14 @@
   const resultsEmpty = form.querySelector('[data-pack-results-empty]');
   const reviewButton = form.querySelector('[data-pack-finder-review]');
   const resultRows = [...form.querySelectorAll('[data-pack-result]')];
+  const aiPanel = form.querySelector('[data-packs-ai]');
+  const aiCopy = form.querySelector('[data-packs-ai-copy]');
 
   if (
     !stage || !questions.length || !count || !(progress instanceof HTMLProgressElement) ||
     !(backButton instanceof HTMLButtonElement) || !(nextButton instanceof HTMLButtonElement) ||
     !results || !resultsHeading || !resultsSummary || !resultsEmpty ||
-    !(reviewButton instanceof HTMLButtonElement) || resultRows.length !== questions.length
+    !(reviewButton instanceof HTMLButtonElement) || resultRows.length !== questions.length || !aiPanel || !aiCopy
   ) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -201,6 +203,7 @@
 
     stage.hidden = false;
     results.hidden = true;
+    aiPanel.hidden = true;
     updateControls();
 
     if (focus) {
@@ -258,6 +261,8 @@
     window.stapleitPlanner.packs = packSummary;
     window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
     window.stapleitTrack?.('pack_finder_completed');
+    const answerPayload = Object.fromEntries(questions.map(question => [question.dataset.packKey, selectedAnswer(question)]));
+    window.stapleitExplainPlanner?.('packs', answerPayload, aiPanel, aiCopy);
     stage.hidden = true;
     results.hidden = false;
     delete form.dataset.packDirection;
@@ -297,11 +302,50 @@
   const endpoint = '/wp-admin/admin-ajax.php';
   const sent = new Set();
   window.stapleitTrack = eventName => {
-    if (!/^(package_finder_started|package_finder_completed|pack_finder_started|pack_finder_completed|cost_estimate_updated|planner_handoff_clicked)$/.test(eventName) || sent.has(eventName)) return;
+    if (!/^(package_finder_started|package_finder_completed|pack_finder_started|pack_finder_completed|cost_estimate_updated|planner_handoff_clicked|package_ai_explained|pack_ai_explained)$/.test(eventName) || sent.has(eventName)) return;
     sent.add(eventName);
     const body = new URLSearchParams({ action: 'stapleit_track_planner_event', event: eventName });
     if (navigator.sendBeacon) navigator.sendBeacon(endpoint, body);
     else fetch(endpoint, { method: 'POST', body, credentials: 'same-origin', keepalive: true }).catch(() => {});
+  };
+})();
+
+(() => {
+  window.stapleitExplainPlanner = async (plannerType, answers, panel, copy) => {
+    if (!(panel instanceof HTMLElement) || !(copy instanceof HTMLElement)) return;
+    const requestKey = JSON.stringify([plannerType, answers]);
+    if (panel.dataset.requestKey === requestKey) {
+      panel.hidden = false;
+      return;
+    }
+    panel.dataset.requestKey = requestKey;
+    panel.hidden = false;
+    panel.classList.add('is-loading');
+    copy.textContent = 'Checking your answers against Staple IT’s service guide…';
+
+    try {
+      const body = new URLSearchParams({
+        action: 'stapleit_cora_planner_explain',
+        planner_type: plannerType,
+        answers: JSON.stringify(answers)
+      });
+      const response = await fetch('/wp-admin/admin-ajax.php', {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body,
+        credentials: 'same-origin'
+      });
+      const payload = await response.json();
+      if (!response.ok || payload?.ok === false || !payload?.reply) throw new Error('Cora could not add an explanation.');
+      copy.textContent = payload.reply;
+      panel.dataset.mode = payload.mode || 'knowledge-guide';
+      window.stapleitTrack?.(plannerType === 'package' ? 'package_ai_explained' : 'pack_ai_explained');
+    } catch {
+      copy.textContent = 'Your recommendation above is complete. A Staple IT engineer can confirm the detail during a free IT audit.';
+      panel.dataset.mode = 'unavailable';
+    } finally {
+      panel.classList.remove('is-loading');
+    }
   };
 })();
 
@@ -321,7 +365,9 @@
   const tier = form.querySelector('[data-cost-tier]');
   const total = form.querySelector('[data-cost-total]');
   const note = form.querySelector('[data-cost-note]');
-  if (!questions.length || !count || !(progress instanceof HTMLProgressElement) || !(back instanceof HTMLButtonElement) || !(next instanceof HTMLButtonElement) || !result || !title || !reason || !(review instanceof HTMLButtonElement) || !(staff instanceof HTMLInputElement) || !(tier instanceof HTMLSelectElement) || !total || !note) return;
+  const aiPanel = form.querySelector('[data-package-ai]');
+  const aiCopy = form.querySelector('[data-package-ai-copy]');
+  if (!questions.length || !count || !(progress instanceof HTMLProgressElement) || !(back instanceof HTMLButtonElement) || !(next instanceof HTMLButtonElement) || !result || !title || !reason || !(review instanceof HTMLButtonElement) || !(staff instanceof HTMLInputElement) || !(tier instanceof HTMLSelectElement) || !total || !note || !aiPanel || !aiCopy) return;
 
   const rates = { basic: 35, standard: 55, premium: 75 };
   let current = 0;
@@ -337,6 +383,7 @@
     current = Math.max(0, Math.min(questions.length - 1, index));
     questions.forEach((question, questionIndex) => { question.hidden = questionIndex !== current; });
     result.hidden = true;
+    aiPanel.hidden = true;
     updateControls();
     if (focus) requestAnimationFrame(() => questions[current].querySelector('legend')?.focus());
   };
@@ -366,6 +413,7 @@
       tier.value = recommended;
       staff.value = team === '25' ? '25' : '10';
       staff.closest('[data-cost-calculator]').hidden = false;
+      note.textContent = 'Based on published per-person pricing. Add-ons and projects are priced separately; your written proposal confirms the final scope and price.';
       title.textContent = `${recommended[0].toUpperCase()}${recommended.slice(1)} is the sensible starting point`;
       reason.textContent = evidence === 'yes'
         ? 'Your need to provide security evidence makes managed protection and regular reviews important, as well as day-to-day support.'
@@ -376,6 +424,8 @@
     }
     questions.forEach(question => { question.hidden = true; });
     result.hidden = false;
+    const answerPayload = Object.fromEntries(questions.map(question => [question.dataset.packageKey, answer(question)]));
+    window.stapleitExplainPlanner?.('package', answerPayload, aiPanel, aiCopy);
     window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
     window.stapleitTrack?.('package_finder_completed');
     requestAnimationFrame(() => title.focus());

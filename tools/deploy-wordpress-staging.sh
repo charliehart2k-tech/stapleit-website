@@ -88,6 +88,13 @@ if [[ ! -f "$WORDPRESS_SOURCE/functions.php" ]]; then
   exit 1
 fi
 
+for cora_source in cora-safety.php cora-knowledge.php; do
+  if [[ ! -f "$WORDPRESS_SOURCE/$cora_source" ]]; then
+    echo "Cora source not found: $WORDPRESS_SOURCE/$cora_source" >&2
+    exit 1
+  fi
+done
+
 if [[ ! -f "$STATIC_ROUTES_SOURCE" ]]; then
   echo "Static route handler not found: $STATIC_ROUTES_SOURCE" >&2
   exit 1
@@ -121,6 +128,9 @@ if [[ -f "$THEME/front-page.php" && -d "$THEME/assets" ]]; then
   if [[ -f "$THEME/cora-safety.php" ]]; then
     theme_backup_items+=(cora-safety.php)
   fi
+  if [[ -f "$THEME/cora-knowledge.php" ]]; then
+    theme_backup_items+=(cora-knowledge.php)
+  fi
   tar -czf "$BACKUP_DIR/stapleit-theme-$STAMP.tar.gz" \
     -C "$THEME" "${theme_backup_items[@]}"
   echo "Rollback backup: $BACKUP_DIR/stapleit-theme-$STAMP.tar.gz"
@@ -141,6 +151,7 @@ cp "$SOURCE/favicon.ico" "$THEME/favicon.ico"
 cp "$SOURCE/apple-touch-icon.png" "$THEME/apple-touch-icon.png"
 cp "$WORDPRESS_SOURCE/functions.php" "$THEME/functions.php"
 cp "$WORDPRESS_SOURCE/cora-safety.php" "$THEME/cora-safety.php"
+cp "$WORDPRESS_SOURCE/cora-knowledge.php" "$THEME/cora-knowledge.php"
 find "$THEME" -maxdepth 1 -type f -name 'static-*.php' -delete
 
 python3 "$REPO/tools/build-wordpress-templates.py" \
@@ -157,6 +168,7 @@ php -l "$THEME/front-page.php"
 php -l "$THEME/404.php"
 php -l "$THEME/functions.php"
 php -l "$THEME/cora-safety.php"
+php -l "$THEME/cora-knowledge.php"
 php -l "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 
 for template in "$THEME"/static-*.php; do
@@ -251,6 +263,8 @@ grep -Fq "http://127.0.0.1:11434/api/chat" "$THEME/functions.php"
 grep -Fq "stapleit_cora_reply_is_safe" "$THEME/functions.php"
 grep -Fq "'num_ctx' => 2048" "$THEME/functions.php"
 grep -Fq "function stapleit_cora_reply_is_safe" "$THEME/cora-safety.php"
+grep -Fq "function stapleit_cora_relevant_knowledge" "$THEME/cora-knowledge.php"
+grep -Fq "wp_ajax_nopriv_stapleit_cora_planner_explain" "$THEME/functions.php"
 grep -Fq "_stapleit_enquiry_type" "$THEME/functions.php"
 grep -Fq "xmlrpc_enabled" "$THEME/functions.php"
 grep -Fq "stapleit_mail_error" "$THEME/functions.php"
