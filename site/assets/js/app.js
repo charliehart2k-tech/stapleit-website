@@ -120,10 +120,15 @@
 
   const conversation = [];
   let conversationContext = '';
+  let conversationFlow = '';
+  let conversationFlowState = {};
+  let suppressNextUserMessage = false;
   const tracked = new Set();
   let previousFocus = null;
   let responsePending = false;
   const finePointer = window.matchMedia('(hover:hover) and (pointer:fine)');
+  const narrowViewport = window.matchMedia('(max-width:600px)');
+  const canAutoFocus = () => finePointer.matches && !narrowViewport.matches;
 
   const track = eventName => {
     if (tracked.has(eventName)) return;
@@ -144,7 +149,7 @@
 
   const renderSuggestions = copies => {
     suggestions.replaceChildren();
-    copies.slice(0, 3).forEach(copy => {
+    copies.slice(0, 4).forEach(copy => {
       const button = element('button', 'cora-suggestion', copy);
       button.type = 'button';
       suggestions.append(button);
@@ -168,7 +173,7 @@
   addMessage('assistant', 'Hi, I’m Cora. What can I help with?');
   renderSuggestions(initialSuggestions);
 
-  const setOpen = (open, { focusInput = finePointer.matches } = {}) => {
+  const setOpen = (open, { focusInput = canAutoFocus() } = {}) => {
     if (root.classList.contains('is-open') === open) return;
     root.classList.toggle('is-open', open);
     root.classList.toggle('is-closed', !open);
@@ -189,14 +194,22 @@
   };
 
   root.classList.add('is-closed');
-  toggle.addEventListener('click', () => setOpen(!root.classList.contains('is-open'), { focusInput: finePointer.matches }));
+  toggle.addEventListener('click', () => setOpen(!root.classList.contains('is-open'), { focusInput: canAutoFocus() }));
   close.addEventListener('click', () => setOpen(false));
   document.addEventListener('click', event => {
     const contextualTrigger = event.target.closest('[data-cora-open]');
     if (!contextualTrigger) return;
     const seededMessage = contextualTrigger.dataset.coraMessage?.trim();
+    const flow = contextualTrigger.dataset.coraFlow?.trim();
     if (seededMessage && !input.value.trim()) input.value = seededMessage;
     setOpen(true, { focusInput: false });
+    if (flow === 'package') {
+      conversationFlow = 'package';
+      conversationFlowState = {};
+      suppressNextUserMessage = true;
+      input.value = 'Start package discovery';
+      window.requestAnimationFrame(() => form.requestSubmit());
+    }
   });
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && root.classList.contains('is-open')) setOpen(false);
@@ -205,9 +218,19 @@
   suggestions.addEventListener('click', event => {
     const button = event.target.closest('.cora-suggestion');
     if (!(button instanceof HTMLButtonElement)) return;
-    input.value = button.textContent;
-    input.focus();
+    const copy = button.textContent.trim();
+    if (!conversationFlow && (/(?:which|what).*package|choose.*package/i.test(copy) || /^start again$/i.test(copy))) {
+      conversationFlow = 'package';
+      conversationFlowState = {};
+    }
+    input.value = copy;
+    form.requestSubmit();
   });
+
+  input.addEventListener('focus', () => root.classList.add('is-input-focused'));
+  input.addEventListener('blur', () => window.setTimeout(() => {
+    if (document.activeElement !== input) root.classList.remove('is-input-focused');
+  }, 80));
 
   input.addEventListener('keydown', event => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -222,9 +245,13 @@
     const prompt = input.value.trim();
     if (!prompt) return;
 
-    addMessage('user', prompt);
+    const showUserMessage = !suppressNextUserMessage;
+    suppressNextUserMessage = false;
+    if (showUserMessage) {
+      addMessage('user', prompt);
+      conversation.push({ role: 'user', content: prompt });
+    }
     track('cora_conversation_started');
-    conversation.push({ role: 'user', content: prompt });
     input.value = '';
     responsePending = true;
     send.disabled = true;
@@ -242,6 +269,8 @@
         prompt,
         history: JSON.stringify(priorUserTurns),
         context: conversationContext,
+        flow: conversationFlow,
+        flow_state: JSON.stringify(conversationFlowState),
         page: window.location.pathname
       });
       const response = await fetch('/wp-admin/admin-ajax.php', {
@@ -255,7 +284,11 @@
         throw new Error(payload?.message || 'Cora cannot respond at the moment.');
       }
       thinking.remove();
-      conversationContext = typeof payload.context === 'string' ? payload.context : '';
+      conversationContext = typeof payload.context === 'string' ? payload.context : conversationContext;
+      if (payload.flow === 'package' && payload.flow_state && typeof payload.flow_state === 'object') {
+        conversationFlowState = payload.flow_state;
+        conversationFlow = payload.flow_active ? 'package' : '';
+      }
       conversation.push({ role: 'assistant', content: payload.reply });
       if (conversation.length > 8) conversation.splice(0, conversation.length - 8);
       addMessage('assistant', payload.reply);
@@ -269,7 +302,7 @@
       send.classList.remove('is-thinking');
       send.textContent = 'Send';
       subtitle.textContent = 'Ask me about support, security or Microsoft 365';
-      input.focus();
+      if (canAutoFocus()) input.focus();
     }
   });
 })();

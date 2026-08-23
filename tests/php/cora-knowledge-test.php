@@ -15,6 +15,18 @@ $standard_follow_up = stapleit_cora_fast_reply( 'What’s included?', 'package_s
 $contact  = stapleit_cora_relevant_knowledge( 'How can I contact Staple IT and when are you open?', '/' );
 $boundary = stapleit_cora_relevant_knowledge( 'Can you guarantee compliance or book a call for me?', '/' );
 $functions_source = file_get_contents( __DIR__ . '/../../wordpress/functions.php' );
+$package_flow_start = stapleit_cora_package_flow_step( 'Start package discovery', array() );
+$package_flow_security = stapleit_cora_package_flow_step( 'We have 12 staff and need better security', array() );
+$package_flow_small = stapleit_cora_package_flow_step( 'We are 3 people and need ongoing IT support', array() );
+$package_flow_basic_question = stapleit_cora_package_flow_step( 'We have 8 staff and just need Outlook and printer support', array() );
+$package_flow_basic_no_evidence = stapleit_cora_package_flow_step( 'No', $package_flow_basic_question['state'] );
+$package_flow_evidence = stapleit_cora_package_flow_step( 'We are 8 people. We mainly need day-to-day IT help, but a client asks for security evidence', array() );
+$package_flow_premium = stapleit_cora_package_flow_step( 'We have 20 staff and want Microsoft 365 Business Premium included', array() );
+$package_flow_existing_m365 = stapleit_cora_package_flow_step( 'We have 12 staff and already have Microsoft 365 Business Premium', array() );
+$package_flow_existing_m365_security = stapleit_cora_package_flow_step( 'We have 12 staff and already have Microsoft 365 Business Premium and need better security', array() );
+$package_flow_written_number = stapleit_cora_package_flow_step( 'We are twelve staff and need better security', array() );
+$package_flow_twenty_plus = stapleit_cora_package_flow_step( '20+ people', array() );
+$package_flow_m365 = stapleit_cora_package_flow_step( 'We use Microsoft 365 Business Premium', array() );
 
 $checks = array(
     array( strpos( $security, 'Microsoft 365 Business Premium' ) !== false, 'Microsoft knowledge is retrieved for Microsoft 365' ),
@@ -48,6 +60,19 @@ $checks = array(
     array( strpos( $functions_source, '$fallback_suggestions = $fallback_services ?' ) !== false, 'unclassified prompts do not receive generic sales suggestion chips' ),
     array( strpos( $functions_source, '$device_prompt = (bool) preg_match' ) !== false, 'unclassified device prompts use a safety-first fallback' ),
     array( strpos( $functions_source, '( $device_prompt && ! $fallback_services ) ? \'\'' ) !== false, 'unclassified device prompts cannot be overridden by the local model' ),
+    array( $package_flow_start['complete'] === false && strpos( $package_flow_start['reply'], 'How many people' ) !== false && count( $package_flow_start['suggestions'] ) === 4, 'package discovery starts with all four team-size choices' ),
+    array( $package_flow_security['complete'] === true && $package_flow_security['state']['team'] === '10' && $package_flow_security['context'] === 'package_standard', 'free-text 12-staff stronger-security request resolves directly to Standard without model inference' ),
+    array( $package_flow_small['complete'] === true && $package_flow_small['context'] === 'package_sole' && strpos( $package_flow_small['reply'], '£35' ) === false, 'teams below five route to Tailored and never receive Basic pricing' ),
+    array( $package_flow_basic_question['complete'] === false && $package_flow_basic_question['state']['security'] === 'basic' && strpos( $package_flow_basic_question['reply'], 'security evidence' ) !== false, 'Basic intent asks the one follow-up that can change the recommendation' ),
+    array( $package_flow_basic_no_evidence['complete'] === true && $package_flow_basic_no_evidence['context'] === 'package_basic', 'Basic intent with no evidence requirement resolves to Basic' ),
+    array( $package_flow_evidence['complete'] === true && $package_flow_evidence['context'] === 'package_standard', 'security evidence escalates day-to-day support to Standard' ),
+    array( $package_flow_premium['complete'] === true && $package_flow_premium['context'] === 'package_premium', 'explicit Business Premium inclusion resolves to Premium' ),
+    array( $package_flow_existing_m365['complete'] === false && $package_flow_existing_m365['state']['security'] === '', 'already owning Business Premium does not force Premium support' ),
+    array( $package_flow_existing_m365_security['complete'] === true && $package_flow_existing_m365_security['context'] === 'package_standard', 'existing Business Premium plus stronger security resolves to Standard' ),
+    array( $package_flow_written_number['complete'] === true && $package_flow_written_number['state']['team'] === '10', 'written team sizes are understood without asking for digits' ),
+    array( $package_flow_twenty_plus['state']['team'] === '25', '20+ team-size quick reply is parsed correctly' ),
+    array( $package_flow_m365['state']['team'] === '', 'Microsoft 365 is never misread as a 365-person team' ),
+    array( strpos( $functions_source, 'substr( wp_unslash' ) !== false && strpos( $functions_source, "flow_state" ) !== false, 'package conversation state payload is length-bounded server-side' ),
 );
 
 $failures = array();

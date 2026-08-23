@@ -230,6 +230,28 @@ function stapleit_handle_cora_chat_ajax() {
     }
 
     $page_path        = substr( sanitize_text_field( (string) ( $_POST['page'] ?? '' ) ), 0, 180 );
+    $flow             = sanitize_key( wp_unslash( (string) ( $_POST['flow'] ?? '' ) ) );
+    $flow_state_json  = substr( wp_unslash( (string) ( $_POST['flow_state'] ?? '{}' ) ), 0, 512 );
+    $flow_state       = json_decode( $flow_state_json, true );
+    $flow_state       = is_array( $flow_state ) ? $flow_state : array();
+    if ( $flow !== 'package' ) $flow = '';
+    if ( $flow === '' && preg_match( '/(?:which|what|choose|find|help\s+me\s+choose).{0,35}(?:support\s+)?package/i', $prompt ) ) {
+        $flow = 'package';
+    }
+    if ( $flow === 'package' ) {
+        $flow_result = stapleit_cora_package_flow_step( $prompt, $flow_state );
+        wp_send_json( array(
+            'ok'                => true,
+            'mode'              => 'package-flow',
+            'reply'             => $flow_result['reply'],
+            'context'           => (string) ( $flow_result['context'] ?? '' ),
+            'flow'              => 'package',
+            'flow_active'       => ! (bool) $flow_result['complete'],
+            'flow_state'        => $flow_result['state'],
+            'suggestions'       => $flow_result['suggestions'],
+            'knowledge_version' => stapleit_cora_knowledge_version(),
+        ) );
+    }
     $history          = stapleit_cora_history_from_request();
     $incoming_context = stapleit_cora_valid_context_key( (string) ( $_POST['context'] ?? '' ) );
     $turn_context     = stapleit_cora_context_for_turn( $prompt, $incoming_context, $history );

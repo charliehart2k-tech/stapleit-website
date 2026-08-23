@@ -279,6 +279,132 @@ function stapleit_cora_fast_reply( $prompt, $context = '' ) {
     return '';
 }
 
+function stapleit_cora_package_flow_state( $raw ) {
+    $state = is_array( $raw ) ? $raw : array();
+    return array(
+        'team'         => in_array( (string) ( $state['team'] ?? '' ), array( '1', '4', '10', '25' ), true ) ? (string) $state['team'] : '',
+        'security'     => in_array( (string) ( $state['security'] ?? '' ), array( 'basic', 'standard', 'premium' ), true ) ? (string) $state['security'] : '',
+        'requirements' => in_array( (string) ( $state['requirements'] ?? '' ), array( 'yes', 'no', 'unsure' ), true ) ? (string) $state['requirements'] : '',
+    );
+}
+
+function stapleit_cora_parse_package_team( $prompt ) {
+    $text = strtolower( trim( (string) $prompt ) );
+    if ( preg_match( '/\b(?:just\s+me|only\s+me|sole[-\s]?trader|one\s+person)\b/i', $text ) ) return '1';
+    if ( preg_match( '/\b2\s*[–-]\s*4\b/i', $text ) ) return '4';
+    if ( preg_match( '/\b5\s*[–-]\s*19\b/i', $text ) ) return '10';
+    if ( preg_match( '/(?:^|\b)20\s*\+/i', $text ) ) return '25';
+    $count = 0;
+    if ( preg_match( '/^\s*(\d{1,3})\s*$/', $text, $match ) ) {
+        $count = (int) $match[1];
+    } elseif ( preg_match( '/\b(?:we\s+(?:have|are)|team\s+of|staff\s+of|there\s+are)\s+(\d{1,3})(?:\s*(?:staff|people|users?|employees?|of\s+us))?\b/i', $text, $match ) ) {
+        $count = (int) $match[1];
+    } elseif ( preg_match( '/\b(\d{1,3})\s+(?:staff|people|users?|employees?)\b/i', $text, $match ) ) {
+        $count = (int) $match[1];
+    } else {
+        $number_words = array(
+            'one' => 1, 'two' => 2, 'three' => 3, 'four' => 4, 'five' => 5,
+            'six' => 6, 'seven' => 7, 'eight' => 8, 'nine' => 9, 'ten' => 10,
+            'eleven' => 11, 'twelve' => 12, 'thirteen' => 13, 'fourteen' => 14,
+            'fifteen' => 15, 'sixteen' => 16, 'seventeen' => 17, 'eighteen' => 18,
+            'nineteen' => 19, 'twenty' => 20,
+        );
+        $words = implode( '|', array_keys( $number_words ) );
+        if ( preg_match( '/\b(' . $words . ')\s+(?:staff|people|users?|employees?|of\s+us)\b/i', $text, $match ) || preg_match( '/\b(?:team\s+of|we\s+(?:have|are))\s+(' . $words . ')\b/i', $text, $match ) ) {
+            $count = $number_words[ strtolower( $match[1] ) ] ?? 0;
+        }
+    }
+    if ( $count === 1 ) return '1';
+    if ( $count >= 2 && $count <= 4 ) return '4';
+    if ( $count >= 5 && $count <= 19 ) return '10';
+    if ( $count >= 20 ) return '25';
+    return '';
+}
+
+function stapleit_cora_parse_package_security( $prompt ) {
+    $text = strtolower( trim( (string) $prompt ) );
+    $already_has_business_premium = (bool) preg_match( '/\b(?:already\s+(?:have|use)|we\s+(?:have|use)|licensed\s+for)\b.{0,36}\bbusiness\s+premium\b/i', $text );
+    if ( preg_match( '/\bpremium\b/i', $text ) && ! $already_has_business_premium ) return 'premium';
+    if ( preg_match( '/\b(?:want|need|include|included|bundled|bundle|get)\b.{0,36}\bbusiness\s+premium\b/i', $text ) || preg_match( '/\bbusiness\s+premium\b.{0,28}\b(?:included|bundled|package)\b/i', $text ) ) return 'premium';
+    if ( preg_match( '/\b(?:standard|security\s*\+\s*backup|stronger\s+security|better\s+security|more\s+security|edr|conditional\s+access|mfa|cloud\s+backup|email\s+security|phishing|identity\s+protection)\b/i', $text ) ) return 'standard';
+    if ( preg_match( '/\b(?:basic|day-to-day\s+support|day\s+to\s+day\s+support|just\s+support|everyday\s+support|printer|printing|outlook|password\s+reset|general\s+it\s+help)\b/i', $text ) ) return 'basic';
+    return '';
+}
+
+function stapleit_cora_parse_package_requirements( $prompt ) {
+    $text = strtolower( trim( (string) $prompt ) );
+    if ( preg_match( '/\b(?:not\s+sure|unsure|don\x{2019}t\s+know|don\'t\s+know)\b/iu', $text ) ) return 'unsure';
+    if ( preg_match( '/\b(?:no\s+(?:clients?|insurers?|regulators?|security\s+evidence|questionnaires?)|(?:clients?|insurers?|regulators?)\s+(?:do\s+not|don\x{2019}t|don\'t|does\s+not|doesn\x{2019}t|doesn\'t)\s+(?:ask|require|need)|not\s+(?:asked|required)\s+for\s+security\s+evidence|none|nope)\b/iu', $text ) ) return 'no';
+    if ( preg_match( '/\b(?:yes|yeah|yep|we\s+do|they\s+do|client|insurer|regulator|audit\s+evidence|security\s+evidence|questionnaire)\b/i', $text ) ) return 'yes';
+    if ( preg_match( '/^\s*no\s*$/i', $text ) ) return 'no';
+    return '';
+}
+
+function stapleit_cora_package_flow_result( $state ) {
+    $state = stapleit_cora_package_flow_state( $state );
+    if ( $state['team'] === '1' || $state['team'] === '4' ) {
+        return array(
+            'reply'       => 'The published per-person packages start at five staff, so Tailored support is the correct route. Pricing is confirmed around what you need.',
+            'context'     => 'package_sole',
+            'suggestions' => array( 'What does Tailored include?', 'Start again' ),
+        );
+    }
+    if ( $state['team'] === '' ) return array();
+
+    $tier = $state['security'];
+    if ( $state['requirements'] === 'yes' && ( $tier === '' || $tier === 'basic' ) ) $tier = 'standard';
+    if ( $tier === 'standard' || $tier === 'premium' ) {
+        // Evidence cannot lower these tiers, so do not ask a redundant question.
+    } elseif ( $tier === 'basic' && $state['requirements'] === '' ) {
+        return array();
+    } elseif ( $tier === '' ) {
+        return array();
+    }
+
+    if ( $tier === 'basic' ) {
+        $reply = 'Basic is the starting point. It starts from £35 per staff member, per month for teams of 5+ and covers day-to-day helpdesk support, monitoring, patching, device management and business-grade antivirus.';
+    } elseif ( $tier === 'standard' ) {
+        $reply = 'Standard is the starting point. It starts from £55 per staff member, per month for teams of 5+ and adds EDR, email security, MFA, Conditional Access, cloud backup, LastPass, Exclaimer and regular security reviews. Microsoft 365 Business Premium or equivalent licensing is required and sold separately unless specifically included.';
+    } else {
+        $reply = 'Premium is the starting point. It starts from £75 per staff member, per month for teams of 5+ and includes Microsoft 365 Business Premium plus enhanced Microsoft security and data protection.';
+    }
+    return array(
+        'reply'       => $reply,
+        'context'     => 'package_' . $tier,
+        'suggestions' => array( 'What’s included?', 'How do the packages differ?', 'Start again' ),
+    );
+}
+
+function stapleit_cora_package_flow_step( $prompt, $raw_state = array() ) {
+    $state = stapleit_cora_package_flow_state( $raw_state );
+    $text  = trim( (string) $prompt );
+    if ( preg_match( '/\bstart\s+again\b/i', $text ) ) $state = stapleit_cora_package_flow_state( array() );
+
+    if ( $state['team'] === '' ) {
+        $parsed = stapleit_cora_parse_package_team( $text );
+        if ( $parsed !== '' ) $state['team'] = $parsed;
+    }
+    if ( $state['security'] === '' ) {
+        $parsed = stapleit_cora_parse_package_security( $text );
+        if ( $parsed !== '' ) $state['security'] = $parsed;
+    }
+    if ( $state['requirements'] === '' ) {
+        $parsed = stapleit_cora_parse_package_requirements( $text );
+        if ( $parsed !== '' ) $state['requirements'] = $parsed;
+    }
+
+    $result = stapleit_cora_package_flow_result( $state );
+    if ( $result ) return array_merge( $result, array( 'state' => $state, 'complete' => true ) );
+
+    if ( $state['team'] === '' ) {
+        return array( 'reply' => 'How many people need IT support?', 'suggestions' => array( 'Just me', '2–4 people', '5–19 people', '20+ people' ), 'state' => $state, 'complete' => false );
+    }
+    if ( $state['security'] === '' ) {
+        return array( 'reply' => 'How much protection do you want included?', 'suggestions' => array( 'Day-to-day support', 'Security + backup', 'Microsoft 365 Business Premium' ), 'state' => $state, 'complete' => false );
+    }
+    return array( 'reply' => 'Do clients, insurers or regulators ask for security evidence?', 'suggestions' => array( 'Yes', 'No', 'Not sure' ), 'state' => $state, 'complete' => false );
+}
+
 function stapleit_cora_follow_up_suggestions( $prompt ) {
     $prompt = strtolower( (string) $prompt );
     if ( preg_match( '/\b(?:business\s+premium|microsoft\s*365\s+business\s+premium)\b/i', $prompt ) && preg_match( '/\b(?:licen[cs]e|subscription)\b/i', $prompt ) && preg_match( '/\b(?:price|pricing|cost|how\s+much)\b/i', $prompt ) ) {

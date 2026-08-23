@@ -24,10 +24,10 @@ for (const [name, width, height] of viewports) {
     await expect(page.getByRole('dialog', { name: 'Cora' })).toBeVisible();
 
     const contract = await page.evaluate(() => {
-      const question = document.querySelector('[data-package-question]:not([hidden])');
+      const packageChooser = document.querySelector('[data-cora-flow="package"]');
       const lead = document.querySelector('.support-section-lead');
       const bodySize = lead ? Number.parseFloat(getComputedStyle(lead).fontSize) : 0;
-      const controls = [...document.querySelectorAll('[data-support-planner] button, [data-support-planner] select, [data-support-planner] input[type="number"], [data-support-planner] .support-pack-choices label')]
+      const controls = [...document.querySelectorAll('[data-support-planner] button')]
         .filter(element => element.getClientRects().length)
         .map(element => element.getBoundingClientRect().height);
       const boundedSelectors = [
@@ -68,7 +68,7 @@ for (const [name, width, height] of viewports) {
       return {
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
         bodySize,
-        questionVisible: Boolean(question),
+        packageChooserVisible: Boolean(packageChooser),
         smallestControl: controls.length ? Math.min(...controls) : 0,
         escaped,
         packageColumns,
@@ -91,7 +91,7 @@ for (const [name, width, height] of viewports) {
 
     expect(contract.overflow).toBeLessThanOrEqual(1);
     expect(contract.bodySize).toBeGreaterThanOrEqual(width <= 700 ? 16 : 17);
-    expect(contract.questionVisible).toBe(true);
+    expect(contract.packageChooserVisible).toBe(true);
     expect(contract.smallestControl).toBeGreaterThanOrEqual(44);
     expect(contract.escaped).toEqual([]);
     expect(contract.heroMotionPresent).toBe(false);
@@ -172,12 +172,10 @@ test('tablet chapter headings stay below hero scale', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
   const sizes = await page.evaluate(() => ({
     onboarding: Number.parseFloat(getComputedStyle(document.querySelector('.support-onboarding h2')).fontSize),
-    packages: Number.parseFloat(getComputedStyle(document.querySelector('.support-packages > .support-section-heading h2')).fontSize),
-    planner: Number.parseFloat(getComputedStyle(document.querySelector('.support-planner-header h3')).fontSize)
+    packages: Number.parseFloat(getComputedStyle(document.querySelector('.support-packages > .support-section-heading h2')).fontSize)
   }));
   expect(sizes.onboarding).toBeLessThanOrEqual(58);
   expect(sizes.packages).toBeLessThanOrEqual(58);
-  expect(sizes.planner).toBeLessThanOrEqual(52);
 });
 
 test('Cora does not expose backend mode labels to visitors', async ({ page }) => {
@@ -207,112 +205,48 @@ test('Cora does not expose backend mode labels to visitors', async ({ page }) =>
   await expect(page.locator('.cora-messages')).not.toContainText(/knowledge guide|guardrail|local-ai|local ai/i);
 });
 
-test('package recommendation stays deterministic while Cora explains it', async ({ page }) => {
+test('Cora leads package discovery and only asks questions that can change the result', async ({ page }) => {
+  const requests = [];
   await page.route('**/wp-admin/admin-ajax.php', async route => {
     const body = route.request().postData() || '';
-    if (body.includes('action=stapleit_cora_planner_explain')) {
-      await route.fulfill({
-        contentType: 'application/json',
-        body: JSON.stringify({ ok: true, mode: 'local-ai', reply: 'Standard fits because you selected stronger managed protection for a team of five or more. A free IT audit will confirm the final scope.' })
-      });
+    if (!body.includes('action=stapleit_cora_chat')) {
+      await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
       return;
     }
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-  });
-
-  await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
-  const packageForm = page.locator('[data-package-finder]');
-  await packageForm.getByLabel('5–19 people').check();
-  await packageForm.getByRole('button', { name: 'Continue' }).click();
-  await packageForm.getByLabel('Security + backup').check();
-  await packageForm.getByRole('button', { name: 'Continue' }).click();
-  await packageForm.getByLabel('No', { exact: true }).check();
-  await packageForm.getByRole('button', { name: 'See recommendation' }).click();
-
-  await expect(page.locator('[data-package-title]')).toContainText('Standard');
-  await expect(page.locator('[data-package-ai-copy]')).toContainText('stronger managed protection');
-  const surfaces = await page.evaluate(() => {
-    const planner = document.querySelector('[data-support-planner]');
-    const form = planner?.querySelector(':scope > [data-package-finder]');
-    return {
-      formIsDirectChild: Boolean(form),
-      outerBorder: planner ? getComputedStyle(planner).borderTopStyle : '',
-      formBorder: form ? Number.parseFloat(getComputedStyle(form).borderTopWidth) : 0
-    };
-  });
-  expect(surfaces.formIsDirectChild).toBe(true);
-  expect(surfaces.outerBorder).toBe('none');
-  expect(surfaces.formBorder).toBeGreaterThan(0);
-});
-
-test('mobile package finder is compact, scannable and hands off cleanly', async ({ page }) => {
-  await page.route('**/wp-admin/admin-ajax.php', async route => {
-    const body = route.request().postData() || '';
-    if (body.includes('action=stapleit_cora_planner_explain')) {
-      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
-      return;
+    const params = new URLSearchParams(body);
+    const state = JSON.parse(params.get('flow_state') || '{}');
+    requests.push({ flow: params.get('flow'), prompt: params.get('prompt'), state });
+    const prompt = params.get('prompt') || '';
+    let payload;
+    if (/start package discovery/i.test(prompt)) {
+      payload = { ok:true, mode:'package-flow', reply:'How many people need IT support?', flow:'package', flow_active:true, flow_state:{team:'',security:'',requirements:''}, suggestions:['Just me','2–4 people','5–19 people','20+ people'] };
+    } else if (/5–19 people/i.test(prompt)) {
+      payload = { ok:true, mode:'package-flow', reply:'How much protection do you want included?', flow:'package', flow_active:true, flow_state:{team:'10',security:'',requirements:''}, suggestions:['Day-to-day support','Security + backup','Microsoft 365 Business Premium'] };
+    } else {
+      payload = { ok:true, mode:'package-flow', reply:'Standard is the starting point. It starts from £55 per staff member, per month for teams of 5+.', context:'package_standard', flow:'package', flow_active:false, flow_state:{team:'10',security:'standard',requirements:''}, suggestions:['What’s included?','How do the packages differ?','Start again'] };
     }
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+    await route.fulfill({ contentType:'application/json', body:JSON.stringify(payload) });
   });
 
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
-  const form = page.locator('[data-package-finder]');
-  const initial = await page.evaluate(() => {
-    const form = document.querySelector('[data-package-finder]');
-    const question = document.querySelector('[data-package-question]:not([hidden])');
-    const choices = question?.querySelector('.support-pack-choices');
-    const cards = [...document.querySelectorAll('.support-package-card')].map(card => card.getBoundingClientRect().height);
-    return {
-      formHeight: form?.getBoundingClientRect().height || 0,
-      questionHeight: question?.getBoundingClientRect().height || 0,
-      teamColumns: choices ? getComputedStyle(choices).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
-      tallestCard: Math.max(...cards),
-      primaryOrder: [...document.querySelectorAll('[data-package-grid] > .support-package-card h3')].map(element => element.textContent.trim()),
-      fitCount: document.querySelectorAll('.support-package-fit').length,
-      popularCount: document.querySelectorAll('.support-package-badge').length
-    };
-  });
-  expect(initial.formHeight).toBeLessThanOrEqual(430);
-  expect(initial.questionHeight).toBeLessThanOrEqual(310);
-  expect(initial.teamColumns).toBe(2);
-  expect(initial.tallestCard).toBeLessThanOrEqual(430);
-  expect(initial.primaryOrder).toEqual(['Basic','Standard','Premium']);
-  expect(initial.fitCount).toBe(0);
-  expect(initial.popularCount).toBe(0);
-
-  await form.getByLabel('5–19 people').check();
-  await form.getByRole('button', { name: 'Continue' }).click();
-  await form.getByLabel('Security + backup').check();
-  await form.getByRole('button', { name: 'Continue' }).click();
-  const requirementColumns = await form.locator('[data-package-key="requirements"] .support-pack-choices').evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').filter(Boolean).length);
-  expect(requirementColumns).toBe(3);
-  await form.getByLabel('No', { exact: true }).check();
-  await form.getByRole('button', { name: 'See recommendation' }).click();
-  await expect(page.locator('[data-package-title]')).toHaveText('Standard');
-  await expect(page.locator('[data-package-ai-copy]')).toContainText('Standard fits');
-
-  const result = await page.evaluate(() => {
-    const panel = document.querySelector('[data-package-result]');
-    const handoff = document.querySelector('[data-planner-handoff]');
-    const calculator = document.querySelector('[data-cost-calculator]');
-    const actions = document.querySelector('.support-package-result-panel .support-pack-results-actions');
-    return {
-      height: panel?.getBoundingClientRect().height || 0,
-      handoffInside: Boolean(panel?.contains(handoff)),
-      calculatorColumns: calculator ? getComputedStyle(calculator).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
-      actionColumns: actions ? getComputedStyle(actions).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
-      auditHref: document.querySelector('[data-planner-audit]')?.getAttribute('href') || ''
-    };
-  });
-  expect(result.height).toBeLessThanOrEqual(810);
-  expect(result.handoffInside).toBe(true);
-  expect(result.calculatorColumns).toBe(2);
-  expect(result.actionColumns).toBe(2);
-  expect(result.auditHref).toBe('/get-in-touch/it-audit/');
+  await page.setViewportSize({ width:390, height:844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil:'networkidle' });
+  await expect(page.locator('[data-package-finder]')).toHaveCount(0);
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute('content', /interactive-widget=resizes-content/);
+  await page.locator('[data-cora-flow="package"]').click();
+  const cora = page.getByRole('dialog', { name:'Cora' });
+  await expect(cora).toBeVisible();
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('How many people');
+  await expect(cora.locator('.cora-suggestion')).toHaveCount(4);
+  await expect(cora.getByRole('button', { name:'20+ people' })).toBeVisible();
+  await cora.getByRole('button', { name:'5–19 people' }).click();
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('How much protection');
+  await cora.getByRole('button', { name:'Security + backup' }).click();
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('Standard is the starting point');
+  expect(requests).toHaveLength(3);
+  expect(requests.every(request => request.flow === 'package')).toBe(true);
+  expect(requests[1].state.team).toBe('');
+  expect(requests[2].state.team).toBe('10');
 });
-
 
 test('primary packages lead and tailored support stays behind See more', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -381,46 +315,36 @@ test('Cora keeps package context across a natural follow-up', async ({ page }) =
 });
 
 
-test('mobile planner fallback stays useful and contextual Cora opens before the keyboard', async ({ page }) => {
-  await page.route('**/wp-admin/admin-ajax.php', async route => {
-    const body = route.request().postData() || '';
-    if (body.includes('action=stapleit_cora_planner_explain')) {
-      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
-      return;
-    }
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-  });
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
-  const packageForm = page.locator('[data-package-finder]');
-  await packageForm.getByLabel('2–4 people').check();
-  await packageForm.locator('[data-package-next]').click();
-  await packageForm.getByLabel('Day-to-day support').check();
-  await packageForm.locator('[data-package-next]').click();
-  await packageForm.getByLabel('No', { exact: true }).check();
-  await packageForm.locator('[data-package-next]').click();
-
-  const explanation = page.locator('[data-package-ai-copy]');
-  await expect(explanation).toContainText('five-user minimum');
-  await expect(explanation).not.toContainText(/recommendation above still stands|free IT audit/i);
-
-  await packageForm.getByRole('button', { name: 'Ask Cora' }).click();
-  const cora = page.getByRole('dialog', { name: 'Cora' });
-  await expect(cora).toBeVisible();
-  const state = await page.evaluate(() => {
+test('mobile Cora tracks a keyboard-resized viewport and keeps the composer visible', async ({ page }) => {
+  await page.setViewportSize({ width:390, height:844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil:'networkidle' });
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute('content', /interactive-widget=resizes-content/);
+  await page.getByRole('button', { name:'Chat to Cora' }).click();
+  const input = page.getByLabel('Message Cora');
+  await input.focus();
+  await expect(page.locator('.cora')).toHaveClass(/is-input-focused/);
+  await page.setViewportSize({ width:390, height:500 });
+  const geometry = await page.evaluate(() => {
     const panel = document.querySelector('.cora-panel').getBoundingClientRect();
+    const composer = document.querySelector('.cora-form').getBoundingClientRect();
+    const suggestions = document.querySelector('.cora-suggestions');
+    const privacy = document.querySelector('.cora-privacy');
     return {
-      activeIsTextarea: document.activeElement?.matches?.('.cora-form textarea') || false,
-      width: panel.width,
-      left: panel.left,
-      right: panel.right
+      panelTop: panel.top,
+      panelBottom: panel.bottom,
+      panelHeight: panel.height,
+      composerBottom: composer.bottom,
+      suggestionsHidden: getComputedStyle(suggestions).display === 'none',
+      privacyHidden: getComputedStyle(privacy).display === 'none',
+      overflow: document.documentElement.scrollWidth - innerWidth
     };
   });
-  expect(state.activeIsTextarea).toBe(false);
-  expect(state.width).toBeGreaterThan(300);
-  expect(state.left).toBeGreaterThanOrEqual(-1);
-  expect(state.right).toBeLessThanOrEqual(391);
+  expect(geometry.panelTop).toBeGreaterThanOrEqual(7);
+  expect(geometry.panelBottom).toBeLessThanOrEqual(501);
+  expect(geometry.composerBottom).toBeLessThanOrEqual(501);
+  expect(geometry.suggestionsHidden).toBe(true);
+  expect(geometry.privacyHidden).toBe(true);
+  expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
 test('Cora add-on conversation adapts and suggests without a nine-question checklist', async ({ page }) => {

@@ -747,8 +747,8 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   color:#c7d0da;
   font:600 var(--type-small)/1.3 var(--font-display);
   cursor:pointer;
-  opacity:0;
-  transform:translate3d(8px,0,0);
+  opacity:1;
+  transform:none;
   transition:transform 260ms var(--cora-ease),border-color 220ms ease,background 220ms ease,color 220ms ease;
 }
 
@@ -820,6 +820,11 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   .cora-messages{padding:19px 17px 13px}
   .cora-suggestions{padding-inline:15px}
   .cora-form{padding-inline:11px}
+  .cora.is-open.is-input-focused .cora-panel{position:fixed;inset:8px 8px auto;width:auto;height:calc(100dvh - 16px);max-height:none;border-radius:20px}
+  .cora.is-input-focused .cora-header{min-height:58px;padding-block:10px}
+  .cora.is-input-focused .cora-suggestions{display:none}
+  .cora.is-input-focused .cora-messages{padding-top:12px}
+  .cora.is-input-focused .cora-privacy{display:none}
 }
 
 @media(max-height:680px) and (min-width:601px){
@@ -3889,40 +3894,12 @@ body.support-dialog-open{overflow:hidden}
 @keyframes supportCoraInsightIn{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
 
 /* source: it-support-packages.css */
-/* IT Support package finder and package comparison refinements. */
-
-/* Package finder — compact guided composition. Add-on finder keeps the shared rules above. */
-.support-planner{margin-bottom:var(--space-7);padding-top:clamp(34px,4.5vw,56px)}
-.support-planner-header{gap:clamp(26px,4vw,54px);margin-bottom:27px}
-.support-planner-header h3{max-width:12ch;font-size:clamp(2.85rem,4.4vw,4.65rem);line-height:1.02}
-.support-planner-header>p:last-child{max-width:34rem;font-size:1rem;line-height:1.55}
-.support-planner .support-package-finder{border-radius:24px}
-.support-planner .support-pack-finder-progress{grid-template-columns:auto minmax(120px,1fr);gap:16px;padding:20px 30px 0;align-items:center}
-.support-planner .support-pack-finder-progress progress{height:6px;border-radius:999px;overflow:hidden}
-.support-planner .support-pack-finder-stage{padding:0 30px 20px}
-.support-planner .support-pack-question{padding:23px 0 19px}
-.support-planner .support-pack-question legend{max-width:30ch;font-size:clamp(1.75rem,2.45vw,2.35rem);line-height:1.14}
-.support-planner .support-pack-question-help{margin-top:10px;line-height:1.52}
-.support-planner .support-pack-choices{gap:9px;margin-top:18px}
-.support-planner .support-pack-choices label{min-height:52px;padding:11px 14px;border-radius:13px}
-.support-planner .support-pack-finder-actions{margin:0 30px 21px;padding-top:17px}
-.support-planner .support-pack-finder-button{min-height:48px;padding:10px 19px}
-.support-planner .support-package-result-panel{padding:27px 30px 25px}
-.support-planner .support-package-result-panel h4{font-size:clamp(2.15rem,3.4vw,3.35rem);line-height:1.04}
-.support-planner .support-package-result-panel>p:not(.support-planner-kicker){max-width:58ch;line-height:1.55}
-.support-planner .support-cora-insight{margin:18px 0 0;padding:16px 0;gap:12px}
-.support-planner .support-cora-insight p{margin-top:4px;line-height:1.55}
-.support-planner .support-cost-calculator{gap:14px;margin-top:18px;padding:18px 0}
-.support-planner .support-cost-calculator input,.support-planner .support-cost-calculator select{min-height:48px;padding:10px 12px}
-.support-planner .support-cost-total{padding-block:10px}
-.support-planner .support-cost-note{margin-top:12px;font-size:.9rem;line-height:1.5}
-.support-planner .support-pack-results-actions{gap:10px;margin-top:18px;padding-top:17px}
-.support-planner .support-planner-handoff{grid-template-columns:minmax(0,1fr) auto;gap:13px 18px;margin-top:20px;padding:18px;border:1px solid rgba(255,255,255,.085);border-radius:16px;background:rgba(255,255,255,.018)}
-.support-planner .support-planner-handoff-copy{min-width:0}
-.support-planner .support-planner-handoff-copy strong{display:block;color:#f1f4f7;font-family:var(--font-display);font-size:.95rem;line-height:1.35}
-.support-planner .support-planner-handoff-copy p{margin:4px 0 0;color:#9faab6;font-size:.86rem;line-height:1.45}
-.support-planner .support-planner-handoff label{grid-column:1;gap:9px;font-size:.9rem;line-height:1.4}
-.support-planner .support-planner-handoff>a{grid-column:2;grid-row:1 / span 2;align-self:center}
+/* Package discovery is led by Cora; package card styling lives in it-support.css. */
+.support-package-cora{display:flex;justify-content:flex-start;margin:0 0 28px}
+.support-package-cora-trigger{min-height:48px;display:inline-flex;align-items:center;justify-content:center;padding:11px 20px;border:1px solid rgba(255,255,255,.15);border-radius:999px;background:rgba(255,255,255,.035);color:#f3f6f9;font:700 .92rem/1.3 var(--font-display);cursor:pointer;touch-action:manipulation;box-shadow:0 18px 46px rgba(0,0,0,.28),0 0 30px rgba(124,58,237,.07);transition:transform var(--motion-fast) var(--ease),border-color var(--motion-fast) ease,background var(--motion-fast) ease,box-shadow var(--motion-fast) ease}
+.support-package-cora-trigger:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
+@media(hover:hover) and (pointer:fine){.support-package-cora-trigger:hover{transform:translateY(-2px);border-color:rgba(168,85,247,.32);background:rgba(255,255,255,.06);box-shadow:0 22px 54px rgba(0,0,0,.34),0 0 38px rgba(124,58,237,.12)}}
+@media(max-width:700px){.support-package-cora{margin-bottom:20px}.support-package-cora-trigger{width:100%}}
 
 /* source: it-support-packs-conversation.css */
 /* Cora-led adaptive add-on conversation. */
@@ -4241,6 +4218,7 @@ body.support-dialog-open{overflow:hidden}
   .support-planner::before,.support-package-finder::before,.support-packs .support-pack-finder::before{display:none}
   .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px;clip-path:none;filter:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:opacity 240ms ease,transform 420ms var(--cora-ease),visibility 0s linear 420ms;will-change:opacity,transform}
   .cora.is-open .cora-panel{clip-path:none;filter:none;transition-delay:0s}
+  .cora.is-open.is-input-focused .cora-panel{position:fixed;inset:8px 8px auto;width:auto;max-width:none;height:calc(100dvh - 16px);max-height:none}
   .cora-header{padding-inline:15px}
   .cora-identity{min-width:0}
   .cora-identity span{white-space:normal;overflow-wrap:anywhere}
@@ -4248,7 +4226,6 @@ body.support-dialog-open{overflow:hidden}
   .cora-message,.cora-message--user{max-width:100%}
   .cora-suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:100%;padding-inline:13px;overflow:visible;-webkit-mask-image:none;mask-image:none}
   .cora-suggestion{width:100%;max-width:none;min-width:0;white-space:normal;text-align:center;padding-inline:9px}
-  .cora-suggestion:nth-child(n+3){display:none}
   .cora-form{min-width:0;padding:11px 10px max(12px,env(safe-area-inset-bottom))}
   .cora-form textarea{min-width:0}
 }
