@@ -239,7 +239,7 @@ grep -Fq 'Microsoft 365 Business Premium included' "$THEME/static-it-support.php
 grep -Fq 'Huntress endpoint protection' "$THEME/static-it-support.php"
 grep -Fq 'additional Microsoft licensing required to enable those features is charged separately' "$THEME/static-it-support.php"
 grep -Fq 'included licence quantities and service levels are confirmed in your written proposal' "$THEME/static-it-support.php"
-grep -Fq 'From day-to-day IT support for common problems to fully managed security and protection' "$THEME/static-it-support.php"
+grep -Fq 'Every package includes day-to-day support and proactive management' "$THEME/static-it-support.php"
 grep -Fq 'data-package-finder' "$THEME/static-it-support.php"
 grep -Fq 'data-pack-finder' "$THEME/static-it-support.php"
 grep -Fq 'data-package-ai' "$THEME/static-it-support.php"
