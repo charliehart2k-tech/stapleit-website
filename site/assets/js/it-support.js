@@ -311,6 +311,87 @@
 })();
 
 (() => {
+  const naturalList = items => {
+    if (items.length < 2) return items[0] || '';
+    if (items.length === 2) return `${items[0]} and ${items[1]}`;
+    return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+  };
+
+  const packageExplanation = answers => {
+    const team = String(answers?.team || '');
+    const protection = String(answers?.security || '');
+    const requirements = String(answers?.requirements || '');
+
+    if (team === '1') {
+      return 'Because it’s just you, forcing you into the five-user minimum would not make sense. A tailored sole-trader arrangement can focus on the devices, Microsoft 365 and day-to-day help you actually need.';
+    }
+    if (team === '4') {
+      return 'Because you have 2–4 people, the published team packages would force a five-user minimum. A tailored plan lets us match support and security to the people and systems you actually have instead of charging against a package that does not fit cleanly.';
+    }
+
+    let recommended = protection;
+    if (requirements === 'yes' && recommended === 'basic') recommended = 'standard';
+
+    if (recommended === 'basic') {
+      return 'Basic fits because your answers point to straightforward day-to-day IT support without extra managed security requirements. It covers the helpdesk, monitoring, patching, device management and business-grade antivirus while keeping the package simple.';
+    }
+    if (recommended === 'standard') {
+      return requirements === 'yes'
+        ? 'Standard fits because you need stronger protection and also need to provide security evidence. It adds EDR, email security, cloud backup, MFA, Conditional Access and regular security reviews on top of the day-to-day support.'
+        : 'Standard fits because you want day-to-day support with stronger security, backup and identity protection. It adds EDR, email security, cloud backup, MFA and Conditional Access without moving straight to the full Premium package.';
+    }
+    return 'Premium fits because you selected the fullest level of managed protection. It includes everything in Standard plus Microsoft 365 Business Premium, enhanced Microsoft security, DNS and web protection and stronger data-protection controls.';
+  };
+
+  const packLabels = {
+    server: 'Server',
+    azure: 'Azure',
+    network: 'Network',
+    security: 'Security',
+    governance: 'Governance & compliance',
+    'cyber-essentials': 'Cyber Essentials',
+    ai: 'AI',
+    strategy: 'Strategy',
+    'disaster-recovery': 'Disaster recovery'
+  };
+  const packReasons = {
+    server: 'you run a physical Windows server',
+    azure: 'you use systems or virtual machines in Azure',
+    network: 'you rely on managed Wi-Fi, switches or a dedicated firewall',
+    security: 'you want stronger protection beyond the core support package',
+    governance: 'you need policies, documentation or security evidence',
+    'cyber-essentials': 'Cyber Essentials is a requirement or goal',
+    ai: 'you are introducing AI tools for staff',
+    strategy: 'you want regular planning, budgeting or a technology roadmap',
+    'disaster-recovery': 'you need a structured recovery plan for critical systems and data'
+  };
+
+  const packExplanation = answers => {
+    const keys = Object.keys(packLabels);
+    const likely = keys.filter(key => answers?.[key] === 'yes');
+    const unsure = keys.filter(key => answers?.[key] === 'unsure');
+
+    if (!likely.length && !unsure.length) {
+      return 'Nothing in your answers points strongly to an add-on right now. That is a useful result in itself — it means the core support package may already cover what you need without adding extra services.';
+    }
+
+    const parts = [];
+    if (likely.length) {
+      const names = naturalList(likely.map(key => packLabels[key]));
+      const reasons = naturalList(likely.slice(0, 3).map(key => packReasons[key]));
+      parts.push(`${names} ${likely.length === 1 ? 'stands' : 'stand'} out because ${reasons}.`);
+    }
+    if (unsure.length) {
+      const names = naturalList(unsure.map(key => packLabels[key]));
+      parts.push(`You marked ${names} as Not sure, so ${unsure.length === 1 ? 'it is' : 'they are'} shown as worth discussing rather than a definite recommendation.`);
+    }
+    return parts.join(' ');
+  };
+
+  const deterministicExplanation = (plannerType, answers) => plannerType === 'package'
+    ? packageExplanation(answers)
+    : packExplanation(answers);
+
   window.stapleitExplainPlanner = async (plannerType, answers, panel, copy) => {
     if (!(panel instanceof HTMLElement) || !(copy instanceof HTMLElement)) return;
     const requestKey = JSON.stringify([plannerType, answers]);
@@ -318,10 +399,12 @@
       panel.hidden = false;
       return;
     }
+
+    const immediateCopy = deterministicExplanation(plannerType, answers);
     panel.dataset.requestKey = requestKey;
     panel.hidden = false;
-    panel.classList.add('is-loading');
-    copy.textContent = 'Looking at what you told us…';
+    panel.classList.remove('is-loading');
+    copy.textContent = immediateCopy;
 
     try {
       const body = new URLSearchParams({
@@ -336,15 +419,17 @@
         credentials: 'same-origin'
       });
       const payload = await response.json();
-      if (!response.ok || payload?.ok === false || !payload?.reply) throw new Error('Cora could not add an explanation.');
-      copy.textContent = payload.reply;
-      panel.dataset.mode = payload.mode || 'knowledge-guide';
-      window.stapleitTrack?.(plannerType === 'package' ? 'package_ai_explained' : 'pack_ai_explained');
+      if (!response.ok || payload?.ok === false) throw new Error('Cora could not add an explanation.');
+
+      if (payload?.mode === 'local-ai' && typeof payload.reply === 'string' && payload.reply.trim().length > 24) {
+        copy.textContent = payload.reply.trim();
+        panel.dataset.mode = 'local-ai';
+        window.stapleitTrack?.(plannerType === 'package' ? 'package_ai_explained' : 'pack_ai_explained');
+      } else {
+        panel.dataset.mode = 'knowledge-guide';
+      }
     } catch {
-      copy.textContent = 'The recommendation above still stands. We can confirm the detail with you during a free IT audit.';
       panel.dataset.mode = 'unavailable';
-    } finally {
-      panel.classList.remove('is-loading');
     }
   };
 })();

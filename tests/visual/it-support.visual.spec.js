@@ -68,6 +68,7 @@ for (const [name, width, height] of viewports) {
           const rect = document.querySelector('.cora-panel').getBoundingClientRect();
           return rect.left >= -1 && rect.right <= innerWidth + 1 && rect.top >= -1 && rect.bottom <= innerHeight + 1;
         })(),
+        coraPanelWidth: document.querySelector('.cora-panel').getBoundingClientRect().width,
         exposesImplementationCopy: /private local ai|safety guardrail|staple it knowledge guide|checking your answers against staple it’s service guide/i.test(publicCopy)
       };
     });
@@ -78,6 +79,7 @@ for (const [name, width, height] of viewports) {
     expect(contract.smallestControl).toBeGreaterThanOrEqual(44);
     expect(contract.escaped).toEqual([]);
     expect(contract.coraPanelInsideViewport).toBe(true);
+    expect(contract.coraPanelWidth).toBeGreaterThanOrEqual(width <= 320 ? 270 : width <= 840 ? 280 : 360);
     expect(contract.exposesImplementationCopy).toBe(false);
     if (width <= 840) expect(contract.packageColumns).toBe(1);
 
@@ -217,4 +219,122 @@ test('Cora keeps package context across a natural follow-up', async ({ page }) =
   await page.getByRole('button', { name: 'Send' }).click();
   await expect(page.locator('.cora-message--assistant').last()).toContainText('Basic includes');
   expect(chatCalls).toBe(2);
+});
+
+
+test('mobile planner fallback stays useful and contextual Cora opens before the keyboard', async ({ page }) => {
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    const body = route.request().postData() || '';
+    if (body.includes('action=stapleit_cora_planner_explain')) {
+      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
+      return;
+    }
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const packageForm = page.locator('[data-package-finder]');
+  await packageForm.getByLabel('2–4 people').check();
+  await packageForm.locator('[data-package-next]').click();
+  await packageForm.getByLabel('Day-to-day IT support').check();
+  await packageForm.locator('[data-package-next]').click();
+  await packageForm.getByLabel('No', { exact: true }).check();
+  await packageForm.locator('[data-package-next]').click();
+
+  const explanation = page.locator('[data-package-ai-copy]');
+  await expect(explanation).toContainText('five-user minimum');
+  await expect(explanation).not.toContainText(/recommendation above still stands|free IT audit/i);
+
+  await packageForm.getByRole('button', { name: 'Ask Cora about this' }).click();
+  const cora = page.getByRole('dialog', { name: 'Cora' });
+  await expect(cora).toBeVisible();
+  const state = await page.evaluate(() => {
+    const panel = document.querySelector('.cora-panel').getBoundingClientRect();
+    return {
+      activeIsTextarea: document.activeElement?.matches?.('.cora-form textarea') || false,
+      width: panel.width,
+      left: panel.left,
+      right: panel.right
+    };
+  });
+  expect(state.activeIsTextarea).toBe(false);
+  expect(state.width).toBeGreaterThan(300);
+  expect(state.left).toBeGreaterThanOrEqual(-1);
+  expect(state.right).toBeLessThanOrEqual(391);
+});
+
+test('add-on fallback explains the selected packs without generic audit copy', async ({ page }) => {
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    const body = route.request().postData() || '';
+    if (body.includes('action=stapleit_cora_planner_explain')) {
+      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
+      return;
+    }
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+  });
+
+  await page.setViewportSize({ width: 430, height: 932 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const form = page.locator('[data-pack-finder]');
+  const answers = [
+    ['server', 'no'],
+    ['azure', 'no'],
+    ['network', 'no'],
+    ['security', 'no'],
+    ['governance', 'yes'],
+    ['cyber-essentials', 'no'],
+    ['ai', 'yes'],
+    ['strategy', 'no'],
+    ['disaster-recovery', 'yes']
+  ];
+
+  for (let index = 0; index < answers.length; index += 1) {
+    const [key, value] = answers[index];
+    const question = form.locator(`[data-pack-question][data-pack-key="${key}"]`);
+    await question.locator(`input[value="${value}"]`).check();
+    await form.locator('[data-pack-finder-next]').click();
+  }
+
+  const explanation = page.locator('[data-packs-ai-copy]');
+  await expect(explanation).toContainText('Governance & compliance');
+  await expect(explanation).toContainText('AI');
+  await expect(explanation).toContainText('Disaster recovery');
+  await expect(explanation).not.toContainText(/recommendation above still stands|free IT audit/i);
+});
+
+test('touch-opened dialogs do not leave package cards glowing and use the mobile sheet treatment', async ({ browser }) => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true
+  });
+  const page = await context.newPage();
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const card = page.locator('.support-package-basic');
+  await card.locator('summary').click();
+  const dialog = page.locator('#support-dialog');
+  await expect(dialog).toBeVisible();
+  const modalState = await page.evaluate(() => {
+    const dialog = document.querySelector('#support-dialog');
+    const rect = dialog.getBoundingClientRect();
+    const backdrop = getComputedStyle(dialog, '::backdrop');
+    return {
+      bottomGap: innerHeight - rect.bottom,
+      width: rect.width,
+      backdropFilter: backdrop.backdropFilter || backdrop.webkitBackdropFilter || '',
+      radius: getComputedStyle(dialog).borderTopLeftRadius
+    };
+  });
+  expect(modalState.bottomGap).toBeLessThanOrEqual(8);
+  expect(modalState.width).toBeLessThanOrEqual(384);
+  expect(modalState.backdropFilter).toContain('blur(3px)');
+  expect(Number.parseFloat(modalState.radius)).toBeGreaterThanOrEqual(20);
+
+  await page.getByRole('button', { name: 'Close' }).click();
+  await expect(dialog).toBeHidden();
+  await expect.poll(async () => card.evaluate(element => getComputedStyle(element).transform)).toBe('none');
+  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeLessThanOrEqual(0.16);
+  await context.close();
 });

@@ -123,6 +123,7 @@
   const tracked = new Set();
   let previousFocus = null;
   let responsePending = false;
+  const finePointer = window.matchMedia('(hover:hover) and (pointer:fine)');
 
   const track = eventName => {
     if (tracked.has(eventName)) return;
@@ -167,7 +168,7 @@
   addMessage('assistant', 'Hi, I’m Cora. Tell me what you need help with — a problem, something you want to improve, or just how your IT works today. I’ll point you in the right direction.');
   renderSuggestions(initialSuggestions);
 
-  const setOpen = open => {
+  const setOpen = (open, { focusInput = finePointer.matches } = {}) => {
     if (root.classList.contains('is-open') === open) return;
     root.classList.toggle('is-open', open);
     root.classList.toggle('is-closed', !open);
@@ -179,7 +180,7 @@
       previousFocus = document.activeElement;
       window.requestAnimationFrame(() => {
         messages.scrollTop = messages.scrollHeight;
-        input.focus({ preventScroll: true });
+        if (focusInput) input.focus({ preventScroll: true });
       });
     } else if (previousFocus instanceof HTMLElement) {
       window.setTimeout(() => previousFocus?.focus({ preventScroll: true }), 260);
@@ -188,10 +189,11 @@
   };
 
   root.classList.add('is-closed');
-  toggle.addEventListener('click', () => setOpen(!root.classList.contains('is-open')));
+  toggle.addEventListener('click', () => setOpen(!root.classList.contains('is-open'), { focusInput: finePointer.matches }));
   close.addEventListener('click', () => setOpen(false));
   document.addEventListener('click', event => {
-    if (event.target.closest('[data-cora-open]')) setOpen(true);
+    const contextualTrigger = event.target.closest('[data-cora-open]');
+    if (contextualTrigger) setOpen(true, { focusInput: false });
   });
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && root.classList.contains('is-open')) setOpen(false);
