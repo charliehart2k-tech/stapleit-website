@@ -47,6 +47,7 @@ $checks = array(
     array( strpos( $functions_source, 'if ( ! $matches ) return array();' ) !== false, 'unclassified prompts do not default to Basic package' ),
     array( strpos( $functions_source, '$fallback_suggestions = $fallback_services ?' ) !== false, 'unclassified prompts do not receive generic sales suggestion chips' ),
     array( strpos( $functions_source, '$device_prompt = (bool) preg_match' ) !== false, 'unclassified device prompts use a safety-first fallback' ),
+    array( strpos( $functions_source, '( $device_prompt && ! $fallback_services ) ? \'\'' ) !== false, 'unclassified device prompts cannot be overridden by the local model' ),
 );
 
 $failures = array();

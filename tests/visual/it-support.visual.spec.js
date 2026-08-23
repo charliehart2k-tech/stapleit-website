@@ -72,6 +72,7 @@ for (const [name, width, height] of viewports) {
         escaped,
         packageColumns,
         heroMotionPresent: heroMotion instanceof HTMLVideoElement && /liquid-wave\.mp4/.test(heroMotion.querySelector('source')?.getAttribute('src') || ''),
+        heroMotionOpacity: Number.parseFloat(getComputedStyle(heroMotion).opacity),
         heroStageRadius: Number.parseFloat(getComputedStyle(heroStage).borderTopLeftRadius),
         heroStageOverflow: getComputedStyle(heroStage).overflow,
         heroCopyBlur: getComputedStyle(heroCopy).backdropFilter || getComputedStyle(heroCopy).webkitBackdropFilter || '',
@@ -92,6 +93,7 @@ for (const [name, width, height] of viewports) {
     expect(contract.smallestControl).toBeGreaterThanOrEqual(44);
     expect(contract.escaped).toEqual([]);
     expect(contract.heroMotionPresent).toBe(true);
+    expect(contract.heroMotionOpacity).toBeGreaterThanOrEqual(width <= 700 ? .55 : .6);
     expect(contract.heroStageRadius).toBeGreaterThanOrEqual(width <= 700 ? 24 : 34);
     expect(contract.heroStageOverflow).toBe('hidden');
     expect(contract.heroCopyBlur).toContain('blur');

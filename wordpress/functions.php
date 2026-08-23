@@ -272,7 +272,7 @@ function stapleit_handle_cora_chat_ajax() {
         $history,
         array( array( 'role' => 'user', 'content' => $prompt ) )
     );
-    $reply = stapleit_cora_model_reply( $messages );
+    $reply = ( $device_prompt && ! $fallback_services ) ? '' : stapleit_cora_model_reply( $messages );
     if ( $reply !== '' ) {
         $result['mode']  = 'local-ai';
         $result['reply'] = $reply;

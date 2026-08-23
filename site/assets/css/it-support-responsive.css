@@ -103,7 +103,7 @@
 
   .support-hero-shell{padding:10px;border-radius:28px}
 
-  .support-hero-shell>.support-hero-motion{opacity:.45;filter:brightness(.52)}
+  .support-hero-shell>.support-hero-motion{opacity:.56;filter:saturate(1.1) contrast(1.04) brightness(.58)}
   .support-hero-lead{max-width:31rem;margin-top:14px;font-size:1rem;line-height:1.62}
   .support-hero-proposition>.support-hero-cta{width:100%;max-width:320px}
   .support-planner{padding-top:28px;margin-bottom:42px}
