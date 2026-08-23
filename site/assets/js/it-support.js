@@ -1,4 +1,17 @@
 (() => {
+  const standard=document.querySelector('.support-standard');
+  const toggle=standard?.querySelector('[data-standard-toggle]');
+  if(!standard||!toggle)return;
+  standard.classList.add('is-enhanced');
+  toggle.addEventListener('click',()=>{
+    const expanded = toggle.getAttribute('aria-expanded') !== 'true';
+    standard.classList.toggle('is-expanded', expanded);
+    toggle.setAttribute('aria-expanded', String(expanded));
+    toggle.textContent = expanded ? 'Show fewer inclusions' : 'Show all standard inclusions';
+  });
+})();
+
+(() => {
   const dialog = document.getElementById('support-dialog');
   const closeButton = document.getElementById('support-dialog-close');
   const title = document.getElementById('support-dialog-title');

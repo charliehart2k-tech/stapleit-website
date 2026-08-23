@@ -1,9 +1,9 @@
 /* IT Support viewport hardening.
  *
  * This file owns route-specific phone/tablet containment and readability.
- * It is loaded only when .support-main is present, after the generated route
- * bundle, so the desktop design remains unchanged while narrow layouts get a
- * deliberately simpler composition.
+ * It is compiled into the IT Support route bundle and only applies to
+ * .support-main, so narrow layouts get deliberate containment without a
+ * JavaScript-dependent second stylesheet.
  */
 
 .support-main,
@@ -67,7 +67,7 @@
 
   .support-package-card{min-height:0}
   .support-planner-header{grid-template-columns:1fr;gap:18px}
-  .support-planner-header h3{max-width:13ch;font-size:clamp(2.8rem,8vw,4.35rem)}
+  .support-planner-header h3{max-width:13ch;font-size:clamp(2.6rem,6.5vw,3.6rem)}
   .support-planner-header>p:last-child{max-width:44rem;margin:0}
 
   .support-pack-results-list{grid-template-columns:1fr}
@@ -105,7 +105,7 @@
   .support-hero-proposition>.support-hero-cta{width:100%;max-width:320px}
   .support-planner{padding-top:36px}
   .support-planner-header{gap:14px;margin-bottom:22px;padding-inline:0}
-  .support-planner-header h3{font-size:clamp(2.25rem,11vw,3.15rem);line-height:1.04;letter-spacing:-.035em}
+  .support-planner-header h3{font-size:clamp(2rem,8.5vw,2.45rem);line-height:1.06;letter-spacing:-.03em}
   .support-planner-header>p:last-child{font-size:1rem;line-height:1.6}
 
   .support-package-finder,

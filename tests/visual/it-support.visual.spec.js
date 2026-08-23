@@ -103,6 +103,58 @@ for (const route of ['/', '/about-us/', '/it-services/it-support/']) {
   });
 }
 
+test('mobile top chapters keep deliberate rhythm and standard inclusions progressively disclose', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const initial = await page.evaluate(() => {
+    const hero = document.querySelector('.support-hero').getBoundingClientRect();
+    const copy = document.querySelector('.support-hero-copy').getBoundingClientRect();
+    const standard = document.querySelector('.support-standard').getBoundingClientRect();
+    const onboarding = document.querySelector('.support-onboarding').getBoundingClientRect();
+    const packageHeading = document.querySelector('.support-packages > .support-section-heading h2');
+    const visibleItems = [...document.querySelectorAll('.support-standard-group li')]
+      .filter(element => element.getClientRects().length).length;
+    return {
+      heroHeight: hero.height,
+      standardHeight: standard.height,
+      onboardingHeight: onboarding.height,
+      separation: standard.top - copy.bottom,
+      packageHeadingSize: Number.parseFloat(getComputedStyle(packageHeading).fontSize),
+      visibleItems
+    };
+  });
+
+  expect(initial.heroHeight).toBeLessThan(1120);
+  expect(initial.standardHeight).toBeLessThan(680);
+  expect(initial.onboardingHeight).toBeLessThan(1100);
+  expect(initial.separation).toBeGreaterThanOrEqual(12);
+  expect(initial.packageHeadingSize).toBeLessThanOrEqual(40);
+  expect(initial.visibleItems).toBe(8);
+
+  const toggle = page.locator('[data-standard-toggle]');
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await toggle.click();
+  await expect(toggle).toHaveText('Show fewer inclusions');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  const expandedItems = await page.locator('.support-standard-group li').evaluateAll(items => items.filter(item => item.getClientRects().length).length);
+  expect(expandedItems).toBe(16);
+});
+
+test('tablet chapter headings stay below hero scale', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const sizes = await page.evaluate(() => ({
+    onboarding: Number.parseFloat(getComputedStyle(document.querySelector('.support-onboarding h2')).fontSize),
+    packages: Number.parseFloat(getComputedStyle(document.querySelector('.support-packages > .support-section-heading h2')).fontSize),
+    planner: Number.parseFloat(getComputedStyle(document.querySelector('.support-planner-header h3')).fontSize)
+  }));
+  expect(sizes.onboarding).toBeLessThanOrEqual(58);
+  expect(sizes.packages).toBeLessThanOrEqual(58);
+  expect(sizes.planner).toBeLessThanOrEqual(52);
+});
+
 test('Cora does not expose backend mode labels to visitors', async ({ page }) => {
   await page.route('**/wp-admin/admin-ajax.php', async route => {
     const body = route.request().postData() || '';
