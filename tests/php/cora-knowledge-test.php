@@ -19,6 +19,8 @@ $checks = array(
     array( strpos( $default, 'Cora is a service guide' ) !== false, 'Cora boundaries are always present' ),
     array( strpos( $default, 'hello@stapleit.co.uk' ) !== false, 'approved public contact details are grounded' ),
     array( strpos( $security, 'additional Microsoft licensing' ) !== false, 'advanced Microsoft licensing caveat is grounded' ),
+    array( strpos( $security, 'Endpoint Detection and Response' ) !== false, 'Standard security controls are grounded' ),
+    array( strpos( $security, 'Conditional Access' ) !== false, 'identity controls are grounded for security questions' ),
     array( count( stapleit_cora_follow_up_suggestions( 'Microsoft 365 help' ) ) === 3, 'three contextual suggestions are returned' ),
     array( stapleit_cora_follow_up_suggestions( 'We want to use ChatGPT' )[0] === 'Which AI platform might fit?', 'AI questions receive AI-specific follow-up suggestions' ),
 );

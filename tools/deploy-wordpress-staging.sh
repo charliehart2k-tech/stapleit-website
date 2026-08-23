@@ -18,6 +18,26 @@ fail() {
   exit 1
 }
 
+as_deploy() {
+  if (( EUID == 0 )); then
+    sudo -n -u deploy "$@"
+  else
+    "$@"
+  fi
+}
+
+repo_git() {
+  as_deploy git -C "$REPO" "$@"
+}
+
+privileged() {
+  if (( EUID == 0 )); then
+    "$@"
+  else
+    sudo "$@"
+  fi
+}
+
 require_safe_absolute_path() {
   local label="$1"
   local path="$2"
@@ -41,16 +61,16 @@ require_safe_absolute_path BACKUP_DIR "$BACKUP_DIR"
 [[ "$WELL_KNOWN_DIR" == "$WP_ROOT"/.well-known ]] || fail "WELL_KNOWN_DIR does not match the configured WordPress root"
 
 [[ -d "$REPO/.git" ]] || fail "Git repository not found at $REPO"
-CURRENT_BRANCH="$(git -C "$REPO" branch --show-current)"
+CURRENT_BRANCH="$(repo_git branch --show-current)"
 [[ "$CURRENT_BRANCH" == "$EXPECTED_BRANCH" ]] || fail "expected branch $EXPECTED_BRANCH, found ${CURRENT_BRANCH:-detached HEAD}"
-[[ -z "$(git -C "$REPO" status --porcelain)" ]] || fail "repository contains uncommitted changes"
-UPSTREAM_HEAD="$(git -C "$REPO" rev-parse '@{upstream}' 2>/dev/null || true)"
+[[ -z "$(repo_git status --porcelain)" ]] || fail "repository contains uncommitted changes"
+UPSTREAM_HEAD="$(repo_git rev-parse '@{upstream}' 2>/dev/null || true)"
 [[ -n "$UPSTREAM_HEAD" ]] || fail "branch $EXPECTED_BRANCH has no configured upstream"
-[[ "$(git -C "$REPO" rev-parse HEAD)" == "$UPSTREAM_HEAD" ]] || fail "local $EXPECTED_BRANCH does not match its fetched upstream"
+[[ "$(repo_git rev-parse HEAD)" == "$UPSTREAM_HEAD" ]] || fail "local $EXPECTED_BRANCH does not match its fetched upstream"
 [[ ! -L "$THEME/assets" ]] || fail "theme assets path must not be a symbolic link"
 
 STAMP="$(date +%Y%m%d-%H%M%S)"
-VERSION="$(git -C "$REPO" rev-parse --short HEAD)"
+VERSION="$(repo_git rev-parse --short HEAD)"
 
 STATIC_ROUTE_SOURCES=(
   "it-services/index.html"
@@ -164,10 +184,10 @@ python3 "$REPO/tools/build-wordpress-templates.py" \
   --theme-root "$THEME" \
   --version "$VERSION"
 
-sudo mkdir -p "$MU_PLUGINS_DIR"
-sudo install -m 0644 -o deploy -g www-data "$STATIC_ROUTES_SOURCE" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
-sudo mkdir -p "$WELL_KNOWN_DIR"
-sudo install -m 0644 -o deploy -g www-data "$SOURCE/.well-known/security.txt" "$WELL_KNOWN_DIR/security.txt"
+privileged mkdir -p "$MU_PLUGINS_DIR"
+privileged install -m 0644 -o deploy -g www-data "$STATIC_ROUTES_SOURCE" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
+privileged mkdir -p "$WELL_KNOWN_DIR"
+privileged install -m 0644 -o deploy -g www-data "$SOURCE/.well-known/security.txt" "$WELL_KNOWN_DIR/security.txt"
 
 php -l "$THEME/front-page.php"
 php -l "$THEME/404.php"
@@ -351,7 +371,7 @@ if grep -Fq 'home-polish.js' "$THEME/front-page.php"; then
   exit 1
 fi
 
-sudo chown -R deploy:www-data "$THEME"
+privileged chown -R deploy:www-data "$THEME"
 find "$THEME" -type d -exec chmod 755 {} \;
 find "$THEME" -type f -exec chmod 644 {} \;
 
@@ -363,8 +383,8 @@ if (( ${#php_fpm_units[@]} == 0 )); then
   fail "no active PHP-FPM service was found; deployed PHP could remain stale in OPcache"
 fi
 for php_fpm_unit in "${php_fpm_units[@]}"; do
-  sudo systemctl reload "$php_fpm_unit"
-  sudo systemctl is-active --quiet "$php_fpm_unit" \
+  privileged systemctl reload "$php_fpm_unit"
+  privileged systemctl is-active --quiet "$php_fpm_unit" \
     || fail "$php_fpm_unit did not remain active after reload"
   echo "Reloaded $php_fpm_unit to activate deployed PHP."
 done

@@ -81,6 +81,8 @@ jobs:
           bash -n tools/deploy-wordpress-staging.sh
           bash -n tools/audit-vps.sh
           bash -n tools/prune-theme-backups.sh
+          bash -n tools/install-cora-warm-service.sh
+          bash -n ops/systemd/stapleit-cora-warm.sh
 
       - name: Validate Nginx hardening baseline
         run: |

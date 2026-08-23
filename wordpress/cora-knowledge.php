@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function stapleit_cora_knowledge_version() {
-    return '2026-08-22.2';
+    return '2026-08-23.1';
 }
 
 function stapleit_cora_knowledge_records() {
@@ -23,7 +23,7 @@ function stapleit_cora_knowledge_records() {
         ),
         'packages' => array(
             'keywords' => array( 'package', 'price', 'cost', 'support', 'staff', 'team', 'basic', 'standard', 'premium', 'sole trader' ),
-            'content'  => 'Sole trader support is tailored and price on application. Basic starts from £35 per staff member, per month for teams of five or more. Standard starts from £55 per staff member, per month for teams of five or more and adds stronger security, backup and identity protection; Microsoft 365 Business Premium or equivalent licensing is required and is sold separately unless specifically included. Premium starts from £75 per staff member, per month for teams of five or more and includes Microsoft 365 Business Premium plus enhanced Microsoft security and data protection. Microsoft Defender Suite and Microsoft Purview Suite features are managed and supported where required, but any additional Microsoft licensing required to enable those features is charged separately. A written proposal confirms final scope, eligibility and price.',
+            'content'  => 'Sole trader support is tailored and price on application. Basic starts from £35 per staff member, per month for teams of five or more and covers day-to-day helpdesk support plus monitoring, patching, device management and business-grade antivirus. Standard starts from £55 per staff member, per month for teams of five or more and includes everything in Basic plus Endpoint Detection and Response, advanced threat detection and response, email security, Multi-Factor Authentication, Conditional Access, privileged account protection, LastPass, Microsoft 365 or Google Workspace backup, Exclaimer and regular security reviews; Microsoft 365 Business Premium or equivalent licensing is required and is sold separately unless specifically included. Premium starts from £75 per staff member, per month for teams of five or more and includes everything in Standard plus Microsoft 365 Business Premium, DNS and web protection, enhanced Microsoft 365 security, Defender for Business and Defender for Office 365 management, stronger access controls and Microsoft Purview configuration where required. Microsoft Defender Suite and Microsoft Purview Suite features are managed and supported where required, but any additional Microsoft licensing required to enable those advanced features is charged separately. A written proposal confirms final scope, eligibility and price.',
         ),
         'onboarding' => array(
             'keywords' => array( 'move', 'switch', 'provider', 'onboard', 'onboarding', 'changeover', 'start', 'audit', 'review' ),
@@ -39,7 +39,7 @@ function stapleit_cora_knowledge_records() {
         ),
         'security' => array(
             'keywords' => array( 'security', 'secure', 'secur', 'phishing', 'password', 'identity', 'antivirus', 'ransomware', 'cyber', 'breach', 'compromise' ),
-            'content'  => 'Staple IT offers layered cyber security across devices, email, identities and online services. The Security pack can add stronger monitoring and protection. For a suspected active compromise or cyber incident, the safe next step is to call Staple IT on 01372 309 707; Cora must not ask for credentials or attempt incident response in chat.',
+            'content'  => 'Staple IT offers layered cyber security across devices, email, identities and online services. Standard includes published controls such as Endpoint Detection and Response, advanced threat detection and automated response, anti-phishing and spam protection, malicious link and attachment scanning, spoofing protection, Multi-Factor Authentication, Conditional Access and privileged account protection. Premium adds enhanced Microsoft 365 security, DNS and web protection and stronger Microsoft security and data-protection management. The optional Security pack can add stronger monitoring and protection when the core package is not enough. For a suspected active compromise or cyber incident, the safe next step is to call Staple IT on 01372 309 707; Cora must not ask for credentials or attempt incident response in chat.',
         ),
         'packs' => array(
             'keywords' => array( 'server', 'azure', 'wifi', 'wi-fi', 'network', 'firewall', 'compliance', 'policy', 'cyber essentials', 'ai', 'strategy', 'roadmap', 'disaster', 'recovery', 'add-on', 'pack' ),
