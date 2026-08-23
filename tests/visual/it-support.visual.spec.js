@@ -56,6 +56,13 @@ for (const [name, width, height] of viewports) {
       const packageColumns = packageGrid
         ? getComputedStyle(packageGrid).gridTemplateColumns.split(' ').filter(Boolean).length
         : 0;
+      const heroStage = document.querySelector('.support-hero-shell');
+      const heroMotion = document.querySelector('.support-hero-motion');
+      const heroCopy = document.querySelector('.support-hero-copy');
+      const standard = document.querySelector('.support-standard');
+      const tierBasic = document.querySelector('.support-package-basic');
+      const tierStandard = document.querySelector('.support-package-standard');
+      const tierPremium = document.querySelector('.support-package-premium');
       const publicCopy = document.body.innerText;
       return {
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -64,6 +71,12 @@ for (const [name, width, height] of viewports) {
         smallestControl: controls.length ? Math.min(...controls) : 0,
         escaped,
         packageColumns,
+        heroMotionPresent: heroMotion instanceof HTMLVideoElement && /liquid-wave\.mp4/.test(heroMotion.querySelector('source')?.getAttribute('src') || ''),
+        heroStageRadius: Number.parseFloat(getComputedStyle(heroStage).borderTopLeftRadius),
+        heroStageOverflow: getComputedStyle(heroStage).overflow,
+        heroCopyBlur: getComputedStyle(heroCopy).backdropFilter || getComputedStyle(heroCopy).webkitBackdropFilter || '',
+        standardBlur: getComputedStyle(standard).backdropFilter || getComputedStyle(standard).webkitBackdropFilter || '',
+        packageAccents: [tierBasic,tierStandard,tierPremium].map(el => getComputedStyle(el).getPropertyValue('--support-card-accent').trim()),
         coraPanelInsideViewport: (() => {
           const rect = document.querySelector('.cora-panel').getBoundingClientRect();
           return rect.left >= -1 && rect.right <= innerWidth + 1 && rect.top >= -1 && rect.bottom <= innerHeight + 1;
@@ -78,6 +91,12 @@ for (const [name, width, height] of viewports) {
     expect(contract.questionVisible).toBe(true);
     expect(contract.smallestControl).toBeGreaterThanOrEqual(44);
     expect(contract.escaped).toEqual([]);
+    expect(contract.heroMotionPresent).toBe(true);
+    expect(contract.heroStageRadius).toBeGreaterThanOrEqual(width <= 700 ? 24 : 34);
+    expect(contract.heroStageOverflow).toBe('hidden');
+    expect(contract.heroCopyBlur).toContain('blur');
+    expect(contract.standardBlur).toContain('blur');
+    expect(contract.packageAccents).toEqual(['#4f85ff','#22c55e','#a855f7']);
     expect(contract.coraPanelInsideViewport).toBe(true);
     expect(contract.coraPanelWidth).toBeGreaterThanOrEqual(width <= 320 ? 270 : width <= 840 ? 280 : 360);
     expect(contract.exposesImplementationCopy).toBe(false);
@@ -88,6 +107,17 @@ for (const [name, width, height] of viewports) {
     await page.screenshot({ path: `test-results/it-support-${name}.png`, fullPage: true, animations: 'disabled' });
   });
 }
+
+
+test('IT Support liquid stage respects reduced motion', async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1366, height: 768 } });
+  const page = await context.newPage();
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const video = page.locator('.support-hero-motion');
+  await expect(video).toHaveCount(1);
+  await expect.poll(() => video.evaluate(element => element.paused)).toBe(true);
+  await context.close();
+});
 
 for (const route of ['/', '/about-us/', '/it-services/it-support/']) {
   test(`Cora is usable on ${route}`, async ({ page }) => {

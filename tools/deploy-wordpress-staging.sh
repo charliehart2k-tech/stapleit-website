@@ -220,6 +220,8 @@ test -s "$THEME/assets/css/cora.css"
 # Current IT Support contract: semantic hero, package/planner flow and Cora integration.
 grep -Fq 'class="support-hero-shell"' "$THEME/static-it-support.php"
 grep -Fq 'id="support-hero-title"' "$THEME/static-it-support.php"
+grep -Fq 'class="support-hero-motion hero-liquid-motion"' "$THEME/static-it-support.php"
+grep -Fq 'assets/media/liquid-wave.mp4' "$THEME/static-it-support.php"
 grep -Fq 'class="support-hero-unlimited">Unlimited</span>' "$THEME/static-it-support.php"
 grep -Fq 'class="support-standard-accent">as standard</span>' "$THEME/static-it-support.php"
 grep -Fq 'class="support-packages-accent">support</span>' "$THEME/static-it-support.php"

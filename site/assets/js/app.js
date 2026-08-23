@@ -363,9 +363,10 @@
   if (!(video instanceof HTMLVideoElement)) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const saveData = Boolean(navigator.connection?.saveData);
 
   const syncPlayback = () => {
-    if (reducedMotion.matches || document.hidden) {
+    if (reducedMotion.matches || saveData || document.hidden) {
       video.pause();
       return;
     }
