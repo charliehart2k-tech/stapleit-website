@@ -193,7 +193,10 @@
   close.addEventListener('click', () => setOpen(false));
   document.addEventListener('click', event => {
     const contextualTrigger = event.target.closest('[data-cora-open]');
-    if (contextualTrigger) setOpen(true, { focusInput: false });
+    if (!contextualTrigger) return;
+    const seededMessage = contextualTrigger.dataset.coraMessage?.trim();
+    if (seededMessage && !input.value.trim()) input.value = seededMessage;
+    setOpen(true, { focusInput: false });
   });
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && root.classList.contains('is-open')) setOpen(false);

@@ -324,32 +324,41 @@ function stapleit_cora_pack_plan( $answers ) {
     );
     $likely = array();
     $consider = array();
+    $answered = array();
     foreach ( $pack_names as $key => $name ) {
-        $answer = (string) ( $answers[ $key ] ?? '' );
+        if ( ! array_key_exists( $key, $answers ) ) {
+            continue;
+        }
+        $answer = (string) $answers[ $key ];
         if ( ! in_array( $answer, array( 'yes', 'no', 'unsure' ), true ) ) {
             return array();
         }
+        $answered[] = $name;
         if ( $answer === 'yes' ) {
             $likely[] = $name;
         } elseif ( $answer === 'unsure' ) {
             $consider[] = $name;
         }
     }
+    if ( ! $answered ) {
+        return array();
+    }
 
     $parts = array();
     if ( $likely ) {
-        $parts[] = 'Likely useful: ' . implode( ', ', $likely ) . '.';
+        $parts[] = 'Worth discussing first: ' . implode( ', ', $likely ) . '.';
     }
     if ( $consider ) {
-        $parts[] = 'Worth discussing: ' . implode( ', ', $consider ) . '.';
+        $parts[] = 'Worth clarifying: ' . implode( ', ', $consider ) . '.';
     }
     if ( ! $parts ) {
-        $parts[] = 'No optional pack was selected as likely or uncertain.';
+        $parts[] = 'Nothing discussed so far points clearly to an optional pack.';
     }
+    $known_scope = 'Only these areas were discussed: ' . implode( ', ', $answered ) . '. Unasked areas are unknown and must not be described as unnecessary, absent or already covered.';
     return array(
-        'label'    => 'Add-on pack result',
-        'facts'    => 'Fixed website result. ' . implode( ' ', $parts ) . ' Every pack is price on application.',
-        'fallback' => implode( ' ', $parts ) . ' These are prompts for a conversation rather than a quote; a free IT audit can confirm whether the current package is already enough.',
+        'label'    => 'Add-on conversation result',
+        'facts'    => 'Fixed website suggestion based on a partial conversation. ' . implode( ' ', $parts ) . ' ' . $known_scope . ' Every pack is price on application.',
+        'fallback' => implode( ' ', $parts ) . ' This is only a starting point from what you have told Cora so far, not a complete assessment or quote.',
     );
 }
 
@@ -363,7 +372,7 @@ function stapleit_handle_cora_planner_explain_ajax() {
     $answers      = is_array( $answers ) ? $answers : array();
     $plan         = $planner_type === 'package' ? stapleit_cora_package_plan( $answers ) : ( $planner_type === 'packs' ? stapleit_cora_pack_plan( $answers ) : array() );
     if ( ! $plan ) {
-        wp_send_json( array( 'ok' => false, 'message' => 'Please complete the questions before asking Cora to explain the result.' ), 400 );
+        wp_send_json( array( 'ok' => false, 'message' => 'Tell Cora about at least one relevant area before asking for a suggestion.' ), 400 );
     }
 
     $result = array(

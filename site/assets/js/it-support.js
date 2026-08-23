@@ -166,150 +166,6 @@
   });
 })();
 
-(() => {
-  const form = document.querySelector('[data-pack-finder]');
-  if (!(form instanceof HTMLFormElement)) return;
-
-  const stage = form.querySelector('[data-pack-finder-stage]');
-  const questions = [...form.querySelectorAll('[data-pack-question]')];
-  const count = form.querySelector('[data-pack-finder-count]');
-  const progress = form.querySelector('[data-pack-finder-progress]');
-  const backButton = form.querySelector('[data-pack-finder-back]');
-  const nextButton = form.querySelector('[data-pack-finder-next]');
-  const results = form.querySelector('[data-pack-results]');
-  const resultsHeading = form.querySelector('#support-pack-results-title');
-  const resultsSummary = form.querySelector('[data-pack-results-summary]');
-  const resultsEmpty = form.querySelector('[data-pack-results-empty]');
-  const reviewButton = form.querySelector('[data-pack-finder-review]');
-  const resultRows = [...form.querySelectorAll('[data-pack-result]')];
-  const aiPanel = form.querySelector('[data-packs-ai]');
-  const aiCopy = form.querySelector('[data-packs-ai-copy]');
-
-  if (
-    !stage || !questions.length || !count || !(progress instanceof HTMLProgressElement) ||
-    !(backButton instanceof HTMLButtonElement) || !(nextButton instanceof HTMLButtonElement) ||
-    !results || !resultsHeading || !resultsSummary || !resultsEmpty ||
-    !(reviewButton instanceof HTMLButtonElement) || resultRows.length !== questions.length || !aiPanel || !aiCopy
-  ) return;
-
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let currentQuestion = 0;
-
-  const selectedAnswer = question => question.querySelector('input[type="radio"]:checked')?.value || '';
-
-  const updateControls = () => {
-    count.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
-    progress.value = currentQuestion + 1;
-    progress.textContent = `${currentQuestion + 1} of ${questions.length}`;
-    backButton.hidden = currentQuestion === 0;
-    nextButton.disabled = !selectedAnswer(questions[currentQuestion]);
-    nextButton.textContent = currentQuestion === questions.length - 1 ? 'See my results' : 'Continue';
-  };
-
-  const showQuestion = (index, { direction = 'forward', focus = true } = {}) => {
-    currentQuestion = Math.max(0, Math.min(questions.length - 1, index));
-    form.dataset.packDirection = direction;
-
-    questions.forEach((question, questionIndex) => {
-      question.hidden = questionIndex !== currentQuestion;
-    });
-
-    stage.hidden = false;
-    results.hidden = true;
-    aiPanel.hidden = true;
-    updateControls();
-
-    if (focus) {
-      window.requestAnimationFrame(() => questions[currentQuestion].querySelector('legend')?.focus());
-    }
-  };
-
-  const resultSummaryText = (likelyCount, considerCount) => {
-    const packWord = countValue => countValue === 1 ? 'pack' : 'packs';
-
-    if (likelyCount && considerCount) {
-      return `${likelyCount} ${packWord(likelyCount)} look useful, with ${considerCount} more worth a chat. You can explore them below.`;
-    }
-    if (likelyCount) {
-      return `${likelyCount} ${packWord(likelyCount)} look useful for the way you work. You can explore them below.`;
-    }
-    if (considerCount) {
-      return `${considerCount} ${packWord(considerCount)} may be worth a chat because you selected Not sure.`;
-    }
-    return 'Nothing in your answers points clearly to an add-on pack at the moment.';
-  };
-
-  const showResults = () => {
-    let likelyCount = 0;
-    let considerCount = 0;
-
-    resultRows.forEach(row => {
-      const key = row.dataset.packResult;
-      const question = questions.find(candidate => candidate.dataset.packKey === key);
-      const answer = question ? selectedAnswer(question) : 'no';
-      const status = row.querySelector('[data-pack-result-status]');
-      const matched = answer === 'yes' || answer === 'unsure';
-
-      row.hidden = !matched;
-      if (!matched || !status) return;
-
-      if (answer === 'yes') {
-        likelyCount += 1;
-        row.dataset.match = 'likely';
-        status.textContent = 'Looks useful';
-      } else {
-        considerCount += 1;
-        row.dataset.match = 'consider';
-        status.textContent = 'Worth a chat';
-      }
-    });
-
-    resultsSummary.textContent = resultSummaryText(likelyCount, considerCount);
-    resultsEmpty.hidden = likelyCount + considerCount > 0;
-    const packSummary = resultRows
-      .filter(row => !row.hidden)
-      .map(row => `${row.querySelector('h4')?.textContent?.trim()}: ${row.querySelector('[data-pack-result-status]')?.textContent?.trim()}`)
-      .filter(Boolean);
-    window.stapleitPlanner = window.stapleitPlanner || {};
-    window.stapleitPlanner.packs = packSummary;
-    window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
-    window.stapleitTrack?.('pack_finder_completed');
-    const answerPayload = Object.fromEntries(questions.map(question => [question.dataset.packKey, selectedAnswer(question)]));
-    window.stapleitExplainPlanner?.('packs', answerPayload, aiPanel, aiCopy);
-    stage.hidden = true;
-    results.hidden = false;
-    delete form.dataset.packDirection;
-    window.requestAnimationFrame(() => resultsHeading.focus({ preventScroll: false }));
-  };
-
-  questions.forEach(question => {
-    question.addEventListener('change', updateControls);
-  });
-
-  nextButton.addEventListener('click', () => {
-    if (!selectedAnswer(questions[currentQuestion])) return;
-    if (currentQuestion === 0) window.stapleitTrack?.('pack_finder_started');
-    if (currentQuestion === questions.length - 1) {
-      showResults();
-      return;
-    }
-    showQuestion(currentQuestion + 1);
-  });
-
-  backButton.addEventListener('click', () => showQuestion(currentQuestion - 1, { direction: 'back' }));
-  reviewButton.addEventListener('click', () => showQuestion(questions.length - 1, { direction: 'back' }));
-
-  form.addEventListener('submit', event => event.preventDefault());
-
-  questions.forEach((question, index) => {
-    question.hidden = index !== 0;
-  });
-  results.hidden = true;
-  form.classList.add('is-enhanced');
-  showQuestion(0, { focus: false });
-
-  if (reducedMotion.matches) delete form.dataset.packDirection;
-})();
 
 (() => {
   const endpoint = '/wp-admin/admin-ajax.php';
@@ -385,18 +241,18 @@
     const unsure = keys.filter(key => answers?.[key] === 'unsure');
 
     if (!likely.length && !unsure.length) {
-      return 'Nothing in your answers points strongly to an add-on right now. That is a useful result in itself — it means the core support package may already cover what you need without adding extra services.';
+      return 'Nothing you’ve told me so far points strongly to an add-on. That does not rule out other needs — it just means I would not add something based on this conversation alone.';
     }
 
     const parts = [];
     if (likely.length) {
       const names = naturalList(likely.map(key => packLabels[key]));
       const reasons = naturalList(likely.slice(0, 3).map(key => packReasons[key]));
-      parts.push(`${names} ${likely.length === 1 ? 'stands' : 'stand'} out because ${reasons}.`);
+      parts.push(`${names} ${likely.length === 1 ? 'stands' : 'stand'} out from what you’ve told me because ${reasons}.`);
     }
     if (unsure.length) {
       const names = naturalList(unsure.map(key => packLabels[key]));
-      parts.push(`You marked ${names} as Not sure, so ${unsure.length === 1 ? 'it is' : 'they are'} shown as worth discussing rather than a definite recommendation.`);
+      parts.push(`You were not sure about ${names}, so I’m treating ${unsure.length === 1 ? 'it' : 'them'} as worth clarifying rather than a definite recommendation.`);
     }
     return parts.join(' ');
   };

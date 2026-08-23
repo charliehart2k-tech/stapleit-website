@@ -289,21 +289,34 @@
 <section class="support-section support-packs" aria-labelledby="support-packs-title">
 <header class="support-section-heading support-section-heading--wide">
 <h2 id="support-packs-title">Add-ons, if you need them</h2>
-<p class="support-section-lead"><strong>Not every business needs every extra. Answer nine quick questions and we’ll highlight only the packs that look relevant. Choose Not sure whenever you need to.</strong></p>
+<p class="support-section-lead"><strong>Not every business needs every extra. Cora will ask a few things that seem relevant and suggest areas worth discussing. You can stop whenever — this is a starting point, not an assessment.</strong></p>
 </header>
 <form class="support-pack-finder" data-pack-finder novalidate>
 <header class="support-pack-finder-header">
 <div>
-<h3>A few quick questions about your setup</h3>
-<p>No technical knowledge needed. If you are unsure about anything, choose <strong>Not sure</strong> and keep going.</p>
+<h3>Have a quick chat with Cora</h3>
+<p>Start with what brought you here. Cora will follow the useful thread and skip anything that does not seem relevant.</p>
 </div>
 </header>
-<noscript><p class="support-pack-finder-noscript">The guided result needs JavaScript, but every question and pack remains available below.</p></noscript>
+<noscript><p class="support-pack-finder-noscript">The guided conversation needs JavaScript, but every add-on pack remains available to browse below.</p></noscript>
+<div class="support-pack-cora-intro" aria-live="polite"><span class="support-cora-insight-mark" aria-hidden="true"></span><div><strong>Cora</strong><p data-pack-cora-line>I’ll ask only what seems useful. You can stop as soon as you have enough to work with.</p></div></div>
 <div class="support-pack-finder-stage" data-pack-finder-stage>
-<div class="support-pack-finder-progress">
-<p id="support-pack-finder-count" data-pack-finder-count>Question 1 of 9</p>
-<progress data-pack-finder-progress value="1" max="9" aria-labelledby="support-pack-finder-count">1 of 9</progress>
+<div class="support-pack-finder-progress support-pack-finder-progress--conversation">
+<p id="support-pack-finder-count" data-pack-finder-count>Cora · start wherever feels closest</p>
+<span class="support-pack-conversation-pulse" aria-hidden="true"></span>
 </div>
+
+<fieldset class="support-pack-question support-pack-question--gateway" data-pack-question data-pack-gateway data-pack-key="focus" aria-describedby="support-pack-question-focus-help">
+<legend tabindex="-1">What made you stop here?</legend>
+<p class="support-pack-question-help" id="support-pack-question-focus-help">Pick the closest one. It only tells Cora where to start — it does not lock you into anything.</p>
+<div class="support-pack-choices support-pack-choices--focus">
+<label><input type="radio" name="pack-focus" value="security"><span>Security or compliance</span></label>
+<label><input type="radio" name="pack-focus" value="infrastructure"><span>Servers, cloud or network</span></label>
+<label><input type="radio" name="pack-focus" value="future"><span>AI, planning or resilience</span></label>
+<label><input type="radio" name="pack-focus" value="guide"><span>I’m not sure — guide me</span></label>
+</div>
+<button class="support-pack-free-chat" type="button" data-cora-open>Tell Cora in your own words instead</button>
+</fieldset>
 
 <fieldset class="support-pack-question" data-pack-question data-pack-key="server" aria-describedby="support-pack-question-server-help">
 <legend tabindex="-1">Is there a physical Windows server at your workplace or another site?</legend>
@@ -406,33 +419,34 @@
 
 <div class="support-pack-finder-actions" data-pack-finder-actions>
 <button class="support-pack-finder-button support-pack-finder-button--back" type="button" data-pack-finder-back>Back</button>
-<button class="support-pack-finder-button support-pack-finder-button--next" type="button" data-pack-finder-next disabled>Continue</button>
+<button class="support-pack-finder-button support-pack-finder-button--suggest" type="button" data-pack-finder-suggest hidden>Show suggestions now</button>
+<button class="support-pack-finder-button support-pack-finder-button--next" type="button" data-pack-finder-next disabled>Start there</button>
 </div>
 </div>
 
 <section class="support-pack-results" data-pack-results hidden aria-labelledby="support-pack-results-title" aria-live="polite">
 <header class="support-pack-results-header">
-<p class="support-pack-results-step">Your answers</p>
-<h3 id="support-pack-results-title" tabindex="-1">A useful starting point</h3>
+<p class="support-pack-results-step">Cora’s suggestion</p>
+<h3 id="support-pack-results-title" tabindex="-1">What stands out so far</h3>
 <p data-pack-results-summary></p>
 </header>
-<div class="support-cora-insight" data-packs-ai hidden><span class="support-cora-insight-mark" aria-hidden="true"></span><div><strong>Why these may help</strong><p data-packs-ai-copy></p></div></div>
+<div class="support-cora-insight" data-packs-ai hidden><span class="support-cora-insight-mark" aria-hidden="true"></span><div><strong>Why these stand out</strong><p data-packs-ai-copy></p></div></div>
 <div class="support-pack-results-list">
-<article class="support-pack-result" data-pack-result="server" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Server pack</h4><p>A physical Windows server needs its own monitoring, patching, backup oversight and lifecycle planning.</p></div><a href="#support-pack-server">Explore pack</a></article>
-<article class="support-pack-result" data-pack-result="azure" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Azure pack</h4><p>Azure resources benefit from dedicated monitoring, maintenance, access control and cost reviews.</p></div><a href="#support-pack-azure">Explore pack</a></article>
-<article class="support-pack-result" data-pack-result="network" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Network pack</h4><p>Managed firewalls, switches and Wi-Fi access points need active monitoring and configuration.</p></div><a href="#support-pack-network">Explore pack</a></article>
-<article class="support-pack-result" data-pack-result="security" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Security pack</h4><p>This adds stronger protection and monitoring across devices, accounts, email and web use.</p></div><a href="#support-pack-security">Explore pack</a></article>
-<article class="support-pack-result" data-pack-result="governance" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Governance &amp; compliance pack</h4><p>This helps with IT policies, documentation, evidence and responses to customer or insurer checks.</p></div><a href="#support-pack-governance">Explore pack</a></article>
-<article class="support-pack-result" data-pack-result="cyber-essentials" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Cyber Essentials pack</h4><p>This supports readiness, remediation and application preparation for Cyber Essentials or Plus.</p></div><a href="#support-pack-cyber-essentials">Explore pack</a></article>
-<article class="support-pack-result" data-pack-result="ai" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>AI pack</h4><p>This covers platform choice, secure setup, staff guidance and ongoing administration.</p></div><a href="#support-pack-ai">Explore pack</a></article>
-<article class="support-pack-result" data-pack-result="strategy" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Strategy pack</h4><p>This adds regular reviews, budgeting, supplier support and a practical technology roadmap.</p></div><a href="#support-pack-strategy">Explore pack</a></article>
-<article class="support-pack-result" data-pack-result="disaster-recovery" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Disaster recovery pack</h4><p>This creates and tests a structured recovery plan for critical systems and data.</p></div><a href="#support-pack-disaster-recovery">Explore pack</a></article>
+<article class="support-pack-result" data-pack-result="server" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Server pack</h4><p>A physical Windows server needs its own monitoring, patching, backup oversight and lifecycle planning.</p></div><a href="#support-pack-server">See what it covers</a></article>
+<article class="support-pack-result" data-pack-result="azure" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Azure pack</h4><p>Azure resources benefit from dedicated monitoring, maintenance, access control and cost reviews.</p></div><a href="#support-pack-azure">See what it covers</a></article>
+<article class="support-pack-result" data-pack-result="network" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Network pack</h4><p>Managed firewalls, switches and Wi-Fi access points need active monitoring and configuration.</p></div><a href="#support-pack-network">See what it covers</a></article>
+<article class="support-pack-result" data-pack-result="security" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Security pack</h4><p>This adds stronger protection and monitoring across devices, accounts, email and web use.</p></div><a href="#support-pack-security">See what it covers</a></article>
+<article class="support-pack-result" data-pack-result="governance" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Governance &amp; compliance pack</h4><p>This helps with IT policies, documentation, evidence and responses to customer or insurer checks.</p></div><a href="#support-pack-governance">See what it covers</a></article>
+<article class="support-pack-result" data-pack-result="cyber-essentials" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Cyber Essentials pack</h4><p>This supports readiness, remediation and application preparation for Cyber Essentials or Plus.</p></div><a href="#support-pack-cyber-essentials">See what it covers</a></article>
+<article class="support-pack-result" data-pack-result="ai" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>AI pack</h4><p>This covers platform choice, secure setup, staff guidance and ongoing administration.</p></div><a href="#support-pack-ai">See what it covers</a></article>
+<article class="support-pack-result" data-pack-result="strategy" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Strategy pack</h4><p>This adds regular reviews, budgeting, supplier support and a practical technology roadmap.</p></div><a href="#support-pack-strategy">See what it covers</a></article>
+<article class="support-pack-result" data-pack-result="disaster-recovery" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Disaster recovery pack</h4><p>This creates and tests a structured recovery plan for critical systems and data.</p></div><a href="#support-pack-disaster-recovery">See what it covers</a></article>
 </div>
-<p class="support-pack-results-empty" data-pack-results-empty hidden>No add-on stands out from these answers. Your current support package may be enough, and a free audit can confirm it.</p>
-<p class="support-pack-results-note">This is a guide, not a quote. Your answers are not stored, and we’ll confirm the final fit and price with you before anything is added.</p>
+<p class="support-pack-results-empty" data-pack-results-empty hidden>Nothing you’ve told Cora so far makes an add-on obvious. That does not mean there are no gaps — just that she would not add something for the sake of it.</p>
+<p class="support-pack-results-note">Cora has only used what you’ve told her here. This is not a complete assessment or a quote; we’ll confirm anything specific before anything is added.</p>
 <div class="support-pack-results-actions">
-<button class="support-pack-finder-button support-pack-finder-button--back" type="button" data-pack-finder-review>Review answers</button>
-<a class="support-pack-finder-button support-pack-finder-button--next" href="#support-planner-handoff">Use these results</a>
+<button class="support-pack-finder-button support-pack-finder-button--back" type="button" data-pack-finder-review>Change what I told Cora</button>
+<button class="support-pack-finder-button support-pack-finder-button--next" type="button" data-cora-open data-packs-cora-chat>Chat to Cora about these</button>
 </div>
 </section>
 </form>
@@ -595,5 +609,6 @@
 <script src="/assets/js/app.js"></script>
 <script src="/assets/js/forms.js"></script>
 <script src="/assets/js/it-support.js"></script>
+<script src="/assets/js/it-support-packs.js"></script>
 </body>
 </html>

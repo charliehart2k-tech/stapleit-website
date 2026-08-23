@@ -4014,6 +4014,50 @@ body.support-dialog-open{overflow:hidden}
 .support-planner .support-planner-handoff label{grid-column:1;gap:9px;font-size:.9rem;line-height:1.4}
 .support-planner .support-planner-handoff>a{grid-column:2;grid-row:1 / span 2;align-self:center}
 
+/* source: it-support-packs-conversation.css */
+/* Cora-led adaptive add-on conversation. */
+.support-packs .support-pack-finder{--planner-accent:#22c55e}
+.support-pack-cora-intro{display:grid;grid-template-columns:auto minmax(0,1fr);gap:13px;align-items:start;margin:0 44px;padding:22px 0 4px;border-bottom:1px solid rgba(255,255,255,.07)}
+.support-pack-cora-intro strong{display:block;color:#f1f4f7;font:700 .92rem/1.35 var(--font-display)}
+.support-pack-cora-intro p{max-width:62ch;margin:4px 0 0;color:#aeb8c4;font-size:1rem;line-height:1.55}
+.support-packs .support-pack-finder-progress--conversation{display:grid;grid-template-columns:auto minmax(120px,1fr);gap:18px;align-items:center;padding-top:21px}
+.support-pack-conversation-pulse{position:relative;height:3px;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.07)}
+.support-pack-conversation-pulse::after{content:"";position:absolute;inset:0 auto 0 0;width:34%;border-radius:inherit;background:linear-gradient(90deg,rgba(34,197,94,.18),#22c55e,rgba(79,133,255,.7));box-shadow:0 0 18px rgba(34,197,94,.2);animation:supportConversationPulse 4.8s ease-in-out infinite alternate}
+.support-packs .support-pack-question--gateway legend{max-width:18ch}
+.support-packs .support-pack-choices--focus{grid-template-columns:repeat(2,minmax(0,1fr))}
+.support-packs .support-pack-choices--focus label{min-height:64px}
+.support-pack-free-chat{min-height:44px;margin-top:14px;padding:0;border:0;background:none;color:#a9d7ff;font:700 .9rem/1.4 var(--font-display);text-decoration:underline;text-decoration-color:rgba(169,215,255,.34);text-underline-offset:4px;cursor:pointer}
+.support-pack-free-chat:focus-visible{outline:2px solid var(--support);outline-offset:4px;border-radius:4px}
+.support-packs .support-pack-finder-button--suggest{margin-right:auto;border-color:rgba(79,133,255,.2);background:rgba(79,133,255,.045);color:#cbdcff}
+.support-packs .support-pack-results-step{color:#a8d7b7}
+.support-packs .support-pack-results-header>p:last-child{max-width:68ch}
+.support-packs .support-pack-result-status{letter-spacing:.01em}
+.support-packs .support-pack-result>a{min-height:44px;display:inline-flex;align-items:center}
+.support-packs .support-pack-results-note{max-width:70ch}
+@media(max-width:700px){
+  .support-pack-cora-intro{margin:0 17px;padding:18px 0 2px;gap:11px}
+  .support-pack-cora-intro p{font-size:.95rem;line-height:1.5}
+  .support-packs .support-pack-finder-progress--conversation{grid-template-columns:1fr;gap:8px;padding-top:18px}
+  .support-pack-conversation-pulse{height:2px}
+  .support-packs .support-pack-question{padding-block:21px 18px}
+  .support-packs .support-pack-question legend{font-size:clamp(1.55rem,7.2vw,1.95rem)}
+  .support-packs .support-pack-question-help{margin-top:11px;line-height:1.52}
+  .support-packs .support-pack-choices{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:17px}
+  .support-packs .support-pack-choices label{min-height:50px;padding:10px 9px;justify-content:center;text-align:center}
+  .support-packs .support-pack-choices label input{flex:0 0 17px;width:17px;height:17px}
+  .support-packs .support-pack-choices--focus{grid-template-columns:1fr 1fr}
+  .support-packs .support-pack-choices--focus label{min-height:60px;justify-content:flex-start;text-align:left;padding-inline:12px}
+  .support-pack-free-chat{margin-top:12px}
+  .support-packs .support-pack-finder.is-enhanced .support-pack-finder-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-inline:17px}
+  .support-packs .support-pack-finder-actions .support-pack-finder-button{width:100%;min-width:0;margin:0}
+  .support-packs .support-pack-finder-actions .support-pack-finder-button--suggest{grid-column:1/-1;grid-row:1}
+  .support-packs .support-pack-finder-actions .support-pack-finder-button--back[hidden]+.support-pack-finder-button--suggest[hidden]+.support-pack-finder-button--next{grid-column:1/-1}
+  .support-packs .support-pack-results-actions{display:grid;grid-template-columns:1fr;gap:8px}
+  .support-packs .support-pack-results-actions .support-pack-finder-button{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.support-pack-conversation-pulse::after{animation:none;width:56%}}
+@keyframes supportConversationPulse{from{transform:translateX(-18%);width:28%}to{transform:translateX(180%);width:42%}}
+
 /* source: it-support-responsive.css */
 /* IT Support viewport hardening.
  *

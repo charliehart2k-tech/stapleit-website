@@ -379,7 +379,7 @@ test('mobile planner fallback stays useful and contextual Cora opens before the 
   expect(state.right).toBeLessThanOrEqual(391);
 });
 
-test('add-on fallback explains the selected packs without generic audit copy', async ({ page }) => {
+test('Cora add-on conversation adapts and suggests without a nine-question checklist', async ({ page }) => {
   await page.route('**/wp-admin/admin-ajax.php', async route => {
     const body = route.request().postData() || '';
     if (body.includes('action=stapleit_cora_planner_explain')) {
@@ -392,30 +392,71 @@ test('add-on fallback explains the selected packs without generic audit copy', a
   await page.setViewportSize({ width: 430, height: 932 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
   const form = page.locator('[data-pack-finder]');
-  const answers = [
-    ['server', 'no'],
-    ['azure', 'no'],
-    ['network', 'no'],
-    ['security', 'no'],
-    ['governance', 'yes'],
-    ['cyber-essentials', 'no'],
-    ['ai', 'yes'],
-    ['strategy', 'no'],
-    ['disaster-recovery', 'yes']
-  ];
 
-  for (let index = 0; index < answers.length; index += 1) {
-    const [key, value] = answers[index];
-    const question = form.locator(`[data-pack-question][data-pack-key="${key}"]`);
-    await question.locator(`input[value="${value}"]`).check();
-    await form.locator('[data-pack-finder-next]').click();
-  }
+  await expect(form).not.toContainText(/Question \d+ of 9/i);
+  await expect(form.locator('progress')).toHaveCount(0);
+  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'focus');
+  await form.getByLabel('Security or compliance').check();
+  await expect(form.locator('[data-pack-cora-line]')).toContainText('protection');
+  await form.getByRole('button', { name: 'Start there' }).click();
 
-  const explanation = page.locator('[data-packs-ai-copy]');
-  await expect(explanation).toContainText('Governance & compliance');
-  await expect(explanation).toContainText('AI');
-  await expect(explanation).toContainText('Disaster recovery');
-  await expect(explanation).not.toContainText(/recommendation above still stands|free IT audit/i);
+  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'security');
+  await form.locator('[data-pack-question]:visible input[value="yes"]').check();
+  await form.getByRole('button', { name: 'Keep chatting' }).click();
+  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'governance');
+  await form.locator('[data-pack-question]:visible input[value="yes"]').check();
+
+  await expect(form.getByRole('button', { name: 'See what Cora suggests' })).toBeEnabled();
+  await expect(form.getByRole('button', { name: 'Show suggestions now' })).toBeVisible();
+  await form.getByRole('button', { name: 'See what Cora suggests' }).click();
+
+  await expect(form.locator('[data-pack-results]')).toBeVisible();
+  await expect(form.locator('[data-pack-results-summary]')).toContainText('Security');
+  await expect(form.locator('[data-pack-results-summary]')).toContainText('Governance & compliance');
+  await expect(form.locator('[data-pack-result="security"]')).toBeVisible();
+  await expect(form.locator('[data-pack-result="governance"]')).toBeVisible();
+  await expect(form.locator('[data-pack-result="cyber-essentials"]')).toBeHidden();
+  await expect(form.locator('[data-pack-result="server"]')).toBeHidden();
+  await expect(form.locator('[data-packs-ai-copy]')).toContainText('Security');
+  await expect(form.locator('[data-packs-ai-copy]')).toContainText('Governance & compliance');
+  await expect(form.locator('.support-pack-results-note')).toContainText('not a complete assessment');
+
+  const answeredPackTopics = await form.locator('[data-pack-question]:not([data-pack-gateway]) input:checked').count();
+  expect(answeredPackTopics).toBe(2);
+});
+
+test('Cora add-on conversation can stop early and leaves unasked areas unknown', async ({ page }) => {
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const form = page.locator('[data-pack-finder]');
+
+  await form.getByLabel('Servers, cloud or network').check();
+  await form.getByRole('button', { name: 'Start there' }).click();
+  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'server');
+  await form.locator('[data-pack-question]:visible input[value="no"]').check();
+  await form.getByRole('button', { name: 'Keep chatting' }).click();
+  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'azure');
+  await form.locator('[data-pack-question]:visible input[value="no"]').check();
+
+  const stop = form.getByRole('button', { name: 'Show suggestions now' });
+  await expect(stop).toBeVisible();
+  await stop.click();
+
+  await expect(form.locator('[data-pack-results]')).toBeVisible();
+  await expect(form.locator('[data-pack-results-summary]')).toContainText('Nothing you’ve told me so far');
+  await expect(form.locator('[data-pack-results-empty]')).toBeVisible();
+  await expect(form.locator('[data-pack-result]:visible')).toHaveCount(0);
+  await expect(form.locator('[data-pack-question][data-pack-key="network"] input:checked')).toHaveCount(0);
+  await expect(form.locator('.support-pack-results-note')).toContainText('not a complete assessment');
+
+  const chat = form.getByRole('button', { name: 'Chat to Cora about these' });
+  await chat.click();
+  await expect(page.getByRole('dialog', { name: 'Cora' })).toBeVisible();
+  await expect(page.getByLabel('Message Cora')).toHaveValue(/Nothing stood out/i);
 });
 
 test('touch-opened dialogs do not leave package cards glowing and use the mobile sheet treatment', async ({ browser }) => {

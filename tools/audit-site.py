@@ -510,8 +510,20 @@ def audit(root: Path) -> int:
                 "strategy",
                 "disaster-recovery",
             }
+            question_matches = re.findall(
+                r'<fieldset\b[^>]*\bdata-pack-question\b[^>]*\bdata-pack-key="([^"]+)"',
+                text,
+                re.I,
+            )
+            expected_question_keys = expected_pack_finder_keys | {"focus"}
+            if len(question_matches) != len(expected_question_keys) or set(question_matches) != expected_question_keys:
+                errors.append(
+                    f"{rel}: adaptive pack conversation must contain one focus gateway plus the nine add-on topics"
+                )
+            if len(re.findall(r'<fieldset\b[^>]*\bdata-pack-gateway\b', text, re.I)) != 1:
+                errors.append(f"{rel}: adaptive pack conversation requires exactly one gateway question")
+
             pack_finder_patterns = {
-                "question": r'<fieldset\b[^>]*\bdata-pack-question\b[^>]*\bdata-pack-key="([^"]+)"',
                 "result": r'<article\b[^>]*\bdata-pack-result="([^"]+)"',
                 "catalogue card": r'<article\b[^>]*\bdata-pack-card="([^"]+)"',
             }
@@ -521,6 +533,13 @@ def audit(root: Path) -> int:
                     errors.append(
                         f"{rel}: pack finder {role} keys must map exactly to the nine add-on packs"
                     )
+
+            for retired_copy in ("Question 1 of 9", "nine quick questions"):
+                if retired_copy in text:
+                    errors.append(f"{rel}: fixed nine-question pack-finder copy is retired: {retired_copy}")
+            for required_marker in ("data-pack-cora-line", "data-pack-finder-suggest", "data-pack-gateway"):
+                if required_marker not in text:
+                    errors.append(f"{rel}: adaptive Cora pack conversation marker is missing: {required_marker}")
 
             finder_start = text.find('<form class="support-pack-finder"')
             finder_end = text.find("</form>", finder_start)
@@ -532,7 +551,7 @@ def audit(root: Path) -> int:
                     answer_count = finder_markup.count(f'value="{answer}"')
                     if answer_count != len(expected_pack_finder_keys):
                         errors.append(
-                            f"{rel}: pack finder requires one {answer!r} answer for every question"
+                            f"{rel}: pack finder requires one {answer!r} answer for every add-on topic"
                         )
 
         if parser.canonical and parser.canonical != expected_canonical(root, html):
