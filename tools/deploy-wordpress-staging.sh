@@ -308,6 +308,7 @@ grep -Fq '<title>Managed IT Support in Surrey | Staple IT</title>' "$THEME/stati
 grep -Fq 'aria-current="page" href="/it-services/it-support/"' "$THEME/static-it-support.php"
 grep -Fq "assets/css/it-support.bundle.css?v=$VERSION" "$THEME/static-it-support.php"
 grep -Fq 'source: it-support-responsive.css' "$THEME/assets/css/it-support.bundle.css"
+grep -Fq 'source: it-support-packages.css' "$THEME/assets/css/it-support.bundle.css"
 grep -Fq '"@type":"Service"' "$THEME/static-it-support.php"
 grep -Fq "assets/js/it-support.js?v=$VERSION" "$THEME/static-it-support.php"
 grep -Fq "assets/js/forms.js?v=$VERSION" "$THEME/static-it-support.php"

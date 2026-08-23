@@ -200,10 +200,10 @@ test('package recommendation stays deterministic while Cora explains it', async 
   const packageForm = page.locator('[data-package-finder]');
   await packageForm.getByLabel('5–19 people').check();
   await packageForm.getByRole('button', { name: 'Continue' }).click();
-  await packageForm.getByLabel('Support + stronger security & backup').check();
+  await packageForm.getByLabel('Security + backup').check();
   await packageForm.getByRole('button', { name: 'Continue' }).click();
   await packageForm.getByLabel('No', { exact: true }).check();
-  await packageForm.getByRole('button', { name: 'See my recommendation' }).click();
+  await packageForm.getByRole('button', { name: 'See recommendation' }).click();
 
   await expect(page.locator('[data-package-title]')).toContainText('Standard');
   await expect(page.locator('[data-package-ai-copy]')).toContainText('stronger managed protection');
@@ -219,6 +219,69 @@ test('package recommendation stays deterministic while Cora explains it', async 
   expect(surfaces.formIsDirectChild).toBe(true);
   expect(surfaces.outerBorder).toBe('none');
   expect(surfaces.formBorder).toBeGreaterThan(0);
+});
+
+test('mobile package finder is compact, scannable and hands off cleanly', async ({ page }) => {
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    const body = route.request().postData() || '';
+    if (body.includes('action=stapleit_cora_planner_explain')) {
+      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
+      return;
+    }
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const form = page.locator('[data-package-finder]');
+  const initial = await page.evaluate(() => {
+    const form = document.querySelector('[data-package-finder]');
+    const question = document.querySelector('[data-package-question]:not([hidden])');
+    const choices = question?.querySelector('.support-pack-choices');
+    const cards = [...document.querySelectorAll('.support-package-card')].map(card => card.getBoundingClientRect().height);
+    return {
+      formHeight: form?.getBoundingClientRect().height || 0,
+      questionHeight: question?.getBoundingClientRect().height || 0,
+      teamColumns: choices ? getComputedStyle(choices).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
+      tallestCard: Math.max(...cards),
+      fits: [...document.querySelectorAll('.support-package-fit')].map(element => element.textContent.trim())
+    };
+  });
+  expect(initial.formHeight).toBeLessThanOrEqual(430);
+  expect(initial.questionHeight).toBeLessThanOrEqual(310);
+  expect(initial.teamColumns).toBe(2);
+  expect(initial.tallestCard).toBeLessThanOrEqual(430);
+  expect(initial.fits).toHaveLength(4);
+
+  await form.getByLabel('5–19 people').check();
+  await form.getByRole('button', { name: 'Continue' }).click();
+  await form.getByLabel('Security + backup').check();
+  await form.getByRole('button', { name: 'Continue' }).click();
+  const requirementColumns = await form.locator('[data-package-key="requirements"] .support-pack-choices').evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').filter(Boolean).length);
+  expect(requirementColumns).toBe(3);
+  await form.getByLabel('No', { exact: true }).check();
+  await form.getByRole('button', { name: 'See recommendation' }).click();
+  await expect(page.locator('[data-package-title]')).toHaveText('Standard');
+  await expect(page.locator('[data-package-ai-copy]')).toContainText('Standard fits');
+
+  const result = await page.evaluate(() => {
+    const panel = document.querySelector('[data-package-result]');
+    const handoff = document.querySelector('[data-planner-handoff]');
+    const calculator = document.querySelector('[data-cost-calculator]');
+    const actions = document.querySelector('.support-package-result-panel .support-pack-results-actions');
+    return {
+      height: panel?.getBoundingClientRect().height || 0,
+      handoffInside: Boolean(panel?.contains(handoff)),
+      calculatorColumns: calculator ? getComputedStyle(calculator).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
+      actionColumns: actions ? getComputedStyle(actions).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
+      auditHref: document.querySelector('[data-planner-audit]')?.getAttribute('href') || ''
+    };
+  });
+  expect(result.height).toBeLessThanOrEqual(810);
+  expect(result.handoffInside).toBe(true);
+  expect(result.calculatorColumns).toBe(2);
+  expect(result.actionColumns).toBe(2);
+  expect(result.auditHref).toBe('/get-in-touch/it-audit/');
 });
 
 test('Cora keeps package context across a natural follow-up', async ({ page }) => {
@@ -289,7 +352,7 @@ test('mobile planner fallback stays useful and contextual Cora opens before the 
   const packageForm = page.locator('[data-package-finder]');
   await packageForm.getByLabel('2–4 people').check();
   await packageForm.locator('[data-package-next]').click();
-  await packageForm.getByLabel('Day-to-day IT support').check();
+  await packageForm.getByLabel('Day-to-day support').check();
   await packageForm.locator('[data-package-next]').click();
   await packageForm.getByLabel('No', { exact: true }).check();
   await packageForm.locator('[data-package-next]').click();
@@ -298,7 +361,7 @@ test('mobile planner fallback stays useful and contextual Cora opens before the 
   await expect(explanation).toContainText('five-user minimum');
   await expect(explanation).not.toContainText(/recommendation above still stands|free IT audit/i);
 
-  await packageForm.getByRole('button', { name: 'Ask Cora about this' }).click();
+  await packageForm.getByRole('button', { name: 'Ask Cora' }).click();
   const cora = page.getByRole('dialog', { name: 'Cora' });
   await expect(cora).toBeVisible();
   const state = await page.evaluate(() => {

@@ -374,7 +374,7 @@ function stapleit_handle_cora_planner_explain_ajax() {
     );
     $messages = array(
         array( 'role' => 'system', 'content' => stapleit_cora_system_prompt( 'planner' ) . "\n\n" . stapleit_cora_relevant_knowledge( $plan['facts'], '/it-services/it-support/' ) ),
-        array( 'role' => 'user', 'content' => "Explain this fixed result to a non-technical visitor in two short paragraphs. Keep the recommendation exactly as supplied.\n\n" . $plan['facts'] ),
+        array( 'role' => 'user', 'content' => "Explain this fixed result in one short paragraph of no more than 45 words. Keep the recommendation exactly as supplied.\n\n" . $plan['facts'] ),
     );
     $reply = stapleit_cora_model_reply( $messages );
     if ( $reply !== '' ) {

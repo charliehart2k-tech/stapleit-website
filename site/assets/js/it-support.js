@@ -336,24 +336,24 @@
     const requirements = String(answers?.requirements || '');
 
     if (team === '1') {
-      return 'Because it’s just you, forcing you into the five-user minimum would not make sense. A tailored sole-trader arrangement can focus on the devices, Microsoft 365 and day-to-day help you actually need.';
+      return 'Because it’s just you, a five-user package would not make sense. Tailored support can focus on the devices, Microsoft 365 and day-to-day help you actually use.';
     }
     if (team === '4') {
-      return 'Because you have 2–4 people, the published team packages would force a five-user minimum. A tailored plan lets us match support and security to the people and systems you actually have instead of charging against a package that does not fit cleanly.';
+      return 'Because you have 2–4 people, the five-user minimum would not fit cleanly. A tailored plan can match support and security to the team you actually have.';
     }
 
     let recommended = protection;
     if (requirements === 'yes' && recommended === 'basic') recommended = 'standard';
 
     if (recommended === 'basic') {
-      return 'Basic fits because your answers point to straightforward day-to-day IT support without extra managed security requirements. It covers the helpdesk, monitoring, patching, device management and business-grade antivirus while keeping the package simple.';
+      return 'Basic fits because you want straightforward day-to-day support, monitoring, patching and device management without extra managed security layers.';
     }
     if (recommended === 'standard') {
       return requirements === 'yes'
-        ? 'Standard fits because you need stronger protection and also need to provide security evidence. It adds EDR, email security, cloud backup, MFA, Conditional Access and regular security reviews on top of the day-to-day support.'
-        : 'Standard fits because you want day-to-day support with stronger security, backup and identity protection. It adds EDR, email security, cloud backup, MFA and Conditional Access without moving straight to the full Premium package.';
+        ? 'Standard fits because you need stronger protection and security evidence, adding managed endpoint, email, backup and identity controls to day-to-day support.'
+        : 'Standard fits because you want day-to-day support with stronger managed security, cloud backup and identity protection.';
     }
-    return 'Premium fits because you selected the fullest level of managed protection. It includes everything in Standard plus Microsoft 365 Business Premium, enhanced Microsoft security, DNS and web protection and stronger data-protection controls.';
+    return 'Premium fits because you want the fullest managed package, including Microsoft 365 Business Premium and enhanced Microsoft security and data protection.';
   };
 
   const packLabels = {
@@ -475,7 +475,7 @@
     progress.value = current + 1;
     back.hidden = current === 0;
     next.disabled = !answer(questions[current]);
-    next.textContent = current === questions.length - 1 ? 'See my recommendation' : 'Continue';
+    next.textContent = current === questions.length - 1 ? 'See recommendation' : 'Continue';
   };
   const show = (index, focus = true) => {
     current = Math.max(0, Math.min(questions.length - 1, index));
@@ -499,7 +499,7 @@
     const protection = answer(questions[1]);
     const evidence = answer(questions[2]);
     if (team === '1' || team === '4') {
-      title.textContent = team === '1' ? 'Tailored sole-trader support' : 'A tailored support plan';
+      title.textContent = team === '1' ? 'Sole trader support' : 'Tailored support';
       reason.textContent = 'Our published per-person packages start at five staff, so a short conversation will give you a more honest answer than a made-up online price.';
       staff.closest('[data-cost-calculator]').hidden = true;
       note.textContent = 'Price on application. We will confirm the scope before you commit to anything.';
@@ -512,7 +512,7 @@
       staff.value = team === '25' ? '25' : '10';
       staff.closest('[data-cost-calculator]').hidden = false;
       note.textContent = 'Based on published per-person pricing. Add-ons and projects are priced separately; your written proposal confirms the final scope and price.';
-      title.textContent = `${recommended[0].toUpperCase()}${recommended.slice(1)} looks like your best starting point`;
+      title.textContent = `${recommended[0].toUpperCase()}${recommended.slice(1)}`;
       reason.textContent = evidence === 'yes'
         ? 'Your need to provide security evidence makes managed protection and regular reviews important, as well as day-to-day support.'
         : recommended === 'basic' ? 'Your answers point to straightforward day-to-day support without unnecessary extras.'
