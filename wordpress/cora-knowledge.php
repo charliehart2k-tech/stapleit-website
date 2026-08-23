@@ -133,8 +133,107 @@ function stapleit_cora_relevant_knowledge( $prompt, $page_path = '' ) {
     return implode( "\n", $lines );
 }
 
-function stapleit_cora_fast_reply( $prompt ) {
+function stapleit_cora_valid_context_key( $context ) {
+    $context = strtolower( (string) $context );
+    $context = preg_replace( '/[^a-z0-9_]/', '', $context );
+    $allowed = array(
+        'package_sole', 'package_basic', 'package_standard', 'package_premium',
+        'pack_server', 'pack_azure', 'pack_network', 'pack_security',
+        'pack_governance', 'pack_cyber_essentials', 'pack_ai', 'pack_strategy',
+        'pack_disaster_recovery', 'onboarding',
+    );
+    return in_array( $context, $allowed, true ) ? $context : '';
+}
+
+function stapleit_cora_context_label( $context ) {
+    $labels = array(
+        'package_sole'            => 'Sole trader support',
+        'package_basic'           => 'Basic package',
+        'package_standard'        => 'Standard package',
+        'package_premium'         => 'Premium package',
+        'pack_server'             => 'Server pack',
+        'pack_azure'              => 'Azure pack',
+        'pack_network'            => 'Network pack',
+        'pack_security'           => 'Security pack',
+        'pack_governance'         => 'Governance & compliance pack',
+        'pack_cyber_essentials'   => 'Cyber Essentials pack',
+        'pack_ai'                 => 'AI pack',
+        'pack_strategy'           => 'Strategy pack',
+        'pack_disaster_recovery'  => 'Disaster recovery pack',
+        'onboarding'              => 'managed onboarding',
+    );
+    $context = stapleit_cora_valid_context_key( $context );
+    return $context !== '' ? $labels[ $context ] : '';
+}
+
+function stapleit_cora_context_from_prompt( $prompt ) {
     $text = strtolower( trim( (string) $prompt ) );
+    if ( preg_match( '/\b(?:cheapest|least\s+expensive|lowest[-\s]+cost|most\s+affordable)\b/i', $text ) ) return 'package_basic';
+    if ( preg_match( '/\bsole[-\s]?trader\b/i', $text ) ) return 'package_sole';
+    if ( preg_match( '/\bbasic\b/i', $text ) ) return 'package_basic';
+    if ( preg_match( '/\bstandard\b/i', $text ) ) return 'package_standard';
+    if ( preg_match( '/\bpremium\b/i', $text ) ) return 'package_premium';
+    if ( preg_match( '/\b(?:cyber\s+essentials|ce\+)\b/i', $text ) ) return 'pack_cyber_essentials';
+    if ( preg_match( '/\b(?:physical\s+server|windows\s+server|active\s+directory|group\s+policy|file\s+server)\b/i', $text ) ) return 'pack_server';
+    if ( preg_match( '/\b(?:azure|virtual\s+machine|vnet)\b/i', $text ) ) return 'pack_azure';
+    if ( preg_match( '/\b(?:wi-?fi|firewall|access\s+point|network\s+switch|networking)\b/i', $text ) ) return 'pack_network';
+    if ( preg_match( '/\b(?:governance|compliance|it\s+polic(?:y|ies)|documentation|evidence)\b/i', $text ) ) return 'pack_governance';
+    if ( preg_match( '/\b(?:chatgpt|copilot|claude|artificial\s+intelligence|ai\s+tools|ai\s+adoption)\b/i', $text ) ) return 'pack_ai';
+    if ( preg_match( '/\b(?:strategy|roadmap|budgeting|technology\s+roadmap)\b/i', $text ) ) return 'pack_strategy';
+    if ( preg_match( '/\b(?:disaster\s+recovery|business\s+continuity|recovery\s+plan)\b/i', $text ) ) return 'pack_disaster_recovery';
+    if ( preg_match( '/\b(?:switch|change|move)\b/i', $text ) && preg_match( '/\b(?:it\s+provider|support\s+provider|msp|provider)\b/i', $text ) ) return 'onboarding';
+    if ( preg_match( '/\b(?:microsoft\s*365|m365|entra|office\s*365)\b/i', $text ) && preg_match( '/\b(?:secur|protection|protect|phishing|identity|mfa|conditional\s+access|defender)\w*/i', $text ) ) return 'package_standard';
+    if ( preg_match( '/\b(?:printer|printing|outlook)\b/i', $text ) && preg_match( '/\b(?:issues?|problems?|help|support|not working|keeps|broken|errors?)\b/i', $text ) ) return 'package_basic';
+    return '';
+}
+
+function stapleit_cora_context_from_history( $history ) {
+    if ( ! is_array( $history ) ) return '';
+    foreach ( array_reverse( $history ) as $message ) {
+        $content = is_array( $message ) ? (string) ( $message['content'] ?? '' ) : '';
+        $context = stapleit_cora_context_from_prompt( $content );
+        if ( $context !== '' ) return $context;
+    }
+    return '';
+}
+
+function stapleit_cora_is_contextual_follow_up( $prompt ) {
+    $text = strtolower( trim( (string) $prompt ) );
+    if ( strlen( $text ) > 180 ) return false;
+    return (bool) preg_match( '/\b(?:that|it|this|those|them|included|include|includes|cover|covers|come\s+with|what\s+do\s+i\s+get|tell\s+me\s+more|more\s+detail|how\s+much\s+is\s+that|what\s+about)\b/i', $text );
+}
+
+function stapleit_cora_context_for_turn( $prompt, $incoming_context = '', $history = array() ) {
+    $explicit = stapleit_cora_context_from_prompt( $prompt );
+    if ( $explicit !== '' ) return $explicit;
+    if ( ! stapleit_cora_is_contextual_follow_up( $prompt ) ) return '';
+    $incoming_context = stapleit_cora_valid_context_key( $incoming_context );
+    if ( $incoming_context !== '' ) return $incoming_context;
+    return stapleit_cora_context_from_history( $history );
+}
+
+function stapleit_cora_fast_reply( $prompt, $context = '' ) {
+    $text    = strtolower( trim( (string) $prompt ) );
+    $context = stapleit_cora_valid_context_key( $context );
+
+    if ( preg_match( '/\b(?:cheapest|least\s+expensive|lowest[-\s]+cost|most\s+affordable)\b/i', $text ) ) {
+        return 'The cheapest published team package is Basic, starting from £35 per staff member, per month for teams of 5+. It covers day-to-day helpdesk support, monitoring, patching, remote device management and business-grade antivirus. Sole-trader support is tailored and price on application.';
+    }
+
+    if ( stapleit_cora_is_contextual_follow_up( $text ) && preg_match( '/\b(?:include|included|includes|cover|covers|come\s+with|what\s+do\s+i\s+get|tell\s+me\s+more|more\s+detail)\b/i', $text ) ) {
+        if ( $context === 'package_basic' ) {
+            return 'Basic includes unlimited helpdesk support during 9am–5pm Monday to Friday, 24/7 device monitoring, remote device management, Windows and software patching, mobile device management, business-grade antivirus, asset and licence tracking, hardware and warranty management, onboarding and access to the client portal. It starts from £35 per staff member, per month for teams of 5+.';
+        }
+        if ( $context === 'package_standard' ) {
+            return 'Standard includes everything in Basic, then adds EDR, advanced email security, MFA and Conditional Access, privileged-account protection, LastPass, Microsoft 365 or Google Workspace backup, Exclaimer and regular security reviews. It starts from £55 per staff member, per month for teams of 5+; Microsoft 365 Business Premium or equivalent licensing is required and sold separately unless specifically included.';
+        }
+        if ( $context === 'package_premium' ) {
+            return 'Premium includes everything in Standard plus Microsoft 365 Business Premium, DNS and web protection, enhanced Microsoft 365 security, Defender for Business and Defender for Office 365 management, stronger access controls and Microsoft Purview configuration where required. It starts from £75 per staff member, per month for teams of 5+. Additional Microsoft licensing may still be required for advanced Defender or Purview Suite features.';
+        }
+        if ( $context === 'package_sole' ) {
+            return 'Sole-trader support is tailored around the devices, Microsoft 365 services and day-to-day help you actually need rather than forcing you into a five-user package. The scope and price are confirmed after a short review, so it is price on application.';
+        }
+    }
 
     if ( preg_match( '/\b(?:cyber\s+essentials|ce\+)\b/i', $text ) ) {
         return 'Yes. The Cyber Essentials pack supports readiness, remediation and application preparation for Cyber Essentials or Cyber Essentials Plus, and it is price on application. We can help review the current setup, identify gaps and work through remediation before the assessment. If you also need IT policies, documentation or evidence for a customer or insurer, the Governance & compliance pack may be useful too.';
@@ -191,6 +290,9 @@ function stapleit_cora_follow_up_suggestions( $prompt ) {
     }
     if ( preg_match( '/strategy|roadmap|budget|supplier/', $prompt ) ) {
         return array( 'What would the roadmap cover?', 'Can you help plan our budget?', 'How often would we review it?' );
+    }
+    if ( preg_match( '/\b(?:basic|standard|premium|package)\b/', $prompt ) ) {
+        return array( 'What’s included?', 'How do the packages differ?', 'What happens during onboarding?' );
     }
     return array( 'Which package suits our team?', 'What happens during onboarding?', 'Could we start with a free audit?' );
 }

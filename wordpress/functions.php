@@ -229,29 +229,40 @@ function stapleit_handle_cora_chat_ajax() {
         wp_send_json( array( 'ok' => false, 'message' => 'Cora has received several messages from this connection. Please wait ten minutes, or call 01372 309 707.' ), 429 );
     }
 
-    $page_path = substr( sanitize_text_field( (string) ( $_POST['page'] ?? '' ) ), 0, 180 );
-    $fast_reply = stapleit_cora_fast_reply( $prompt );
+    $page_path        = substr( sanitize_text_field( (string) ( $_POST['page'] ?? '' ) ), 0, 180 );
+    $history          = stapleit_cora_history_from_request();
+    $incoming_context = stapleit_cora_valid_context_key( (string) ( $_POST['context'] ?? '' ) );
+    $turn_context     = stapleit_cora_context_for_turn( $prompt, $incoming_context, $history );
+    $context_label    = stapleit_cora_context_label( $turn_context );
+    $effective_prompt = $context_label !== '' && stapleit_cora_is_contextual_follow_up( $prompt )
+        ? $context_label . '. Follow-up question: ' . $prompt
+        : $prompt;
+
+    $fast_reply = stapleit_cora_fast_reply( $prompt, $turn_context );
     if ( $fast_reply !== '' ) {
         wp_send_json( array(
             'ok'                => true,
             'mode'              => 'knowledge-guide',
             'reply'             => $fast_reply,
-            'suggestions'       => stapleit_cora_follow_up_suggestions( $prompt ),
+            'context'           => $turn_context,
+            'suggestions'       => stapleit_cora_follow_up_suggestions( $effective_prompt ),
             'knowledge_version' => stapleit_cora_knowledge_version(),
         ) );
     }
 
-    $fallback_services = stapleit_support_catalogue_match( $prompt );
+    $fallback_services = stapleit_support_catalogue_match( $effective_prompt );
     $result = array(
         'ok'                => true,
         'mode'              => 'knowledge-guide',
         'reply'             => 'Based on what you’ve said, ' . implode( ', ', $fallback_services ) . ' looks like the closest starting point. If you tell me roughly how many people use your systems and what is causing the most concern, I can narrow that down. Anything specific to your setup will be confirmed by a person before you commit.',
-        'suggestions'       => stapleit_cora_follow_up_suggestions( $prompt ),
+        'context'           => $turn_context,
+        'suggestions'       => stapleit_cora_follow_up_suggestions( $effective_prompt ),
         'knowledge_version' => stapleit_cora_knowledge_version(),
     );
+    $context_note = $context_label !== '' ? "\n\nCONVERSATION CONTEXT: The current subject is " . $context_label . ". Resolve short follow-up wording such as ‘that’, ‘it’ or ‘what’s included?’ against this subject unless the visitor clearly changes topic." : '';
     $messages = array_merge(
-        array( array( 'role' => 'system', 'content' => stapleit_cora_system_prompt() . "\n\n" . stapleit_cora_relevant_knowledge( $prompt, $page_path ) ) ),
-        stapleit_cora_history_from_request(),
+        array( array( 'role' => 'system', 'content' => stapleit_cora_system_prompt() . "\n\n" . stapleit_cora_relevant_knowledge( $effective_prompt, $page_path ) . $context_note ) ),
+        $history,
         array( array( 'role' => 'user', 'content' => $prompt ) )
     );
     $reply = stapleit_cora_model_reply( $messages );

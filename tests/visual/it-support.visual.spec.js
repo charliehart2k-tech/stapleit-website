@@ -166,3 +166,55 @@ test('package recommendation stays deterministic while Cora explains it', async 
   expect(surfaces.outerBorder).toBe('none');
   expect(surfaces.formBorder).toBeGreaterThan(0);
 });
+
+test('Cora keeps package context across a natural follow-up', async ({ page }) => {
+  let chatCalls = 0;
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    const body = route.request().postData() || '';
+    if (!body.includes('action=stapleit_cora_chat')) {
+      await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+      return;
+    }
+
+    chatCalls += 1;
+    const params = new URLSearchParams(body);
+    if (chatCalls === 1) {
+      expect(params.get('context')).toBe('');
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          mode: 'knowledge-guide',
+          context: 'package_basic',
+          reply: 'The cheapest published team package is Basic, starting from £35 per staff member, per month.',
+          suggestions: ['What’s included?', 'How do the packages differ?']
+        })
+      });
+      return;
+    }
+
+    expect(params.get('context')).toBe('package_basic');
+    expect(params.get('history')).toContain('cheapest package');
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok: true,
+        mode: 'knowledge-guide',
+        context: 'package_basic',
+        reply: 'Basic includes helpdesk support, monitoring, patching and remote device management.',
+        suggestions: ['How do the packages differ?']
+      })
+    });
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Chat to Cora' }).click();
+  await page.getByLabel('Message Cora').fill("What's the cheapest package?");
+  await page.getByRole('button', { name: 'Send' }).click();
+  await expect(page.locator('.cora-message--assistant').last()).toContainText('Basic');
+  await page.getByLabel('Message Cora').fill('What does that include?');
+  await page.getByRole('button', { name: 'Send' }).click();
+  await expect(page.locator('.cora-message--assistant').last()).toContainText('Basic includes');
+  expect(chatCalls).toBe(2);
+});

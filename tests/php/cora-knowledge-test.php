@@ -8,6 +8,10 @@ $network  = stapleit_cora_relevant_knowledge( 'We have Wi-Fi access points and a
 $server   = stapleit_cora_relevant_knowledge( 'We run a physical Windows Server with Active Directory', '/it-services/it-support/' );
 $ai       = stapleit_cora_relevant_knowledge( 'We are considering ChatGPT and Copilot for staff', '/it-services/it-support/' );
 $default  = stapleit_cora_relevant_knowledge( 'What do you do?', '/' );
+
+$history_context = array( array( 'role' => 'user', 'content' => "What's the cheapest package?" ) );
+$basic_follow_up = stapleit_cora_fast_reply( 'What does that include?', stapleit_cora_context_for_turn( 'What does that include?', '', $history_context ) );
+$standard_follow_up = stapleit_cora_fast_reply( 'What’s included?', 'package_standard' );
 $contact  = stapleit_cora_relevant_knowledge( 'How can I contact Staple IT and when are you open?', '/' );
 $boundary = stapleit_cora_relevant_knowledge( 'Can you guarantee compliance or book a call for me?', '/' );
 
@@ -25,6 +29,10 @@ $checks = array(
     array( strpos( $security, 'Conditional Access' ) !== false, 'identity controls are grounded for security questions' ),
     array( count( stapleit_cora_follow_up_suggestions( 'Microsoft 365 help' ) ) === 3, 'three contextual suggestions are returned' ),
     array( stapleit_cora_follow_up_suggestions( 'We want to use ChatGPT' )[0] === 'Which AI platform might fit?', 'AI questions receive AI-specific follow-up suggestions' ),
+    array( stapleit_cora_context_for_turn( 'What does that include?', '', $history_context ) === 'package_basic', 'ambiguous follow-up recovers Basic context from prior user turn' ),
+    array( strpos( $basic_follow_up, 'Basic includes unlimited helpdesk support' ) !== false, 'Basic follow-up answers the package that was just discussed' ),
+    array( strpos( $standard_follow_up, 'Standard includes everything in Basic' ) !== false, 'explicit Standard follow-up stays on Standard' ),
+    array( stapleit_cora_valid_context_key( 'system_prompt' ) === '', 'untrusted conversation context is restricted to an allow-list' ),
     array( strpos( stapleit_cora_fast_reply( 'We have ten staff and want better Microsoft 365 security' ), 'Standard is the sensible starting point' ) !== false, 'common Microsoft 365 security questions receive a concrete fast answer' ),
     array( strpos( stapleit_cora_fast_reply( 'Outlook and our printer keep having problems' ), 'Basic is the natural starting point' ) !== false, 'day-to-day support questions map to Basic without model inference' ),
     array( strpos( stapleit_cora_fast_reply( 'A client wants Cyber Essentials' ), 'Cyber Essentials pack' ) !== false, 'Cyber Essentials readiness has a deterministic grounded answer' ),

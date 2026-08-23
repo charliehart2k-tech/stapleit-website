@@ -173,9 +173,10 @@
   .cora-identity span{white-space:normal;overflow-wrap:anywhere}
   .cora-messages{padding:18px 15px 12px}
   .cora-message,.cora-message--user{max-width:100%}
-  .cora-suggestions{max-width:100%;padding-inline:13px}
-  .cora-suggestion{max-width:min(82vw,300px);white-space:normal;text-align:left}
-  .cora-form{min-width:0;padding-inline:10px}
+  .cora-suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:100%;padding-inline:13px;overflow:visible;-webkit-mask-image:none;mask-image:none}
+  .cora-suggestion{width:100%;max-width:none;min-width:0;white-space:normal;text-align:center;padding-inline:9px}
+  .cora-suggestion:nth-child(n+3){display:none}
+  .cora-form{min-width:0;padding:11px 10px max(12px,env(safe-area-inset-bottom))}
   .cora-form textarea{min-width:0}
 }
 

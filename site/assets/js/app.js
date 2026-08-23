@@ -119,6 +119,7 @@
   document.body.append(root);
 
   const conversation = [];
+  let conversationContext = '';
   const tracked = new Set();
   let previousFocus = null;
   let responsePending = false;
@@ -235,6 +236,7 @@
         action: 'stapleit_cora_chat',
         prompt,
         history: JSON.stringify(priorUserTurns),
+        context: conversationContext,
         page: window.location.pathname
       });
       const response = await fetch('/wp-admin/admin-ajax.php', {
@@ -248,6 +250,7 @@
         throw new Error(payload?.message || 'Cora cannot respond at the moment.');
       }
       thinking.remove();
+      conversationContext = typeof payload.context === 'string' ? payload.context : '';
       conversation.push({ role: 'assistant', content: payload.reply });
       if (conversation.length > 8) conversation.splice(0, conversation.length - 8);
       addMessage('assistant', payload.reply);
