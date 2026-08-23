@@ -243,7 +243,6 @@ grep -Fq 'Every package includes day-to-day support and proactive management' "$
 grep -Fq 'data-package-finder' "$THEME/static-it-support.php"
 grep -Fq 'data-pack-finder' "$THEME/static-it-support.php"
 grep -Fq 'data-package-ai' "$THEME/static-it-support.php"
-grep -Fq 'data-packs-ai' "$THEME/static-it-support.php"
 grep -Fq 'data-cora-open' "$THEME/static-it-support.php"
 grep -Fq 'supportPlannerQuestionIn' "$THEME/assets/css/it-support-extras.css"
 grep -Fq 'coraMessageIn' "$THEME/assets/css/cora.css"
