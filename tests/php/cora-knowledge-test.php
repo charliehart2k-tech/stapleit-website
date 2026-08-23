@@ -45,6 +45,8 @@ $checks = array(
     array( strpos( $functions_source, 'Unasked areas are unknown' ) !== false, 'partial add-on plans explicitly preserve unknown unasked areas' ),
     array( strpos( $functions_source, 'If a visitor describes immediate physical danger from a device' ) !== false, 'Cora prioritises physical safety over package recommendations' ),
     array( strpos( $functions_source, 'if ( ! $matches ) return array();' ) !== false, 'unclassified prompts do not default to Basic package' ),
+    array( strpos( $functions_source, '$fallback_suggestions = $fallback_services ?' ) !== false, 'unclassified prompts do not receive generic sales suggestion chips' ),
+    array( strpos( $functions_source, '$device_prompt = (bool) preg_match' ) !== false, 'unclassified device prompts use a safety-first fallback' ),
 );
 
 $failures = array();

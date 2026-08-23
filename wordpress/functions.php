@@ -251,15 +251,19 @@ function stapleit_handle_cora_chat_ajax() {
     }
 
     $fallback_services = stapleit_support_catalogue_match( $effective_prompt );
+    $device_prompt = (bool) preg_match( '/\b(?:pc|computer|laptop|device|machine)\b/i', strtolower( $prompt ) );
     $fallback_reply = $fallback_services
         ? 'Based on what you’ve said, ' . implode( ', ', $fallback_services ) . ' looks like the closest starting point. If you tell me roughly how many people use your systems and what is causing the most concern, I can narrow that down. Anything specific to your setup will be confirmed by a person before you commit.'
-        : 'I do not have enough information to match that to a Staple IT service. If there is an immediate physical danger, deal with that first rather than troubleshooting in chat. Otherwise, tell me what the device or service is doing.';
+        : ( $device_prompt
+            ? 'If the device is physically dangerous, stop using it and move away from it. If it is safe and you mean it is malfunctioning or overheating, shut it down and tell me what happened.'
+            : 'I do not have enough information to match that to a Staple IT service. Tell me what you mean and I will keep the answer practical.' );
+    $fallback_suggestions = $fallback_services ? stapleit_cora_follow_up_suggestions( $effective_prompt ) : array();
     $result = array(
         'ok'                => true,
         'mode'              => 'knowledge-guide',
         'reply'             => $fallback_reply,
         'context'           => $turn_context,
-        'suggestions'       => stapleit_cora_follow_up_suggestions( $effective_prompt ),
+        'suggestions'       => $fallback_suggestions,
         'knowledge_version' => stapleit_cora_knowledge_version(),
     );
     $context_note = $context_label !== '' ? "\n\nCONVERSATION CONTEXT: The current subject is " . $context_label . ". Resolve short follow-up wording such as ‘that’, ‘it’ or ‘what’s included?’ against this subject unless the visitor clearly changes topic." : '';
