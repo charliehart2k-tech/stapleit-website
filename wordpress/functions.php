@@ -367,8 +367,9 @@ function stapleit_handle_cora_planner_explain_ajax() {
         wp_send_json( array( 'ok' => false, 'message' => 'Cora is taking a short pause. Your recommendation is still complete and an engineer can confirm it during a free IT audit.' ), 429 );
     }
 
-    $planner_type = sanitize_key( (string) ( $_POST['planner_type'] ?? '' ) );
-    $answers      = json_decode( (string) ( $_POST['answers'] ?? '{}' ), true );
+    $planner_type = sanitize_key( wp_unslash( (string) ( $_POST['planner_type'] ?? '' ) ) );
+    $answers_json = wp_unslash( (string) ( $_POST['answers'] ?? '{}' ) );
+    $answers      = json_decode( $answers_json, true );
     $answers      = is_array( $answers ) ? $answers : array();
     $plan         = $planner_type === 'package' ? stapleit_cora_package_plan( $answers ) : ( $planner_type === 'packs' ? stapleit_cora_pack_plan( $answers ) : array() );
     if ( ! $plan ) {

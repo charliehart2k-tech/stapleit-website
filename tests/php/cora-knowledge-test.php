@@ -14,6 +14,7 @@ $basic_follow_up = stapleit_cora_fast_reply( 'What does that include?', stapleit
 $standard_follow_up = stapleit_cora_fast_reply( 'What’s included?', 'package_standard' );
 $contact  = stapleit_cora_relevant_knowledge( 'How can I contact Staple IT and when are you open?', '/' );
 $boundary = stapleit_cora_relevant_knowledge( 'Can you guarantee compliance or book a call for me?', '/' );
+$functions_source = file_get_contents( __DIR__ . '/../../wordpress/functions.php' );
 
 $checks = array(
     array( strpos( $security, 'Microsoft 365 Business Premium' ) !== false, 'Microsoft knowledge is retrieved for Microsoft 365' ),
@@ -37,6 +38,9 @@ $checks = array(
     array( strpos( stapleit_cora_fast_reply( 'Outlook and our printer keep having problems' ), 'Basic is the natural starting point' ) !== false, 'day-to-day support questions map to Basic without model inference' ),
     array( strpos( stapleit_cora_fast_reply( 'A client wants Cyber Essentials' ), 'Cyber Essentials pack' ) !== false, 'Cyber Essentials readiness has a deterministic grounded answer' ),
     array( stapleit_cora_fast_reply( 'Can you explain our unusual line-of-business workflow?' ) === '', 'ambiguous questions remain available to the local model' ),
+    array( strpos( $functions_source, '$answers_json = wp_unslash' ) !== false, 'planner AJAX JSON is unslashed before decoding' ),
+    array( strpos( $functions_source, 'array_key_exists( $key, $answers )' ) !== false, 'add-on planner accepts partial conversation payloads' ),
+    array( strpos( $functions_source, 'Unasked areas are unknown' ) !== false, 'partial add-on plans explicitly preserve unknown unasked areas' ),
 );
 
 $failures = array();
