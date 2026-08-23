@@ -274,9 +274,6 @@ body.support-dialog-open{overflow:hidden}
   line-height:1.65;
 }
 
-@media(max-width:1180px) and (min-width:981px){
-  .support-package-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
 
 .support-packs{
   padding-block:var(--space-9);

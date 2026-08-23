@@ -548,3 +548,16 @@
     }, { once: true });
   });
 })();
+(() => {
+  const more = document.querySelector('[data-package-more]');
+  const tailored = document.querySelector('[data-package-tailored-wrap]');
+  if (!(more instanceof HTMLButtonElement) || !(tailored instanceof HTMLElement)) return;
+  tailored.hidden = true;
+  more.hidden = false;
+  const setExpanded = expanded => {
+    tailored.hidden = !expanded;
+    more.setAttribute('aria-expanded', String(expanded));
+    more.textContent = expanded ? 'Show less' : 'See more';
+  };
+  more.addEventListener('click', () => setExpanded(more.getAttribute('aria-expanded') !== 'true'));
+})();

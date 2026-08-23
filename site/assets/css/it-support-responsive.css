@@ -176,7 +176,6 @@
   .support-package-card{padding:25px 19px 20px}
   .support-extra-card{padding-inline:18px}
   .support-package-card h3{font-size:clamp(1.65rem,7.4vw,2rem)}
-  .support-package-fit{margin-top:6px;font-size:.78rem}
   .support-package-standard{padding-top:47px}
   .support-package-price{margin-top:14px}
   .support-package-price-main strong{font-size:clamp(2.15rem,10vw,2.75rem)}
@@ -186,7 +185,6 @@
   .support-package-highlights li{font-size:.9rem;line-height:1.42}
   .support-package-details{padding-top:11px}
   .support-package-details>summary{min-height:46px;padding:10px 15px;font-size:.86rem}
-  .support-package-badge{top:18px;right:19px;max-width:calc(100% - 38px);white-space:normal;text-align:right}
   .support-package-price-main{flex-wrap:wrap}
 
   .support-dialog-header{gap:16px}

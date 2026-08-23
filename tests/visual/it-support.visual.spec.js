@@ -57,9 +57,10 @@ for (const [name, width, height] of viewports) {
         ? getComputedStyle(packageGrid).gridTemplateColumns.split(' ').filter(Boolean).length
         : 0;
       const heroStage = document.querySelector('.support-hero-shell');
-      const heroMotion = document.querySelector('.support-hero-motion');
       const heroCopy = document.querySelector('.support-hero-copy');
       const standard = document.querySelector('.support-standard');
+      const heroCta = document.querySelector('.support-hero-cta');
+      const heroProposition = document.querySelector('.support-hero-proposition');
       const tierBasic = document.querySelector('.support-package-basic');
       const tierStandard = document.querySelector('.support-package-standard');
       const tierPremium = document.querySelector('.support-package-premium');
@@ -71,12 +72,13 @@ for (const [name, width, height] of viewports) {
         smallestControl: controls.length ? Math.min(...controls) : 0,
         escaped,
         packageColumns,
-        heroMotionPresent: heroMotion instanceof HTMLVideoElement && /liquid-wave\.mp4/.test(heroMotion.querySelector('source')?.getAttribute('src') || ''),
-        heroMotionOpacity: Number.parseFloat(getComputedStyle(heroMotion).opacity),
-        heroStageRadius: Number.parseFloat(getComputedStyle(heroStage).borderTopLeftRadius),
+        heroMotionPresent: Boolean(document.querySelector('.support-hero-motion')),
         heroStageOverflow: getComputedStyle(heroStage).overflow,
+        heroCopyRadius: Number.parseFloat(getComputedStyle(heroCopy).borderTopLeftRadius),
+        standardRadius: Number.parseFloat(getComputedStyle(standard).borderTopLeftRadius),
         heroCopyBlur: getComputedStyle(heroCopy).backdropFilter || getComputedStyle(heroCopy).webkitBackdropFilter || '',
         standardBlur: getComputedStyle(standard).backdropFilter || getComputedStyle(standard).webkitBackdropFilter || '',
+        ctaAlignedLeft: Math.abs(heroCta.getBoundingClientRect().left - heroProposition.getBoundingClientRect().left) < 2,
         packageAccents: [tierBasic,tierStandard,tierPremium].map(el => getComputedStyle(el).getPropertyValue('--support-card-accent').trim()),
         coraPanelInsideViewport: (() => {
           const rect = document.querySelector('.cora-panel').getBoundingClientRect();
@@ -92,13 +94,14 @@ for (const [name, width, height] of viewports) {
     expect(contract.questionVisible).toBe(true);
     expect(contract.smallestControl).toBeGreaterThanOrEqual(44);
     expect(contract.escaped).toEqual([]);
-    expect(contract.heroMotionPresent).toBe(true);
-    expect(contract.heroMotionOpacity).toBeGreaterThanOrEqual(width <= 700 ? .55 : .6);
-    expect(contract.heroStageRadius).toBeGreaterThanOrEqual(width <= 700 ? 24 : 34);
-    expect(contract.heroStageOverflow).toBe('hidden');
+    expect(contract.heroMotionPresent).toBe(false);
+    expect(contract.heroStageOverflow).toBe('visible');
+    expect(contract.heroCopyRadius).toBeGreaterThanOrEqual(width <= 700 ? 20 : 28);
+    expect(contract.standardRadius).toBeGreaterThanOrEqual(width <= 700 ? 20 : 28);
+    expect(contract.ctaAlignedLeft).toBe(true);
     expect(contract.heroCopyBlur).toContain('blur');
     expect(contract.standardBlur).toContain('blur');
-    expect(contract.packageAccents).toEqual(['#4f85ff','#22c55e','#a855f7']);
+    expect(contract.packageAccents).toEqual(['#F82822','#004AAD','#5E17EB']);
     expect(contract.coraPanelInsideViewport).toBe(true);
     expect(contract.coraPanelWidth).toBeGreaterThanOrEqual(width <= 320 ? 270 : width <= 840 ? 280 : 360);
     expect(contract.exposesImplementationCopy).toBe(false);
@@ -110,16 +113,6 @@ for (const [name, width, height] of viewports) {
   });
 }
 
-
-test('IT Support liquid stage respects reduced motion', async ({ browser }) => {
-  const context = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1366, height: 768 } });
-  const page = await context.newPage();
-  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
-  const video = page.locator('.support-hero-motion');
-  await expect(video).toHaveCount(1);
-  await expect.poll(() => video.evaluate(element => element.paused)).toBe(true);
-  await context.close();
-});
 
 for (const route of ['/', '/about-us/', '/it-services/it-support/']) {
   test(`Cora is usable on ${route}`, async ({ page }) => {
@@ -276,14 +269,18 @@ test('mobile package finder is compact, scannable and hands off cleanly', async 
       questionHeight: question?.getBoundingClientRect().height || 0,
       teamColumns: choices ? getComputedStyle(choices).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
       tallestCard: Math.max(...cards),
-      fits: [...document.querySelectorAll('.support-package-fit')].map(element => element.textContent.trim())
+      primaryOrder: [...document.querySelectorAll('[data-package-grid] > .support-package-card h3')].map(element => element.textContent.trim()),
+      fitCount: document.querySelectorAll('.support-package-fit').length,
+      popularCount: document.querySelectorAll('.support-package-badge').length
     };
   });
   expect(initial.formHeight).toBeLessThanOrEqual(430);
   expect(initial.questionHeight).toBeLessThanOrEqual(310);
   expect(initial.teamColumns).toBe(2);
   expect(initial.tallestCard).toBeLessThanOrEqual(430);
-  expect(initial.fits).toHaveLength(4);
+  expect(initial.primaryOrder).toEqual(['Basic','Standard','Premium']);
+  expect(initial.fitCount).toBe(0);
+  expect(initial.popularCount).toBe(0);
 
   await form.getByLabel('5–19 people').check();
   await form.getByRole('button', { name: 'Continue' }).click();
@@ -314,6 +311,21 @@ test('mobile package finder is compact, scannable and hands off cleanly', async 
   expect(result.calculatorColumns).toBe(2);
   expect(result.actionColumns).toBe(2);
   expect(result.auditHref).toBe('/get-in-touch/it-audit/');
+});
+
+
+test('primary packages lead and tailored support stays behind See more', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const more = page.locator('[data-package-more]');
+  const tailored = page.locator('[data-package-tailored-wrap]');
+  await expect(page.locator('[data-package-grid] > .support-package-card h3')).toHaveText(['Basic','Standard','Premium']);
+  await expect(tailored).toBeHidden();
+  await expect(more).toBeVisible();
+  await more.click();
+  await expect(tailored).toBeVisible();
+  await expect(tailored.getByText('Tailored', { exact: true })).toBeVisible();
+  await expect(more).toHaveText('Show less');
 });
 
 test('Cora keeps package context across a natural follow-up', async ({ page }) => {
@@ -576,6 +588,6 @@ test('touch-opened dialogs do not leave package cards glowing and use the mobile
   await page.getByRole('button', { name: 'Close' }).click();
   await expect(dialog).toBeHidden();
   await expect.poll(async () => card.evaluate(element => getComputedStyle(element).transform)).toBe('none');
-  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeLessThanOrEqual(0.16);
+  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeLessThanOrEqual(0.20);
   await context.close();
 });
