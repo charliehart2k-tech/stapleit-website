@@ -19,15 +19,13 @@
   const resultsEmpty = form.querySelector('[data-pack-results-empty]');
   const reviewButton = form.querySelector('[data-pack-finder-review]');
   const resultRows = [...form.querySelectorAll('[data-pack-result]')];
-  const aiPanel = form.querySelector('[data-packs-ai]');
-  const aiCopy = form.querySelector('[data-packs-ai-copy]');
   const coraChat = form.querySelector('[data-packs-cora-chat]');
 
   if (
     !stage || !(gateway instanceof HTMLFieldSetElement) || !questions.length || !count || !coraLine ||
     !(backButton instanceof HTMLButtonElement) || !(suggestButton instanceof HTMLButtonElement) ||
     !(nextButton instanceof HTMLButtonElement) || !results || !resultsHeading || !resultsSummary || !resultsEmpty ||
-    !(reviewButton instanceof HTMLButtonElement) || resultRows.length !== questions.length || !aiPanel || !aiCopy
+    !(reviewButton instanceof HTMLButtonElement) || resultRows.length !== questions.length
   ) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -123,7 +121,6 @@
     allQuestions.forEach(question => { question.hidden = question.dataset.packKey !== key; });
     stage.hidden = false;
     results.hidden = true;
-    aiPanel.hidden = true;
     updateControls();
     if (focus) window.requestAnimationFrame(() => currentQuestion()?.querySelector('legend')?.focus());
   };
@@ -135,10 +132,10 @@
   };
   const resultSummaryText = (likelyNames, considerNames) => {
     if (likelyNames.length && considerNames.length) {
-      return `From what you’ve told me so far, ${naturalList(likelyNames)} ${likelyNames.length === 1 ? 'looks' : 'look'} worth discussing first. ${naturalList(considerNames)} ${considerNames.length === 1 ? 'is' : 'are'} worth clarifying.`;
+      return `${naturalList(likelyNames)} ${likelyNames.length === 1 ? 'stands' : 'stand'} out from what you’ve told me. ${naturalList(considerNames)} ${considerNames.length === 1 ? 'is' : 'are'} worth clarifying.`;
     }
     if (likelyNames.length) {
-      return `From what you’ve told me so far, ${naturalList(likelyNames)} ${likelyNames.length === 1 ? 'looks' : 'look'} worth discussing first.`;
+      return `${naturalList(likelyNames)} ${likelyNames.length === 1 ? 'stands' : 'stand'} out from what you’ve told me.`;
     }
     if (considerNames.length) {
       return `${naturalList(considerNames)} ${considerNames.length === 1 ? 'is' : 'are'} worth clarifying because you were not sure.`;
@@ -159,15 +156,19 @@
       if (answer === 'yes') {
         likelyNames.push(name);
         row.dataset.match = 'likely';
-        status.textContent = 'Worth discussing';
+        status.textContent = 'Suggested';
       } else {
         considerNames.push(name);
         row.dataset.match = 'consider';
         status.textContent = 'Worth clarifying';
       }
     });
+    const resultCount = likelyNames.length + considerNames.length;
+    resultsHeading.textContent = resultCount
+      ? `${resultCount} ${resultCount === 1 ? 'area stands' : 'areas stand'} out so far`
+      : 'Nothing obvious stands out yet';
     resultsSummary.textContent = resultSummaryText(likelyNames, considerNames);
-    resultsEmpty.hidden = likelyNames.length + considerNames.length > 0;
+    resultsEmpty.hidden = resultCount > 0;
     const packSummary = resultRows
       .filter(row => !row.hidden)
       .map(row => `${row.querySelector('h4')?.textContent?.trim()}: ${row.querySelector('[data-pack-result-status]')?.textContent?.trim()}`)
@@ -176,8 +177,6 @@
     window.stapleitPlanner.packs = packSummary;
     window.dispatchEvent(new CustomEvent('stapleit:planner-update'));
     window.stapleitTrack?.('pack_finder_completed');
-    const payload = answerObject();
-    window.stapleitExplainPlanner?.('packs', payload, aiPanel, aiCopy);
     if (coraChat instanceof HTMLButtonElement) {
       const names = [...likelyNames, ...considerNames];
       coraChat.dataset.coraMessage = names.length

@@ -437,7 +437,6 @@
 
   moreButton.setAttribute('aria-controls', packGrid.id);
   moreButton.setAttribute('aria-expanded', 'false');
-  moreButton.textContent = `Show ${lateCards.length} more ${lateCards.length === 1 ? 'pack' : 'packs'}`;
 
   lateCards.forEach(card => {
     card.hidden = true;

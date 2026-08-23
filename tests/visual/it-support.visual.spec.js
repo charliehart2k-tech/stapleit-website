@@ -417,8 +417,30 @@ test('Cora add-on conversation adapts and suggests without a nine-question check
   await expect(form.locator('[data-pack-result="governance"]')).toBeVisible();
   await expect(form.locator('[data-pack-result="cyber-essentials"]')).toBeHidden();
   await expect(form.locator('[data-pack-result="server"]')).toBeHidden();
-  await expect(form.locator('[data-packs-ai-copy]')).toContainText('Security');
-  await expect(form.locator('[data-packs-ai-copy]')).toContainText('Governance & compliance');
+  await expect(form.locator('#support-pack-results-title')).toHaveText('2 areas stand out so far');
+  await expect(form.locator('[data-pack-result]:visible')).toHaveCount(2);
+  await expect(form.locator('[data-pack-result]:visible').first().getByRole('link', { name: 'View pack details' })).toBeVisible();
+  await expect(page.locator('#support-packs-grid .support-extra-card:not([hidden])')).toHaveCount(6);
+  const viewAll = page.getByRole('button', { name: /More specialist packs.*View all 9 packs/i });
+  await expect(viewAll).toBeVisible();
+  const continuation = await viewAll.evaluate(element => ({
+    width: element.getBoundingClientRect().width,
+    parentWidth: element.parentElement?.getBoundingClientRect().width || 0
+  }));
+  expect(continuation.width).toBeGreaterThan(continuation.parentWidth - 2);
+  const pass4bGeometry = await page.evaluate(() => ({
+    resultHeight: document.querySelector('[data-pack-results]')?.getBoundingClientRect().height || 0,
+    resultCardHeights: [...document.querySelectorAll('[data-pack-result]:not([hidden])')].map(card => card.getBoundingClientRect().height),
+    catalogueCardHeights: [...document.querySelectorAll('#support-packs-grid .support-extra-card:not([hidden])')].slice(0, 6).map(card => card.getBoundingClientRect().height),
+    overflow: document.documentElement.scrollWidth - innerWidth
+  }));
+  expect(pass4bGeometry.resultHeight).toBeLessThanOrEqual(930);
+  expect(Math.max(...pass4bGeometry.resultCardHeights)).toBeLessThanOrEqual(280);
+  expect(Math.max(...pass4bGeometry.catalogueCardHeights)).toBeLessThanOrEqual(270);
+  expect(pass4bGeometry.overflow).toBeLessThanOrEqual(0);
+
+  await viewAll.click();
+  await expect(page.locator('#support-packs-grid .support-extra-card:not([hidden])')).toHaveCount(9);
   await expect(form.locator('.support-pack-results-note')).toContainText('not a complete assessment');
 
   const answeredPackTopics = await form.locator('[data-pack-question]:not([data-pack-gateway]) input:checked').count();
@@ -453,7 +475,7 @@ test('Cora add-on conversation can stop early and leaves unasked areas unknown',
   await expect(form.locator('[data-pack-question][data-pack-key="network"] input:checked')).toHaveCount(0);
   await expect(form.locator('.support-pack-results-note')).toContainText('not a complete assessment');
 
-  const chat = form.getByRole('button', { name: 'Chat to Cora about these' });
+  const chat = form.getByRole('button', { name: 'Ask Cora about this' });
   await chat.click();
   await expect(page.getByRole('dialog', { name: 'Cora' })).toBeVisible();
   await expect(page.getByLabel('Message Cora')).toHaveValue(/Nothing stood out/i);

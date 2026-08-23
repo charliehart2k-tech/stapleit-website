@@ -310,6 +310,13 @@ grep -Fq "assets/css/it-support.bundle.css?v=$VERSION" "$THEME/static-it-support
 grep -Fq 'source: it-support-responsive.css' "$THEME/assets/css/it-support.bundle.css"
 grep -Fq 'source: it-support-packages.css' "$THEME/assets/css/it-support.bundle.css"
 grep -Fq 'source: it-support-packs-conversation.css' "$THEME/assets/css/it-support.bundle.css"
+grep -Fq 'Browse the full catalogue' "$THEME/static-it-support.php"
+grep -Fq 'View all 9 packs' "$THEME/static-it-support.php"
+grep -Fq '>View pack details</' "$THEME/static-it-support.php"
+if grep -Fq 'Show 3 more packs' "$THEME/static-it-support.php"; then
+  echo "Legacy floating add-on pack reveal control is still present; refusing deployment." >&2
+  exit 1
+fi
 grep -Fq '"@type":"Service"' "$THEME/static-it-support.php"
 grep -Fq "assets/js/it-support.js?v=$VERSION" "$THEME/static-it-support.php"
 grep -Fq "assets/js/it-support-packs.js?v=$VERSION" "$THEME/static-it-support.php"
