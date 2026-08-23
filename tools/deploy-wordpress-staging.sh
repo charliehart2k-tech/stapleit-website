@@ -218,7 +218,7 @@ grep -Fq 'Chat to Cora' "$THEME/assets/js/app.js"
 test -s "$THEME/assets/css/cora.css"
 
 # Current IT Support contract: semantic hero, package/planner flow and Cora integration.
-grep -Fq 'class="support-hero-shell liquid-glass"' "$THEME/static-it-support.php"
+grep -Fq 'class="support-hero-shell"' "$THEME/static-it-support.php"
 grep -Fq 'id="support-hero-title"' "$THEME/static-it-support.php"
 grep -Fq 'class="support-hero-unlimited">Unlimited</span>' "$THEME/static-it-support.php"
 grep -Fq 'class="support-standard-accent">as standard</span>' "$THEME/static-it-support.php"
