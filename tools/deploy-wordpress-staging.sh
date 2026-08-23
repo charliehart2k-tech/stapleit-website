@@ -311,9 +311,15 @@ grep -Fq "assets/css/it-support.bundle.css?v=$VERSION" "$THEME/static-it-support
 grep -Fq 'source: it-support-responsive.css' "$THEME/assets/css/it-support.bundle.css"
 grep -Fq 'source: it-support-packages.css' "$THEME/assets/css/it-support.bundle.css"
 grep -Fq 'source: it-support-packs-conversation.css' "$THEME/assets/css/it-support.bundle.css"
-grep -Fq 'Browse the full catalogue' "$THEME/static-it-support.php"
+grep -Fq 'id="support-pack-catalogue-title">All add-on packs</h3>' "$THEME/static-it-support.php"
 grep -Fq 'View all 9 packs' "$THEME/static-it-support.php"
 grep -Fq '>View pack details</' "$THEME/static-it-support.php"
+for stale_copy in 'Have a quick chat with Cora' 'What made you stop here' 'Cora · start wherever feels closest' 'Browse the full catalogue' 'More specialist packs'; do
+  if grep -Fq "$stale_copy" "$THEME/static-it-support.php"; then
+    echo "Unapproved add-on copy returned: $stale_copy" >&2
+    exit 1
+  fi
+done
 if grep -Fq 'Show 3 more packs' "$THEME/static-it-support.php"; then
   echo "Legacy floating add-on pack reveal control is still present; refusing deployment." >&2
   exit 1

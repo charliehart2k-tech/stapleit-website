@@ -537,7 +537,7 @@ def audit(root: Path) -> int:
             for retired_copy in ("Question 1 of 9", "nine quick questions"):
                 if retired_copy in text:
                     errors.append(f"{rel}: fixed nine-question pack-finder copy is retired: {retired_copy}")
-            for required_marker in ("data-pack-cora-line", "data-pack-finder-suggest", "data-pack-gateway"):
+            for required_marker in ("data-pack-finder-count", "data-pack-finder-suggest", "data-pack-gateway"):
                 if required_marker not in text:
                     errors.append(f"{rel}: adaptive Cora pack conversation marker is missing: {required_marker}")
 

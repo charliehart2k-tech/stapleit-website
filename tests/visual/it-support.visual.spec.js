@@ -427,7 +427,7 @@ test('Cora add-on conversation adapts and suggests without a nine-question check
   await expect(form.locator('progress')).toHaveCount(0);
   await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'focus');
   await form.getByLabel('Security or compliance').check();
-  await expect(form.locator('[data-pack-cora-line]')).toContainText('protection');
+  await expect(form.locator('[data-pack-cora-line]')).toHaveCount(0);
   await form.getByRole('button', { name: 'Start there' }).click();
 
   await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'security');
@@ -447,11 +447,11 @@ test('Cora add-on conversation adapts and suggests without a nine-question check
   await expect(form.locator('[data-pack-result="governance"]')).toBeVisible();
   await expect(form.locator('[data-pack-result="cyber-essentials"]')).toBeHidden();
   await expect(form.locator('[data-pack-result="server"]')).toBeHidden();
-  await expect(form.locator('#support-pack-results-title')).toHaveText('2 areas stand out so far');
+  await expect(form.locator('#support-pack-results-title')).toHaveText('Suggestions');
   await expect(form.locator('[data-pack-result]:visible')).toHaveCount(2);
   await expect(form.locator('[data-pack-result]:visible').first().getByRole('link', { name: 'View pack details' })).toBeVisible();
   await expect(page.locator('#support-packs-grid .support-extra-card:not([hidden])')).toHaveCount(6);
-  const viewAll = page.getByRole('button', { name: /More specialist packs.*View all 9 packs/i });
+  const viewAll = page.getByRole('button', { name: /View all 9 packs/i });
   await expect(viewAll).toBeVisible();
   const continuation = await viewAll.evaluate(element => ({
     width: element.getBoundingClientRect().width,
@@ -509,6 +509,35 @@ test('Cora add-on conversation can stop early and leaves unasked areas unknown',
   await chat.click();
   await expect(page.getByRole('dialog', { name: 'Cora' })).toBeVisible();
   await expect(page.getByLabel('Message Cora')).toHaveValue(/Nothing stood out/i);
+});
+
+test('mobile support content never disappears behind scroll reveal and unapproved filler copy stays absent', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const state = await page.evaluate(() => {
+    const targets = [
+      ...document.querySelectorAll('.support-package-card, #support-packs-grid .support-extra-card, .support-section-heading')
+    ];
+    targets.forEach(target => {
+      target.classList.add('motion-ready');
+      target.classList.remove('motion-in');
+    });
+    window.scrollTo(0, document.documentElement.scrollHeight);
+    const hidden = targets.filter(target => {
+      const style = getComputedStyle(target);
+      return Number.parseFloat(style.opacity) < .99;
+    }).map(target => target.className);
+    return {
+      hidden,
+      copy: document.body.innerText,
+      overflow: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+
+  expect(state.hidden).toEqual([]);
+  expect(state.copy).not.toMatch(/Have a quick chat with Cora|What made you stop here|Cora · start wherever feels closest|Browse the full catalogue|More specialist packs/i);
+  expect(state.overflow).toBeLessThanOrEqual(0);
 });
 
 test('touch-opened dialogs do not leave package cards glowing and use the mobile sheet treatment', async ({ browser }) => {

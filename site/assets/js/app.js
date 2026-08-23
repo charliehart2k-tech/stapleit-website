@@ -165,7 +165,7 @@
     return thinking;
   };
 
-  addMessage('assistant', 'Hi, I’m Cora. Tell me what you need help with — a problem, something you want to improve, or just how your IT works today. I’ll point you in the right direction.');
+  addMessage('assistant', 'Hi, I’m Cora. What can I help with?');
   renderSuggestions(initialSuggestions);
 
   const setOpen = (open, { focusInput = finePointer.matches } = {}) => {

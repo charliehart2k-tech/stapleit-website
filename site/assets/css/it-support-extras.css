@@ -1086,14 +1086,7 @@ body.support-dialog-open{overflow:hidden}
 }
 
 @media(prefers-reduced-motion:no-preference){
-  .support-pack-finder.motion-ready{
-    opacity:0;
-    transform:translateY(14px) scale(.998);
-    transition:opacity 820ms var(--support-ease),transform 820ms var(--support-ease);
-    will-change:opacity,transform;
-  }
-
-  .support-pack-finder.motion-ready.motion-in{opacity:1;transform:none;will-change:auto}
+  .support-pack-finder.motion-ready{opacity:1;transform:none;will-change:auto}
 
   .support-pack-finder.is-enhanced .support-pack-question:not([hidden]){animation:supportPackQuestionIn 520ms var(--support-ease) both}
   .support-pack-finder.is-enhanced[data-pack-direction="back"] .support-pack-question:not([hidden]){animation-name:supportPackQuestionBack}

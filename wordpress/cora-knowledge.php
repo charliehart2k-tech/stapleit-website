@@ -168,6 +168,7 @@ function stapleit_cora_context_label( $context ) {
 
 function stapleit_cora_context_from_prompt( $prompt ) {
     $text = strtolower( trim( (string) $prompt ) );
+    if ( preg_match( '/\b(?:business\s+premium|microsoft\s*365\s+business\s+premium)\b/i', $text ) && preg_match( '/\b(?:licen[cs]e|subscription)\b/i', $text ) && preg_match( '/\b(?:price|pricing|cost|how\s+much)\b/i', $text ) ) return '';
     if ( preg_match( '/\b(?:cheapest|least\s+expensive|lowest[-\s]+cost|most\s+affordable)\b/i', $text ) ) return 'package_basic';
     if ( preg_match( '/\bsole[-\s]?trader\b/i', $text ) ) return 'package_sole';
     if ( preg_match( '/\bbasic\b/i', $text ) ) return 'package_basic';
@@ -215,6 +216,10 @@ function stapleit_cora_context_for_turn( $prompt, $incoming_context = '', $histo
 function stapleit_cora_fast_reply( $prompt, $context = '' ) {
     $text    = strtolower( trim( (string) $prompt ) );
     $context = stapleit_cora_valid_context_key( $context );
+
+    if ( preg_match( '/\b(?:business\s+premium|microsoft\s*365\s+business\s+premium)\b/i', $text ) && preg_match( '/\b(?:licen[cs]e|subscription)\b/i', $text ) && preg_match( '/\b(?:price|pricing|cost|how\s+much)\b/i', $text ) ) {
+        return 'Staple IT does not publish a standalone Microsoft 365 Business Premium licence price on this site. The managed Premium support package includes Business Premium, but that package price is not the standalone Microsoft licence price. A person can confirm the licence price and quantity you need.';
+    }
 
     if ( preg_match( '/\b(?:cheapest|least\s+expensive|lowest[-\s]+cost|most\s+affordable)\b/i', $text ) ) {
         return 'The cheapest published team package is Basic, starting from £35 per staff member, per month for teams of 5+. It covers day-to-day helpdesk support, monitoring, patching, remote device management and business-grade antivirus. Sole-trader support is tailored and price on application.';
@@ -276,6 +281,9 @@ function stapleit_cora_fast_reply( $prompt, $context = '' ) {
 
 function stapleit_cora_follow_up_suggestions( $prompt ) {
     $prompt = strtolower( (string) $prompt );
+    if ( preg_match( '/\b(?:business\s+premium|microsoft\s*365\s+business\s+premium)\b/i', $prompt ) && preg_match( '/\b(?:licen[cs]e|subscription)\b/i', $prompt ) && preg_match( '/\b(?:price|pricing|cost|how\s+much)\b/i', $prompt ) ) {
+        return array( 'What does Premium include?', 'Can you review our licences?' );
+    }
     if ( preg_match( '/secur|phishing|cyber|ransomware|identity|password/', $prompt ) ) {
         return array( 'What protection is included?', 'Do we need a Security pack?', 'What should we review first?' );
     }

@@ -9,7 +9,6 @@
   const questions = allQuestions.filter(question => question !== gateway);
   const questionByKey = new Map(allQuestions.map(question => [question.dataset.packKey, question]));
   const count = form.querySelector('[data-pack-finder-count]');
-  const coraLine = form.querySelector('[data-pack-cora-line]');
   const backButton = form.querySelector('[data-pack-finder-back]');
   const suggestButton = form.querySelector('[data-pack-finder-suggest]');
   const nextButton = form.querySelector('[data-pack-finder-next]');
@@ -22,7 +21,7 @@
   const coraChat = form.querySelector('[data-packs-cora-chat]');
 
   if (
-    !stage || !(gateway instanceof HTMLFieldSetElement) || !questions.length || !count || !coraLine ||
+    !stage || !(gateway instanceof HTMLFieldSetElement) || !questions.length || !count ||
     !(backButton instanceof HTMLButtonElement) || !(suggestButton instanceof HTMLButtonElement) ||
     !(nextButton instanceof HTMLButtonElement) || !results || !resultsHeading || !resultsSummary || !resultsEmpty ||
     !(reviewButton instanceof HTMLButtonElement) || resultRows.length !== questions.length
@@ -34,12 +33,6 @@
     infrastructure: ['server', 'azure', 'network', 'disaster-recovery'],
     future: ['ai', 'strategy', 'disaster-recovery', 'security'],
     guide: ['security', 'governance', 'network', 'disaster-recovery', 'strategy']
-  };
-  const focusLines = {
-    security: 'Got it — I’ll start with protection and anything you may need to evidence.',
-    infrastructure: 'Okay — I’ll work out which parts of the environment may need their own management.',
-    future: 'Got it — I’ll look at where AI, planning or resilience might genuinely help.',
-    guide: 'No problem — I’ll keep it broad and only go deeper where what you tell me points.'
   };
   let history = ['focus'];
   let historyIndex = 0;
@@ -73,38 +66,17 @@
     const signals = answers.filter(answer => answer === 'yes' || answer === 'unsure').length;
     return answers.length >= 4 || answers.length >= 3 || (answers.length >= 2 && signals >= 2);
   };
-  const updateCoraLine = (lastKey = '', lastAnswer = '') => {
-    if (currentKey === 'focus' && !selectedAnswer(gateway)) {
-      coraLine.textContent = 'I’ll ask only what seems useful. You can stop as soon as you have enough to work with.';
-      return;
-    }
-    if (lastKey === 'focus') {
-      coraLine.textContent = focusLines[selectedFocus()] || focusLines.guide;
-      return;
-    }
-    if (enoughToSuggest()) {
-      coraLine.textContent = 'I’ve got enough to suggest a starting point without pretending I know your whole environment.';
-      return;
-    }
-    if (lastAnswer === 'yes') {
-      coraLine.textContent = 'That’s useful. I’ll follow the related thread rather than run through everything.';
-    } else if (lastAnswer === 'unsure') {
-      coraLine.textContent = 'That’s fine. I’ll treat it as something to discuss, not a definite need.';
-    } else if (lastAnswer === 'no') {
-      coraLine.textContent = 'Good to know. I’ll leave that out and move to the next thing that may matter.';
-    }
-  };
   const updateControls = () => {
     const answers = packAnswers();
     const currentAnswer = selectedAnswer(currentQuestion());
     if (currentKey === 'focus') {
-      count.textContent = 'Cora · start wherever feels closest';
+      count.textContent = 'Cora';
     } else if (answers.length <= 1) {
-      count.textContent = 'Cora · getting a feel for your setup';
+      count.textContent = 'Cora';
     } else if (enoughToSuggest()) {
-      count.textContent = 'Cora · enough to suggest a starting point';
+      count.textContent = 'Cora';
     } else {
-      count.textContent = 'Cora · narrowing it down';
+      count.textContent = 'Cora';
     }
     backButton.hidden = historyIndex === 0;
     suggestButton.hidden = answers.length < 2;
@@ -164,9 +136,7 @@
       }
     });
     const resultCount = likelyNames.length + considerNames.length;
-    resultsHeading.textContent = resultCount
-      ? `${resultCount} ${resultCount === 1 ? 'area stands' : 'areas stand'} out so far`
-      : 'Nothing obvious stands out yet';
+    resultsHeading.textContent = resultCount ? 'Suggestions' : 'No add-ons suggested';
     resultsSummary.textContent = resultSummaryText(likelyNames, considerNames);
     resultsEmpty.hidden = resultCount > 0;
     const packSummary = resultRows
@@ -191,7 +161,6 @@
 
   allQuestions.forEach(question => question.addEventListener('change', () => {
     updateControls();
-    updateCoraLine(currentKey, selectedAnswer(question));
   }));
   nextButton.addEventListener('click', () => {
     const question = currentQuestion();
@@ -199,12 +168,10 @@
     if (!answer) return;
     if (currentKey === 'focus') {
       window.stapleitTrack?.('pack_finder_started');
-      updateCoraLine('focus', answer);
       const nextKey = nextQuestionKey();
       if (nextKey) goForward(nextKey); else showResults();
       return;
     }
-    updateCoraLine(currentKey, answer);
     const nextKey = nextQuestionKey();
     if (enoughToSuggest() || !nextKey) showResults();
     else goForward(nextKey);
@@ -216,11 +183,9 @@
     if (historyIndex === 0) return;
     historyIndex -= 1;
     showQuestion(history[historyIndex], { direction: 'back' });
-    updateCoraLine();
   });
   reviewButton.addEventListener('click', () => {
     showQuestion(history[historyIndex], { direction: 'back' });
-    updateCoraLine();
   });
   form.addEventListener('submit', event => event.preventDefault());
 
