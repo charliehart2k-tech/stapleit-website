@@ -316,6 +316,7 @@ test('touch-opened dialogs do not leave package cards glowing and use the mobile
   await card.locator('summary').click();
   const dialog = page.locator('#support-dialog');
   await expect(dialog).toBeVisible();
+  await page.waitForTimeout(550);
   const modalState = await page.evaluate(() => {
     const dialog = document.querySelector('#support-dialog');
     const rect = dialog.getBoundingClientRect();
@@ -327,6 +328,7 @@ test('touch-opened dialogs do not leave package cards glowing and use the mobile
       radius: getComputedStyle(dialog).borderTopLeftRadius
     };
   });
+  expect(modalState.bottomGap).toBeGreaterThanOrEqual(0);
   expect(modalState.bottomGap).toBeLessThanOrEqual(8);
   expect(modalState.width).toBeLessThanOrEqual(384);
   expect(modalState.backdropFilter).toContain('blur(3px)');
