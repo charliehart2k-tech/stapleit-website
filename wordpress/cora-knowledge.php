@@ -112,15 +112,18 @@ function stapleit_cora_relevant_knowledge( $prompt, $page_path = '' ) {
     }
 
     arsort( $scores );
-    $selected = array( 'identity', 'packages', 'boundaries' );
+    $selected = array( 'packages' );
     foreach ( $scores as $key => $score ) {
         if ( $score < 1 || in_array( $key, $selected, true ) ) {
             continue;
         }
         $selected[] = $key;
-        if ( count( $selected ) >= 7 ) {
+        if ( count( $selected ) >= 4 ) {
             break;
         }
+    }
+    if ( count( $selected ) === 1 ) {
+        $selected[] = 'managed_support';
     }
 
     $lines = array( 'STAPLE IT KNOWLEDGE ' . stapleit_cora_knowledge_version() . ' — USE ONLY THESE FACTS:' );
@@ -128,6 +131,48 @@ function stapleit_cora_relevant_knowledge( $prompt, $page_path = '' ) {
         $lines[] = '- ' . $records[ $key ]['content'];
     }
     return implode( "\n", $lines );
+}
+
+function stapleit_cora_fast_reply( $prompt ) {
+    $text = strtolower( trim( (string) $prompt ) );
+
+    if ( preg_match( '/\b(?:cyber\s+essentials|ce\+)\b/i', $text ) ) {
+        return 'Yes. The Cyber Essentials pack supports readiness, remediation and application preparation for Cyber Essentials or Cyber Essentials Plus, and it is price on application. We can help review the current setup, identify gaps and work through remediation before the assessment. If you also need IT policies, documentation or evidence for a customer or insurer, the Governance & compliance pack may be useful too.';
+    }
+
+    if ( preg_match( '/\b(?:microsoft\s*365|m365|business\s+premium|entra|office\s*365)\b/i', $text ) && preg_match( '/\b(?:secur|protection|protect|phishing|identity|mfa|conditional\s+access|defender)\w*/i', $text ) ) {
+        return 'For a team wanting stronger Microsoft 365 security, Standard is the sensible starting point: it adds EDR, email protection, MFA, Conditional Access, privileged-account protection, cloud backup and regular security reviews. Standard starts from £55 per staff member, per month for teams of 5+; Microsoft 365 Business Premium or equivalent licensing is required and sold separately unless specifically included. If you want Business Premium bundled with enhanced Microsoft protection, Premium starts from £75 per staff member, per month.';
+    }
+
+    if ( preg_match( '/\b(?:printer|printing|outlook)\b/i', $text ) && preg_match( '/\b(?:issues?|problems?|help|support|not working|keeps|broken|errors?)\b/i', $text ) ) {
+        return 'That is day-to-day support, so Basic is the natural starting point. Basic starts from £35 per staff member, per month for teams of 5+ and covers helpdesk support during 9am–5pm Monday to Friday for computers, email, printers and supported software, plus monitoring, patching and remote device management. If the recurring issue points to a wider Microsoft 365 or security problem, we can then review whether Standard adds value.';
+    }
+
+    if ( preg_match( '/\b(?:business\s+premium|microsoft\s*365\s+business\s+premium)\b/i', $text ) ) {
+        return 'Microsoft 365 Business Premium is included with Premium, which starts from £75 per staff member, per month for teams of 5+. Standard starts from £55 per staff member, per month and requires Business Premium or equivalent licensing, sold separately unless specifically included. Premium is the clearer fit when you want the Microsoft licence bundled with the managed support and enhanced Microsoft security.';
+    }
+
+    if ( preg_match( '/\b(?:price|pricing|cost|how much)\b/i', $text ) && preg_match( '/\b(?:package|support|basic|standard|premium)\b/i', $text ) ) {
+        return 'For teams of 5+, Basic starts from £35 per staff member, per month, Standard from £55 per staff member, per month, and Premium from £75 per staff member, per month. Sole-trader support and optional packs are price on application. Your written proposal confirms the final scope, eligibility and price before onboarding.';
+    }
+
+    if ( preg_match( '/\b(?:physical\s+server|windows\s+server|active\s+directory|group\s+policy|file\s+server)\b/i', $text ) ) {
+        return 'If you run a physical Windows Server, the Server pack is likely relevant. It is price on application and covers ongoing server support, 24/7 health monitoring, patching, backup oversight and recovery assistance, plus core services such as Active Directory, Group Policy, DNS, DHCP, file shares and permissions. We would confirm the exact server roles and support scope before adding it.';
+    }
+
+    if ( preg_match( '/\b(?:wi-?fi|firewall|access\s+point|network\s+switch|networking)\b/i', $text ) ) {
+        return 'The Network pack is designed for managed firewalls, switches and Wi-Fi access points. It adds active monitoring, configuration and ongoing management for that infrastructure and is price on application. If you are unsure what equipment you have, that is fine — the IT audit can identify it without you needing to know the technical names.';
+    }
+
+    if ( preg_match( '/\b(?:chatgpt|copilot|claude|artificial\s+intelligence|ai\s+tools|ai\s+adoption)\b/i', $text ) ) {
+        return 'The AI pack is for businesses introducing AI tools safely and practically. It covers readiness, platform choice, secure setup, staff guidance and ongoing administration, including Microsoft Copilot, ChatGPT Business or Enterprise and Claude Team or Enterprise where suitable. It is price on application because the right setup depends on your data, licences and how your staff will use it.';
+    }
+
+    if ( preg_match( '/\b(?:switch|change|move)\b/i', $text ) && preg_match( '/\b(?:it\s+provider|support\s+provider|msp|provider)\b/i', $text ) ) {
+        return 'Changing IT provider is handled as a managed onboarding rather than leaving you to coordinate it. We first review the current setup, agree what needs moving, then work directly with the existing IT provider and other suppliers where needed. The aim is a controlled changeover with the day-to-day support ready before the old arrangement ends.';
+    }
+
+    return '';
 }
 
 function stapleit_cora_follow_up_suggestions( $prompt ) {

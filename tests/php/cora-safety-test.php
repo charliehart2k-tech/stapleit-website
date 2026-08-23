@@ -2,6 +2,7 @@
 
 define( 'ABSPATH', __DIR__ );
 require_once __DIR__ . '/../../wordpress/cora-safety.php';
+require_once __DIR__ . '/../../wordpress/cora-knowledge.php';
 
 $cases = array(
     array( true, 'Standard starts from £55 per staff member, per month and adds stronger security, backup and identity protection.', 'published Standard price' ),
@@ -27,6 +28,18 @@ $cases = array(
 );
 
 $failures = array();
+$fast_reply_cases = array(
+    array( 'We have ten staff and want better Microsoft 365 security', 'Microsoft 365 security fast reply' ),
+    array( 'Outlook and our printer keep having problems', 'day-to-day support fast reply' ),
+    array( 'A client wants Cyber Essentials', 'Cyber Essentials fast reply' ),
+);
+foreach ( $fast_reply_cases as $case ) {
+    list( $prompt, $label ) = $case;
+    $reply = stapleit_cora_fast_reply( $prompt );
+    if ( $reply === '' || ! stapleit_cora_reply_is_safe( $reply ) ) {
+        $failures[] = $label . ': deterministic reply must be present and safety-clean';
+    }
+}
 foreach ( $cases as $case ) {
     list( $expected, $reply, $label ) = $case;
     $actual = stapleit_cora_reply_is_safe( $reply );
@@ -79,4 +92,4 @@ if ( $failures ) {
     exit( 1 );
 }
 
-echo 'Cora safety contract: ' . ( count( $cases ) + count( $prompt_cases ) + count( $history_cases ) ) . " cases passed\n";
+echo 'Cora safety contract: ' . ( count( $cases ) + count( $prompt_cases ) + count( $history_cases ) + count( $fast_reply_cases ) ) . " cases passed\n";
