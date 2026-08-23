@@ -43,6 +43,8 @@ $checks = array(
     array( strpos( $functions_source, '$answers_json = wp_unslash' ) !== false, 'planner AJAX JSON is unslashed before decoding' ),
     array( strpos( $functions_source, 'array_key_exists( $key, $answers )' ) !== false, 'add-on planner accepts partial conversation payloads' ),
     array( strpos( $functions_source, 'Unasked areas are unknown' ) !== false, 'partial add-on plans explicitly preserve unknown unasked areas' ),
+    array( strpos( $functions_source, 'If a visitor describes immediate physical danger from a device' ) !== false, 'Cora prioritises physical safety over package recommendations' ),
+    array( strpos( $functions_source, 'if ( ! $matches ) return array();' ) !== false, 'unclassified prompts do not default to Basic package' ),
 );
 
 $failures = array();
