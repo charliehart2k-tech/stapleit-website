@@ -12,13 +12,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function stapleit_cora_knowledge_version() {
-    return '2026-08-23.1';
+    return '2026-08-24.1';
 }
 
 function stapleit_cora_knowledge_records() {
     return array(
         'identity' => array(
-            'keywords' => array( 'staple it', 'where', 'epsom', 'surrey', 'hours', 'open', 'contact', 'phone', 'email' ),
+            'keywords' => array( 'staple it', 'where', 'epsom', 'surrey', 'hours', 'open', 'contact', 'phone', 'email', 'business', 'businesses', 'charity', 'charities', 'individual', 'individuals' ),
             'content'  => 'Staple IT is an Epsom, Surrey IT provider for businesses, charities and individuals. Public staffed support hours are Monday to Friday, 9am to 5pm. 24/7 references on the website describe monitoring, not a 24/7 staffed helpdesk. The public telephone number is 01372 309 707, the public email address is hello@stapleit.co.uk, and the contact form is the correct place for an enquiry.',
         ),
         'packages' => array(
@@ -30,7 +30,7 @@ function stapleit_cora_knowledge_records() {
             'content'  => 'The support journey is: an initial no-obligation conversation, a review of the current setup, then managed onboarding. Staple IT can work directly with an existing IT provider and other suppliers to make the changeover smoother. A free IT audit confirms what is genuinely needed.',
         ),
         'managed_support' => array(
-            'keywords' => array( 'helpdesk', 'unlimited', 'monitor', 'patch', 'device', 'warranty', 'portal', 'engineer', 'remote support' ),
+            'keywords' => array( 'helpdesk', 'unlimited', 'monitor', 'patch', 'device', 'warranty', 'portal', 'engineer', 'remote support', 'printer', 'printing', 'outlook', 'email', 'software', 'password', 'day-to-day', 'everyday it' ),
             'content'  => 'Published managed support includes unlimited helpdesk support during the public staffed support window, UK-based engineers, a dedicated point of contact and clear response times. The published standard service areas include 24/7 monitoring, remote device management, Windows and software updates, mobile device management, next-generation antivirus, device and software management, hardware and warranty tracking, a client support portal, managed onboarding, regular check-ins, fixed monthly pricing and a three-month rolling agreement. Do not describe 24/7 monitoring as a 24/7 staffed helpdesk.',
         ),
         'microsoft' => array(
@@ -86,7 +86,7 @@ function stapleit_cora_knowledge_records() {
             'content'  => 'Staple IT consultancy covers practical IT planning, roadmaps, governance, supplier decisions, Microsoft 365 strategy, Cyber Essentials readiness and AI adoption. Advice should be explained in plain English and shaped around the organisation rather than sold as a generic bundle.',
         ),
         'projects' => array(
-            'keywords' => array( 'project', 'migration', 'cloud', 'automation', 'voip', 'procurement', 'move', 'solution' ),
+            'keywords' => array( 'project', 'migration', 'cloud', 'automation', 'voip', 'telephony', 'phone system', 'procurement', 'move', 'solution' ),
             'content'  => 'Staple IT solutions include cloud and Microsoft 365 work, automation, compliance workflows, procurement, VoIP and other fixed-scope or bespoke projects. Project scope and pricing are confirmed after a review and are not publicly fixed.',
         ),
         'boundaries' => array(
@@ -97,7 +97,8 @@ function stapleit_cora_knowledge_records() {
 }
 
 function stapleit_cora_relevant_knowledge( $prompt, $page_path = '' ) {
-    $haystack = strtolower( trim( (string) $prompt . ' ' . (string) $page_path ) );
+    // The page path must never bias the model toward a product or package.
+    $haystack = strtolower( trim( (string) $prompt ) );
     $records  = stapleit_cora_knowledge_records();
     $scores   = array();
 
@@ -112,18 +113,14 @@ function stapleit_cora_relevant_knowledge( $prompt, $page_path = '' ) {
     }
 
     arsort( $scores );
-    $selected = array( 'packages' );
+    $selected = array();
     foreach ( $scores as $key => $score ) {
-        if ( $score < 1 || in_array( $key, $selected, true ) ) {
-            continue;
-        }
+        if ( $score < 1 ) continue;
         $selected[] = $key;
-        if ( count( $selected ) >= 4 ) {
-            break;
-        }
+        if ( count( $selected ) >= 3 ) break;
     }
-    if ( count( $selected ) === 1 ) {
-        $selected[] = 'managed_support';
+    if ( ! $selected ) {
+        $selected = array( 'identity', 'managed_support' );
     }
 
     $lines = array( 'STAPLE IT KNOWLEDGE ' . stapleit_cora_knowledge_version() . ' — USE ONLY THESE FACTS:' );
@@ -131,6 +128,19 @@ function stapleit_cora_relevant_knowledge( $prompt, $page_path = '' ) {
         $lines[] = '- ' . $records[ $key ]['content'];
     }
     return implode( "\n", $lines );
+}
+
+function stapleit_cora_business_it_intent( $prompt ) {
+    $text = strtolower( trim( (string) $prompt ) );
+    return (bool) preg_match( '/\b(?:it|computer|pc|laptop|device|hardware|software|app|application|system|server|cloud|azure|microsoft|m365|office\s*365|google\s+workspace|security|secure|cyber|phishing|ransomware|network|wi-?fi|firewall|switch|router|internet|vpn|backup|restore|email|outlook|printer|password|identity|mfa|conditional\s+access|sharepoint|onedrive|teams|copilot|chatgpt|ai|voip|phone\s+system|telephony|domain|dns|licen[cs]e|helpdesk|support|remote\s+work|remote\s+staff|data|access|user|users)\b/i', $text );
+}
+
+function stapleit_cora_package_discovery_intent( $prompt ) {
+    $text = strtolower( trim( (string) $prompt ) );
+    if ( preg_match( '/\b(?:which|what|choose|find|recommend|help\s+me\s+choose)\b.{0,42}\b(?:support\s+)?(?:package|plan|tier)\b/i', $text ) ) return true;
+    if ( preg_match( '/\b(?:which|what)\s+(?:support|cover)\s+(?:fits|suits|do\s+(?:i|we)\s+need)\b/i', $text ) ) return true;
+    if ( stapleit_cora_parse_package_team( $text ) !== '' && preg_match( '/\b(?:it\s+support|helpdesk|day-to-day|printer|outlook|better\s+security|stronger\s+security|security\s+evidence|edr|endpoint\s+detection|mfa|conditional\s+access|email\s+security|cloud\s+backup)\b|\b(?:want|need|include|included).{0,24}\bbusiness\s+premium\b/i', $text ) ) return true;
+    return false;
 }
 
 function stapleit_cora_valid_context_key( $context ) {
@@ -175,16 +185,17 @@ function stapleit_cora_context_from_prompt( $prompt ) {
     if ( preg_match( '/\bstandard\b/i', $text ) ) return 'package_standard';
     if ( preg_match( '/\bpremium\b/i', $text ) ) return 'package_premium';
     if ( preg_match( '/\b(?:cyber\s+essentials|ce\+)\b/i', $text ) ) return 'pack_cyber_essentials';
-    if ( preg_match( '/\b(?:physical\s+server|windows\s+server|active\s+directory|group\s+policy|file\s+server)\b/i', $text ) ) return 'pack_server';
+    if ( preg_match( '/\b(?:server\s+pack|physical\s+server|windows\s+server|active\s+directory|group\s+policy|file\s+server)\b/i', $text ) ) return 'pack_server';
     if ( preg_match( '/\b(?:azure|virtual\s+machine|vnet)\b/i', $text ) ) return 'pack_azure';
-    if ( preg_match( '/\b(?:wi-?fi|firewall|access\s+point|network\s+switch|networking)\b/i', $text ) ) return 'pack_network';
+    if ( preg_match( '/\b(?:network\s+pack|wi-?fi|firewall|access\s+point|network\s+switch|networking)\b/i', $text ) ) return 'pack_network';
+    if ( preg_match( '/\bsecurity\s+pack\b/i', $text ) ) return 'pack_security';
     if ( preg_match( '/\b(?:governance|compliance|it\s+polic(?:y|ies)|documentation|evidence)\b/i', $text ) ) return 'pack_governance';
-    if ( preg_match( '/\b(?:chatgpt|copilot|claude|artificial\s+intelligence|ai\s+tools|ai\s+adoption)\b/i', $text ) ) return 'pack_ai';
+    if ( preg_match( '/\b(?:ai\s+pack|chatgpt|copilot|claude|artificial\s+intelligence|ai\s+tools|ai\s+adoption)\b/i', $text ) ) return 'pack_ai';
     if ( preg_match( '/\b(?:strategy|roadmap|budgeting|technology\s+roadmap)\b/i', $text ) ) return 'pack_strategy';
     if ( preg_match( '/\b(?:disaster\s+recovery|business\s+continuity|recovery\s+plan)\b/i', $text ) ) return 'pack_disaster_recovery';
-    if ( preg_match( '/\b(?:switch|change|move)\b/i', $text ) && preg_match( '/\b(?:it\s+provider|support\s+provider|msp|provider)\b/i', $text ) ) return 'onboarding';
+    if ( preg_match( '/\b(?:switch(?:ing)?|chang(?:e|ing)|mov(?:e|ing))\b/i', $text ) && preg_match( '/\b(?:it\s+providers?|support\s+providers?|msps?|providers?)\b/i', $text ) ) return 'onboarding';
     if ( preg_match( '/\b(?:microsoft\s*365|m365|entra|office\s*365)\b/i', $text ) && preg_match( '/\b(?:secur|protection|protect|phishing|identity|mfa|conditional\s+access|defender)\w*/i', $text ) ) return 'package_standard';
-    if ( preg_match( '/\b(?:printer|printing|outlook)\b/i', $text ) && preg_match( '/\b(?:issues?|problems?|help|support|not working|keeps|broken|errors?)\b/i', $text ) ) return 'package_basic';
+    if ( preg_match( '/\b(?:printer|printing|outlook)\b/i', $text ) && preg_match( '/\b(?:issues?|problems?|help|support|not working|keeps?|breaking|broken|errors?)\b/i', $text ) ) return 'package_basic';
     return '';
 }
 
@@ -245,11 +256,23 @@ function stapleit_cora_fast_reply( $prompt, $context = '' ) {
     }
 
     if ( preg_match( '/\b(?:microsoft\s*365|m365|business\s+premium|entra|office\s*365)\b/i', $text ) && preg_match( '/\b(?:secur|protection|protect|phishing|identity|mfa|conditional\s+access|defender)\w*/i', $text ) ) {
-        return 'For a team wanting stronger Microsoft 365 security, Standard is the sensible starting point: it adds EDR, email protection, MFA, Conditional Access, privileged-account protection, cloud backup and regular security reviews. Standard starts from £55 per staff member, per month for teams of 5+; Microsoft 365 Business Premium or equivalent licensing is required and sold separately unless specifically included. If you want Business Premium bundled with enhanced Microsoft protection, Premium starts from £75 per staff member, per month.';
+        return 'For teams of 5+, Standard is the published starting point for stronger Microsoft 365 security: it adds EDR, email protection, MFA, Conditional Access, privileged-account protection, cloud backup and regular security reviews. Microsoft 365 Business Premium or equivalent licensing is required and sold separately unless specifically included. Smaller teams use Tailored support, so I would need the team size before choosing a core package.';
     }
 
-    if ( preg_match( '/\b(?:printer|printing|outlook)\b/i', $text ) && preg_match( '/\b(?:issues?|problems?|help|support|not working|keeps|broken|errors?)\b/i', $text ) ) {
-        return 'That is day-to-day support, so Basic is the natural starting point. Basic starts from £35 per staff member, per month for teams of 5+ and covers helpdesk support during 9am–5pm Monday to Friday for computers, email, printers and supported software, plus monitoring, patching and remote device management. If the recurring issue points to a wider Microsoft 365 or security problem, we can then review whether Standard adds value.';
+    if ( preg_match( '/\b(?:printer|printing|outlook)\b/i', $text ) && preg_match( '/\b(?:issues?|problems?|help|support|not working|keeps?|breaking|broken|errors?)\b/i', $text ) ) {
+        return 'That is day-to-day support. For teams of 5+, it sits in Basic, which starts from £35 per staff member, per month and covers helpdesk support during 9am–5pm Monday to Friday plus monitoring, patching and remote device management. Smaller teams use Tailored support, so I would need the team size before choosing a core package.';
+    }
+
+    if ( preg_match( '/\b(?:what\s+security|security\s+services|cyber\s+security|cybersecurity|protect\s+our|security\s+protection)\b/i', $text ) ) {
+        return 'Staple IT provides layered security across devices, email, identities and online services. Published controls include EDR, anti-phishing and email protection, MFA, Conditional Access and privileged-account protection, with stronger Microsoft security and DNS/web protection available where required.';
+    }
+
+    if ( preg_match( '/\b(?:backup|backups|back\s+up)\b/i', $text ) && preg_match( '/\b(?:microsoft\s*365|m365|google\s+workspace|email|onedrive|sharepoint|teams|cloud)\b/i', $text ) ) {
+        return 'Standard includes Microsoft 365 or Google Workspace backup for supported cloud data, with monitoring, failure alerts, restoration support and periodic restore testing. For teams under five, the support scope is tailored rather than forcing the published per-user package.';
+    }
+
+    if ( preg_match( '/\bgoogle\s+workspace\b/i', $text ) ) {
+        return 'Yes. Staple IT supports Google Workspace as well as Microsoft 365. The exact licensing and backup position depends on the support package and your current setup, so I will not invent a licence cost.';
     }
 
     if ( preg_match( '/\b(?:business\s+premium|microsoft\s*365\s+business\s+premium)\b/i', $text ) ) {
@@ -272,8 +295,124 @@ function stapleit_cora_fast_reply( $prompt, $context = '' ) {
         return 'The AI pack is for businesses introducing AI tools safely and practically. It covers readiness, platform choice, secure setup, staff guidance and ongoing administration, including Microsoft Copilot, ChatGPT Business or Enterprise and Claude Team or Enterprise where suitable. It is price on application because the right setup depends on your data, licences and how your staff will use it.';
     }
 
-    if ( preg_match( '/\b(?:switch|change|move)\b/i', $text ) && preg_match( '/\b(?:it\s+provider|support\s+provider|msp|provider)\b/i', $text ) ) {
-        return 'Changing IT provider is handled as a managed onboarding rather than leaving you to coordinate it. We first review the current setup, agree what needs moving, then work directly with the existing IT provider and other suppliers where needed. The aim is a controlled changeover with the day-to-day support ready before the old arrangement ends.';
+    if ( preg_match( '/\b(?:switch(?:ing)?|chang(?:e|ing)|mov(?:e|ing))\b/i', $text ) && preg_match( '/\b(?:it\s+providers?|support\s+providers?|msps?|providers?)\b/i', $text ) ) {
+        return 'We handle the changeover as managed onboarding. We review the current setup, agree what needs moving, and can work directly with the existing IT provider and other suppliers so support is ready before the old arrangement ends.';
+    }
+
+    if ( preg_match( '/^(?:hi|hello|hey|hiya|yo|morning|afternoon|evening)[.! ]*$/i', trim( $prompt ) ) ) {
+        return 'Hi — what can I help with?';
+    }
+
+    if ( preg_match( '/\b(?:thanks|thank\s+you|cheers)\b/i', $text ) && strlen( $text ) < 80 ) {
+        return 'You’re welcome.';
+    }
+
+    if ( preg_match( '/\b(?:what\s+do\s+you(?:\s+actually)?\s+do|what\s+does\s+staple\s+it\s+do|what\s+can\s+you\s+help\s+with|what\s+services)\b/i', $text ) ) {
+        return 'Staple IT provides managed IT support plus Microsoft 365, cyber security, networking, servers, Azure, consultancy, AI adoption, VoIP and bespoke project work. I can explain any of those, or help work out which support package is the sensible starting point.';
+    }
+
+    if ( preg_match( '/\b(?:charit(?:y|ies)|non[- ]?profit|not[- ]for[- ]profit)\b/i', $text ) && preg_match( '/\b(?:support|help|work\s+with|client|organisation|organization)\b/i', $text ) ) {
+        return 'Yes. Staple IT supports businesses, charities and individuals. If you tell me roughly how many people need support and what you want help with, I can narrow down the relevant support route without assuming more than you’ve told me.';
+    }
+
+    if ( preg_match( '/\b(?:hours|opening|open|when\s+are\s+you|when\s+can\s+i\s+call)\b/i', $text ) ) {
+        return 'Staffed support is Monday to Friday, 9am–5pm. Device and service monitoring runs 24/7; staffed support does not.';
+    }
+
+    if ( preg_match( '/\b(?:contact|phone\s+number|telephone\s+number|email\s+address|email\s+you|call\s+you|get\s+in\s+touch)\b|\bwhat(?:\x{2019}s|\'s|\s+is)\s+your\s+email\b/iu', $text ) ) {
+        return 'You can call Staple IT on 01372 309 707 or email hello@stapleit.co.uk.';
+    }
+
+    if ( preg_match( '/\b(?:azure|virtual\s+machine|vnet|azure\s+vm)\b/i', $text ) ) {
+        return 'The Azure pack covers Microsoft Azure administration, virtual machines, monitoring, maintenance, access control, backup and recovery support, and cost reviews. It is price on application because the scope depends on the Azure resources you actually run.';
+    }
+
+    if ( preg_match( '/\b(?:governance|it\s+polic(?:y|ies)|documentation|insurer|customer\s+questionnaire|compliance\s+evidence)\b/i', $text ) ) {
+        return 'The Governance & compliance pack covers IT policies, documentation, evidence and help responding to customer or insurer checks. It is price on application; formal legal, regulatory or certification advice is not included unless specifically agreed.';
+    }
+
+    if ( preg_match( '/\b(?:strategy|technology\s+roadmap|it\s+roadmap|budgeting|it\s+budget|supplier\s+planning)\b/i', $text ) ) {
+        return 'The Strategy pack adds regular IT reviews, budgeting, supplier support and a practical technology roadmap. It is price on application and is intended to make improvements and growth planned rather than purely reactive.';
+    }
+
+    if ( preg_match( '/\b(?:disaster\s+recovery|business\s+continuity|recovery\s+plan|rto|rpo)\b/i', $text ) ) {
+        return 'The Disaster recovery pack creates and tests a structured recovery plan for critical systems and data. Scope, recovery objectives and testing arrangements are agreed after a review and cannot be set in chat.';
+    }
+
+    if ( preg_match( '/\b(?:voip|phone\s+system|telephone\s+system|telephony)\b/i', $text ) ) {
+        return 'Yes — VoIP is one of Staple IT’s available services. It is price on application, so the exact solution and project scope are confirmed after reviewing what you use and what needs replacing.';
+    }
+
+    if ( preg_match( '/\b(?:which|what)\s+packages?\b/i', $text ) && preg_match( '/\bmicrosoft\s*365\b/i', $text ) && preg_match( '/\b(?:include|included|licen[cs]e)\b/i', $text ) ) {
+        return 'Microsoft 365 Business Premium is included with Premium. Standard requires Business Premium or equivalent licensing, sold separately unless specifically included. Basic supports Microsoft 365, but the software licence itself is sold separately.';
+    }
+
+    if ( preg_match( '/\b(?:microsoft\s*365|m365|office\s*365|sharepoint|onedrive|teams|entra)\b/i', $text ) ) {
+        return 'Staple IT supports Microsoft 365 administration, identity protection and security. If you tell me what you are trying to change or fix, I can explain the relevant support or licensing position without guessing at licence costs.';
+    }
+
+    if ( preg_match( '/\b(?:line[- ]of[- ]business|bespoke|custom|proprietary)\b/i', $text ) && preg_match( '/\b(?:app|application|software|system)\b/i', $text ) ) {
+        return 'That sounds specific to your environment. Staple IT supports everyday business software where it is properly licensed and supported, but an engineer would need to confirm that particular application and any vendor dependencies before I claim it is covered.';
+    }
+
+    if ( preg_match( '/\b(?:weather|football|recipe|movie|film\s+times|horoscope)\b/i', $text ) ) {
+        return 'I can only help with Staple IT and business IT questions.';
+    }
+
+    if ( preg_match( '/\b(?:how\s+do\s+the\s+packages\s+differ|difference\s+between\s+(?:basic|standard|premium)|compare\s+(?:the\s+)?packages|basic\s+vs\s+standard|standard\s+vs\s+premium)\b/i', $text ) ) {
+        return 'Basic is the day-to-day support layer. Standard adds managed security, identity protection and cloud backup. Premium adds Microsoft 365 Business Premium plus enhanced Microsoft security and data protection. The published per-person packages are for teams of 5+; smaller teams use Tailored support.';
+    }
+
+    if ( preg_match( '/\b(?:minimum|minimum\s+users?|minimum\s+staff|how\s+many\s+(?:users?|people|staff)|five\s+users?)\b/i', $text ) && preg_match( '/\b(?:package|support|staff|users?|people|minimum)\b/i', $text ) ) {
+        return 'Basic, Standard and Premium are published for teams of 5 or more. Smaller teams and sole traders use Tailored support rather than being forced into a five-user package.';
+    }
+
+    if ( preg_match( '/\b(?:sole[- ]?trader|one[- ]person\s+business|just\s+me)\b/i', $text ) && preg_match( '/\b(?:support|package|help|pricing|price|cost)\b/i', $text ) ) {
+        return 'Sole-trader support is Tailored and price on application. It is shaped around the devices, Microsoft 365 services and day-to-day help actually needed rather than forcing a one-person business into the published five-user packages.';
+    }
+
+    if ( preg_match( '/\b(?:contract|agreement|lock[- ]?in|rolling)\b/i', $text ) ) {
+        return 'Managed support uses a three-month rolling agreement with fixed monthly pricing. There is no long-term lock-in in the published support terms.';
+    }
+
+    if ( preg_match( '/\b(?:24\s*(?:\/|x)\s*7|twenty[- ]four\s+seven|round[- ]the[- ]clock)\b/i', $text ) && preg_match( '/\b(?:support|helpdesk|monitor|monitoring|engineer|service)\b/i', $text ) ) {
+        return 'Monitoring runs 24/7. The staffed helpdesk is Monday to Friday, 9am–5pm, so 24/7 monitoring should not be read as a 24/7 staffed support desk.';
+    }
+
+    if ( preg_match( '/\b(?:edr|endpoint\s+detection|conditional\s+access|mfa|multi[- ]factor|privileged\s+account|email\s+security|anti[- ]phishing)\b/i', $text ) ) {
+        return 'Those managed security controls sit in Standard and above for teams of 5+. Standard includes EDR, email security, MFA, Conditional Access and privileged-account protection. Microsoft 365 Business Premium or equivalent licensing is required and sold separately unless specifically included; smaller teams use Tailored support.';
+    }
+
+    if ( preg_match( '/\b(?:mdm|mobile\s+device\s+management|device\s+management|remote\s+wipe|device\s+compliance)\b/i', $text ) ) {
+        return 'Managed support includes device management, and Standard adds stronger mobile-device controls such as compliance policies, remote wipe and work-application management. The exact policy scope depends on the devices and licensing in use.';
+    }
+
+    if ( preg_match( '/\b(?:lastpass|exclaimer|email\s+signature)\b/i', $text ) ) {
+        return 'Standard includes LastPass password management and Exclaimer email-signature management, and Premium includes everything in Standard. The published per-person packages apply to teams of 5+.';
+    }
+
+    if ( preg_match( '/\b(?:include|included|comes\s+with|licen[cs]e)\b/i', $text ) && preg_match( '/\bmicrosoft\s*365\b/i', $text ) ) {
+        return 'Microsoft 365 Business Premium is included with Premium. Standard requires Business Premium or equivalent licensing, sold separately unless specifically included. Basic supports Microsoft 365, but the software licence itself is sold separately.';
+    }
+
+    if ( preg_match( '/\b(?:password\s+resets?|reset\s+(?:a\s+)?passwords?|forgot(?:ten)?\s+(?:my|a)\s+password)\b/i', $text ) ) {
+        return 'Password resets are part of normal day-to-day helpdesk support. For teams of 5+, that sits within Basic and above; smaller teams use Tailored support.';
+    }
+
+    if ( preg_match( '/\b(?:new\s+starter|new\s+user|leaver|offboard|onboard\s+(?:a\s+)?user|joiner)\b/i', $text ) ) {
+        return 'New-starter and leaver management is part of managed support. That includes setting up or removing user access and supported devices as part of the agreed environment; physical device setup can be scoped separately where required.';
+    }
+
+    if ( preg_match( '/\b(?:can\s+you|do\s+you)\s+support\s+(?:me|us|our\s+(?:business|company|charity|organisation|organization))\b/i', $text ) ) {
+        return 'Staple IT supports businesses, charities and individuals. Tell me what you need help with and, if you are looking at ongoing support, roughly how many people need it.';
+    }
+
+    if ( preg_match( '/\b(?:can\s+you|do\s+you)\s+(?:support|help\s+with|manage)\b/i', $text ) && preg_match( '/\b(?:app|application|software|system|platform)\b/i', $text ) ) {
+        return 'That specific product is not in my published Staple IT knowledge, so I will not claim it is covered. An engineer would need to confirm the application, licensing, vendor support and any dependencies before it is included in support.';
+    }
+
+    if ( preg_match( '/\b(?:can\s+you|do\s+you)\s+(?:support|manage|help\s+with)\s+(.{2,80})[?.!]*$/i', trim( $prompt ) ) ) {
+        return 'That specific product or system is not in my published Staple IT knowledge, so I will not claim it is covered. An engineer would need to confirm the product, licensing, vendor support and any dependencies.';
     }
 
     return '';
@@ -428,5 +567,5 @@ function stapleit_cora_follow_up_suggestions( $prompt ) {
     if ( preg_match( '/\b(?:basic|standard|premium|package)\b/', $prompt ) ) {
         return array( 'What’s included?', 'How do the packages differ?', 'What happens during onboarding?' );
     }
-    return array( 'Which package suits our team?', 'What happens during onboarding?', 'Could we start with a free audit?' );
+    return array();
 }

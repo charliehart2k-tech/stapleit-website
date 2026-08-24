@@ -135,6 +135,7 @@ jobs:
           php -l wordpress/mu-plugins/stapleit-static-routes.php
           php tests/php/cora-safety-test.php
           php tests/php/cora-knowledge-test.php
+          php tests/php/cora-regression-test.php
 
       - name: Run content security SEO and AEO gates
         run: python3 tools/audit-site.py --root site

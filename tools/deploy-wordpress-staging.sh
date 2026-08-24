@@ -140,6 +140,7 @@ echo
 echo "=== Release gate: Cora PHP contracts ==="
 php "$REPO/tests/php/cora-safety-test.php"
 php "$REPO/tests/php/cora-knowledge-test.php"
+php "$REPO/tests/php/cora-regression-test.php"
 
 echo
 echo "Deploying Staple IT site from Git $VERSION"
@@ -294,7 +295,7 @@ grep -Fq "wp_ajax_nopriv_stapleit_cora_chat" "$THEME/functions.php"
 grep -Fq "wp_ajax_nopriv_stapleit_track_planner_event" "$THEME/functions.php"
 grep -Fq "http://127.0.0.1:11434/api/chat" "$THEME/functions.php"
 grep -Fq "stapleit_cora_reply_is_safe" "$THEME/functions.php"
-grep -Fq "'num_ctx' => 1536" "$THEME/functions.php"
+grep -Fq "'num_ctx' => 1280" "$THEME/functions.php"
 grep -Fq "function stapleit_cora_reply_is_safe" "$THEME/cora-safety.php"
 grep -Fq "function stapleit_cora_relevant_knowledge" "$THEME/cora-knowledge.php"
 grep -Fq "function stapleit_cora_knowledge_version" "$THEME/cora-knowledge.php"

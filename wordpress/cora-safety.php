@@ -55,6 +55,10 @@ function stapleit_cora_history_message_is_safe( $role, $content ) {
         stapleit_cora_prompt_guard_response( $content ) === '';
 }
 
+function stapleit_cora_model_makes_core_package_decision( $reply ) {
+    return (bool) preg_match( '/\b(?:recommend|choose|start\s+with|starting\s+point|best\s+fit|sensible\s+(?:fit|starting\s+point)|suitable)\b[^.!?\n]{0,80}\b(?:Basic|Standard|Premium)\b|\b(?:Basic|Standard|Premium)\b[^.!?\n]{0,80}\b(?:recommend|starting\s+point|best\s+fit|sensible|suitable|should\s+start)\b/iu', (string) $reply );
+}
+
 function stapleit_cora_reply_is_safe( $reply ) {
     $reply = trim( (string) $reply );
     if ( $reply === '' || strlen( $reply ) > 2000 ) {
