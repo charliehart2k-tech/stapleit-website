@@ -263,6 +263,38 @@ test('Cora leads package discovery and only asks questions that can change the r
   expect(requests[2].state.team).toBe('10');
 });
 
+test('package discovery is visually led by Cora and tier glows stay visible', async ({ page }) => {
+  for (const [width, height] of [[390, 844], [1366, 768]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+    const state = await page.evaluate(() => {
+      const lead = document.querySelector('.support-package-cora');
+      const trigger = document.querySelector('.support-package-cora-trigger');
+      const cards = [...document.querySelectorAll('[data-package-grid] > .support-package-card')];
+      const leadRect = lead.getBoundingClientRect();
+      const triggerRect = trigger.getBoundingClientRect();
+      return {
+        triggerRatio: triggerRect.width / leadRect.width,
+        triggerHeight: triggerRect.height,
+        orbVisible: getComputedStyle(trigger, '::before').backgroundImage !== 'none',
+        cardGlowOpacity: cards.map(card => Number.parseFloat(getComputedStyle(card, '::before').opacity)),
+        cardShadows: cards.map(card => getComputedStyle(card).boxShadow),
+        taglines: document.querySelectorAll('.support-package-fit').length,
+        badges: document.querySelectorAll('.support-package-badge').length,
+        overflow: document.documentElement.scrollWidth - innerWidth
+      };
+    });
+    expect(state.triggerRatio).toBeGreaterThanOrEqual(.99);
+    expect(state.triggerHeight).toBeGreaterThanOrEqual(width <= 700 ? 72 : 88);
+    expect(state.orbVisible).toBe(true);
+    expect(Math.min(...state.cardGlowOpacity)).toBeGreaterThanOrEqual(.28);
+    expect(state.cardShadows.every(shadow => shadow !== 'none')).toBe(true);
+    expect(state.taglines).toBe(0);
+    expect(state.badges).toBe(0);
+    expect(state.overflow).toBeLessThanOrEqual(0);
+  }
+});
+
 test('primary packages lead and tailored support stays behind See more', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
@@ -523,6 +555,7 @@ test('touch-opened dialogs do not leave package cards glowing and use the mobile
   await page.getByRole('button', { name: 'Close' }).click();
   await expect(dialog).toBeHidden();
   await expect.poll(async () => card.evaluate(element => getComputedStyle(element).transform)).toBe('none');
-  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeLessThanOrEqual(0.20);
+  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeGreaterThanOrEqual(0.28);
+  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeLessThanOrEqual(0.31);
   await context.close();
 });
