@@ -490,7 +490,7 @@ test('Cora add-on conversation adapts and suggests without a nine-question check
   await expect(form.locator('#support-pack-results-title')).toHaveText('Suggestions');
   await expect(form.locator('[data-pack-result]:visible')).toHaveCount(2);
   await expect(form.locator('[data-pack-result]:visible').first().getByRole('link', { name: 'View pack details' })).toBeVisible();
-  await expect(page.locator('#support-packs-grid .support-extra-card:not([hidden])')).toHaveCount(6);
+  await expect(page.locator('#support-packs-grid .support-extra-card:not([hidden])')).toHaveCount(0);
   const viewAll = page.getByRole('button', { name: /View all 9 packs/i });
   await expect(viewAll).toBeVisible();
   const continuation = await viewAll.evaluate(element => ({
@@ -499,18 +499,21 @@ test('Cora add-on conversation adapts and suggests without a nine-question check
   }));
   expect(continuation.width).toBeGreaterThan(continuation.parentWidth - 2);
   const pass4bGeometry = await page.evaluate(() => ({
+    sectionHeight: document.querySelector('.support-packs')?.getBoundingClientRect().height || 0,
     resultHeight: document.querySelector('[data-pack-results]')?.getBoundingClientRect().height || 0,
     resultCardHeights: [...document.querySelectorAll('[data-pack-result]:not([hidden])')].map(card => card.getBoundingClientRect().height),
-    catalogueCardHeights: [...document.querySelectorAll('#support-packs-grid .support-extra-card:not([hidden])')].slice(0, 6).map(card => card.getBoundingClientRect().height),
     overflow: document.documentElement.scrollWidth - innerWidth
   }));
-  expect(pass4bGeometry.resultHeight).toBeLessThanOrEqual(930);
-  expect(Math.max(...pass4bGeometry.resultCardHeights)).toBeLessThanOrEqual(280);
-  expect(Math.max(...pass4bGeometry.catalogueCardHeights)).toBeLessThanOrEqual(270);
+  expect(pass4bGeometry.sectionHeight).toBeLessThanOrEqual(1250);
+  expect(pass4bGeometry.resultHeight).toBeLessThanOrEqual(650);
+  expect(Math.max(...pass4bGeometry.resultCardHeights)).toBeLessThanOrEqual(190);
   expect(pass4bGeometry.overflow).toBeLessThanOrEqual(0);
 
   await viewAll.click();
-  await expect(page.locator('#support-packs-grid .support-extra-card:not([hidden])')).toHaveCount(9);
+  const visibleCatalogue = page.locator('#support-packs-grid .support-extra-card:not([hidden])');
+  await expect(visibleCatalogue).toHaveCount(9);
+  const catalogueCardHeights = await visibleCatalogue.evaluateAll(cards => cards.map(card => card.getBoundingClientRect().height));
+  expect(Math.max(...catalogueCardHeights)).toBeLessThanOrEqual(280);
   await expect(form.locator('.support-pack-results-note')).toContainText('not a complete assessment');
 
   const answeredPackTopics = await form.locator('[data-pack-question]:not([data-pack-gateway]) input:checked').count();

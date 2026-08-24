@@ -110,3 +110,80 @@
   .support-packs .support-pack-results-note{margin-top:14px;padding-top:13px;font-size:.82rem;line-height:1.44}
   .support-packs .support-pack-results-actions{margin-top:14px;padding-top:13px}
 }
+
+
+/* Release 4 — Cora-first add-on hierarchy. */
+.support-packs .support-pack-finder{
+  border-color:rgba(255,255,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.065),0 30px 84px rgba(0,0,0,.32),0 0 52px rgba(34,197,94,.04),0 0 36px rgba(79,133,255,.025);
+}
+.support-packs [data-pack-finder-count],
+.support-packs .support-pack-results-step{
+  width:max-content;
+  max-width:100%;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  color:#dceee2;
+  font:700 .82rem/1.3 var(--font-display);
+  letter-spacing:.01em;
+}
+.support-packs [data-pack-finder-count]::before,
+.support-packs .support-pack-results-step::before{
+  content:"";
+  width:11px;
+  height:11px;
+  flex:0 0 11px;
+  border-radius:46% 54% 58% 42% / 52% 46% 54% 48%;
+  background:linear-gradient(135deg,var(--brand-blue),var(--brand-security) 48%,var(--support));
+  box-shadow:0 0 16px rgba(79,133,255,.28),0 0 12px rgba(34,197,94,.18);
+  animation:supportCoraPackOrb 6.4s ease-in-out infinite;
+}
+.support-packs .support-pack-conversation-pulse::after{
+  background:linear-gradient(90deg,rgba(79,133,255,.22),var(--brand-security),var(--support),rgba(79,133,255,.72));
+}
+
+@media(max-width:700px){
+  .support-packs .support-pack-finder-stage{padding-bottom:18px}
+  .support-packs .support-pack-finder-actions{padding-top:14px}
+  .support-packs .support-pack-question--gateway{padding-top:18px}
+  .support-packs .support-pack-choices--focus{gap:7px}
+  .support-packs .support-pack-choices--focus label{min-height:56px}
+
+  .support-packs .support-pack-results{padding:21px 16px 18px}
+  .support-packs .support-pack-results-list{gap:8px;margin-top:16px}
+  .support-packs .support-pack-result{
+    min-height:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(102px,116px);
+    gap:12px;
+    align-items:center;
+    padding:14px 14px 14px 15px;
+  }
+  .support-packs .support-pack-result-status{margin-bottom:7px}
+  .support-packs .support-pack-result h4{font-size:clamp(1.22rem,5.8vw,1.42rem)}
+  .support-packs .support-pack-result>a{
+    width:100%;
+    min-height:46px;
+    margin:0;
+    padding:8px 10px;
+    justify-content:center;
+    text-align:center;
+    line-height:1.3;
+  }
+  .support-packs .support-pack-result>a::after{display:none}
+  .support-packs .support-pack-results-note{margin-top:12px;padding-top:12px}
+  .support-packs .support-pack-results-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px;padding-top:12px}
+  .support-packs .support-pack-results-actions .support-pack-finder-button{min-height:48px;padding-inline:10px}
+
+  .support-pack-catalogue-head{margin-top:2px;padding-top:22px}
+  .support-packs .support-packs-more{margin-top:10px}
+  .support-packs .support-packs-more-btn{min-height:58px;justify-content:center;align-items:center;padding:14px 17px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .support-packs [data-pack-finder-count]::before,
+  .support-packs .support-pack-results-step::before{animation:none}
+}
+@keyframes supportCoraPackOrb{0%,100%{border-radius:46% 54% 58% 42% / 52% 46% 54% 48%;transform:rotate(0deg)}50%{border-radius:58% 42% 45% 55% / 44% 58% 42% 56%;transform:rotate(8deg)}}

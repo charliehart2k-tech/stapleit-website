@@ -209,21 +209,20 @@
   const packGrid = document.getElementById('support-packs-grid');
   const moreWrap = document.querySelector('.support-packs-more');
   const moreButton = document.getElementById('support-packs-more');
-  const lateCards = [...document.querySelectorAll('[data-pack-late]')];
+  const packCards = packGrid ? [...packGrid.querySelectorAll('[data-pack-card]')] : [];
 
-  if (!packGrid || !moreWrap || !moreButton || !lateCards.length) return;
+  if (!packGrid || !moreWrap || !moreButton || !packCards.length) return;
 
   moreButton.setAttribute('aria-controls', packGrid.id);
   moreButton.setAttribute('aria-expanded', 'false');
 
-  lateCards.forEach(card => {
+  packCards.forEach(card => {
     card.hidden = true;
   });
-
   moreWrap.hidden = false;
 
-  const revealLatePacks = ({ focusFirst = false } = {}) => {
-    lateCards.forEach(card => {
+  const revealAllPacks = ({ focusFirst = false } = {}) => {
+    packCards.forEach(card => {
       card.hidden = false;
       if (card.classList.contains('motion-ready')) card.classList.add('motion-in');
     });
@@ -232,19 +231,19 @@
     moreWrap.hidden = true;
 
     const firstRevealedControl = focusFirst
-      ? lateCards[0]?.querySelector('summary, button, a[href], [tabindex]:not([tabindex="-1"])')
+      ? packCards[0]?.querySelector('summary, button, a[href], [tabindex]:not([tabindex="-1"])')
       : null;
     if (firstRevealedControl instanceof HTMLElement) {
       window.requestAnimationFrame(() => firstRevealedControl.focus());
     }
   };
 
-  moreButton.addEventListener('click', () => revealLatePacks({ focusFirst: true }));
+  moreButton.addEventListener('click', () => revealAllPacks({ focusFirst: true }));
 
   document.querySelectorAll('a[href^="#support-pack-"]').forEach(link => {
     link.addEventListener('click', () => {
       const target = document.querySelector(link.getAttribute('href'));
-      if (target instanceof HTMLElement && target.hidden) revealLatePacks();
+      if (target instanceof HTMLElement && target.hidden) revealAllPacks();
     });
   });
 })();
