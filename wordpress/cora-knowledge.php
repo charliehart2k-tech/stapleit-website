@@ -135,6 +135,12 @@ function stapleit_cora_business_it_intent( $prompt ) {
     return (bool) preg_match( '/\b(?:it|computer|pc|laptop|device|hardware|software|app|application|system|server|cloud|azure|microsoft|m365|office\s*365|google\s+workspace|security|secure|cyber|phishing|ransomware|network|wi-?fi|firewall|switch|router|internet|vpn|backup|restore|email|outlook|printer|password|identity|mfa|conditional\s+access|sharepoint|onedrive|teams|copilot|chatgpt|ai|voip|phone\s+system|telephony|domain|dns|licen[cs]e|helpdesk|support|remote\s+work|remote\s+staff|data|access|user|users)\b/i', $text );
 }
 
+function stapleit_cora_model_fallback_allowed( $business_it_prompt, $context ) {
+    $context = stapleit_cora_valid_context_key( $context );
+    if ( ! $business_it_prompt || $context === '' ) return false;
+    return strpos( $context, 'package_' ) !== 0;
+}
+
 function stapleit_cora_package_discovery_intent( $prompt ) {
     $text = strtolower( trim( (string) $prompt ) );
     if ( preg_match( '/\b(?:which|what|choose|find|recommend|help\s+me\s+choose)\b.{0,42}\b(?:support\s+)?(?:package|plan|tier)\b/i', $text ) ) return true;

@@ -281,7 +281,7 @@ function stapleit_handle_cora_chat_ajax() {
     }
 
     $fallback_services = stapleit_support_catalogue_match( $effective_prompt );
-    $business_it_prompt = stapleit_cora_business_it_intent( $effective_prompt );
+    $business_it_prompt = stapleit_cora_business_it_intent( $effective_prompt ) || $turn_context !== '';
     $device_prompt = (bool) preg_match( '/\b(?:pc|computer|laptop|device|machine)\b/i', strtolower( $prompt ) );
     $physical_device_danger = $device_prompt && (bool) preg_match( '/\b(?:on\s+fire|fire|smoke|smoking|sparks?|burning|burnt|swollen\s+battery|battery\s+swollen|overheating|extremely\s+hot)\b/i', strtolower( $prompt ) );
     $fallback_reply = $fallback_services
@@ -308,7 +308,7 @@ function stapleit_handle_cora_chat_ajax() {
         $history,
         array( array( 'role' => 'user', 'content' => $prompt ) )
     );
-    $model_allowed = $business_it_prompt && $turn_context !== '';
+    $model_allowed = stapleit_cora_model_fallback_allowed( $business_it_prompt, $turn_context );
     $reply = ( $device_prompt || $fallback_services || ! $model_allowed ) ? '' : stapleit_cora_model_reply( $messages );
     if ( $reply !== '' ) {
         $result['mode']  = 'local-ai';

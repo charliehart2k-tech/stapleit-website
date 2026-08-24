@@ -157,6 +157,11 @@ foreach ( $guard_cases as $prompt ) {
 if ( ! stapleit_cora_business_it_intent( 'Our remote users get an error in a business application' ) ) $failures[] = 'business-IT intent missed a genuine IT prompt';
 if ( stapleit_cora_business_it_intent( 'Who won the football last night?' ) ) $failures[] = 'non-IT prompt was allowed to reach the local model';
 
+
+if ( stapleit_cora_model_fallback_allowed( true, 'package_basic' ) ) $failures[] = 'core-package context is still allowed to invoke the local model';
+if ( ! stapleit_cora_model_fallback_allowed( true, 'pack_strategy' ) ) $failures[] = 'known non-package context cannot use the bounded model fallback';
+if ( stapleit_cora_model_fallback_allowed( true, '' ) ) $failures[] = 'context-free first turn is still allowed to invoke the local model';
+
 if ( stapleit_cora_follow_up_suggestions( 'completely unrelated unknown thing' ) !== array() ) {
     $failures[] = 'unknown prompts still receive generic sales suggestion chips';
 }
@@ -171,8 +176,8 @@ if ( strpos( $functions_source, 'wp_unslash( (string) ( $_POST[\'history\']' ) =
 if ( strpos( $functions_source, 'stapleit_cora_package_discovery_intent( $prompt )' ) === false ) {
     $failures[] = 'AJAX handler is not wired to the shared package-discovery intent detector';
 }
-if ( strpos( $functions_source, '$model_allowed = $business_it_prompt && $turn_context !== \'\';' ) === false ) {
-    $failures[] = 'unclassified first-turn IT prompts can still block on the local model';
+if ( strpos( $functions_source, '$model_allowed = stapleit_cora_model_fallback_allowed( $business_it_prompt, $turn_context );' ) === false ) {
+    $failures[] = 'AJAX handler bypasses the bounded model-fallback policy';
 }
 if ( strpos( $functions_source, "'timeout' => 6" ) === false || strpos( $functions_source, "'num_ctx' => 1280" ) === false || strpos( $functions_source, "'num_predict' => 64" ) === false || strpos( $functions_source, 'LOCK_EX | LOCK_NB' ) === false ) {
     $failures[] = 'local-model last-resort budget changed unexpectedly';
