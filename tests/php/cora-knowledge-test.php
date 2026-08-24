@@ -74,6 +74,7 @@ $checks = array(
     array( $package_flow_written_number['complete'] === true && $package_flow_written_number['state']['team'] === '10', 'written team sizes are understood without asking for digits' ),
     array( $package_flow_twenty_plus['state']['team'] === '25', '20+ team-size quick reply is parsed correctly' ),
     array( $package_flow_m365['state']['team'] === '', 'Microsoft 365 is never misread as a 365-person team' ),
+    array( strpos( $functions_source, "wp_unslash( (string) ( \$_POST['prompt'] ?? '' ) )" ) !== false, 'Cora unslashes WordPress prompt POST values before intent parsing' ),
     array( strpos( $functions_source, 'substr( wp_unslash' ) !== false && strpos( $functions_source, "flow_state" ) !== false, 'package conversation state payload is length-bounded server-side' ),
 );
 

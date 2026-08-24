@@ -234,7 +234,7 @@ function stapleit_cora_history_from_request() {
 }
 
 function stapleit_handle_cora_chat_ajax() {
-    $prompt = trim( sanitize_textarea_field( (string) ( $_POST['prompt'] ?? '' ) ) );
+    $prompt = trim( sanitize_textarea_field( wp_unslash( (string) ( $_POST['prompt'] ?? '' ) ) ) );
     if ( strlen( $prompt ) < 2 || strlen( $prompt ) > 800 ) {
         wp_send_json( array( 'ok' => false, 'message' => 'Please use between 2 and 800 characters.' ), 400 );
     }
