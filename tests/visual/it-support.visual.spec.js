@@ -697,6 +697,58 @@ test('final services and CTA stay compact, distinct and contained', async ({ pag
   await expect(closingCta.getByRole('link', { name: 'Get in touch' })).toHaveAttribute('href', '/get-in-touch/');
 });
 
+test('Get in Touch is a real contact route with working audit handoff', async ({ page }) => {
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    const body = route.request().postData() || '';
+    if (body.includes('stapleit_audit')) {
+      await route.fulfill({ status:200, contentType:'application/json', body:JSON.stringify({ ok:true, message:'Thanks — your audit request has been received. We’ll get back to you within one working day.' }) });
+      return;
+    }
+    await route.continue();
+  });
+
+  for (const [width, height] of [[390, 844], [1366, 768]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'domcontentloaded' });
+    await expect(page.getByRole('heading', { level:1, name:/Get in Touch/i })).toBeVisible();
+    await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding this page/i);
+    await expect(page.getByRole('link', { name:'01372 309 707' })).toHaveAttribute('href', 'tel:+441372309707');
+    await expect(page.getByRole('link', { name:'hello@stapleit.co.uk' })).toHaveAttribute('href', 'mailto:hello@stapleit.co.uk');
+    await expect(page.getByRole('link', { name:'Click to chat' })).toHaveAttribute('href', 'https://wa.me/441372309707');
+    await expect(page.locator('[data-contact-map-frame]')).toHaveCount(1);
+    await expect(page.locator('[data-audit-form]')).toBeVisible();
+
+    const geometry = await page.evaluate(() => {
+      const observed = [...document.querySelectorAll('.contact-hero,.contact-panel,.contact-map-card,.audit-hero,.audit-form')];
+      return {
+        h1: document.querySelectorAll('main h1').length,
+        overflow: document.documentElement.scrollWidth - innerWidth,
+        hiddenObserved: observed.filter(element => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
+        formRect: (() => {
+          const rect = document.querySelector('[data-audit-form]')?.getBoundingClientRect();
+          return rect ? { left:rect.left, right:rect.right, width:rect.width } : { left:0, right:0, width:0 };
+        })(),
+        clientWidth: document.documentElement.clientWidth
+      };
+    });
+    expect(geometry.h1).toBe(1);
+    expect(geometry.overflow).toBeLessThanOrEqual(0);
+    expect(geometry.hiddenObserved).toBe(0);
+    expect(geometry.formRect.left).toBeGreaterThanOrEqual(0);
+    expect(geometry.formRect.right).toBeLessThanOrEqual(geometry.clientWidth + 1);
+  }
+
+  await page.setViewportSize({ width:390, height:844 });
+  await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'domcontentloaded' });
+  const form = page.locator('[data-audit-form]');
+  await form.locator('input[name="name"]').fill('Test Visitor');
+  await form.locator('input[name="email"]').fill('test@example.com');
+  await form.locator('textarea[name="requirements"]').fill('General IT review');
+  await form.locator('input[name="contact-consent"]').check();
+  await form.getByRole('button', { name:'Request my free IT audit' }).click();
+  await expect(form.locator('[data-audit-form-status]')).toContainText('received');
+});
+
 test('mobile support content never disappears behind scroll reveal and unapproved filler copy stays absent', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });

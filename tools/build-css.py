@@ -68,10 +68,15 @@ BUNDLES = {
     ],
 }
 
+# Get in Touch deliberately reuses the approved homepage contact/audit system,
+# then applies only a small route-specific composition layer.
+BUNDLES["get-in-touch.bundle.css"] = BUNDLES["home.bundle.css"] + ["get-in-touch.css"]
+
 MAX_GZIP_BYTES = {
     "site-shell.bundle.css": 16_000,
     "home.bundle.css": 45_000,
     "it-support.bundle.css": 30_000,
+    "get-in-touch.bundle.css": 45_000,
 }
 
 

@@ -214,6 +214,17 @@ grep -Fq 'class="mobile-nav-group"' "$THEME/front-page.php"
 grep -Fq 'data-audit-explainer' "$THEME/front-page.php"
 grep -Fq 'class="contact-section"' "$THEME/front-page.php"
 grep -Fq "assets/css/home.bundle.css?v=$VERSION" "$THEME/front-page.php"
+
+# Get in Touch must remain a real contact destination, never a placeholder.
+grep -Fq 'class="reset-stage get-in-touch-page"' "$THEME/static-get-in-touch.php"
+grep -Fq 'class="contact-section"' "$THEME/static-get-in-touch.php"
+grep -Fq 'data-audit-form' "$THEME/static-get-in-touch.php"
+grep -Fq '01372 309 707' "$THEME/static-get-in-touch.php"
+grep -Fq 'hello@stapleit.co.uk' "$THEME/static-get-in-touch.php"
+grep -Fq "assets/css/get-in-touch.bundle.css?v=$VERSION" "$THEME/static-get-in-touch.php"
+grep -Fq "assets/js/forms.js?v=$VERSION" "$THEME/static-get-in-touch.php"
+test -s "$THEME/assets/css/get-in-touch.bundle.css"
+if grep -Fqi 'Page in progress' "$THEME/static-get-in-touch.php"; then echo 'Get in Touch placeholder has returned; refusing deployment.' >&2; exit 1; fi
 grep -Fq "assets/fonts/manrope-latin.woff2" "$THEME/front-page.php"
 grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
 grep -Fq 'Chat to Cora' "$THEME/assets/js/app.js"
