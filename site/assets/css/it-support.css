@@ -152,7 +152,7 @@
   text-wrap:pretty;
 }
 
-.support-hero-proposition>.support-hero-cta{align-self:flex-start}
+.support-hero-proposition>.support-hero-cta{align-self:center}
 
 .support-hero-cta{
   position:relative;

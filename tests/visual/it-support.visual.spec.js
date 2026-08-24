@@ -78,7 +78,7 @@ for (const [name, width, height] of viewports) {
         standardRadius: Number.parseFloat(getComputedStyle(standard).borderTopLeftRadius),
         heroCopyBlur: getComputedStyle(heroCopy).backdropFilter || getComputedStyle(heroCopy).webkitBackdropFilter || '',
         standardBlur: getComputedStyle(standard).backdropFilter || getComputedStyle(standard).webkitBackdropFilter || '',
-        ctaAlignedLeft: Math.abs(heroCta.getBoundingClientRect().left - heroProposition.getBoundingClientRect().left) < 2,
+        ctaCentered: Math.abs((heroCta.getBoundingClientRect().left + heroCta.getBoundingClientRect().width / 2) - (heroProposition.getBoundingClientRect().left + heroProposition.getBoundingClientRect().width / 2)) < 2,
         packageAccents: [tierBasic,tierStandard,tierPremium].map(el => getComputedStyle(el).getPropertyValue('--support-card-accent').trim()),
         coraPanelInsideViewport: (() => {
           const rect = document.querySelector('.cora-panel').getBoundingClientRect();
@@ -98,7 +98,7 @@ for (const [name, width, height] of viewports) {
     expect(contract.heroStageOverflow).toBe('visible');
     expect(contract.heroCopyRadius).toBeGreaterThanOrEqual(width <= 700 ? 20 : 28);
     expect(contract.standardRadius).toBeGreaterThanOrEqual(width <= 700 ? 20 : 28);
-    expect(contract.ctaAlignedLeft).toBe(true);
+    expect(contract.ctaCentered).toBe(true);
     expect(contract.heroCopyBlur).toContain('blur');
     expect(contract.standardBlur).toContain('blur');
     expect(contract.packageAccents).toEqual(['#F82822','#004AAD','#5E17EB']);
