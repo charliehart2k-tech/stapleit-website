@@ -3737,6 +3737,99 @@ body.support-dialog-open{overflow:hidden}
 @keyframes supportPlannerQuestionBack{from{opacity:0;transform:translate3d(-10px,0,0)}to{opacity:1;transform:none}}
 @keyframes supportPlannerResultIn{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:none}}
 
+
+/* Release 4 — final services and closing chapter polish. */
+#support-services-grid{gap:14px}
+#support-services-grid .support-extra-card{
+  min-height:280px;
+  padding:30px 28px 25px;
+  border-radius:22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 30px 84px color-mix(in srgb,var(--support-card-accent) 11%,transparent),
+    0 0 38px color-mix(in srgb,var(--support-card-accent) 5%,transparent),
+    0 22px 58px rgba(0,0,0,.36);
+}
+#support-services-grid .support-extra-card::before{opacity:.22}
+#support-services-grid .support-extra-card:nth-child(1){--support-card-accent:var(--blue-bright)}
+#support-services-grid .support-extra-card:nth-child(2){--support-card-accent:var(--solutions)}
+#support-services-grid .support-extra-card:nth-child(3){--support-card-accent:var(--support)}
+#support-services-grid .support-extra-card:nth-child(4){--support-card-accent:var(--security)}
+#support-services-grid .support-extra-summary{margin-top:14px;line-height:1.58}
+#support-services-grid .support-extra-details{padding-top:17px}
+#support-services-grid .support-extra-details summary{
+  min-height:44px;
+  padding:10px 14px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+  font-size:.88rem;
+}
+@media(hover:hover) and (pointer:fine){
+  #support-services-grid .support-extra-details summary:hover{
+    border-color:color-mix(in srgb,var(--support-card-accent) 34%,rgba(255,255,255,.16));
+    background:color-mix(in srgb,var(--support-card-accent) 5%,rgba(255,255,255,.025));
+  }
+}
+
+.support-extras{padding-bottom:var(--space-7)}
+.support-cta{
+  position:relative;
+  isolation:isolate;
+  padding-top:var(--space-6);
+  padding-bottom:var(--space-8);
+}
+.support-cta::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:50%;
+  top:-130px;
+  width:100vw;
+  height:calc(100% + 130px);
+  transform:translateX(-50%);
+  pointer-events:none;
+  background:
+    radial-gradient(760px 360px at 46% 30%,rgba(79,133,255,.07),transparent 68%),
+    radial-gradient(700px 340px at 60% 42%,rgba(168,85,247,.055),transparent 70%),
+    radial-gradient(620px 300px at 52% 58%,rgba(34,197,94,.035),transparent 72%);
+}
+.support-cta-panel{
+  border-color:rgba(255,255,255,.135);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 34px 96px rgba(0,0,0,.42),
+    0 0 64px rgba(79,133,255,.055),
+    0 0 48px rgba(168,85,247,.035);
+}
+
+@media(max-width:700px){
+  .support-extras{padding-bottom:36px}
+  #support-services-grid{gap:10px}
+  #support-services-grid .support-extra-card{
+    min-height:0;
+    padding:20px 17px 17px;
+    border-radius:18px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.055),
+      0 20px 54px color-mix(in srgb,var(--support-card-accent) 9%,transparent),
+      0 0 28px color-mix(in srgb,var(--support-card-accent) 4%,transparent),
+      0 18px 46px rgba(0,0,0,.34);
+  }
+  #support-services-grid .support-extra-card h3{font-size:clamp(1.45rem,6.6vw,1.72rem)}
+  #support-services-grid .support-extra-summary{margin-top:10px;font-size:.94rem;line-height:1.48}
+  #support-services-grid .support-extra-details{padding-top:12px}
+  #support-services-grid .support-extra-details summary{min-height:44px;padding:9px 13px;font-size:.84rem}
+
+  .support-cta{padding-top:28px;padding-bottom:52px}
+  .support-cta::before{top:-90px;height:calc(100% + 90px);background:radial-gradient(460px 280px at 50% 38%,rgba(79,133,255,.07),rgba(168,85,247,.035) 42%,transparent 72%)}
+  .support-cta-panel{padding:30px 18px;border-radius:20px}
+  .support-cta-panel h2{font-size:clamp(1.9rem,8.6vw,2.3rem)}
+  .support-cta-lead{margin-top:14px;font-size:1rem;line-height:1.55}
+  .support-cta-actions{gap:10px;margin-top:22px}
+  .support-cta-btn{min-height:50px;padding:12px 20px}
+}
+
 /* source: it-support-packages.css */
 /* Package discovery is led by Cora; package card styling lives in it-support.css. */
 .support-package-cora{

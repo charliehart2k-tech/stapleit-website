@@ -554,6 +554,39 @@ test('Cora add-on conversation can stop early and leaves unasked areas unknown',
   await expect(page.getByLabel('Message Cora')).toHaveValue(/Nothing stood out/i);
 });
 
+test('final services and CTA stay compact, distinct and contained', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const mobile = await page.evaluate(() => {
+    const extras = document.querySelector('.support-extras');
+    const cta = document.querySelector('.support-cta');
+    const panel = document.querySelector('.support-cta-panel');
+    const cards = [...document.querySelectorAll('#support-services-grid .support-extra-card')];
+    return {
+      extrasHeight: extras.getBoundingClientRect().height,
+      cardHeights: cards.map(card => card.getBoundingClientRect().height),
+      accents: cards.map(card => getComputedStyle(card).getPropertyValue('--support-card-accent').trim()),
+      ctaHeight: cta.getBoundingClientRect().height,
+      panelHeight: panel.getBoundingClientRect().height,
+      panelShadow: getComputedStyle(panel).boxShadow,
+      overflow: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+
+  expect(mobile.extrasHeight).toBeLessThanOrEqual(1100);
+  expect(Math.max(...mobile.cardHeights)).toBeLessThanOrEqual(210);
+  expect(mobile.accents).toEqual(['#4F85FF', '#F97316', '#22C55E', '#A855F7']);
+  expect(mobile.ctaHeight).toBeLessThanOrEqual(510);
+  expect(mobile.panelHeight).toBeLessThanOrEqual(430);
+  expect(mobile.panelShadow).not.toBe('none');
+  expect(mobile.overflow).toBeLessThanOrEqual(0);
+
+  const closingCta = page.locator('.support-cta');
+  await expect(closingCta.getByRole('link', { name: 'Start your free IT audit' })).toHaveAttribute('href', '/#free-it-audit');
+  await expect(closingCta.getByRole('link', { name: 'Get in touch' })).toHaveAttribute('href', '/get-in-touch/');
+});
+
 test('mobile support content never disappears behind scroll reveal and unapproved filler copy stays absent', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
