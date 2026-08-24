@@ -204,6 +204,7 @@
     if (seededMessage && !input.value.trim()) input.value = seededMessage;
     setOpen(true, { focusInput: false });
     if (flow === 'package') {
+      if (conversation.length === 0) messages.replaceChildren();
       conversationFlow = 'package';
       conversationFlowState = {};
       suppressNextUserMessage = true;

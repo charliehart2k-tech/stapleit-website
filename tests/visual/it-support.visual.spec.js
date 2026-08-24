@@ -251,6 +251,8 @@ test('Cora leads package discovery and only asks questions that can change the r
   const cora = page.getByRole('dialog', { name:'Cora' });
   await expect(cora).toBeVisible();
   await expect(cora.locator('.cora-message--assistant').last()).toContainText('How many people');
+  await expect(cora.locator('.cora-message--assistant')).toHaveCount(1);
+  await expect(cora.locator('.cora-messages')).not.toContainText('Hi, I’m Cora');
   await expect(cora.locator('.cora-suggestion')).toHaveCount(4);
   await expect(cora.getByRole('button', { name:'20+ people' })).toBeVisible();
   await cora.getByRole('button', { name:'5–19 people' }).click();
@@ -261,6 +263,41 @@ test('Cora leads package discovery and only asks questions that can change the r
   expect(requests.every(request => request.flow === 'package')).toBe(true);
   expect(requests[1].state.team).toBe('');
   expect(requests[2].state.team).toBe('10');
+});
+
+test('desktop Cora gives replies and suggestions enough room without horizontal clipping', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil:'networkidle' });
+  await page.getByRole('button', { name:'Chat to Cora' }).click();
+  const cora = page.getByRole('dialog', { name:'Cora' });
+  await expect(cora).toBeVisible();
+  await page.waitForTimeout(600);
+
+  const geometry = await cora.evaluate(element => {
+    const panel = element;
+    const suggestions = element.querySelector('.cora-suggestions');
+    const buttons = [...element.querySelectorAll('.cora-suggestion')];
+    const suggestionRect = suggestions.getBoundingClientRect();
+    return {
+      panelWidth: panel.getBoundingClientRect().width,
+      suggestionDisplay: getComputedStyle(suggestions).display,
+      suggestionOverflow: suggestions.scrollWidth - suggestions.clientWidth,
+      buttonsInside: buttons.every(button => {
+        const rect = button.getBoundingClientRect();
+        return rect.left >= suggestionRect.left - 1 && rect.right <= suggestionRect.right + 1;
+      }),
+      maxButtonWidth: Math.max(...buttons.map(button => button.getBoundingClientRect().width)),
+      overflow: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+
+  expect(geometry.panelWidth).toBeGreaterThanOrEqual(468);
+  expect(geometry.panelWidth).toBeLessThanOrEqual(482);
+  expect(geometry.suggestionDisplay).toBe('grid');
+  expect(geometry.suggestionOverflow).toBeLessThanOrEqual(0);
+  expect(geometry.buttonsInside).toBe(true);
+  expect(geometry.maxButtonWidth).toBeLessThan(230);
+  expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
 test('Cora recovers from package-flow interruptions and can change topic', async ({ page }) => {
