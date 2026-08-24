@@ -350,10 +350,6 @@ test('mobile Cora tracks a keyboard-resized viewport and keeps the composer visi
 test('Cora add-on conversation adapts and suggests without a nine-question checklist', async ({ page }) => {
   await page.route('**/wp-admin/admin-ajax.php', async route => {
     const body = route.request().postData() || '';
-    if (body.includes('action=stapleit_cora_planner_explain')) {
-      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
-      return;
-    }
     await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
   });
 

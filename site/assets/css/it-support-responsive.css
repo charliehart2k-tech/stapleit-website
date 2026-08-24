@@ -18,20 +18,14 @@
 .support-onboarding>.support-section-heading,
 .support-onboarding>.support-step-grid,
 .support-onboarding-cta,
-.support-planner,
-.support-planner-header,
-.support-package-finder,
 .support-pack-finder,
 .support-pack-finder-header,
 .support-pack-finder-stage,
 .support-pack-question,
 .support-pack-choices,
-.support-package-result-panel,
 .support-pack-results,
 .support-pack-results-list,
 .support-pack-result,
-.support-cost-calculator,
-.support-planner-handoff,
 .support-package-grid,
 .support-catalogue-grid,
 #support-packs-grid,
@@ -66,13 +60,7 @@
   #support-services-grid{grid-template-columns:1fr}
 
   .support-package-card{min-height:0}
-  .support-planner-header{grid-template-columns:1fr;gap:18px}
-  .support-planner-header h3{max-width:13ch;font-size:clamp(2.6rem,6.5vw,3.6rem)}
-  .support-planner-header>p:last-child{max-width:44rem;margin:0}
-
   .support-pack-results-list{grid-template-columns:1fr}
-  .support-cost-calculator{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .support-cost-total{grid-column:1/-1;border-left:0;border-top:1px solid rgba(255,255,255,.075);padding:18px 0 0}
 }
 
 @media(max-width:700px){
@@ -95,83 +83,40 @@
   .support-standard h2,
   .support-section-heading h2,
   .support-onboarding .support-section-heading h2,
-  .support-planner-header h3,
   .support-pack-finder-header h3,
   .support-pack-question legend,
-  .support-package-result-panel h4,
   .support-pack-results-header h3{width:auto;max-width:100%;text-wrap:balance}
 
   .support-hero-shell{padding:10px;border-radius:28px}
 
-  .support-hero-shell>.support-hero-motion{opacity:.56;filter:saturate(1.1) contrast(1.04) brightness(.58)}
   .support-hero-lead{max-width:31rem;margin-top:14px;font-size:1rem;line-height:1.62}
   .support-hero-proposition>.support-hero-cta{width:100%;max-width:320px}
-  .support-planner{padding-top:28px;margin-bottom:42px}
-  .support-planner-header{gap:10px;margin-bottom:18px;padding-inline:0}
-  .support-planner-header h3{font-size:clamp(2.05rem,8.8vw,2.35rem);line-height:1.05;letter-spacing:-.03em}
-  .support-planner-header>p:last-child{font-size:.96rem;line-height:1.52}
 
-  .support-package-finder,
-  .support-packs .support-pack-finder,
-  .support-planner .support-package-finder{width:100%;border-radius:20px}
+    .support-packs .support-pack-finder,
 
   .support-pack-finder-header{padding:24px 17px 21px}
   .support-pack-finder-header h3{font-size:clamp(1.7rem,8.5vw,2.2rem);line-height:1.12}
   .support-pack-finder-header p{font-size:1rem;line-height:1.58}
 
-  .support-planner .support-pack-finder-progress{grid-template-columns:auto minmax(90px,1fr);gap:11px;padding:16px 15px 0;align-items:center}
   .support-pack-finder-progress{grid-template-columns:1fr;gap:9px;padding:20px 17px 0}
-  .support-planner .support-pack-finder-progress progress{height:6px}
 
   .support-pack-finder-progress p{white-space:normal}
-  .support-planner .support-pack-finder-stage{padding:0 15px 17px}
   .support-pack-finder-stage{padding:0 17px 22px}
-  .support-planner .support-pack-question{min-height:0;padding:18px 0 15px}
   .support-pack-finder.is-enhanced .support-pack-question{min-height:0;padding:24px 0 21px}
-  .support-planner .support-pack-question legend{font-size:clamp(1.42rem,6.4vw,1.72rem);line-height:1.16}
   .support-pack-question legend{font-size:clamp(1.55rem,7.7vw,2rem);line-height:1.18}
-  .support-planner .support-pack-question-help{margin-top:9px;font-size:.92rem;line-height:1.48}
   .support-pack-question-help{font-size:1rem;line-height:1.6}
-  .support-planner .support-pack-choices{grid-template-columns:1fr;gap:7px;margin-top:14px}
-  .support-planner .support-pack-choices--four{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-  .support-planner [data-package-key="requirements"] .support-pack-choices{grid-template-columns:repeat(3,minmax(0,1fr))}
   .support-pack-choices{grid-template-columns:1fr;gap:9px;margin-top:20px}
-  .support-planner .support-pack-choices label{width:100%;min-height:48px;padding:9px 10px;font-size:.88rem;line-height:1.3}
   .support-pack-choices label{width:100%;min-height:54px;padding:12px 14px}
 
-  .support-planner .support-pack-finder-actions{margin:0 15px 15px;padding-top:13px;flex-direction:row;align-items:center}
   .support-pack-finder-actions{margin:0 17px 20px;padding-top:18px;flex-direction:column-reverse;align-items:stretch}
-  .support-planner .support-pack-finder-button{width:auto;max-width:100%;margin-left:0;min-height:48px;padding-inline:16px}
-  .support-planner .support-pack-finder-button--next{margin-left:auto;min-width:148px}
   .support-pack-finder-button,
   .support-pack-finder-button--next{width:100%;max-width:100%;margin-left:0}
 
-  .support-planner .support-package-result-panel{padding:21px 15px 17px}
-  .support-package-result-panel,
-  .support-pack-results{padding:25px 17px 22px}
-  .support-planner .support-package-result-panel h4{font-size:clamp(1.9rem,8.2vw,2.25rem);line-height:1.08}
-  .support-package-result-panel h4,
+    .support-pack-results{padding:25px 17px 22px}
   .support-pack-results-header h3{font-size:clamp(1.8rem,9vw,2.35rem);line-height:1.12}
   .support-pack-result{grid-template-columns:1fr;gap:8px}
   .support-pack-result>a{width:auto;max-width:100%;white-space:normal}
 
-  .support-planner .support-cora-insight{margin-top:12px;padding:10px 0}
-  .support-planner .support-cora-insight p{font-size:.9rem;line-height:1.44}
-  .support-planner .support-cost-calculator{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:15px 0;margin-top:14px}
-  .support-planner .support-cost-total{grid-column:1/-1;margin-top:0;padding:10px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.075);flex-direction:row;align-items:baseline;justify-content:space-between;gap:10px}
-  .support-cost-calculator{grid-template-columns:1fr;gap:15px;padding:19px 0}
-  .support-cost-total{grid-column:1;margin-top:2px;padding:17px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.075)}
-  .support-planner .support-cost-total strong{font-size:clamp(1.85rem,9vw,2.35rem)}
-  .support-cost-total strong{font-size:clamp(2rem,11vw,2.8rem)}
-  .support-planner .support-cost-note{margin-top:7px;font-size:.84rem;line-height:1.42}
-  .support-cost-note{font-size:.95rem;line-height:1.6}
-  .support-planner .support-pack-results-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px;padding-top:14px}
-  .support-planner .support-pack-results-actions .support-pack-finder-button{width:100%;margin:0;min-width:0;padding-inline:10px}
-  .support-planner .support-planner-handoff{grid-template-columns:1fr;gap:8px;margin-top:13px;padding:12px}
-  .support-planner .support-planner-handoff>a{grid-column:1;grid-row:auto;width:100%;margin:0}
-  .support-planner .support-planner-handoff label{grid-column:1}
-  .support-planner-handoff{grid-template-columns:1fr;gap:14px;margin-top:26px;padding-inline:0}
-  .support-planner-handoff .support-pack-finder-button{width:100%}
 
   .support-package-card{padding:25px 19px 20px}
   .support-extra-card{padding-inline:18px}
@@ -197,7 +142,6 @@
    * squeezed into a phone viewport. Blur and clip-path are deliberately
    * removed on phones to reduce compositor work and make the motion crisper. */
   .cora{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));z-index:1250;width:auto;max-width:calc(100vw - max(16px,env(safe-area-inset-left) + env(safe-area-inset-right)))}
-  .support-planner::before,.support-package-finder::before,.support-packs .support-pack-finder::before{display:none}
   .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px;clip-path:none;filter:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:opacity 240ms ease,transform 420ms var(--cora-ease),visibility 0s linear 420ms;will-change:opacity,transform}
   .cora.is-open .cora-panel{clip-path:none;filter:none;transition-delay:0s}
   .cora.is-open.is-input-focused .cora-panel{position:fixed;inset:8px 8px auto;width:auto;max-width:none;height:calc(100dvh - 16px);max-height:none}
@@ -235,17 +179,14 @@
 @media(max-width:840px) and (prefers-reduced-motion:no-preference){
   .support-pack-finder.is-enhanced .support-pack-question:not([hidden]){animation-name:supportPlannerQuestionInNarrow}
   .support-pack-finder.is-enhanced[data-pack-direction="back"] .support-pack-question:not([hidden]){animation-name:supportPlannerQuestionBackNarrow}
-  .support-package-result-panel:not([hidden]),
   .support-pack-results:not([hidden]){animation-name:supportPlannerResultInNarrow}
   .cora-message--new{animation-name:coraMessageInNarrow}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .support-package-finder,
-  .support-pack-finder,
+    .support-pack-finder,
   .support-pack-question,
-  .support-package-result-panel,
-  .support-pack-results{scroll-behavior:auto}
+    .support-pack-results{scroll-behavior:auto}
 }
 
 @keyframes supportPlannerQuestionInNarrow{from{opacity:0;transform:translate3d(8px,0,0)}to{opacity:1;transform:none}}

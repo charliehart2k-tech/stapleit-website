@@ -114,16 +114,11 @@ add_action( 'wp_ajax_nopriv_stapleit_track_planner_event', 'stapleit_track_plann
 add_action( 'wp_ajax_stapleit_track_planner_event', 'stapleit_track_planner_event' );
 add_action( 'wp_ajax_nopriv_stapleit_cora_chat', 'stapleit_handle_cora_chat_ajax' );
 add_action( 'wp_ajax_stapleit_cora_chat', 'stapleit_handle_cora_chat_ajax' );
-add_action( 'wp_ajax_nopriv_stapleit_cora_planner_explain', 'stapleit_handle_cora_planner_explain_ajax' );
-add_action( 'wp_ajax_stapleit_cora_planner_explain', 'stapleit_handle_cora_planner_explain_ajax' );
 
 function stapleit_track_planner_event() {
     $allowed = array(
-        'package_finder_started', 'package_finder_completed',
         'pack_finder_started', 'pack_finder_completed',
-        'cost_estimate_updated', 'planner_handoff_clicked',
         'cora_opened', 'cora_conversation_started',
-        'package_ai_explained', 'pack_ai_explained',
     );
     $event = sanitize_key( (string) ( $_POST['event'] ?? '' ) );
     if ( ! in_array( $event, $allowed, true ) ) {
@@ -332,127 +327,6 @@ function stapleit_handle_cora_chat_ajax() {
     );
     $model_allowed = stapleit_cora_model_fallback_allowed( $business_it_prompt, $turn_context );
     $reply = ( $device_prompt || $fallback_services || ! $model_allowed ) ? '' : stapleit_cora_model_reply( $messages );
-    if ( $reply !== '' ) {
-        $result['mode']  = 'local-ai';
-        $result['reply'] = $reply;
-    }
-    wp_send_json( $result );
-}
-
-function stapleit_cora_package_plan( $answers ) {
-    $team         = in_array( (string) ( $answers['team'] ?? '' ), array( '1', '4', '10', '25' ), true ) ? (string) $answers['team'] : '';
-    $protection   = in_array( (string) ( $answers['security'] ?? '' ), array( 'basic', 'standard', 'premium' ), true ) ? (string) $answers['security'] : '';
-    $requirements = in_array( (string) ( $answers['requirements'] ?? '' ), array( 'yes', 'no', 'unsure' ), true ) ? (string) $answers['requirements'] : '';
-    if ( $team === '' || $protection === '' || $requirements === '' ) {
-        return array();
-    }
-
-    if ( $team === '1' || $team === '4' ) {
-        $label = $team === '1' ? 'Tailored sole-trader support' : 'A tailored support plan';
-        return array(
-            'label'    => $label,
-            'facts'    => 'Fixed website result: ' . $label . '. The visitor selected a team below five people, so the published per-person packages are not presented as a quote. Price is on application.',
-            'fallback' => 'Because the published per-person packages start at five staff, a tailored review is the honest starting point. Staple IT can shape the support around the way this smaller team actually works rather than forcing it into a package that may not fit.',
-        );
-    }
-
-    $recommended = $protection;
-    if ( $requirements === 'yes' && $recommended === 'basic' ) {
-        $recommended = 'standard';
-    }
-    $label = ucfirst( $recommended );
-    $reason = $requirements === 'yes'
-        ? 'The visitor needs to provide security evidence, so managed protection and regular reviews matter alongside day-to-day support.'
-        : ( $recommended === 'basic'
-            ? 'The visitor chose straightforward day-to-day support without additional managed protection.'
-            : ( $recommended === 'standard'
-                ? 'The visitor wants day-to-day support with stronger security, backup and identity protection.'
-                : 'The visitor wants the most complete published package, including Microsoft 365 Business Premium and enhanced protection.' ) );
-
-    return array(
-        'label'    => $label . ' package',
-        'facts'    => 'Fixed website result: ' . $label . ' package. Team answer: ' . $team . '. Security preference: ' . $protection . '. Security evidence answer: ' . $requirements . '. Reason: ' . $reason,
-        'fallback' => $reason . ' The next step is a free IT audit so an engineer can confirm the scope and any eligibility details.',
-    );
-}
-
-function stapleit_cora_pack_plan( $answers ) {
-    $pack_names = array(
-        'server'            => 'Server pack',
-        'azure'             => 'Azure pack',
-        'network'           => 'Network pack',
-        'security'          => 'Security pack',
-        'governance'        => 'Governance & compliance pack',
-        'cyber-essentials'  => 'Cyber Essentials pack',
-        'ai'                => 'AI pack',
-        'strategy'          => 'Strategy pack',
-        'disaster-recovery' => 'Disaster recovery pack',
-    );
-    $likely = array();
-    $consider = array();
-    $answered = array();
-    foreach ( $pack_names as $key => $name ) {
-        if ( ! array_key_exists( $key, $answers ) ) {
-            continue;
-        }
-        $answer = (string) $answers[ $key ];
-        if ( ! in_array( $answer, array( 'yes', 'no', 'unsure' ), true ) ) {
-            return array();
-        }
-        $answered[] = $name;
-        if ( $answer === 'yes' ) {
-            $likely[] = $name;
-        } elseif ( $answer === 'unsure' ) {
-            $consider[] = $name;
-        }
-    }
-    if ( ! $answered ) {
-        return array();
-    }
-
-    $parts = array();
-    if ( $likely ) {
-        $parts[] = 'Worth discussing first: ' . implode( ', ', $likely ) . '.';
-    }
-    if ( $consider ) {
-        $parts[] = 'Worth clarifying: ' . implode( ', ', $consider ) . '.';
-    }
-    if ( ! $parts ) {
-        $parts[] = 'Nothing discussed so far points clearly to an optional pack.';
-    }
-    $known_scope = 'Only these areas were discussed: ' . implode( ', ', $answered ) . '. Unasked areas are unknown and must not be described as unnecessary, absent or already covered.';
-    return array(
-        'label'    => 'Add-on conversation result',
-        'facts'    => 'Fixed website suggestion based on a partial conversation. ' . implode( ' ', $parts ) . ' ' . $known_scope . ' Every pack is price on application.',
-        'fallback' => implode( ' ', $parts ) . ' This is only a starting point from what you have told Cora so far, not a complete assessment or quote.',
-    );
-}
-
-function stapleit_handle_cora_planner_explain_ajax() {
-    if ( ! stapleit_cora_rate_limit_allows_request() ) {
-        wp_send_json( array( 'ok' => false, 'message' => 'Cora is taking a short pause. Your recommendation is still complete and an engineer can confirm it during a free IT audit.' ), 429 );
-    }
-
-    $planner_type = sanitize_key( wp_unslash( (string) ( $_POST['planner_type'] ?? '' ) ) );
-    $answers_json = wp_unslash( (string) ( $_POST['answers'] ?? '{}' ) );
-    $answers      = json_decode( $answers_json, true );
-    $answers      = is_array( $answers ) ? $answers : array();
-    $plan         = $planner_type === 'package' ? stapleit_cora_package_plan( $answers ) : ( $planner_type === 'packs' ? stapleit_cora_pack_plan( $answers ) : array() );
-    if ( ! $plan ) {
-        wp_send_json( array( 'ok' => false, 'message' => 'Tell Cora about at least one relevant area before asking for a suggestion.' ), 400 );
-    }
-
-    $result = array(
-        'ok'                => true,
-        'mode'              => 'knowledge-guide',
-        'reply'             => $plan['fallback'],
-        'knowledge_version' => stapleit_cora_knowledge_version(),
-    );
-    $messages = array(
-        array( 'role' => 'system', 'content' => stapleit_cora_system_prompt( 'planner' ) . "\n\n" . stapleit_cora_relevant_knowledge( $plan['facts'], '/it-services/it-support/' ) ),
-        array( 'role' => 'user', 'content' => "Explain this fixed result in one short paragraph of no more than 45 words. Keep the recommendation exactly as supplied.\n\n" . $plan['facts'] ),
-    );
-    $reply = stapleit_cora_model_reply( $messages );
     if ( $reply !== '' ) {
         $result['mode']  = 'local-ai';
         $result['reply'] = $reply;
