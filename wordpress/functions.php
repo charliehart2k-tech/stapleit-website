@@ -49,6 +49,28 @@ add_filter( 'wp_headers', function ( $headers ) {
     return $headers;
 } );
 
+/* Do not expose account display names or login-like slugs through public
+ * author discovery. Authenticated WordPress users keep the normal REST users
+ * routes for administration. */
+add_filter( 'rest_endpoints', function ( $endpoints ) {
+    if ( is_user_logged_in() ) return $endpoints;
+    foreach ( array_keys( $endpoints ) as $route ) {
+        if ( preg_match( '#^/wp/v2/users(?:/|$)#', $route ) ) unset( $endpoints[ $route ] );
+    }
+    return $endpoints;
+} );
+
+add_action( 'template_redirect', function () {
+    if ( ! isset( $_GET['author'] ) && ! is_author() ) return;
+    global $wp_query;
+    if ( $wp_query ) $wp_query->set_404();
+    status_header( 404 );
+    nocache_headers();
+    $template = get_404_template();
+    if ( $template ) include $template;
+    exit;
+}, 0 );
+
 /* Sensible sender identity. An authenticated SMTP plugin can override these
  * filters later; until then WordPress will at least identify mail correctly. */
 add_filter( 'wp_mail_from', function () {
