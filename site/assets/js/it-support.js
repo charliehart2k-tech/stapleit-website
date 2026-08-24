@@ -40,7 +40,7 @@
     movedContentSource = null;
     movedContentNodes = [];
     dialog.classList.remove(...tierClasses);
-    body.classList.remove('support-dialog-body--single', 'support-dialog-body--form');
+    body.classList.remove('support-dialog-body--single', 'support-dialog-body--form', 'support-dialog-body--accordion');
     body.replaceChildren();
     title.textContent = '';
     price.textContent = '';
@@ -82,6 +82,32 @@
       const clone = content.cloneNode(true);
       clone.querySelectorAll?.('.support-package-note').forEach(element => element.remove());
       body.append(...clone.childNodes);
+    }
+
+    if (window.matchMedia('(max-width: 700px)').matches && ['basic', 'standard', 'premium'].includes(tier)) {
+      body.classList.add('support-dialog-body--accordion');
+      [...body.querySelectorAll(':scope > .support-detail-group')].forEach(group => {
+        const groupHeading = group.querySelector(':scope > h4');
+        if (!groupHeading) return;
+        const disclosure = document.createElement('details');
+        disclosure.className = 'support-detail-group support-dialog-detail';
+        const summary = document.createElement('summary');
+        summary.textContent = groupHeading.textContent.trim();
+        const detailContent = document.createElement('div');
+        detailContent.className = 'support-dialog-detail-content';
+        [...group.childNodes].forEach(node => {
+          if (node !== groupHeading) detailContent.append(node);
+        });
+        disclosure.append(summary, detailContent);
+        group.replaceWith(disclosure);
+      });
+      const disclosures = [...body.querySelectorAll(':scope > .support-dialog-detail')];
+      disclosures.forEach(disclosure => disclosure.addEventListener('toggle', () => {
+        if (!disclosure.open) return;
+        disclosures.forEach(other => {
+          if (other !== disclosure) other.open = false;
+        });
+      }));
     }
 
     dialog.showModal();

@@ -295,6 +295,65 @@ test('package discovery is visually led by Cora and tier glows stay visible', as
   }
 });
 
+test('mobile package dialogs stay contained and collapse dense inclusion groups', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  for (const tier of ['standard', 'premium']) {
+    await page.locator(`.support-package-${tier} summary`).click();
+    const dialog = page.locator('#support-dialog');
+    await expect(dialog).toBeVisible();
+    await page.waitForTimeout(460);
+
+    const geometry = await dialog.evaluate(element => {
+      const body = element.querySelector('.support-dialog-body');
+      const close = element.querySelector('.support-dialog-close').getBoundingClientRect();
+      const rect = element.getBoundingClientRect();
+      return {
+        top: rect.top,
+        bottom: rect.bottom,
+        closeWidth: close.width,
+        closeHeight: close.height,
+        accordionCount: body.querySelectorAll(':scope > .support-dialog-detail').length,
+        scrollRatio: body.scrollHeight / body.clientHeight
+      };
+    });
+
+    expect(geometry.top).toBeGreaterThanOrEqual(5);
+    expect(geometry.bottom).toBeLessThanOrEqual(839);
+    expect(geometry.closeWidth).toBeGreaterThanOrEqual(46);
+    expect(geometry.closeHeight).toBeGreaterThanOrEqual(46);
+    expect(geometry.accordionCount).toBe(8);
+    expect(geometry.scrollRatio).toBeLessThanOrEqual(tier === 'premium' ? 1.3 : 1.15);
+
+    const disclosures = dialog.locator('.support-dialog-detail');
+    await disclosures.nth(0).locator('summary').click();
+    await page.waitForTimeout(40);
+    await disclosures.nth(1).locator('summary').click();
+    await expect.poll(async () => disclosures.evaluateAll(items => items.filter(item => item.open).length)).toBe(1);
+    await expect(disclosures.nth(0)).not.toHaveAttribute('open', '');
+    await expect(disclosures.nth(1)).toHaveAttribute('open', '');
+
+    await page.getByRole('button', { name: 'Close' }).click();
+    await expect(dialog).toBeHidden();
+  }
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.locator('.support-package-standard summary').click();
+  const desktopDialog = page.locator('#support-dialog');
+  await expect(desktopDialog).toBeVisible();
+  const desktopState = await desktopDialog.evaluate(element => ({
+    accordionCount: element.querySelectorAll('.support-dialog-detail').length,
+    columns: getComputedStyle(element.querySelector('.support-dialog-body')).gridTemplateColumns.split(' ').filter(Boolean).length,
+    backdropBlur: getComputedStyle(element, '::backdrop').backdropFilter || getComputedStyle(element, '::backdrop').webkitBackdropFilter || '',
+    dialogBlur: getComputedStyle(element).backdropFilter || getComputedStyle(element).webkitBackdropFilter || ''
+  }));
+  expect(desktopState.accordionCount).toBe(0);
+  expect(desktopState.columns).toBe(2);
+  expect(desktopState.backdropBlur).toContain('blur(3px)');
+  expect(desktopState.dialogBlur).toContain('blur(18px)');
+});
+
 test('primary packages lead and tailored support stays behind See more', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
