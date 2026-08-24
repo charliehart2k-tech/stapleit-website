@@ -152,7 +152,7 @@ test('mobile top chapters keep deliberate rhythm and standard inclusions progres
 
   expect(initial.heroHeight).toBeLessThan(1120);
   expect(initial.standardHeight).toBeLessThan(680);
-  expect(initial.onboardingHeight).toBeLessThan(1100);
+  expect(initial.onboardingHeight).toBeLessThanOrEqual(1005);
   expect(initial.separation).toBeGreaterThanOrEqual(12);
   expect(initial.packageHeadingSize).toBeLessThanOrEqual(40);
   expect(initial.visibleItems).toBe(8);
@@ -165,6 +165,21 @@ test('mobile top chapters keep deliberate rhythm and standard inclusions progres
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   const expandedItems = await page.locator('.support-standard-group li').evaluateAll(items => items.filter(item => item.getClientRects().length).length);
   expect(expandedItems).toBe(16);
+});
+
+test('mobile onboarding progress follows the reading position without generic reveal classes', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const onboarding = page.locator('.support-onboarding');
+  await expect(onboarding.locator('.motion-ready')).toHaveCount(0);
+  const bodyFont = await onboarding.locator('.support-step-copy p').first().evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize));
+  expect(bodyFont).toBeGreaterThanOrEqual(16);
+
+  for (const step of [1, 2, 3]) {
+    await onboarding.locator(`.support-step-card[data-step="${step}"]`).evaluate(element => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expect(onboarding).toHaveAttribute('data-progress', String(step));
+  }
 });
 
 test('tablet chapter headings stay below hero scale', async ({ page }) => {

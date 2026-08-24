@@ -275,31 +275,32 @@
   }, { threshold: .36, rootMargin: '0px 0px -8% 0px' });
   sectionObserver.observe(section);
 
-  const observer = new IntersectionObserver(entries => {
+  let narrowProgressFrame = 0;
+  const updateNarrowProgress = () => {
+    narrowProgressFrame = 0;
     if (desktopLayout.matches) return;
+    const readingLine = window.innerHeight * .48;
+    const visibleCards = cards
+      .map(card => {
+        const rect = card.getBoundingClientRect();
+        const visible = rect.bottom > 0 && rect.top < window.innerHeight;
+        return { card, visible, distance: Math.abs((rect.top + rect.bottom) / 2 - readingLine) };
+      })
+      .filter(item => item.visible)
+      .sort((a, b) => a.distance - b.distance);
+    if (visibleCards[0]) setProgress(Number(visibleCards[0].card.dataset.step));
+  };
+  const scheduleNarrowProgress = () => {
+    if (narrowProgressFrame) return;
+    narrowProgressFrame = window.requestAnimationFrame(updateNarrowProgress);
+  };
 
-    const visibleCard = entries
-      .filter(entry => entry.isIntersecting)
-      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-    if (visibleCard) setProgress(Number(visibleCard.target.dataset.step));
-  }, {
-    threshold: [.35, .55, .75],
-    rootMargin: '-10% 0px -25% 0px'
-  });
-
-  cards.forEach(card => observer.observe(card));
+  window.addEventListener('scroll', scheduleNarrowProgress, { passive: true });
+  window.addEventListener('resize', scheduleNarrowProgress, { passive: true });
+  desktopLayout.addEventListener?.('change', scheduleNarrowProgress);
+  scheduleNarrowProgress();
 })();
 
-(() => {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  document.querySelectorAll('.support-step-card.motion-ready, .support-card.motion-ready').forEach(element => {
-    element.addEventListener('transitionend', event => {
-      if (event.propertyName === 'opacity') element.classList.add('motion-settled');
-    }, { once: true });
-  });
-})();
 (() => {
   const more = document.querySelector('[data-package-more]');
   const tailored = document.querySelector('[data-package-tailored-wrap]');
