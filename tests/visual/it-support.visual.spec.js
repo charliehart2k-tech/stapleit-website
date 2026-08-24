@@ -749,6 +749,29 @@ test('Get in Touch is a real contact route with working audit handoff', async ({
   await expect(form.locator('[data-audit-form-status]')).toContainText('received');
 });
 
+test('IT Audit is a real audit route and keeps contact fallback available', async ({ page }) => {
+  for (const [width, height] of [[390, 844], [1366, 768]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('http://127.0.0.1:4173/get-in-touch/it-audit/', { waitUntil:'domcontentloaded' });
+    await expect(page.locator('main h1')).toHaveCount(1);
+    await expect(page.locator('main h1')).toContainText(/Let us look over/i);
+    await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding/i);
+    await expect(page.locator('[data-audit-form]')).toBeVisible();
+    await expect(page.locator('.contact-panel')).toBeVisible();
+    await expect(page.getByRole('link', { name:'01372 309 707' })).toHaveAttribute('href', 'tel:+441372309707');
+    const geometry = await page.evaluate(() => ({
+      overflow: document.documentElement.scrollWidth - innerWidth,
+      hidden: [...document.querySelectorAll('.audit-hero,.audit-form,.contact-hero,.contact-panel,.contact-map-card')].filter(element => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
+      h1: document.querySelectorAll('main h1').length,
+      h2: document.querySelectorAll('main h2').length
+    }));
+    expect(geometry.overflow).toBeLessThanOrEqual(0);
+    expect(geometry.hidden).toBe(0);
+    expect(geometry.h1).toBe(1);
+    expect(geometry.h2).toBeGreaterThanOrEqual(2);
+  }
+});
+
 test('mobile support content never disappears behind scroll reveal and unapproved filler copy stays absent', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });

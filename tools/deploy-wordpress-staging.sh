@@ -225,6 +225,13 @@ grep -Fq "assets/css/get-in-touch.bundle.css?v=$VERSION" "$THEME/static-get-in-t
 grep -Fq "assets/js/forms.js?v=$VERSION" "$THEME/static-get-in-touch.php"
 test -s "$THEME/assets/css/get-in-touch.bundle.css"
 if grep -Fqi 'Page in progress' "$THEME/static-get-in-touch.php"; then echo 'Get in Touch placeholder has returned; refusing deployment.' >&2; exit 1; fi
+
+grep -Fq 'class="reset-stage get-in-touch-page audit-page"' "$THEME/static-it-audit.php"
+grep -Fq 'data-audit-form' "$THEME/static-it-audit.php"
+grep -Fq 'class="contact-section"' "$THEME/static-it-audit.php"
+grep -Fq "assets/css/get-in-touch.bundle.css?v=$VERSION" "$THEME/static-it-audit.php"
+grep -Fq "assets/js/forms.js?v=$VERSION" "$THEME/static-it-audit.php"
+if grep -Fqi 'Page in progress' "$THEME/static-it-audit.php"; then echo 'IT Audit placeholder has returned; refusing deployment.' >&2; exit 1; fi
 grep -Fq "assets/fonts/manrope-latin.woff2" "$THEME/front-page.php"
 grep -Fq "assets/js/app.js?v=$VERSION" "$THEME/front-page.php"
 grep -Fq 'Chat to Cora' "$THEME/assets/js/app.js"
