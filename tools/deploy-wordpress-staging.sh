@@ -285,7 +285,7 @@ fi
 grep -Fq 'assets/images/icons/it-support.svg#helpdesk' "$THEME/static-it-support.php"
 test -s "$THEME/assets/images/icons/it-support.svg"
 test -s "$THEME/assets/images/effects/glass-grain.svg"
-grep -Fq 'assets/images/effects/glass-grain.svg' "$THEME/assets/css/it-support.css"
+grep -Fq '../images/effects/glass-grain.svg' "$THEME/assets/css/it-support.css"
 grep -Fq '<link rel="canonical" href="https://stapleit.co.uk/"' "$THEME/front-page.php"
 grep -Fq 'https://stapleit.co.uk/#organization' "$THEME/front-page.php"
 grep -Fq '"ProfessionalService"' "$THEME/front-page.php"
