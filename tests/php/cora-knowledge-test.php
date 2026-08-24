@@ -61,7 +61,7 @@ $checks = array(
     array( strpos( $functions_source, 'if ( ! $matches ) return array();' ) !== false, 'unclassified prompts do not default to Basic package' ),
     array( strpos( $functions_source, '$fallback_suggestions = $fallback_services ?' ) !== false, 'unclassified prompts do not receive generic sales suggestion chips' ),
     array( strpos( $functions_source, '$device_prompt = (bool) preg_match' ) !== false, 'unclassified device prompts use a safety-first fallback' ),
-    array( strpos( $functions_source, '( $device_prompt || $fallback_services || ! $business_it_prompt ) ? \'\'' ) !== false, 'device, deterministic add-on and non-IT replies cannot be overridden by the local model' ),
+    array( strpos( $functions_source, '( $device_prompt || $fallback_services || ! $model_allowed ) ? \'\'' ) !== false, 'device, deterministic add-on and non-contextual replies cannot be overridden by the local model' ),
     array( $package_flow_start['complete'] === false && strpos( $package_flow_start['reply'], 'How many people' ) !== false && count( $package_flow_start['suggestions'] ) === 4, 'package discovery starts with all four team-size choices' ),
     array( $package_flow_security['complete'] === true && $package_flow_security['state']['team'] === '10' && $package_flow_security['context'] === 'package_standard', 'free-text 12-staff stronger-security request resolves directly to Standard without model inference' ),
     array( $package_flow_small['complete'] === true && $package_flow_small['context'] === 'package_sole' && strpos( $package_flow_small['reply'], '£35' ) === false, 'teams below five route to Tailored and never receive Basic pricing' ),

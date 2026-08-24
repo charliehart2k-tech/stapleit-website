@@ -168,6 +168,12 @@ $functions_source = file_get_contents( __DIR__ . '/../../wordpress/functions.php
 if ( strpos( $functions_source, 'wp_unslash( (string) ( $_POST[\'history\']' ) === false || strpos( $functions_source, '0, 6000' ) === false ) {
     $failures[] = 'conversation history is not unslashed and bounded before JSON decoding';
 }
+if ( strpos( $functions_source, 'stapleit_cora_package_discovery_intent( $prompt )' ) === false ) {
+    $failures[] = 'AJAX handler is not wired to the shared package-discovery intent detector';
+}
+if ( strpos( $functions_source, '$model_allowed = $business_it_prompt && $turn_context !== \'\';' ) === false ) {
+    $failures[] = 'unclassified first-turn IT prompts can still block on the local model';
+}
 if ( strpos( $functions_source, "'timeout' => 6" ) === false || strpos( $functions_source, "'num_ctx' => 1280" ) === false || strpos( $functions_source, "'num_predict' => 64" ) === false || strpos( $functions_source, 'LOCK_EX | LOCK_NB' ) === false ) {
     $failures[] = 'local-model last-resort budget changed unexpectedly';
 }

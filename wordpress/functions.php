@@ -243,7 +243,7 @@ function stapleit_handle_cora_chat_ajax() {
     $flow_state       = json_decode( $flow_state_json, true );
     $flow_state       = is_array( $flow_state ) ? $flow_state : array();
     if ( $flow !== 'package' ) $flow = '';
-    if ( $flow === '' && preg_match( '/(?:which|what|choose|find|help\s+me\s+choose).{0,35}(?:support\s+)?package/i', $prompt ) ) {
+    if ( $flow === '' && stapleit_cora_package_discovery_intent( $prompt ) ) {
         $flow = 'package';
     }
     if ( $flow === 'package' ) {
@@ -308,7 +308,8 @@ function stapleit_handle_cora_chat_ajax() {
         $history,
         array( array( 'role' => 'user', 'content' => $prompt ) )
     );
-    $reply = ( $device_prompt || $fallback_services || ! $business_it_prompt ) ? '' : stapleit_cora_model_reply( $messages );
+    $model_allowed = $business_it_prompt && $turn_context !== '';
+    $reply = ( $device_prompt || $fallback_services || ! $model_allowed ) ? '' : stapleit_cora_model_reply( $messages );
     if ( $reply !== '' ) {
         $result['mode']  = 'local-ai';
         $result['reply'] = $reply;
