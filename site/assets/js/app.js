@@ -285,9 +285,14 @@
       }
       thinking.remove();
       conversationContext = typeof payload.context === 'string' ? payload.context : conversationContext;
-      if (payload.flow === 'package' && payload.flow_state && typeof payload.flow_state === 'object') {
-        conversationFlowState = payload.flow_state;
-        conversationFlow = payload.flow_active ? 'package' : '';
+      if (Object.prototype.hasOwnProperty.call(payload, 'flow')) {
+        if (payload.flow === 'package' && payload.flow_state && typeof payload.flow_state === 'object') {
+          conversationFlowState = payload.flow_state;
+          conversationFlow = payload.flow_active ? 'package' : '';
+        } else {
+          conversationFlowState = {};
+          conversationFlow = '';
+        }
       }
       conversation.push({ role: 'assistant', content: payload.reply });
       if (conversation.length > 8) conversation.splice(0, conversation.length - 8);

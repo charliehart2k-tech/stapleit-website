@@ -113,6 +113,55 @@ if ( ! empty( $basic_step['complete'] ) || ( $basic_step['state']['security'] ??
     if ( empty( $basic_done['complete'] ) || ( $basic_done['context'] ?? '' ) !== 'package_basic' ) $failures[] = 'adaptive Basic flow did not resolve to Basic after No';
 }
 
+// Recording-driven recoverability: package discovery must behave like a conversation, not a locked form.
+$recording_start = stapleit_cora_package_flow_step( 'Start package discovery', array() );
+$recording_hi = stapleit_cora_package_flow_step( 'hi cora', $recording_start['state'] );
+if ( ! empty( $recording_hi['complete'] ) || stripos( $recording_hi['reply'], 'Hi' ) === false || stripos( $recording_hi['reply'], 'How many people' ) === false ) {
+    $failures[] = 'recording flow did not handle a greeting while preserving package discovery';
+}
+$recording_team = stapleit_cora_package_flow_step( '39', $recording_hi['state'] );
+if ( ( $recording_team['state']['team'] ?? '' ) !== '25' || stripos( $recording_team['reply'], 'protection' ) === false ) {
+    $failures[] = 'recording flow did not parse a 39-person team';
+}
+$recording_confused = stapleit_cora_package_flow_step( 'sorry what?', $recording_team['state'] );
+if ( stripos( $recording_confused['reply'], 'level of cover' ) === false || trim( $recording_confused['reply'] ) === trim( $recording_team['reply'] ) ) {
+    $failures[] = 'recording flow repeated the security question instead of explaining it';
+}
+$recording_odd = stapleit_cora_package_flow_step( 'this is odd?', $recording_team['state'] );
+if ( stripos( $recording_odd['reply'], 'too rigid' ) === false || trim( $recording_odd['reply'] ) === trim( $recording_confused['reply'] ) ) {
+    $failures[] = 'recording flow did not acknowledge mild frustration distinctly';
+}
+$recording_broken = stapleit_cora_package_flow_step( "you're broken", $recording_team['state'] );
+if ( stripos( $recording_broken['reply'], 'got stuck' ) === false || ! in_array( 'Stop package finder', $recording_broken['suggestions'], true ) ) {
+    $failures[] = 'recording flow did not recover from a stuck/broken complaint';
+}
+$recording_topic_switch = stapleit_cora_package_flow_step( 'How much is Microsoft 365 Business Premium?', $recording_team['state'] );
+if ( empty( $recording_topic_switch['exit_to_general'] ) ) {
+    $failures[] = 'package flow did not release a clear licensing topic switch to general Cora';
+}
+$recording_stop = stapleit_cora_package_flow_step( 'Stop package finder', $recording_team['state'] );
+if ( empty( $recording_stop['complete'] ) || ( $recording_stop['context'] ?? 'x' ) !== '' || stripos( $recording_stop['reply'], 'stopped' ) === false ) {
+    $failures[] = 'package flow cannot be explicitly stopped';
+}
+
+// Recording-driven language coverage: plurals, large quantities and casual recovery remain business-IT aware.
+if ( ! stapleit_cora_business_it_intent( 'I need 700 licenses bespoke' ) ) {
+    $failures[] = 'plural US-spelling licenses were not classified as business IT';
+}
+$bulk_licensing = stapleit_cora_fast_reply( 'I need 700 licenses bespoke' );
+if ( stripos( $bulk_licensing, 'business IT and licensing request' ) === false || stripos( $bulk_licensing, 'bulk price' ) === false ) {
+    $failures[] = 'large bespoke licensing request was not handled safely';
+}
+if ( stripos( stapleit_cora_fast_reply( 'whaat?' ), 'Which part should I explain' ) === false ) {
+    $failures[] = 'short conversational confusion was treated as off-topic';
+}
+if ( stripos( stapleit_cora_fast_reply( 'can i have free money' ), 'reducing IT costs' ) === false ) {
+    $failures[] = 'benign off-topic banter did not redirect naturally';
+}
+if ( stripos( stapleit_cora_fast_reply( "you're not funny" ), 'Fair point' ) === false ) {
+    $failures[] = 'visitor feedback did not receive a natural acknowledgement';
+}
+
 // Context memory must preserve the last trusted subject for short follow-ups.
 $history = array( array( 'role' => 'user', 'content' => 'Tell me about the Network pack' ) );
 if ( stapleit_cora_context_for_turn( 'What does that cover?', '', $history ) !== 'pack_network' ) {

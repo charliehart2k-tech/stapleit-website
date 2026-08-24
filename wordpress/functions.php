@@ -263,19 +263,26 @@ function stapleit_handle_cora_chat_ajax() {
     if ( $flow === '' && stapleit_cora_package_discovery_intent( $prompt ) ) {
         $flow = 'package';
     }
+    $flow_interrupted = false;
     if ( $flow === 'package' ) {
         $flow_result = stapleit_cora_package_flow_step( $prompt, $flow_state );
-        wp_send_json( array(
-            'ok'                => true,
-            'mode'              => 'package-flow',
-            'reply'             => $flow_result['reply'],
-            'context'           => (string) ( $flow_result['context'] ?? '' ),
-            'flow'              => 'package',
-            'flow_active'       => ! (bool) $flow_result['complete'],
-            'flow_state'        => $flow_result['state'],
-            'suggestions'       => $flow_result['suggestions'],
-            'knowledge_version' => stapleit_cora_knowledge_version(),
-        ) );
+        if ( ! empty( $flow_result['exit_to_general'] ) ) {
+            $flow = '';
+            $flow_state = array();
+            $flow_interrupted = true;
+        } else {
+            wp_send_json( array(
+                'ok'                => true,
+                'mode'              => 'package-flow',
+                'reply'             => $flow_result['reply'],
+                'context'           => (string) ( $flow_result['context'] ?? '' ),
+                'flow'              => 'package',
+                'flow_active'       => ! (bool) $flow_result['complete'],
+                'flow_state'        => $flow_result['state'],
+                'suggestions'       => $flow_result['suggestions'],
+                'knowledge_version' => stapleit_cora_knowledge_version(),
+            ) );
+        }
     }
     $history          = stapleit_cora_history_from_request();
     $incoming_context = stapleit_cora_valid_context_key( (string) ( $_POST['context'] ?? '' ) );
@@ -287,14 +294,20 @@ function stapleit_handle_cora_chat_ajax() {
 
     $fast_reply = stapleit_cora_fast_reply( $prompt, $turn_context );
     if ( $fast_reply !== '' ) {
-        wp_send_json( array(
+        $payload = array(
             'ok'                => true,
             'mode'              => 'knowledge-guide',
             'reply'             => $fast_reply,
             'context'           => $turn_context,
             'suggestions'       => stapleit_cora_follow_up_suggestions( $effective_prompt ),
             'knowledge_version' => stapleit_cora_knowledge_version(),
-        ) );
+        );
+        if ( $flow_interrupted ) {
+            $payload['flow'] = '';
+            $payload['flow_active'] = false;
+            $payload['flow_state'] = array();
+        }
+        wp_send_json( $payload );
     }
 
     $fallback_services = stapleit_support_catalogue_match( $effective_prompt );
@@ -319,6 +332,11 @@ function stapleit_handle_cora_chat_ajax() {
         'suggestions'       => $fallback_suggestions,
         'knowledge_version' => stapleit_cora_knowledge_version(),
     );
+    if ( $flow_interrupted ) {
+        $result['flow'] = '';
+        $result['flow_active'] = false;
+        $result['flow_state'] = array();
+    }
     $context_note = $context_label !== '' ? "\n\nCONVERSATION CONTEXT: The current subject is " . $context_label . ". Resolve short follow-up wording such as ‘that’, ‘it’ or ‘what’s included?’ against this subject unless the visitor clearly changes topic." : '';
     $messages = array_merge(
         array( array( 'role' => 'system', 'content' => stapleit_cora_system_prompt() . "\n\n" . stapleit_cora_relevant_knowledge( $effective_prompt, $page_path ) . $context_note ) ),

@@ -263,6 +263,79 @@ test('Cora leads package discovery and only asks questions that can change the r
   expect(requests[2].state.team).toBe('10');
 });
 
+test('Cora recovers from package-flow interruptions and can change topic', async ({ page }) => {
+  const requests = [];
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    const body = route.request().postData() || '';
+    if (!body.includes('action=stapleit_cora_chat')) {
+      await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+      return;
+    }
+    const params = new URLSearchParams(body);
+    const prompt = params.get('prompt') || '';
+    const flow = params.get('flow') || '';
+    const state = JSON.parse(params.get('flow_state') || '{}');
+    requests.push({ prompt, flow, state });
+
+    let payload;
+    if (/start package discovery/i.test(prompt)) {
+      payload = { ok:true, mode:'package-flow', reply:'How many people need IT support?', flow:'package', flow_active:true, flow_state:{team:'',security:'',requirements:''}, suggestions:['Just me','2–4 people','5–19 people','20+ people'] };
+    } else if (prompt === '39') {
+      payload = { ok:true, mode:'package-flow', reply:'How much protection do you want included?', flow:'package', flow_active:true, flow_state:{team:'25',security:'',requirements:''}, suggestions:['Day-to-day support','Security + backup','Microsoft 365 Business Premium'] };
+    } else if (/sorry what/i.test(prompt)) {
+      payload = { ok:true, mode:'package-flow', reply:'I mean the level of cover you want us to manage: mainly day-to-day IT support, stronger security and backup, or Microsoft 365 Business Premium included.', flow:'package', flow_active:true, flow_state:{team:'25',security:'',requirements:''}, suggestions:['Day-to-day support','Security + backup','Microsoft 365 Business Premium'] };
+    } else if (/this is odd/i.test(prompt)) {
+      payload = { ok:true, mode:'package-flow', reply:'You’re right — that was too rigid. I mean the level of cover you want us to manage.', flow:'package', flow_active:true, flow_state:{team:'25',security:'',requirements:''}, suggestions:['Day-to-day support','Security + backup','Microsoft 365 Business Premium'] };
+    } else if (/you.re broken/i.test(prompt)) {
+      payload = { ok:true, mode:'package-flow', reply:'Fair point — I got stuck in the package finder. I can restart it, stop it, or carry on from the last useful answer.', flow:'package', flow_active:true, flow_state:{team:'25',security:'',requirements:''}, suggestions:['Start again','Stop package finder'] };
+    } else if (/how much is microsoft 365 business premium/i.test(prompt)) {
+      payload = { ok:true, mode:'knowledge-guide', reply:'Staple IT does not publish a standalone Microsoft 365 Business Premium licence price on this site.', flow:'', flow_active:false, flow_state:{}, suggestions:['What does Premium include?','Can you review our licences?'] };
+    } else if (/700 licenses bespoke/i.test(prompt)) {
+      payload = { ok:true, mode:'knowledge-guide', reply:'That is a business IT and licensing request. I can help narrow it down, but I will not invent a bulk price in chat.', suggestions:[] };
+    } else {
+      payload = { ok:true, mode:'knowledge-guide', reply:'Which part should I explain?', suggestions:[] };
+    }
+    await route.fulfill({ contentType:'application/json', body:JSON.stringify(payload) });
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil:'networkidle' });
+  await page.locator('[data-cora-flow="package"]').click();
+  const cora = page.getByRole('dialog', { name:'Cora' });
+  const input = cora.getByLabel('Message Cora');
+  const send = cora.getByRole('button', { name:'Send' });
+
+  const sendText = async text => {
+    await input.fill(text);
+    await send.click();
+  };
+
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('How many people');
+  await sendText('39');
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('How much protection');
+
+  await sendText('sorry what?');
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('level of cover');
+  await expect(cora.locator('.cora-message--assistant').last()).not.toHaveText('How much protection do you want included?');
+
+  await sendText('this is odd?');
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('too rigid');
+
+  await sendText("you're broken");
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('got stuck');
+  await expect(cora.getByRole('button', { name:'Stop package finder' })).toBeVisible();
+
+  await sendText('How much is Microsoft 365 Business Premium?');
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('does not publish a standalone');
+
+  await sendText('I need 700 licenses bespoke');
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('business IT and licensing request');
+
+  expect(requests.find(request => request.prompt === '39')?.flow).toBe('package');
+  expect(requests.find(request => /Business Premium/i.test(request.prompt))?.flow).toBe('package');
+  expect(requests.find(request => /700 licenses bespoke/i.test(request.prompt))?.flow).toBe('');
+});
+
 test('package discovery is visually led by Cora and tier glows stay visible', async ({ page }) => {
   for (const [width, height] of [[390, 844], [1366, 768]]) {
     await page.setViewportSize({ width, height });
