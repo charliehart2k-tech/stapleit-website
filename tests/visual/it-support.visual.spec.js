@@ -422,8 +422,8 @@ test('mobile package dialogs stay contained and collapse dense inclusion groups'
       return {
         top: rect.top,
         bottom: rect.bottom,
-        closeWidth: close.width,
-        closeHeight: close.height,
+        closeWidth: Math.round(close.width * 100) / 100,
+        closeHeight: Math.round(close.height * 100) / 100,
         accordionCount: body.querySelectorAll(':scope > .support-dialog-detail').length,
         scrollRatio: body.scrollHeight / body.clientHeight
       };

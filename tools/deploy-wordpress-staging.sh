@@ -141,6 +141,7 @@ echo "=== Release gate: Cora PHP contracts ==="
 php "$REPO/tests/php/cora-safety-test.php"
 php "$REPO/tests/php/cora-knowledge-test.php"
 php "$REPO/tests/php/cora-regression-test.php"
+php "$REPO/tests/php/cora-training-test.php"
 php "$REPO/tests/php/wordpress-hardening-test.php"
 
 echo

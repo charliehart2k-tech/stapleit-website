@@ -136,6 +136,7 @@ jobs:
           php tests/php/cora-safety-test.php
           php tests/php/cora-knowledge-test.php
           php tests/php/cora-regression-test.php
+          php tests/php/cora-training-test.php
           php tests/php/wordpress-hardening-test.php
 
       - name: Run content security SEO and AEO gates

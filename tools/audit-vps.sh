@@ -118,6 +118,8 @@ else
   php -l "$REPO/wordpress/cora-knowledge.php" >/dev/null || fail "Cora knowledge syntax check failed"
   php "$REPO/tests/php/cora-safety-test.php" || fail "Cora safety contract failed"
   php "$REPO/tests/php/cora-knowledge-test.php" || fail "Cora knowledge contract failed"
+  php "$REPO/tests/php/cora-regression-test.php" || fail "Cora regression contract failed"
+  php "$REPO/tests/php/cora-training-test.php" || fail "Cora training corpus failed"
   bash -n "$REPO/tools/deploy-wordpress-staging.sh" || fail "Deployment script syntax check failed"
 fi
 
