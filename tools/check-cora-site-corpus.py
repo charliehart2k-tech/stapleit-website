@@ -4,9 +4,10 @@ from __future__ import annotations
 import csv, hashlib, re, sys
 from pathlib import Path
 
-CORPUS=Path('training/cora-site-corpus.md')
-RUNTIME=Path('training/cora-site-runtime-corpus.md')
-MANIFEST=Path('training/cora-site-corpus-manifest.tsv')
+ROOT=Path(__file__).resolve().parents[1]
+CORPUS=ROOT/'training/cora-site-corpus.md'
+RUNTIME=ROOT/'training/cora-site-runtime-corpus.md'
+MANIFEST=ROOT/'training/cora-site-corpus-manifest.tsv'
 REQUIRED={
  'https://www.stapleit.co.uk/',
  'https://www.stapleit.co.uk/it-services/it-support/',
