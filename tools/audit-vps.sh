@@ -9,6 +9,7 @@ WP_ROOT="${WP_ROOT:-/var/www/stapleit}"
 THEME="${THEME:-$WP_ROOT/wp-content/themes/stapleit}"
 BACKUP_DIR="${BACKUP_DIR:-/home/deploy/stapleit-theme-backups}"
 BACKUP_RETENTION="${BACKUP_RETENTION:-5}"
+DB_BACKUP_DIR="${DB_BACKUP_DIR:-/var/backups/stapleit-db}"
 STAGING_URL="${STAGING_URL:-https://staging.stapleitdev.co.uk}"
 
 warnings=0
@@ -248,7 +249,11 @@ if [[ "$ollama_state" == "active" ]]; then
     fail "Cora model is configured but unavailable to Ollama: $cora_model"
   fi
 else
-  warn "Ollama is not active; Cora will use the deterministic knowledge-guide fallback"
+  if [[ "$ollama_state" == "inactive" ]] && ! systemctl is-enabled --quiet ollama 2>/dev/null; then
+    pass "Ollama is parked while Cora is disabled"
+  else
+    warn "Ollama is not active; verify whether Cora is intentionally parked"
+  fi
 fi
 
 php_fpm_unit="$(systemctl list-units --type=service --all --no-legend 'php*-fpm.service' 2>/dev/null | awk 'NR==1{print $1}')"
@@ -285,7 +290,41 @@ if have sshd; then
   fi
 fi
 
+section "Runtime hardening and performance"
+php_expose="$(php -i 2>/dev/null | awk -F' => ' '/^expose_php =>/{print $2; exit}')"
+php_cookie_secure="$(php -i 2>/dev/null | awk -F' => ' '/^session.cookie_secure =>/{print $2; exit}')"
+php_cookie_http="$(php -i 2>/dev/null | awk -F' => ' '/^session.cookie_httponly =>/{print $2; exit}')"
+[[ "$php_expose" == "Off" ]] && pass "PHP version exposure is disabled" || fail "PHP expose_php is not Off"
+[[ "$php_cookie_secure" == "On" ]] && pass "PHP secure session cookies are enabled" || fail "PHP session.cookie_secure is not On"
+[[ "$php_cookie_http" == "On" ]] && pass "PHP HttpOnly session cookies are enabled" || fail "PHP session.cookie_httponly is not On"
+if privileged nginx -T 2>/dev/null | grep -q 'gzip_types text/plain text/css application/json application/javascript'; then
+  pass "Nginx compresses CSS, JavaScript and text assets"
+else
+  fail "Nginx extended gzip_types baseline is missing"
+fi
+if have node; then
+  node_major="$(node -p 'process.versions.node.split(`.`)[0]' 2>/dev/null || true)"
+  if [[ "$node_major" =~ ^[0-9]+$ ]] && (( node_major >= 20 )); then pass "Supported Node test runtime is installed: $(node -v)"; else fail "Node test runtime is too old: $(node -v 2>/dev/null || echo unavailable)"; fi
+fi
+
 section "Backups"
+if systemctl is-enabled --quiet stapleit-db-backup.timer 2>/dev/null && systemctl is-active --quiet stapleit-db-backup.timer 2>/dev/null; then
+  pass "Daily WordPress database backup timer is enabled and active"
+else
+  fail "Daily WordPress database backup timer is not enabled and active"
+fi
+if [[ -d "$DB_BACKUP_DIR" ]]; then
+  latest_db_backup="$(find "$DB_BACKUP_DIR" -maxdepth 1 -type f -name 'stapleit-*.sql.gz' -printf '%T@ %p\n' 2>/dev/null | sort -nr | awk 'NR==1{$1=""; sub(/^ /,""); print}')"
+  if [[ -n "$latest_db_backup" ]] && gzip -t "$latest_db_backup" 2>/dev/null; then
+    pass "Latest WordPress database backup is present and gzip-valid"
+    printf 'Latest DB backup: %s\n' "$latest_db_backup"
+  else
+    fail "No valid WordPress database backup was found"
+  fi
+else
+  fail "WordPress database backup directory not found at $DB_BACKUP_DIR"
+fi
+
 if [[ -d "$BACKUP_DIR" ]]; then
   release_count="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'stapleit-theme-????????-??????.tar.gz' 2>/dev/null | wc -l)"
   backup_size="$(du -sh "$BACKUP_DIR" 2>/dev/null | awk '{print $1}' || true)"

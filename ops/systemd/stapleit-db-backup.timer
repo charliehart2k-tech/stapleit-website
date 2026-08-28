@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Staple IT WordPress database backup
+
+[Timer]
+OnCalendar=*-*-* 02:25:00 UTC
+Persistent=true
+RandomizedDelaySec=10m
+Unit=stapleit-db-backup.service
+
+[Install]
+WantedBy=timers.target
