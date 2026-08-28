@@ -419,8 +419,8 @@ else
 
   login_headers="$(curl -sS -o /dev/null -D - --max-time 20 "$STAGING_URL/wp-login.php" 2>/dev/null || true)"
   login_status="$(printf '%s\n' "$login_headers" | awk '/^HTTP\//{status=$2} END{print status}')"
-  if [[ "$login_status" == "401" || "$login_status" == "403" ]] || printf '%s\n' "$login_headers" | grep -Eqi '^location:.*cloudflareaccess\.com'; then
-    pass "Development WordPress login is protected by an access policy"
+  if [[ "$login_status" == "401" || "$login_status" == "403" || "$login_status" == "404" ]] || printf '%s\n' "$login_headers" | grep -Eqi '^location:.*cloudflareaccess\.com'; then
+    pass "Development WordPress login is protected or closed"
   else
     fail "Development WordPress login is publicly reachable (HTTP ${login_status:-unavailable})"
   fi
