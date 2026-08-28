@@ -395,3 +395,93 @@
   .support-pack-reel-item,
   .support-packs .support-packs-more-btn{transition:none}
 }
+
+
+
+/* Release 7 — restore IT Support chapter gates after add-on showcase rebuild. */
+.support-packs{
+  padding-top:clamp(5rem,6.4vw,7rem);
+  padding-bottom:clamp(5.5rem,7vw,7.5rem);
+}
+.support-packs-intro{
+  grid-template-columns:minmax(0,1fr) minmax(360px,460px);
+  gap:clamp(3rem,5.5vw,6rem);
+  align-items:center;
+}
+.support-packs-copy{max-width:620px}
+.support-packs-copy h2{
+  max-width:11ch;
+  font-size:clamp(3.4rem,4.1vw,4.25rem);
+  line-height:.98;
+  letter-spacing:-.043em;
+}
+.support-packs-title-accent{
+  margin-top:.06em;
+  background:linear-gradient(100deg,#4f85ff 0%,#6f63ff 50%,#a855f7 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.support-packs-lead{
+  max-width:36rem;
+  margin-top:1.55rem;
+  font-size:clamp(1.03rem,1.15vw,1.15rem);
+  line-height:1.55;
+}
+.support-packs-explainer{
+  max-width:38rem;
+  margin-top:.8rem;
+  color:#9da8b5;
+  font-size:.96rem;
+  line-height:1.6;
+}
+.support-packs .support-pack-cora{
+  width:min(100%,440px);
+  margin:1.65rem 0 0;
+  border-radius:20px;
+}
+.support-packs .support-pack-cora-trigger{
+  min-height:64px;
+  padding:15px 19px;
+  border-radius:20px;
+  font-size:.97rem;
+}
+.support-packs .support-pack-cora-trigger::before{width:16px;height:16px}
+.support-pack-reel-shell{
+  width:100%;
+  max-width:460px;
+  min-height:0;
+  padding:16px;
+  border-radius:23px;
+}
+.support-pack-reel-head{padding:0 2px 12px;font-size:.73rem}
+.support-pack-reel{min-height:204px}
+.support-pack-reel-item{min-height:204px;padding:24px 24px 22px;border-radius:18px}
+.support-pack-reel-name{font-size:clamp(1.7rem,2.1vw,2.15rem)}
+.support-pack-reel-copy{max-width:31ch;margin-top:.55rem;font-size:.9rem;line-height:1.5}
+.support-pack-reel-link{margin-top:1rem;font-size:.82rem}
+.support-packs .support-packs-more{margin-top:10px}
+.support-packs .support-packs-more-btn{min-height:44px;border-radius:14px}
+.support-packs + .support-extras{
+  padding-top:clamp(5.5rem,7vw,7.5rem);
+  border-top:1px solid rgba(255,255,255,.055);
+}
+@media(max-width:900px){
+  .support-packs-intro{grid-template-columns:1fr;gap:2.25rem}
+  .support-packs-copy h2{font-size:clamp(3.1rem,8.5vw,4rem)}
+  .support-pack-reel-shell{max-width:620px;justify-self:start}
+}
+@media(max-width:700px){
+  .support-packs{padding-top:4.5rem;padding-bottom:4.75rem}
+  .support-packs-intro{gap:1.8rem}
+  .support-packs-copy h2{max-width:10ch;font-size:clamp(2.85rem,13vw,3.55rem)}
+  .support-packs-lead{margin-top:1.25rem;font-size:1rem}
+  .support-packs-explainer{font-size:.92rem;line-height:1.55}
+  .support-packs .support-pack-cora{width:100%;margin-top:1.35rem}
+  .support-packs .support-pack-cora-trigger{min-height:60px;padding:14px 16px}
+  .support-pack-reel-shell{max-width:none;padding:13px;border-radius:20px}
+  .support-pack-reel{min-height:188px}
+  .support-pack-reel-item{min-height:188px;padding:21px 20px 19px}
+  .support-pack-reel-name{font-size:1.72rem}
+  .support-packs + .support-extras{padding-top:2.65rem}
+}

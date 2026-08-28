@@ -664,6 +664,50 @@ test('Add-on showcase stays compact, colourful and Cora-ready', async ({ page })
   await expect(reel.locator('[data-pack-reel-item].is-active')).toHaveCount(1);
 });
 
+
+test('desktop add-on chapter stays inside the established visual gates', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const geometry = await page.evaluate(() => {
+    const rect = selector => document.querySelector(selector).getBoundingClientRect();
+    const packs = rect('.support-packs');
+    const packages = rect('.support-packages');
+    const intro = rect('.support-packs-intro');
+    const heading = document.querySelector('#support-packs-title');
+    const reel = rect('.support-pack-reel-shell');
+    const cora = rect('.support-pack-cora-trigger');
+    const extrasHeading = rect('#support-extras-title');
+    return {
+      leftDelta: Math.abs(packs.left - packages.left),
+      rightDelta: Math.abs(packs.right - packages.right),
+      sectionHeight: packs.height,
+      headingSize: Number.parseFloat(getComputedStyle(heading).fontSize),
+      headingHeight: heading.getBoundingClientRect().height,
+      reelWidth: reel.width,
+      reelHeight: reel.height,
+      coraWidth: cora.width,
+      coraHeight: cora.height,
+      contentToNextHeading: extrasHeading.top - intro.bottom,
+      nextSectionBorder: getComputedStyle(document.querySelector('.support-extras')).borderTopWidth,
+      overflow: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+
+  expect(geometry.leftDelta).toBeLessThanOrEqual(1);
+  expect(geometry.rightDelta).toBeLessThanOrEqual(1);
+  expect(geometry.sectionHeight).toBeLessThanOrEqual(760);
+  expect(geometry.headingSize).toBeLessThanOrEqual(68.5);
+  expect(geometry.headingHeight).toBeLessThanOrEqual(215);
+  expect(geometry.reelWidth).toBeLessThanOrEqual(460);
+  expect(geometry.reelHeight).toBeLessThanOrEqual(345);
+  expect(geometry.coraWidth).toBeLessThanOrEqual(440);
+  expect(geometry.coraHeight).toBeLessThanOrEqual(66);
+  expect(geometry.contentToNextHeading).toBeGreaterThanOrEqual(220);
+  expect(Number.parseFloat(geometry.nextSectionBorder)).toBeGreaterThan(0);
+  expect(geometry.overflow).toBeLessThanOrEqual(0);
+});
+
 test('Add-on reel opens pack details and the catalogue can expand to all nine', async ({ page }) => {
   await page.setViewportSize({ width: 430, height: 932 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
