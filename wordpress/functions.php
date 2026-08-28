@@ -121,6 +121,8 @@ add_action( 'wp_ajax_nopriv_stapleit_track_planner_event', 'stapleit_track_plann
 add_action( 'wp_ajax_stapleit_track_planner_event', 'stapleit_track_planner_event' );
 add_action( 'wp_ajax_nopriv_stapleit_cora_chat', 'stapleit_handle_cora_chat_ajax' );
 add_action( 'wp_ajax_stapleit_cora_chat', 'stapleit_handle_cora_chat_ajax' );
+add_action( 'wp_ajax_nopriv_stapleit_cora_status', 'stapleit_handle_cora_status_ajax' );
+add_action( 'wp_ajax_stapleit_cora_status', 'stapleit_handle_cora_status_ajax' );
 
 function stapleit_track_planner_event() {
     $allowed = array(
@@ -224,7 +226,7 @@ function stapleit_cora_model_reply( $messages ) {
 
 
 function stapleit_cora_hosted_model_reply( $prompt, $trusted_answer, $context, $history, $page_path = '' ) {
-    if ( ! stapleit_cora_hosted_enabled() ) return '';
+    if ( ! stapleit_cora_grounded_ready() ) return '';
 
     $context       = stapleit_cora_valid_context_key( $context );
     $context_label = stapleit_cora_context_label( $context );
@@ -324,8 +326,20 @@ function stapleit_cora_history_from_request() {
     return $history;
 }
 
+function stapleit_cora_public_ready() {
+    return STAPLEIT_CORA_PUBLIC_ENABLED && stapleit_cora_grounded_ready();
+}
+
+function stapleit_handle_cora_status_ajax() {
+    nocache_headers();
+    wp_send_json( array(
+        'ok'      => true,
+        'enabled' => stapleit_cora_public_ready(),
+    ) );
+}
+
 function stapleit_handle_cora_chat_ajax() {
-    if ( ! STAPLEIT_CORA_PUBLIC_ENABLED ) {
+    if ( ! stapleit_cora_public_ready() ) {
         wp_send_json( array( 'ok' => false, 'message' => 'Cora is coming soon.' ), 503 );
     }
     $prompt = trim( sanitize_textarea_field( wp_unslash( (string) ( $_POST['prompt'] ?? '' ) ) ) );
@@ -376,7 +390,7 @@ function stapleit_handle_cora_chat_ajax() {
             $flow_context = (string) ( $flow_result['context'] ?? '' );
             $flow_reply   = (string) $flow_result['reply'];
             $flow_mode    = 'package-flow';
-            if ( ! empty( $flow_result['complete'] ) && stapleit_cora_hosted_enabled() ) {
+            if ( ! empty( $flow_result['complete'] ) && stapleit_cora_grounded_ready() ) {
                 $generated = stapleit_cora_hosted_model_reply( $prompt, $flow_reply, $flow_context, $history, $page_path );
                 if ( $generated !== '' ) {
                     $flow_reply = $generated;
@@ -409,7 +423,7 @@ function stapleit_handle_cora_chat_ajax() {
     if ( $fast_reply !== '' ) {
         $final_reply = $fast_reply;
         $mode        = 'knowledge-guide';
-        if ( $business_it_prompt && stapleit_cora_hosted_enabled() ) {
+        if ( $business_it_prompt && stapleit_cora_grounded_ready() ) {
             $generated = stapleit_cora_hosted_model_reply( $prompt, $fast_reply, $turn_context, $history, $page_path );
             if ( $generated !== '' ) {
                 $final_reply = $generated;
@@ -459,7 +473,7 @@ function stapleit_handle_cora_chat_ajax() {
         $result['flow_state'] = array();
     }
 
-    if ( $business_it_prompt && ! $device_prompt && stapleit_cora_hosted_enabled() ) {
+    if ( $business_it_prompt && ! $device_prompt && stapleit_cora_grounded_ready() ) {
         $generated = stapleit_cora_hosted_model_reply( $prompt, $fallback_reply, $turn_context, $history, $page_path );
         if ( $generated !== '' ) {
             $result['mode']  = 'hosted-ai';

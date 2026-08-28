@@ -79,15 +79,18 @@ The current VPS keeps Qwen2.5 1.5B Q5 (roughly 1.1 GB) as a local bounded fallba
 
 Install/verify the local fallback using the existing `tools/install-cora-warm-service.sh` workflow. The expected listener is `127.0.0.1:11434`, never `0.0.0.0:11434`.
 
-Hosted-provider secrets are stored outside Git. Configure them with:
+Hosted-provider secrets are stored outside Git. Cora must stay parked until the hosted provider is fully grounded. Build the public-site snapshots first with `python3 tools/build-cora-site-corpus.py`; this produces the full source-labelled corpus plus `training/cora-site-runtime-corpus.md`, which intentionally excludes supplementary blog posts from live retrieval. Validate both with `python3 tools/check-cora-site-corpus.py`.
+
+With an OpenAI project API key available, sync the canonical runtime corpus with `python3 tools/sync-cora-openai-knowledge.py`. The tool creates/updates the OpenAI vector store and prints the resulting `CORA_OPENAI_VECTOR_STORE_ID`. Then configure and explicitly enable Cora with the key and that vector-store ID:
 
 ```bash
-CORA_OPENAI_API_KEY='...' sudo -E bash tools/install-cora-hosted-config.sh
+CORA_OPENAI_API_KEY='...' \
+CORA_OPENAI_VECTOR_STORE_ID='vs_...' \
+CORA_PUBLIC_ENABLED=1 \
+sudo -E bash tools/install-cora-hosted-config.sh
 ```
 
-The installer writes `/etc/stapleit/cora-ai.php` as `root:www-data` mode `0640`, updates `wp-config.php` to require that server-local file, and reloads PHP-FPM. The key is never emitted to browser JavaScript. `CORA_OPENAI_MODEL` defaults to `gpt-5.6-terra`; `CORA_OPENAI_BASE_URL` defaults to `https://api.openai.com/v1`. `CORA_OPENAI_VECTOR_STORE_ID` attaches the live Staple IT website corpus through OpenAI file search. The model/base URL can be overridden only for an explicitly approved deployment.
-
-Build the public-site knowledge snapshot from the live WordPress sitemap with `python3 tools/build-cora-site-corpus.py`. The committed corpus records source URLs/classes and excludes `/dbc/`; canonical service/company/contact pages outrank supplementary blog content. Validate it with `python3 tools/check-cora-site-corpus.py`. With an OpenAI API key available, `python3 tools/sync-cora-openai-knowledge.py` creates/updates a vector-store corpus and prints the resulting `CORA_OPENAI_VECTOR_STORE_ID`; feed that ID into `tools/install-cora-hosted-config.sh`. Runtime deterministic package/pricing/safety rules always outrank retrieved website text.
+The installer refuses `CORA_PUBLIC_ENABLED=1` without a vector-store ID. It writes `/etc/stapleit/cora-ai.php` as `root:www-data` mode `0640`, updates `wp-config.php` to require that server-local file, and reloads PHP-FPM. The key is never emitted to browser JavaScript. `CORA_OPENAI_MODEL` defaults to `gpt-5.6-terra`; `CORA_OPENAI_BASE_URL` defaults to `https://api.openai.com/v1`. The browser asks WordPress for a boolean readiness status; the full Cora UI activates only when the public flag, API key and vector store are all present. Runtime deterministic package/pricing/safety rules always outrank retrieved website text.
 
 When the hosted provider is configured, successful generated turns use diagnostic mode `hosted-ai`. The local fallback uses `local-ai`; deterministic fallback uses `knowledge-guide`. These backend mode names are diagnostic only and must never appear in visitor-facing copy.
 

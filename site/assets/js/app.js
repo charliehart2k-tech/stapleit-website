@@ -45,10 +45,26 @@
   });
 })();
 
-(() => {
+(async () => {
   if (document.querySelector('[data-cora]')) return;
 
-  if (window.STAPLEIT_CORA_ENABLED !== true) {
+  let coraEnabled = window.STAPLEIT_CORA_ENABLED === true;
+  if (!coraEnabled && window.STAPLEIT_CORA_ENABLED !== false) {
+    try {
+      const statusResponse = await fetch('/wp-admin/admin-ajax.php?action=stapleit_cora_status', {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+        cache: 'no-store'
+      });
+      const statusPayload = await statusResponse.json();
+      coraEnabled = statusResponse.ok && statusPayload?.ok === true && statusPayload?.enabled === true;
+    } catch {
+      coraEnabled = false;
+    }
+  }
+
+  if (!coraEnabled) {
     const e = (tag, className, text = '') => {
       const node = document.createElement(tag);
       if (className) node.className = className;

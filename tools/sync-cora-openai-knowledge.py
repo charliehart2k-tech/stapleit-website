@@ -41,7 +41,7 @@ def multipart_file(path:Path):
 
 def main()->int:
     ap=argparse.ArgumentParser()
-    ap.add_argument('--corpus',default='training/cora-site-corpus.md')
+    ap.add_argument('--corpus',default='training/cora-site-runtime-corpus.md')
     ap.add_argument('--vector-store-id',default=os.getenv('CORA_OPENAI_VECTOR_STORE_ID',''))
     ap.add_argument('--name',default='Staple IT live website knowledge')
     args=ap.parse_args()

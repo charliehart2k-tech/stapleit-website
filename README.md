@@ -149,8 +149,8 @@ Cora is a progressively enhanced service guide shared across the site.
 
 - the browser talks only to WordPress; it never receives an AI-provider credential or calls a model directly;
 - curated, versioned Staple IT knowledge and deterministic package tools remain the commercial source of truth;
-- `tools/build-cora-site-corpus.py` snapshots the public `stapleit.co.uk` sitemap into a source-labelled corpus, and OpenAI file search can retrieve that corpus through a configured vector store;
-- when configured, OpenAI GPT-5.6 Terra writes the conversational reply from the trusted fact/decision packet and live-site file-search context; the local Qwen model remains a bounded fallback on loopback only;
+- `tools/build-cora-site-corpus.py` snapshots the public `stapleit.co.uk` sitemap into a full source-labelled corpus plus a canonical runtime corpus; supplementary blog posts remain available for offline training/reference but are excluded from live file-search retrieval so current service pages remain authoritative;
+- when the public flag, OpenAI project key and Staple IT vector store are all configured, OpenAI GPT-5.6 Terra writes the conversational reply from the trusted fact/decision packet and live-site file-search context; until all three are ready Cora remains parked, while the local Qwen model remains a bounded backend fallback only;
 - WordPress issues a signed conversation token and keeps only a short, server-owned conversation window so Cora can remember her own replies without trusting forged browser assistant/system messages;
 - deterministic input/output gates reject secret disclosure, prompt-injection requests, unsupported commercial claims, invented prices/contact details and unsafe capability claims;
 - package and add-on decisions remain deterministic; a model may explain or rephrase them but cannot change the fixed result or published price basis;

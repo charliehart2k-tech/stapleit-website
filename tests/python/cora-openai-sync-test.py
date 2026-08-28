@@ -14,7 +14,7 @@ class Handler(BaseHTTPRequestHandler):
         n=int(self.headers.get('Content-Length','0')); body=self.rfile.read(n)
         if self.path=='/vector_stores': return self.reply({'id':'vs_mock_site'})
         if self.path=='/files':
-            if b'purpose' not in body or b'cora-site-corpus.md' not in body: return self.reply({'error':'bad multipart'},400)
+            if b'purpose' not in body or b'cora-site-runtime-corpus.md' not in body: return self.reply({'error':'bad multipart'},400)
             return self.reply({'id':'file_mock_site'})
         if self.path=='/vector_stores/vs_mock_site/files': return self.reply({'id':'file_mock_site','status':'in_progress'})
         return self.reply({'error':'unknown'},404)
@@ -28,7 +28,7 @@ def main():
     t=threading.Thread(target=server.serve_forever,daemon=True); t.start()
     env=os.environ.copy(); env.update({'CORA_OPENAI_API_KEY':'sk-test-sync-secret','CORA_OPENAI_BASE_URL':f'http://127.0.0.1:{port}'})
     try:
-        proc=subprocess.run(['python3','tools/sync-cora-openai-knowledge.py','--corpus','training/cora-site-corpus.md'],cwd=root,env=env,text=True,capture_output=True,timeout=20)
+        proc=subprocess.run(['python3','tools/sync-cora-openai-knowledge.py'],cwd=root,env=env,text=True,capture_output=True,timeout=20)
     finally: server.shutdown(); server.server_close()
     if proc.returncode!=0: raise SystemExit('sync tool failed: '+proc.stderr)
     if 'CORA_OPENAI_VECTOR_STORE_ID=vs_mock_site' not in proc.stdout: raise SystemExit('vector store id missing')

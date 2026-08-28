@@ -101,6 +101,7 @@ def clean_blocks(blocks:list[str])->list[str]:
 def main()->int:
     ap=argparse.ArgumentParser()
     ap.add_argument('--output',default='training/cora-site-corpus.md')
+    ap.add_argument('--runtime-output',default='training/cora-site-runtime-corpus.md')
     ap.add_argument('--manifest',default='training/cora-site-corpus-manifest.tsv')
     args=ap.parse_args()
     sections=[]; manifest=[]
@@ -118,7 +119,8 @@ def main()->int:
         first_heading=next((re.sub(r'^#{1,3}\s+','',b).strip() for b in blocks if re.match(r'^#{1,3}\s+',b)), '')
         html_title='' if parser.title.strip().casefold()=='cookie icon' else parser.title
         title=first_h1 or first_heading or html_title or url
-        sections.append(f'---\nSOURCE URL: {url}\nSOURCE CLASS: {cls}\nPAGE TITLE: {title}\nCONTENT SHA256: {digest}\n---\n\n{body}\n')
+        section=f'---\nSOURCE URL: {url}\nSOURCE CLASS: {cls}\nPAGE TITLE: {title}\nCONTENT SHA256: {digest}\n---\n\n{body}\n'
+        sections.append((cls,section))
         manifest.append((url,cls,title,digest,str(len(body))))
     header=(
         '# Staple IT live website knowledge snapshot\n\n'
@@ -126,9 +128,19 @@ def main()->int:
         'Canonical service/company/contact pages outrank supplementary blog content.\n'
         'Runtime package/pricing/safety rules remain authoritative if a website snapshot conflicts with them.\n\n'
     )
-    out=Path(args.output); out.parent.mkdir(parents=True,exist_ok=True); out.write_text(header+'\n'.join(sections),encoding='utf-8')
+    out=Path(args.output); out.parent.mkdir(parents=True,exist_ok=True); out.write_text(header+'\n'.join(section for _,section in sections),encoding='utf-8')
+    runtime_classes={'canonical-service','canonical-company','canonical-contact','public-site'}
+    runtime_header=(
+        '# Staple IT canonical runtime knowledge snapshot\n\n'
+        'This runtime corpus contains current public service, company, contact and utility pages from https://www.stapleit.co.uk/.\n'
+        'Supplementary blog posts are intentionally excluded from runtime retrieval so older editorial content cannot override current services, pricing or policy.\n'
+        'Runtime package/pricing/safety rules remain authoritative if a website snapshot conflicts with them.\n\n'
+    )
+    runtime_sections=[section for cls,section in sections if cls in runtime_classes]
+    runtime=Path(args.runtime_output); runtime.parent.mkdir(parents=True,exist_ok=True); runtime.write_text(runtime_header+'\n'.join(runtime_sections),encoding='utf-8')
     man=Path(args.manifest); man.write_text('url\tsource_class\ttitle\tsha256\tchars\n'+'\n'.join('\t'.join(x) for x in manifest)+'\n',encoding='utf-8')
     print(f'Cora live-site corpus: {len(manifest)} pages, {out.stat().st_size} bytes')
+    print(f'Cora runtime corpus: {len(runtime_sections)} canonical/public pages, {runtime.stat().st_size} bytes')
     for row in manifest: print(f'{row[1]:22s} {row[4]:>6s} {row[0]}')
     return 0
 if __name__=='__main__': raise SystemExit(main())

@@ -5,12 +5,18 @@ set -euo pipefail
 MODEL="${CORA_OPENAI_MODEL:-gpt-5.6-terra}"
 BASE_URL="${CORA_OPENAI_BASE_URL:-https://api.openai.com/v1}"
 VECTOR_STORE_ID="${CORA_OPENAI_VECTOR_STORE_ID:-}"
+PUBLIC_ENABLED="${CORA_PUBLIC_ENABLED:-0}"
 CONFIG_FILE="${CORA_CONFIG_FILE:-/etc/stapleit/cora-ai.php}"
 WP_CONFIG="${CORA_WP_CONFIG:-/var/www/stapleit/wp-config.php}"
 RELOAD_FPM="${CORA_RELOAD_FPM:-1}"
 
+if [[ "$PUBLIC_ENABLED" == "1" && -z "$VECTOR_STORE_ID" ]]; then
+  echo "Refusing to enable Cora publicly without a Staple IT vector store ID." >&2
+  exit 1
+fi
+
 install -d -m 0750 -o root -g www-data "$(dirname "$CONFIG_FILE")"
-CORA_KEY="$CORA_OPENAI_API_KEY" CORA_MODEL="$MODEL" CORA_BASE="$BASE_URL" CORA_VECTOR="$VECTOR_STORE_ID" CORA_OUT="$CONFIG_FILE" python3 - <<'PY'
+CORA_KEY="$CORA_OPENAI_API_KEY" CORA_MODEL="$MODEL" CORA_BASE="$BASE_URL" CORA_VECTOR="$VECTOR_STORE_ID" CORA_PUBLIC="$PUBLIC_ENABLED" CORA_OUT="$CONFIG_FILE" python3 - <<'PY'
 import os
 from pathlib import Path
 
@@ -23,7 +29,14 @@ define( 'STAPLEIT_OPENAI_API_KEY', '%s' );
 define( 'STAPLEIT_OPENAI_MODEL', '%s' );
 define( 'STAPLEIT_OPENAI_BASE_URL', '%s' );
 define( 'STAPLEIT_OPENAI_VECTOR_STORE_ID', '%s' );
-""" % tuple(phpq(os.environ[k]) for k in ('CORA_KEY','CORA_MODEL','CORA_BASE','CORA_VECTOR'))
+define( 'STAPLEIT_CORA_PUBLIC_ENABLED', %s );
+""" % (
+    phpq(os.environ['CORA_KEY']),
+    phpq(os.environ['CORA_MODEL']),
+    phpq(os.environ['CORA_BASE']),
+    phpq(os.environ['CORA_VECTOR']),
+    'true' if os.environ.get('CORA_PUBLIC') == '1' else 'false',
+)
 path.write_text(body,encoding='utf-8')
 PY
 chown root:www-data "$CONFIG_FILE"
@@ -56,5 +69,5 @@ if [[ "$RELOAD_FPM" == "1" ]]; then
   done < <(systemctl list-units --type=service --state=running --plain --no-legend 'php*-fpm.service' | awk '{print $1}')
 fi
 
-echo "Cora hosted provider configured: model=$MODEL base=$BASE_URL vector_store=${VECTOR_STORE_ID:-none}"
+echo "Cora hosted provider configured: model=$MODEL base=$BASE_URL vector_store=${VECTOR_STORE_ID:-none} public_enabled=$PUBLIC_ENABLED"
 echo "API key stored server-side in $CONFIG_FILE (not printed)."

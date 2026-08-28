@@ -14,6 +14,10 @@ putenv( 'STAPLEIT_OPENAI_VECTOR_STORE_ID=vs_test_site' );
 putenv( 'STAPLEIT_OPENAI_BASE_URL=https://gb.api.openai.com/v1' );
 
 $check( stapleit_cora_hosted_enabled(), 'hosted provider does not enable when a server-side key is configured' );
+$check( stapleit_cora_grounded_ready(), 'grounded hosted provider is not ready when both key and vector store are configured' );
+putenv( 'STAPLEIT_OPENAI_VECTOR_STORE_ID' );
+$check( ! stapleit_cora_grounded_ready(), 'grounded provider incorrectly reports ready without the Staple IT vector store' );
+putenv( 'STAPLEIT_OPENAI_VECTOR_STORE_ID=vs_test_site' );
 $check( stapleit_cora_hosted_model() === 'gpt-5.6-terra', 'hosted model configuration is not read from the server environment' );
 $check( stapleit_cora_vector_store_id() === 'vs_test_site', 'hosted vector-store configuration is not read from the server environment' );
 $check( stapleit_cora_hosted_base_url() === 'https://gb.api.openai.com/v1', 'hosted base URL configuration is not read correctly' );
@@ -76,4 +80,4 @@ if ( $failures ) {
     exit( 1 );
 }
 
-echo 'Cora provider contract: 25 checks passed' . PHP_EOL;
+echo 'Cora provider contract: 27 checks passed' . PHP_EOL;

@@ -5,6 +5,7 @@ import csv, hashlib, re, sys
 from pathlib import Path
 
 CORPUS=Path('training/cora-site-corpus.md')
+RUNTIME=Path('training/cora-site-runtime-corpus.md')
 MANIFEST=Path('training/cora-site-corpus-manifest.tsv')
 REQUIRED={
  'https://www.stapleit.co.uk/',
@@ -24,7 +25,7 @@ def fail(msg):
     print('Cora site corpus failure: '+msg,file=sys.stderr); raise SystemExit(1)
 
 def main():
-    if not CORPUS.is_file() or not MANIFEST.is_file(): fail('corpus or manifest missing')
+    if not CORPUS.is_file() or not RUNTIME.is_file() or not MANIFEST.is_file(): fail('corpus, runtime corpus or manifest missing')
     rows=list(csv.DictReader(MANIFEST.open(encoding='utf-8'),delimiter='\t'))
     urls={r['url'] for r in rows}
     missing=sorted(REQUIRED-urls)
@@ -34,10 +35,14 @@ def main():
     if sum(1 for r in rows if r['source_class']=='canonical-service')<6: fail('canonical service coverage is too small')
     if sum(1 for r in rows if r['source_class']=='supplementary-blog')<4: fail('supplementary blog coverage is too small')
     corpus=CORPUS.read_text(encoding='utf-8')
+    runtime=RUNTIME.read_text(encoding='utf-8')
     if len(corpus)<50000: fail('corpus unexpectedly small')
+    if len(runtime)<40000: fail('runtime corpus unexpectedly small')
     for marker in ['Canonical service/company/contact pages outrank supplementary blog content.','Runtime package/pricing/safety rules remain authoritative']:
         if marker not in corpus: fail('authority marker missing: '+marker)
-    if 'SOURCE URL: https://www.stapleit.co.uk/it-services/it-support/' not in corpus: fail('IT Support source marker absent')
-    if 'SOURCE URL: https://www.stapleit.co.uk/it-services/ai-integrations/' not in corpus: fail('AI Integrations source marker absent')
-    print(f'Cora site corpus contract: {len(rows)} live pages, {CORPUS.stat().st_size} bytes')
+    if 'Supplementary blog posts are intentionally excluded from runtime retrieval' not in runtime: fail('runtime authority marker missing')
+    if 'SOURCE CLASS: supplementary-blog' in runtime: fail('supplementary blog leaked into runtime corpus')
+    if 'SOURCE URL: https://www.stapleit.co.uk/it-services/it-support/' not in runtime: fail('IT Support source marker absent from runtime corpus')
+    if 'SOURCE URL: https://www.stapleit.co.uk/it-services/ai-integrations/' not in runtime: fail('AI Integrations source marker absent from runtime corpus')
+    print(f'Cora site corpus contract: {len(rows)} live pages, {CORPUS.stat().st_size} bytes; runtime {RUNTIME.stat().st_size} bytes')
 if __name__=='__main__': main()

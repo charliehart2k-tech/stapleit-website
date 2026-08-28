@@ -1,9 +1,16 @@
 const { test, expect } = require('@playwright/test');
 
 test.beforeEach(async ({ page }, testInfo) => {
-  if (testInfo.title === 'Cora is parked by default while the site is being finished') return;
+  if ([
+    'Cora is parked by default while the site is being finished',
+    'Cora activates from the server readiness endpoint'
+  ].includes(testInfo.title)) return;
   await page.addInitScript(() => { window.STAPLEIT_CORA_ENABLED = true; });
 });
+
+const waitForCoraSettled = async page => {
+  await expect.poll(async () => page.locator('.cora-panel').evaluate(element => getComputedStyle(element).transform)).toBe('none');
+};
 
 test('Cora is parked by default while the site is being finished', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
@@ -24,6 +31,26 @@ test('Cora is parked by default while the site is being finished', async ({ page
   await expect(cora).toContainText('finishing the new Staple IT website first');
   await expect(cora.locator('textarea')).toHaveCount(0);
   await expect(cora.getByRole('button', { name: 'Send' })).toHaveCount(0);
+});
+
+
+test('Cora activates from the server readiness endpoint', async ({ page }) => {
+  let statusChecks = 0;
+  await page.route('**/wp-admin/admin-ajax.php?action=stapleit_cora_status', async route => {
+    statusChecks += 1;
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true, enabled: true })
+    });
+  });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  await expect(page.getByRole('button', { name: 'Chat to Cora' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cora · Coming soon' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Chat to Cora' }).click();
+  const cora = page.getByRole('dialog', { name: 'Cora' });
+  await expect(cora).toBeVisible();
+  await expect(cora.getByLabel('Message Cora')).toBeVisible();
+  expect(statusChecks).toBe(1);
 });
 
 const viewports = [
@@ -48,6 +75,7 @@ for (const [name, width, height] of viewports) {
     await expect(page.getByRole('button', { name: 'Chat to Cora' })).toBeVisible();
     await page.getByRole('button', { name: 'Chat to Cora' }).click();
     await expect(page.getByRole('dialog', { name: 'Cora' })).toBeVisible();
+    await waitForCoraSettled(page);
 
     const contract = await page.evaluate(() => {
       const packageChooser = document.querySelector('[data-cora-flow="package"]');
@@ -687,6 +715,7 @@ test('mobile Cora tracks a keyboard-resized viewport and keeps the composer visi
   await input.focus();
   await expect(page.locator('.cora')).toHaveClass(/is-input-focused/);
   await page.setViewportSize({ width:390, height:500 });
+  await waitForCoraSettled(page);
   const geometry = await page.evaluate(() => {
     const panel = document.querySelector('.cora-panel').getBoundingClientRect();
     const composer = document.querySelector('.cora-form').getBoundingClientRect();
@@ -731,6 +760,8 @@ test('Add-on showcase matches the package chapter and keeps the active card read
   await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(0);
   await expect(section.getByRole('button', { name: 'View all add-ons' })).toBeVisible();
 
+  await reel.scrollIntoViewIfNeeded();
+  await page.mouse.move(1, 1);
   const before = await reel.locator('[data-pack-reel-item].is-active').getAttribute('data-pack-reel-item');
   const state = await page.evaluate(() => {
     const section = document.querySelector('.support-packs');

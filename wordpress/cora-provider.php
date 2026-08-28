@@ -51,6 +51,10 @@ function stapleit_cora_hosted_enabled() {
     return stapleit_cora_hosted_api_key() !== '';
 }
 
+function stapleit_cora_grounded_ready() {
+    return stapleit_cora_hosted_enabled() && stapleit_cora_vector_store_id() !== '';
+}
+
 function stapleit_cora_hosted_payload( $instructions, $messages ) {
     $input = array();
     foreach ( is_array( $messages ) ? array_slice( $messages, -10 ) : array() as $message ) {
