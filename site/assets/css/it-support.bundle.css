@@ -489,6 +489,22 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   .reset-404-inner,.reset-placeholder-inner{padding:60px 0 52px}
 }
 
+
+/* Shared below-fold reveal contract, matching the approved homepage motion. */
+@media(prefers-reduced-motion:no-preference){
+  .motion-ready{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity 620ms cubic-bezier(.16,1,.3,1),transform 620ms cubic-bezier(.16,1,.3,1);
+    will-change:opacity,transform;
+  }
+  .motion-ready.motion-in{
+    opacity:1;
+    transform:none;
+    will-change:auto;
+  }
+}
+
 /* source: cora.css */
 /* Cora shares the homepage's restrained black-glass and slow Staple-spectrum
  * language. The assistant stays mounted so opening and closing can both be
@@ -4336,3 +4352,23 @@ body.support-dialog-open{overflow:hidden}
 @keyframes supportPlannerQuestionBackNarrow{from{opacity:0;transform:translate3d(-8px,0,0)}to{opacity:1;transform:none}}
 @keyframes supportPlannerResultInNarrow{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
 @keyframes coraMessageInNarrow{from{opacity:0;transform:translate3d(0,7px,0)}to{opacity:1;transform:none}}
+
+
+/* Match the homepage reveal on larger screens, but keep Support phone content
+ * always visible because its onboarding/progress UI already owns mobile scroll motion. */
+@media(max-width:700px){
+  .support-standard > h2.motion-ready,
+  .support-standard-group.motion-ready,
+  .support-section-heading.motion-ready,
+  .support-step-card.motion-ready,
+  .support-package-cora.motion-ready,
+  .support-package-card.motion-ready,
+  .support-pack-finder.motion-ready,
+  .support-extra-card.motion-ready,
+  .support-cta-panel.motion-ready{
+    opacity:1!important;
+    transform:none!important;
+    transition:none!important;
+    will-change:auto!important;
+  }
+}

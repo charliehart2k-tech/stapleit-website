@@ -572,9 +572,31 @@
     '.contact-hero',
     '.contact-panel',
     '.contact-map-card',
+    '.support-standard > h2',
+    '.support-standard-group',
+    '.support-section-heading',
+    '.support-step-card',
+    '.support-package-cora',
+    '.support-package-card',
+    '.support-pack-finder',
+    '.support-extra-card',
+    '.support-cta-panel',
     '.footer-panel',
     '.footer-legal-bar'
-  ].join(','))];
+  ].join(','))].filter(element => {
+    const supportReveal = element.matches([
+      '.support-standard > h2',
+      '.support-standard-group',
+      '.support-section-heading',
+      '.support-step-card',
+      '.support-package-cora',
+      '.support-package-card',
+      '.support-pack-finder',
+      '.support-extra-card',
+      '.support-cta-panel'
+    ].join(','));
+    return !supportReveal || window.matchMedia('(min-width:701px)').matches;
+  });
 
   if (!elements.length) return;
 

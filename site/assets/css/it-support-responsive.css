@@ -193,3 +193,23 @@
 @keyframes supportPlannerQuestionBackNarrow{from{opacity:0;transform:translate3d(-8px,0,0)}to{opacity:1;transform:none}}
 @keyframes supportPlannerResultInNarrow{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
 @keyframes coraMessageInNarrow{from{opacity:0;transform:translate3d(0,7px,0)}to{opacity:1;transform:none}}
+
+
+/* Match the homepage reveal on larger screens, but keep Support phone content
+ * always visible because its onboarding/progress UI already owns mobile scroll motion. */
+@media(max-width:700px){
+  .support-standard > h2.motion-ready,
+  .support-standard-group.motion-ready,
+  .support-section-heading.motion-ready,
+  .support-step-card.motion-ready,
+  .support-package-cora.motion-ready,
+  .support-package-card.motion-ready,
+  .support-pack-finder.motion-ready,
+  .support-extra-card.motion-ready,
+  .support-cta-panel.motion-ready{
+    opacity:1!important;
+    transform:none!important;
+    transition:none!important;
+    will-change:auto!important;
+  }
+}
