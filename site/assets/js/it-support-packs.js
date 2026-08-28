@@ -1,4 +1,4 @@
-/* Adaptive, Cora-led add-on conversation for the IT Support route. */
+/* Adaptive add-on fit check for the IT Support route. */
 (() => {
   const form = document.querySelector('[data-pack-finder]');
   if (!(form instanceof HTMLFormElement)) return;
@@ -70,13 +70,13 @@
     const answers = packAnswers();
     const currentAnswer = selectedAnswer(currentQuestion());
     if (currentKey === 'focus') {
-      count.textContent = 'Cora';
+      count.textContent = 'Quick fit check';
     } else if (answers.length <= 1) {
-      count.textContent = 'Cora';
+      count.textContent = 'Quick fit check';
     } else if (enoughToSuggest()) {
-      count.textContent = 'Cora';
+      count.textContent = 'Quick fit check';
     } else {
-      count.textContent = 'Cora';
+      count.textContent = 'Quick fit check';
     }
     backButton.hidden = historyIndex === 0;
     suggestButton.hidden = answers.length < 2;
@@ -84,7 +84,7 @@
     if (currentKey === 'focus') {
       nextButton.textContent = 'Start there';
     } else {
-      nextButton.textContent = enoughToSuggest() || !nextQuestionKey() ? 'See what Cora suggests' : 'Keep chatting';
+      nextButton.textContent = enoughToSuggest() || !nextQuestionKey() ? 'See suggestions' : 'Keep going';
     }
   };
   const showQuestion = (key, { direction = 'forward', focus = true } = {}) => {
@@ -104,15 +104,15 @@
   };
   const resultSummaryText = (likelyNames, considerNames) => {
     if (likelyNames.length && considerNames.length) {
-      return `${naturalList(likelyNames)} ${likelyNames.length === 1 ? 'stands' : 'stand'} out from what you’ve told me. ${naturalList(considerNames)} ${considerNames.length === 1 ? 'is' : 'are'} worth clarifying.`;
+      return `${naturalList(likelyNames)} ${likelyNames.length === 1 ? 'stands' : 'stand'} out from your answers. ${naturalList(considerNames)} ${considerNames.length === 1 ? 'is' : 'are'} worth clarifying.`;
     }
     if (likelyNames.length) {
-      return `${naturalList(likelyNames)} ${likelyNames.length === 1 ? 'stands' : 'stand'} out from what you’ve told me.`;
+      return `${naturalList(likelyNames)} ${likelyNames.length === 1 ? 'stands' : 'stand'} out from your answers.`;
     }
     if (considerNames.length) {
       return `${naturalList(considerNames)} ${considerNames.length === 1 ? 'is' : 'are'} worth clarifying because you were not sure.`;
     }
-    return 'Nothing you’ve told me so far makes an add-on obvious — and I would rather say that than add something for the sake of it.';
+    return 'Nothing in your answers makes an add-on obvious — and that is better than adding something for the sake of it.';
   };
   const showResults = () => {
     const likelyNames = [];

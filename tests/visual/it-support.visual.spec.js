@@ -623,7 +623,7 @@ test('mobile Cora tracks a keyboard-resized viewport and keeps the composer visi
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
-test('Cora add-on conversation adapts and suggests without a nine-question checklist', async ({ page }) => {
+test('Add-on fit check adapts and suggests without a nine-question checklist', async ({ page }) => {
   await page.route('**/wp-admin/admin-ajax.php', async route => {
     const body = route.request().postData() || '';
     await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
@@ -642,13 +642,13 @@ test('Cora add-on conversation adapts and suggests without a nine-question check
 
   await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'security');
   await form.locator('[data-pack-question]:visible input[value="yes"]').check();
-  await form.getByRole('button', { name: 'Keep chatting' }).click();
+  await form.getByRole('button', { name: 'Keep going' }).click();
   await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'governance');
   await form.locator('[data-pack-question]:visible input[value="yes"]').check();
 
-  await expect(form.getByRole('button', { name: 'See what Cora suggests' })).toBeEnabled();
+  await expect(form.getByRole('button', { name: 'See suggestions' })).toBeEnabled();
   await expect(form.getByRole('button', { name: 'Show suggestions now' })).toBeVisible();
-  await form.getByRole('button', { name: 'See what Cora suggests' }).click();
+  await form.getByRole('button', { name: 'See suggestions' }).click();
 
   await expect(form.locator('[data-pack-results]')).toBeVisible();
   await expect(form.locator('[data-pack-results-summary]')).toContainText('Security');
@@ -661,7 +661,7 @@ test('Cora add-on conversation adapts and suggests without a nine-question check
   await expect(form.locator('[data-pack-result]:visible')).toHaveCount(2);
   await expect(form.locator('[data-pack-result]:visible').first().getByRole('link', { name: 'View pack details' })).toBeVisible();
   await expect(page.locator('#support-packs-grid .support-extra-card:not([hidden])')).toHaveCount(0);
-  const viewAll = page.getByRole('button', { name: /View all 9 packs/i });
+  const viewAll = page.getByRole('button', { name: /Browse all 9 packs/i });
   await expect(viewAll).toBeVisible();
   const continuation = await viewAll.evaluate(element => ({
     width: element.getBoundingClientRect().width,
@@ -690,7 +690,7 @@ test('Cora add-on conversation adapts and suggests without a nine-question check
   expect(answeredPackTopics).toBe(2);
 });
 
-test('Cora add-on conversation can stop early and leaves unasked areas unknown', async ({ page }) => {
+test('Add-on fit check can stop early and leaves unasked areas unknown', async ({ page }) => {
   await page.route('**/wp-admin/admin-ajax.php', async route => {
     await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
   });
@@ -703,7 +703,7 @@ test('Cora add-on conversation can stop early and leaves unasked areas unknown',
   await form.getByRole('button', { name: 'Start there' }).click();
   await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'server');
   await form.locator('[data-pack-question]:visible input[value="no"]').check();
-  await form.getByRole('button', { name: 'Keep chatting' }).click();
+  await form.getByRole('button', { name: 'Keep going' }).click();
   await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'azure');
   await form.locator('[data-pack-question]:visible input[value="no"]').check();
 
@@ -712,16 +712,13 @@ test('Cora add-on conversation can stop early and leaves unasked areas unknown',
   await stop.click();
 
   await expect(form.locator('[data-pack-results]')).toBeVisible();
-  await expect(form.locator('[data-pack-results-summary]')).toContainText('Nothing you’ve told me so far');
+  await expect(form.locator('[data-pack-results-summary]')).toContainText('Nothing in your answers');
   await expect(form.locator('[data-pack-results-empty]')).toBeVisible();
   await expect(form.locator('[data-pack-result]:visible')).toHaveCount(0);
   await expect(form.locator('[data-pack-question][data-pack-key="network"] input:checked')).toHaveCount(0);
   await expect(form.locator('.support-pack-results-note')).toContainText('not a complete assessment');
 
-  const chat = form.getByRole('button', { name: 'Ask Cora about this' });
-  await chat.click();
-  await expect(page.getByRole('dialog', { name: 'Cora' })).toBeVisible();
-  await expect(page.getByLabel('Message Cora')).toHaveValue(/Nothing stood out/i);
+  await expect(form.getByRole('button', { name: 'Cora · coming soon' })).toBeVisible();
 });
 
 test('final services and CTA stay compact, distinct and contained', async ({ page }) => {

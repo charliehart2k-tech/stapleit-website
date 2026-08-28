@@ -187,3 +187,151 @@
   .support-packs .support-pack-results-step::before{animation:none}
 }
 @keyframes supportCoraPackOrb{0%,100%{border-radius:46% 54% 58% 42% / 52% 46% 54% 48%;transform:rotate(0deg)}50%{border-radius:58% 42% 45% 55% / 44% 58% 42% 56%;transform:rotate(8deg)}}
+
+
+/* Release 5 — premium add-on chapter. Keep the logic, lose the oversized form feel. */
+.support-packs{
+  padding-top:clamp(5.5rem,8vw,8.5rem);
+  padding-bottom:clamp(5rem,7vw,7.5rem);
+}
+
+.support-packs>.support-section-heading{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(320px,.72fr);
+  gap:clamp(2rem,6vw,6rem);
+  align-items:end;
+  max-width:none;
+  margin-bottom:clamp(2.6rem,4.5vw,4.5rem);
+}
+
+.support-packs .support-section-heading h2{
+  max-width:10ch;
+  font-size:clamp(3.35rem,6vw,5.9rem);
+  line-height:.94;
+  letter-spacing:-.052em;
+}
+
+.support-packs-title-accent{
+  display:block;
+  margin-top:.08em;
+  color:var(--support);
+  font-size:.96em;
+  letter-spacing:-.045em;
+}
+
+.support-packs>.support-section-heading .support-section-lead{
+  max-width:32rem;
+  margin:0 0 .32rem;
+  color:#aeb7c2;
+  font-size:clamp(1.05rem,1.35vw,1.22rem);
+  line-height:1.6;
+  text-wrap:pretty;
+}
+
+.support-packs .support-pack-finder{
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.105);
+  border-radius:28px;
+  background:
+    radial-gradient(900px 440px at 0% 0%,rgba(34,197,94,.075),transparent 58%),
+    radial-gradient(760px 420px at 100% 100%,rgba(79,133,255,.055),transparent 62%),
+    linear-gradient(145deg,rgba(255,255,255,.035),rgba(2,7,7,.88) 42%,rgba(2,6,10,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 26px 72px rgba(0,0,0,.34);
+  backdrop-filter:blur(18px) saturate(112%);
+  -webkit-backdrop-filter:blur(18px) saturate(112%);
+}
+
+.support-packs .support-pack-finder-stage{padding:0 34px 26px}
+.support-packs .support-pack-finder-progress--conversation{gap:16px;padding-top:18px}
+.support-packs [data-pack-finder-count]{font-size:.78rem;color:#b9c7c0}
+.support-pack-conversation-pulse{height:2px;background:rgba(255,255,255,.055)}
+
+.support-packs .support-pack-finder.is-enhanced .support-pack-question{
+  min-height:0;
+  padding:24px 0 20px;
+}
+
+.support-packs .support-pack-question--gateway legend{
+  max-width:20ch;
+  font-size:clamp(2rem,3.25vw,3rem);
+  line-height:1.04;
+  letter-spacing:-.034em;
+}
+
+.support-packs .support-pack-choices--focus{
+  max-width:none;
+  gap:10px;
+  margin-top:24px;
+}
+
+.support-packs .support-pack-choices--focus label{
+  min-height:58px;
+  padding:13px 16px;
+  border-radius:15px;
+  color:#dce3e8;
+  font-size:.91rem;
+  font-weight:600;
+}
+
+.support-pack-free-chat{
+  min-height:40px;
+  margin-top:10px;
+  padding:0;
+  color:#7f8994;
+  font-size:.78rem;
+  text-decoration:none;
+}
+
+.support-packs .support-pack-finder-actions{padding-top:18px}
+.support-packs .support-pack-finder-button{min-height:44px;padding:10px 18px;font-size:.86rem}
+
+.support-pack-catalogue-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:2rem;
+  align-items:end;
+  margin:clamp(3.5rem,6vw,5.75rem) 0 20px;
+  padding-top:0;
+  border-top:0;
+}
+
+.support-pack-catalogue-head h3{
+  font-size:clamp(2.35rem,4vw,3.75rem);
+  line-height:1;
+  letter-spacing:-.042em;
+}
+
+.support-pack-catalogue-head p{
+  max-width:28rem;
+  margin:0 0 .2rem;
+  color:#8f99a5;
+  font-size:.94rem;
+  line-height:1.55;
+  text-align:right;
+}
+
+.support-packs .support-packs-more{justify-content:flex-start;margin-top:18px}
+.support-packs .support-packs-more-btn{
+  width:auto;
+  min-width:210px;
+  min-height:48px;
+  padding:10px 20px;
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+}
+.support-packs-more-action{font-size:.84rem}
+
+@media(max-width:800px){
+  .support-packs>.support-section-heading{grid-template-columns:1fr;gap:1.3rem;margin-bottom:2.25rem}
+  .support-packs .support-section-heading h2{max-width:11ch;font-size:clamp(3rem,11vw,4.5rem);line-height:.96}
+  .support-packs>.support-section-heading .support-section-lead{max-width:36rem;font-size:1rem}
+  .support-packs .support-pack-finder{border-radius:22px}
+  .support-packs .support-pack-finder-stage{padding:0 18px 18px}
+  .support-packs .support-pack-question--gateway legend{font-size:clamp(1.9rem,8vw,2.55rem)}
+  .support-packs .support-pack-choices--focus{grid-template-columns:1fr;gap:8px;margin-top:18px}
+  .support-packs .support-pack-choices--focus label{min-height:52px}
+  .support-pack-catalogue-head{grid-template-columns:1fr;gap:.65rem;margin-top:3rem}
+  .support-pack-catalogue-head p{text-align:left}
+  .support-packs .support-packs-more{justify-content:stretch}
+  .support-packs .support-packs-more-btn{width:100%}
+}
