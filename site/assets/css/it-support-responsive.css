@@ -142,7 +142,7 @@
    * squeezed into a phone viewport. Blur and clip-path are deliberately
    * removed on phones to reduce compositor work and make the motion crisper. */
   .cora{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));z-index:1250;width:auto;max-width:calc(100vw - max(16px,env(safe-area-inset-left) + env(safe-area-inset-right)))}
-  .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px;clip-path:none;filter:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:opacity 240ms ease,transform 420ms var(--cora-ease),visibility 0s linear 420ms;will-change:opacity,transform}
+  .cora-panel{width:100%;max-width:100%;height:min(680px,calc(100dvh - max(16px,env(safe-area-inset-top) + env(safe-area-inset-bottom))));border-radius:20px;clip-path:none;filter:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transform:translate3d(0,4px,0) scale(.982);transition:opacity 220ms ease,transform 380ms var(--cora-ease),visibility 0s linear 380ms}
   .cora.is-open .cora-panel{clip-path:none;filter:none;transition-delay:0s}
   .cora.is-open.is-input-focused .cora-panel{position:fixed;inset:8px 8px auto;width:auto;max-width:none;height:calc(100dvh - 16px);max-height:none}
   .cora-header{padding-inline:15px}

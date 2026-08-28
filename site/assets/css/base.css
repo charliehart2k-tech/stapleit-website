@@ -1,9 +1,10 @@
 @view-transition{navigation:auto}
-@keyframes staplePageOut{to{opacity:.28;transform:scale(.992);filter:brightness(.72)}}
-@keyframes staplePageIn{from{opacity:.18;transform:translateY(18px) scale(.992);filter:brightness(.70);clip-path:inset(7% 0 0 round 30px)}to{opacity:1;transform:none;filter:none;clip-path:inset(0)}}
+/* Keep route transitions on compositor-friendly opacity/transform only. */
+@keyframes staplePageOut{to{opacity:.22;transform:translateY(-3px) scale(.995)}}
+@keyframes staplePageIn{from{opacity:.12;transform:translateY(14px) scale(.995)}to{opacity:1;transform:none}}
 ::view-transition-group(root){background:#000}
-::view-transition-old(root){animation:220ms cubic-bezier(.4,0,.8,.2) both staplePageOut}
-::view-transition-new(root){animation:430ms cubic-bezier(.16,1,.3,1) both staplePageIn}
+::view-transition-old(root){animation:170ms cubic-bezier(.4,0,.8,.2) both staplePageOut}
+::view-transition-new(root){animation:340ms cubic-bezier(.16,1,.3,1) both staplePageIn}
 
 *,*::before,*::after{box-sizing:border-box}
 html{background:#000;scroll-behavior:smooth;scroll-padding-top:96px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%}

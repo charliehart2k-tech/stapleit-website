@@ -1,0 +1,38 @@
+/* Mobile tactile interaction layer.
+ * Real vibration is handled in app.js where supported. These visual responses
+ * use individual transform properties so they compose with existing component
+ * transforms instead of replacing them. */
+:root{
+  --tactile-press-scale:.985;
+  --tactile-release-ease:cubic-bezier(.16,1,.3,1);
+}
+
+button,
+summary,
+.nav-pill,
+.button,
+.service-cta,
+.support-hero-cta,
+.support-package-details>summary,
+.support-extra-details>summary,
+.support-packs-more-btn,
+[data-pack-reel-item],
+[data-cora-open],
+.cora-toggle,
+.cora-close,
+.audit-submit,
+.contact-whatsapp{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+@media(hover:none) and (pointer:coarse) and (prefers-reduced-motion:no-preference){
+  .tactile-target.is-tactile-pressed{
+    scale:var(--tactile-press-scale);
+    translate:0 1px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .tactile-target{scale:1;translate:0 0}
+}

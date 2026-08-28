@@ -760,7 +760,6 @@ test('Add-on showcase matches the package chapter and keeps the active card read
   await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(0);
   await expect(section.getByRole('button', { name: 'View all add-ons' })).toBeVisible();
 
-  await reel.scrollIntoViewIfNeeded();
   await page.mouse.move(1, 1);
   const before = await reel.locator('[data-pack-reel-item].is-active').getAttribute('data-pack-reel-item');
   const state = await page.evaluate(() => {
@@ -790,8 +789,13 @@ test('Add-on showcase matches the package chapter and keeps the active card read
   expect(state.overflow).toBeLessThanOrEqual(0);
 
   await page.waitForTimeout(3900);
-  const after = await reel.locator('[data-pack-reel-item].is-active').getAttribute('data-pack-reel-item');
-  expect(after).not.toBe(before);
+  const whileOffscreen = await reel.locator('[data-pack-reel-item].is-active').getAttribute('data-pack-reel-item');
+  expect(whileOffscreen).toBe(before);
+
+  await reel.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(3900);
+  const afterVisible = await reel.locator('[data-pack-reel-item].is-active').getAttribute('data-pack-reel-item');
+  expect(afterVisible).not.toBe(before);
 });
 
 
@@ -1050,4 +1054,97 @@ test('touch-opened dialogs do not leave package cards glowing and use the mobile
   await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeGreaterThanOrEqual(0.15);
   await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeLessThanOrEqual(0.20);
   await context.close();
+});
+
+
+test('mobile tactile feedback stays short, touch-only and scroll-safe', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__stapleHaptics = [];
+    Object.defineProperty(Navigator.prototype, 'vibrate', {
+      configurable: true,
+      value(pattern) {
+        window.__stapleHaptics.push(pattern);
+        return true;
+      }
+    });
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const target = page.locator('.support-packages .support-package-cora-trigger');
+  const box = await target.boundingBox();
+  const point = { clientX: box.x + box.width / 2, clientY: box.y + box.height / 2 };
+
+  await target.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 41, isPrimary: true, ...point });
+  await target.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 41, isPrimary: true, ...point });
+  await expect.poll(() => page.evaluate(() => window.__stapleHaptics.length)).toBe(1);
+
+  const firstPattern = await page.evaluate(() => window.__stapleHaptics[0]);
+  const segments = Array.isArray(firstPattern) ? firstPattern : [firstPattern];
+  expect(Math.max(...segments)).toBeLessThanOrEqual(32);
+  expect(segments.reduce((total, value) => total + value, 0)).toBeLessThanOrEqual(120);
+
+  await target.dispatchEvent('pointerdown', { pointerType: 'mouse', pointerId: 42, isPrimary: true, ...point });
+  await target.dispatchEvent('pointerup', { pointerType: 'mouse', pointerId: 42, isPrimary: true, ...point });
+  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(1);
+
+  await target.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 43, isPrimary: true, ...point });
+  await target.dispatchEvent('pointermove', { pointerType: 'touch', pointerId: 43, isPrimary: true, clientX: point.clientX, clientY: point.clientY + 40 });
+  await target.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 43, isPrimary: true, clientX: point.clientX, clientY: point.clientY + 40 });
+  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(1);
+});
+
+test('mobile motion remains compositor-first during a full-page interaction pass', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__staplePerf = { longTasks: [], cls: 0 };
+    if (window.PerformanceObserver?.supportedEntryTypes?.includes('longtask')) {
+      new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => window.__staplePerf.longTasks.push(entry.duration));
+      }).observe({ type: 'longtask', buffered: true });
+    }
+    if (window.PerformanceObserver?.supportedEntryTypes?.includes('layout-shift')) {
+      new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
+          if (!entry.hadRecentInput) window.__staplePerf.cls += entry.value;
+        });
+      }).observe({ type: 'layout-shift', buffered: true });
+    }
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise(resolve => setTimeout(resolve, 120));
+    window.__staplePerf.longTasks = [];
+    window.__staplePerf.cls = 0;
+  });
+
+  await page.evaluate(async () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    for (let step = 0; step <= 12; step += 1) {
+      scrollTo(0, Math.round(max * (step / 12)));
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }
+    scrollTo(0, 0);
+  });
+
+  const performanceState = await page.evaluate(() => {
+    const panel = document.querySelector('.cora-panel');
+    const motion = document.querySelector('.motion-ready');
+    return {
+      maxLongTask: Math.max(0, ...window.__staplePerf.longTasks),
+      cls: window.__staplePerf.cls,
+      coraTransition: getComputedStyle(panel).transitionProperty,
+      coraWillChange: getComputedStyle(panel).willChange,
+      revealWillChange: motion ? getComputedStyle(motion).willChange : 'auto',
+      overflow: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+
+  expect(performanceState.maxLongTask).toBeLessThanOrEqual(160);
+  expect(performanceState.cls).toBeLessThanOrEqual(.03);
+  expect(performanceState.coraTransition).not.toMatch(/filter|clip-path/);
+  expect(performanceState.coraWillChange).toBe('auto');
+  expect(performanceState.revealWillChange).toBe('auto');
+  expect(performanceState.overflow).toBeLessThanOrEqual(0);
 });

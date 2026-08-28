@@ -45,13 +45,11 @@
     transition:
       opacity var(--home-motion) var(--home-ease),
       transform var(--home-motion) var(--home-ease);
-    will-change:opacity,transform;
   }
 
   .motion-ready.motion-in{
     opacity:1;
     transform:none;
-    will-change:auto;
   }
 
 }

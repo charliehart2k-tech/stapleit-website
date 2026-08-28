@@ -1,3 +1,128 @@
+/* Tactile interaction runtime: real vibration where the browser exposes it,
+ * compositor-only spring feedback everywhere else. */
+(() => {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const targetSelector = [
+    'button:not(:disabled)',
+    'summary',
+    '.nav-pill',
+    '.button',
+    '.service-cta',
+    '.support-hero-cta',
+    '.support-package-details>summary',
+    '.support-extra-details>summary',
+    '.support-packs-more-btn',
+    '[data-pack-reel-item]',
+    '[data-cora-open]',
+    '.cora-toggle',
+    '.cora-close',
+    '.audit-submit',
+    '.contact-whatsapp'
+  ].join(',');
+  const patterns = Object.freeze({
+    tick: 18,
+    select: [18, 20, 22],
+    snap: [20, 22, 30],
+    panel: [18, 22, 26],
+    confirm: [20, 18, 22, 18, 32]
+  });
+  const activePointers = new Map();
+  const activeAnimations = new WeakMap();
+  let lastPulseAt = 0;
+
+  const targetFor = node => node instanceof Element ? node.closest(targetSelector) : null;
+  const typeFor = target => {
+    if (target.matches('[data-pack-reel-item]')) return 'snap';
+    if (target.matches('.cora-toggle,.cora-close,[data-cora-open],.menu-toggle,.nav-details>summary,.mobile-nav-group>summary')) return 'panel';
+    if (target.matches('button[type="submit"],.audit-submit,.cora-send')) return 'confirm';
+    if (target.matches('summary,[aria-expanded]')) return 'select';
+    return 'tick';
+  };
+
+  const pulse = (type = 'tick') => {
+    if (document.hidden || reducedMotion.matches || typeof navigator.vibrate !== 'function') return false;
+    const now = performance.now();
+    if (now - lastPulseAt < 70) return false;
+    lastPulseAt = now;
+    try {
+      return navigator.vibrate(patterns[type] ?? patterns.tick);
+    } catch {
+      return false;
+    }
+  };
+
+  const release = (target, type = 'tick') => {
+    target.classList.remove('is-tactile-pressed');
+    if (reducedMotion.matches || typeof target.animate !== 'function') return;
+    activeAnimations.get(target)?.cancel();
+    const strong = type === 'snap' || type === 'confirm';
+    const animation = target.animate([
+      { scale: '.985', translate: '0 1px', offset: 0 },
+      { scale: strong ? '1.012' : '1.006', translate: '0 0', offset: .46 },
+      { scale: '1', translate: '0 0', offset: 1 }
+    ], {
+      duration: strong ? 310 : 260,
+      easing: 'cubic-bezier(.16,1,.3,1)'
+    });
+    activeAnimations.set(target, animation);
+    animation.finished.catch(() => {}).finally(() => {
+      if (activeAnimations.get(target) === animation) activeAnimations.delete(target);
+    });
+  };
+
+  const cancelPress = state => {
+    state.target.classList.remove('is-tactile-pressed');
+  };
+
+  document.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'touch' || !event.isPrimary) return;
+    const target = targetFor(event.target);
+    if (!(target instanceof HTMLElement)) return;
+    const state = { target, type: typeFor(target), x: event.clientX, y: event.clientY, moved: false };
+    activePointers.set(event.pointerId, state);
+    target.classList.add('tactile-target', 'is-tactile-pressed');
+  }, { passive: true, capture: true });
+
+  document.addEventListener('pointermove', event => {
+    const state = activePointers.get(event.pointerId);
+    if (!state || state.moved) return;
+    if (Math.hypot(event.clientX - state.x, event.clientY - state.y) < 14) return;
+    state.moved = true;
+    cancelPress(state);
+  }, { passive: true, capture: true });
+
+  document.addEventListener('pointerup', event => {
+    const state = activePointers.get(event.pointerId);
+    if (!state) return;
+    activePointers.delete(event.pointerId);
+    if (state.moved) {
+      cancelPress(state);
+      return;
+    }
+    pulse(state.type);
+    release(state.target, state.type);
+  }, { passive: true, capture: true });
+
+  document.addEventListener('pointercancel', event => {
+    const state = activePointers.get(event.pointerId);
+    if (!state) return;
+    activePointers.delete(event.pointerId);
+    cancelPress(state);
+  }, { passive: true, capture: true });
+
+  window.StapleTactile = Object.freeze({
+    pulse,
+    snap(target) {
+      if (target instanceof HTMLElement) {
+        target.classList.add('tactile-target');
+        release(target, 'snap');
+      }
+      return pulse('snap');
+    },
+    supported() { return typeof navigator.vibrate === 'function'; }
+  });
+})();
+
 (() => {
   const toggle = document.getElementById('menu-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
@@ -36,7 +161,7 @@
     ) {
       closeMobile();
     }
-  });
+  }, { passive: true });
 
   document.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;

@@ -8,6 +8,7 @@
   let activeIndex = Math.max(0, items.findIndex(item => item.classList.contains('is-active')));
   let timer = 0;
   let paused = false;
+  let inViewport = !('IntersectionObserver' in window);
   let pointerStartX = null;
 
   const wrap = index => (index + items.length) % items.length;
@@ -36,12 +37,21 @@
   };
   const start = () => {
     stop();
-    if (paused || reducedMotion.matches || document.hidden) return;
+    if (paused || !inViewport || reducedMotion.matches || document.hidden) return;
     timer = window.setInterval(() => render(activeIndex + 1), 3600);
   };
 
   reel.classList.add('is-enhanced');
   render(activeIndex);
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      inViewport = entries.some(entry => entry.isIntersecting);
+      start();
+    }, { threshold: .12, rootMargin: '80px 0px 80px' });
+    observer.observe(reel);
+  }
+
   start();
 
   items.forEach((item, itemIndex) => {
@@ -70,6 +80,7 @@
     pointerStartX = null;
     if (Math.abs(delta) < 38) return;
     render(activeIndex + (delta < 0 ? 1 : -1));
+    window.StapleTactile?.snap?.(items[activeIndex]);
     start();
   });
   reel.addEventListener('pointercancel', () => { pointerStartX = null; });

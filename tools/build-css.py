@@ -26,6 +26,7 @@ SHELL = [
     "glass.css",
     "nav.css",
     "reset-shell.css",
+    "tactile.css",
     "cora.css",
 ]
 
@@ -36,6 +37,7 @@ SUPPORT_SHELL = [
     "nav.css",
     "nav-rainbow.css",
     "reset-shell.css",
+    "tactile.css",
     "cora.css",
 ]
 
