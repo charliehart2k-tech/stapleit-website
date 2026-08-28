@@ -639,6 +639,9 @@ test('Add-on showcase stays compact, colourful and Cora-ready', async ({ page })
   await expect(section.locator('[data-pack-finder]')).toHaveCount(0);
   await expect(reel.locator('[data-pack-reel-item]')).toHaveCount(9);
   await expect(reel.locator('[data-pack-reel-item].is-active')).toHaveCount(1);
+  await expect(reel.locator('[data-pack-reel-item].is-prev')).toHaveCount(1);
+  await expect(reel.locator('[data-pack-reel-item].is-next')).toHaveCount(1);
+  await expect(reel.locator('[data-pack-reel-item][aria-hidden="false"]')).toHaveCount(3);
   await expect(counter).toHaveText('01 / 09');
   await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(0);
   await expect(section.getByRole('button', { name: 'View all add-ons' })).toBeVisible();
@@ -654,14 +657,16 @@ test('Add-on showcase stays compact, colourful and Cora-ready', async ({ page })
       overflow: document.documentElement.scrollWidth - innerWidth
     };
   });
-  expect(state.sectionHeight).toBeLessThanOrEqual(1050);
-  expect(state.reelHeight).toBeLessThanOrEqual(360);
+  expect(state.sectionHeight).toBeLessThanOrEqual(900);
+  expect(state.reelHeight).toBeLessThanOrEqual(300);
   expect(new Set(state.accents).size).toBeGreaterThanOrEqual(7);
   expect(state.overflow).toBeLessThanOrEqual(0);
 
   await page.waitForTimeout(3200);
   await expect(counter).not.toHaveText('01 / 09');
   await expect(reel.locator('[data-pack-reel-item].is-active')).toHaveCount(1);
+  await expect(reel.locator('[data-pack-reel-item].is-prev')).toHaveCount(1);
+  await expect(reel.locator('[data-pack-reel-item].is-next')).toHaveCount(1);
 });
 
 
@@ -696,14 +701,14 @@ test('desktop add-on chapter stays inside the established visual gates', async (
 
   expect(geometry.leftDelta).toBeLessThanOrEqual(1);
   expect(geometry.rightDelta).toBeLessThanOrEqual(1);
-  expect(geometry.sectionHeight).toBeLessThanOrEqual(760);
-  expect(geometry.headingSize).toBeLessThanOrEqual(68.5);
-  expect(geometry.headingHeight).toBeLessThanOrEqual(215);
-  expect(geometry.reelWidth).toBeLessThanOrEqual(460);
-  expect(geometry.reelHeight).toBeLessThanOrEqual(345);
-  expect(geometry.coraWidth).toBeLessThanOrEqual(440);
-  expect(geometry.coraHeight).toBeLessThanOrEqual(66);
-  expect(geometry.contentToNextHeading).toBeGreaterThanOrEqual(220);
+  expect(geometry.sectionHeight).toBeLessThanOrEqual(720);
+  expect(geometry.headingSize).toBeLessThanOrEqual(64.5);
+  expect(geometry.headingHeight).toBeLessThanOrEqual(145);
+  expect(geometry.reelWidth).toBeGreaterThanOrEqual(1100);
+  expect(geometry.reelHeight).toBeLessThanOrEqual(300);
+  expect(geometry.coraWidth).toBeLessThanOrEqual(320);
+  expect(geometry.coraHeight).toBeLessThanOrEqual(50);
+  expect(geometry.contentToNextHeading).toBeGreaterThanOrEqual(150);
   expect(Number.parseFloat(geometry.nextSectionBorder)).toBeGreaterThan(0);
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
@@ -715,7 +720,13 @@ test('Add-on reel opens pack details and the catalogue can expand to all nine', 
   const section = page.locator('.support-packs');
   const activePack = section.locator('[data-pack-reel-item].is-active');
   await expect(activePack).toContainText('Server pack');
-  await activePack.click();
+  const nextPack = section.locator('[data-pack-reel-item].is-next');
+  await expect(nextPack).toContainText('Azure pack');
+  await nextPack.click();
+  await expect(section.locator('[data-pack-reel-item].is-active')).toContainText('Azure pack');
+  await section.locator('[data-pack-reel-item].is-prev').click();
+  await expect(section.locator('[data-pack-reel-item].is-active')).toContainText('Server pack');
+  await section.locator('[data-pack-reel-item].is-active').click();
   await expect(page.getByRole('dialog', { name: 'Server pack' })).toBeVisible();
   await page.locator('#support-dialog-close').click();
   await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(9);

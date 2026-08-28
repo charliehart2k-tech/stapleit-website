@@ -243,9 +243,11 @@
     link.addEventListener('click', event => {
       const target = document.querySelector(link.getAttribute('href'));
       if (!(target instanceof HTMLElement)) return;
+      const reelItem = link.matches('[data-pack-reel-item]');
+      if (reelItem && !link.classList.contains('is-active')) return;
       if (target.hidden) revealAllPacks();
 
-      if (!link.matches('[data-pack-reel-item]')) return;
+      if (!reelItem) return;
       event.preventDefault();
       window.requestAnimationFrame(() => {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
