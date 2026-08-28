@@ -147,13 +147,15 @@ Current controls/rules include:
 
 Cora is a progressively enhanced service guide shared across the site.
 
-- the browser talks only to WordPress; it never calls Ollama directly;
-- Ollama is expected on loopback only;
-- curated, versioned Staple IT knowledge grounds the model;
-- prior browser-supplied conversation history is treated as untrusted and only visitor turns are accepted;
+- the browser talks only to WordPress; it never receives an AI-provider credential or calls a model directly;
+- curated, versioned Staple IT knowledge and deterministic package tools remain the commercial source of truth;
+- `tools/build-cora-site-corpus.py` snapshots the public `stapleit.co.uk` sitemap into a source-labelled corpus, and OpenAI file search can retrieve that corpus through a configured vector store;
+- when configured, OpenAI GPT-5.6 Terra writes the conversational reply from the trusted fact/decision packet and live-site file-search context; the local Qwen model remains a bounded fallback on loopback only;
+- WordPress issues a signed conversation token and keeps only a short, server-owned conversation window so Cora can remember her own replies without trusting forged browser assistant/system messages;
 - deterministic input/output gates reject secret disclosure, prompt-injection requests, unsupported commercial claims, invented prices/contact details and unsafe capability claims;
-- package and add-on results remain deterministic, with Cora providing a plain-English explanation rather than authority to change the result;
-- if local AI is unavailable or a model reply fails safety validation, WordPress returns the deterministic `knowledge-guide` fallback.
+- package and add-on decisions remain deterministic; a model may explain or rephrase them but cannot change the fixed result or published price basis;
+- the supervised fine-tune dataset is separate from the regression/evaluation corpus so training cannot simply memorise the release tests;
+- if hosted/local AI is unavailable or a model reply fails validation, WordPress returns the deterministic `knowledge-guide` fallback.
 
 ## Performance baseline
 

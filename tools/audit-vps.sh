@@ -116,10 +116,15 @@ else
   php -l "$REPO/wordpress/functions.php" >/dev/null || fail "WordPress functions syntax check failed"
   php -l "$REPO/wordpress/cora-safety.php" >/dev/null || fail "Cora safety syntax check failed"
   php -l "$REPO/wordpress/cora-knowledge.php" >/dev/null || fail "Cora knowledge syntax check failed"
+  php -l "$REPO/wordpress/cora-provider.php" >/dev/null || fail "Cora provider syntax check failed"
   php "$REPO/tests/php/cora-safety-test.php" || fail "Cora safety contract failed"
   php "$REPO/tests/php/cora-knowledge-test.php" || fail "Cora knowledge contract failed"
   php "$REPO/tests/php/cora-regression-test.php" || fail "Cora regression contract failed"
   php "$REPO/tests/php/cora-training-test.php" || fail "Cora training corpus failed"
+  php "$REPO/tests/php/cora-provider-test.php" || fail "Cora provider contract failed"
+  python3 "$REPO/tools/build-cora-finetune.py" --root "$REPO" --check || fail "Cora fine-tune dataset is stale"
+  python3 "$REPO/tools/check-cora-site-corpus.py" || fail "Cora live-site corpus contract failed"
+  python3 "$REPO/tests/python/cora-openai-sync-test.py" || fail "Cora OpenAI vector sync contract failed"
   bash -n "$REPO/tools/deploy-wordpress-staging.sh" || fail "Deployment script syntax check failed"
 fi
 

@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/cora-safety.php';
 require_once __DIR__ . '/cora-knowledge.php';
+require_once __DIR__ . '/cora-provider.php';
 
 add_action( 'wp_enqueue_scripts', function () {
     if ( ! is_front_page() ) {
@@ -215,6 +216,90 @@ function stapleit_cora_model_reply( $messages ) {
     }
 }
 
+
+function stapleit_cora_hosted_model_reply( $prompt, $trusted_answer, $context, $history, $page_path = '' ) {
+    if ( ! stapleit_cora_hosted_enabled() ) return '';
+
+    $context       = stapleit_cora_valid_context_key( $context );
+    $context_label = stapleit_cora_context_label( $context );
+    $knowledge     = stapleit_cora_relevant_knowledge( $prompt, $page_path );
+    $instructions  = stapleit_cora_hosted_instructions(
+        $trusted_answer,
+        $knowledge,
+        $context_label,
+        stapleit_cora_required_package_name( $context )
+    );
+    $messages = is_array( $history ) ? array_slice( $history, -8 ) : array();
+    $messages[] = array( 'role' => 'user', 'content' => $prompt );
+
+    $response = wp_remote_post( stapleit_cora_hosted_base_url() . '/responses', array(
+        'timeout' => 10,
+        'headers' => array(
+            'Authorization' => 'Bearer ' . stapleit_cora_hosted_api_key(),
+            'Content-Type'  => 'application/json',
+        ),
+        'body' => wp_json_encode( stapleit_cora_hosted_payload( $instructions, $messages ) ),
+    ) );
+    if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) return '';
+    $outer = json_decode( wp_remote_retrieve_body( $response ), true );
+    $reply = trim( sanitize_textarea_field( stapleit_cora_extract_hosted_text( $outer ) ) );
+    if ( $reply === '' || ! stapleit_cora_reply_is_safe( $reply ) ) return '';
+    if ( ! stapleit_cora_reply_preserves_trusted_prices( $trusted_answer, $reply ) ) return '';
+    if ( ! stapleit_cora_reply_preserves_required_package( $reply, $context ) ) return '';
+    return substr( $reply, 0, 2000 );
+}
+
+function stapleit_cora_session_token_new() {
+    $id  = bin2hex( random_bytes( 16 ) );
+    $sig = hash_hmac( 'sha256', $id, wp_salt( 'auth' ) );
+    return $id . '.' . $sig;
+}
+
+function stapleit_cora_session_token_valid( $token ) {
+    $token = trim( (string) $token );
+    if ( ! preg_match( '/^([a-f0-9]{32})\.([a-f0-9]{64})$/', $token, $match ) ) return false;
+    $expected = hash_hmac( 'sha256', $match[1], wp_salt( 'auth' ) );
+    return hash_equals( $expected, $match[2] );
+}
+
+function stapleit_cora_session_key( $token ) {
+    return 'stapleit_cora_memory_' . hash_hmac( 'sha256', (string) $token, wp_salt( 'nonce' ) );
+}
+
+function stapleit_cora_session_history( $token ) {
+    if ( ! stapleit_cora_session_token_valid( $token ) ) return array();
+    $stored = get_transient( stapleit_cora_session_key( $token ) );
+    if ( ! is_array( $stored ) ) return array();
+    $history = array();
+    foreach ( array_slice( $stored, -8 ) as $message ) {
+        $role    = is_array( $message ) ? (string) ( $message['role'] ?? '' ) : '';
+        $content = is_array( $message ) ? trim( (string) ( $message['content'] ?? '' ) ) : '';
+        if ( in_array( $role, array( 'user', 'assistant' ), true ) && $content !== '' && strlen( $content ) <= 1200 ) {
+            $history[] = array( 'role' => $role, 'content' => $content );
+        }
+    }
+    return $history;
+}
+
+function stapleit_cora_session_record( $token, $prompt, $reply ) {
+    if ( ! stapleit_cora_session_token_valid( $token ) ) return;
+    $prompt = trim( sanitize_textarea_field( (string) $prompt ) );
+    $reply  = trim( sanitize_textarea_field( (string) $reply ) );
+    if ( $prompt === '' || $reply === '' ) return;
+    $history = stapleit_cora_session_history( $token );
+    $history[] = array( 'role' => 'user', 'content' => substr( $prompt, 0, 800 ) );
+    $history[] = array( 'role' => 'assistant', 'content' => substr( $reply, 0, 1200 ) );
+    set_transient( stapleit_cora_session_key( $token ), array_slice( $history, -8 ), 30 * MINUTE_IN_SECONDS );
+}
+
+function stapleit_cora_send_reply( $payload, $session_token, $prompt, $status = 200 ) {
+    if ( ! is_array( $payload ) ) $payload = array();
+    $reply = trim( (string) ( $payload['reply'] ?? '' ) );
+    if ( $reply !== '' ) stapleit_cora_session_record( $session_token, $prompt, $reply );
+    $payload['conversation_token'] = $session_token;
+    wp_send_json( $payload, $status );
+}
+
 function stapleit_cora_history_from_request() {
     $history_json = substr( wp_unslash( (string) ( $_POST['history'] ?? '[]' ) ), 0, 6000 );
     $history_raw  = json_decode( $history_json, true );
@@ -239,14 +324,18 @@ function stapleit_handle_cora_chat_ajax() {
         wp_send_json( array( 'ok' => false, 'message' => 'Please use between 2 and 800 characters.' ), 400 );
     }
 
+    $incoming_token = trim( sanitize_text_field( wp_unslash( (string) ( $_POST['conversation_token'] ?? '' ) ) ) );
+    $session_token  = stapleit_cora_session_token_valid( $incoming_token ) ? $incoming_token : stapleit_cora_session_token_new();
+
     $guard_response = stapleit_cora_prompt_guard_response( $prompt );
     if ( $guard_response !== '' ) {
         wp_send_json( array(
-            'ok'                => true,
-            'mode'              => 'guardrail',
-            'reply'             => $guard_response,
-            'suggestions'       => stapleit_cora_follow_up_suggestions( '' ),
-            'knowledge_version' => stapleit_cora_knowledge_version(),
+            'ok'                 => true,
+            'mode'               => 'guardrail',
+            'reply'              => $guard_response,
+            'suggestions'        => stapleit_cora_follow_up_suggestions( '' ),
+            'knowledge_version'  => stapleit_cora_knowledge_version(),
+            'conversation_token' => $session_token,
         ) );
     }
 
@@ -254,15 +343,19 @@ function stapleit_handle_cora_chat_ajax() {
         wp_send_json( array( 'ok' => false, 'message' => 'Cora has received several messages from this connection. Please wait ten minutes, or call 01372 309 707.' ), 429 );
     }
 
-    $page_path        = substr( sanitize_text_field( (string) ( $_POST['page'] ?? '' ) ), 0, 180 );
-    $flow             = sanitize_key( wp_unslash( (string) ( $_POST['flow'] ?? '' ) ) );
-    $flow_state_json  = substr( wp_unslash( (string) ( $_POST['flow_state'] ?? '{}' ) ), 0, 512 );
-    $flow_state       = json_decode( $flow_state_json, true );
-    $flow_state       = is_array( $flow_state ) ? $flow_state : array();
+    $page_path       = substr( sanitize_text_field( (string) ( $_POST['page'] ?? '' ) ), 0, 180 );
+    $server_history  = stapleit_cora_session_history( $session_token );
+    $legacy_history  = stapleit_cora_history_from_request();
+    $history         = $server_history ? $server_history : $legacy_history;
+    $flow            = sanitize_key( wp_unslash( (string) ( $_POST['flow'] ?? '' ) ) );
+    $flow_state_json = substr( wp_unslash( (string) ( $_POST['flow_state'] ?? '{}' ) ), 0, 512 );
+    $flow_state      = json_decode( $flow_state_json, true );
+    $flow_state      = is_array( $flow_state ) ? $flow_state : array();
     if ( $flow !== 'package' ) $flow = '';
     if ( $flow === '' && stapleit_cora_package_discovery_intent( $prompt ) ) {
         $flow = 'package';
     }
+
     $flow_interrupted = false;
     if ( $flow === 'package' ) {
         $flow_result = stapleit_cora_package_flow_step( $prompt, $flow_state );
@@ -271,33 +364,53 @@ function stapleit_handle_cora_chat_ajax() {
             $flow_state = array();
             $flow_interrupted = true;
         } else {
-            wp_send_json( array(
+            $flow_context = (string) ( $flow_result['context'] ?? '' );
+            $flow_reply   = (string) $flow_result['reply'];
+            $flow_mode    = 'package-flow';
+            if ( ! empty( $flow_result['complete'] ) && stapleit_cora_hosted_enabled() ) {
+                $generated = stapleit_cora_hosted_model_reply( $prompt, $flow_reply, $flow_context, $history, $page_path );
+                if ( $generated !== '' ) {
+                    $flow_reply = $generated;
+                    $flow_mode  = 'hosted-ai';
+                }
+            }
+            stapleit_cora_send_reply( array(
                 'ok'                => true,
-                'mode'              => 'package-flow',
-                'reply'             => $flow_result['reply'],
-                'context'           => (string) ( $flow_result['context'] ?? '' ),
+                'mode'              => $flow_mode,
+                'reply'             => $flow_reply,
+                'context'           => $flow_context,
                 'flow'              => 'package',
                 'flow_active'       => ! (bool) $flow_result['complete'],
                 'flow_state'        => $flow_result['state'],
                 'suggestions'       => $flow_result['suggestions'],
                 'knowledge_version' => stapleit_cora_knowledge_version(),
-            ) );
+            ), $session_token, $prompt );
         }
     }
-    $history          = stapleit_cora_history_from_request();
-    $incoming_context = stapleit_cora_valid_context_key( (string) ( $_POST['context'] ?? '' ) );
+
+    $incoming_context = stapleit_cora_valid_context_key( wp_unslash( (string) ( $_POST['context'] ?? '' ) ) );
     $turn_context     = stapleit_cora_context_for_turn( $prompt, $incoming_context, $history );
     $context_label    = stapleit_cora_context_label( $turn_context );
     $effective_prompt = $context_label !== '' && stapleit_cora_is_contextual_follow_up( $prompt )
         ? $context_label . '. Follow-up question: ' . $prompt
         : $prompt;
+    $business_it_prompt = stapleit_cora_business_it_intent( $effective_prompt ) || $turn_context !== '';
 
     $fast_reply = stapleit_cora_fast_reply( $prompt, $turn_context );
     if ( $fast_reply !== '' ) {
+        $final_reply = $fast_reply;
+        $mode        = 'knowledge-guide';
+        if ( $business_it_prompt && stapleit_cora_hosted_enabled() ) {
+            $generated = stapleit_cora_hosted_model_reply( $prompt, $fast_reply, $turn_context, $history, $page_path );
+            if ( $generated !== '' ) {
+                $final_reply = $generated;
+                $mode        = 'hosted-ai';
+            }
+        }
         $payload = array(
             'ok'                => true,
-            'mode'              => 'knowledge-guide',
-            'reply'             => $fast_reply,
+            'mode'              => $mode,
+            'reply'             => $final_reply,
             'context'           => $turn_context,
             'suggestions'       => stapleit_cora_follow_up_suggestions( $effective_prompt ),
             'knowledge_version' => stapleit_cora_knowledge_version(),
@@ -307,11 +420,10 @@ function stapleit_handle_cora_chat_ajax() {
             $payload['flow_active'] = false;
             $payload['flow_state'] = array();
         }
-        wp_send_json( $payload );
+        stapleit_cora_send_reply( $payload, $session_token, $prompt );
     }
 
     $fallback_services = stapleit_support_catalogue_match( $effective_prompt );
-    $business_it_prompt = stapleit_cora_business_it_intent( $effective_prompt ) || $turn_context !== '';
     $device_prompt = (bool) preg_match( '/\b(?:pc|computer|laptop|device|machine)\b/i', strtolower( $prompt ) );
     $physical_device_danger = $device_prompt && (bool) preg_match( '/\b(?:on\s+fire|fire|smoke|smoking|sparks?|burning|burnt|swollen\s+battery|battery\s+swollen|overheating|extremely\s+hot)\b/i', strtolower( $prompt ) );
     $fallback_reply = $fallback_services
@@ -337,19 +449,28 @@ function stapleit_handle_cora_chat_ajax() {
         $result['flow_active'] = false;
         $result['flow_state'] = array();
     }
-    $context_note = $context_label !== '' ? "\n\nCONVERSATION CONTEXT: The current subject is " . $context_label . ". Resolve short follow-up wording such as ‘that’, ‘it’ or ‘what’s included?’ against this subject unless the visitor clearly changes topic." : '';
-    $messages = array_merge(
-        array( array( 'role' => 'system', 'content' => stapleit_cora_system_prompt() . "\n\n" . stapleit_cora_relevant_knowledge( $effective_prompt, $page_path ) . $context_note ) ),
-        $history,
-        array( array( 'role' => 'user', 'content' => $prompt ) )
-    );
-    $model_allowed = stapleit_cora_model_fallback_allowed( $business_it_prompt, $turn_context );
-    $reply = ( $device_prompt || $fallback_services || ! $model_allowed ) ? '' : stapleit_cora_model_reply( $messages );
-    if ( $reply !== '' ) {
-        $result['mode']  = 'local-ai';
-        $result['reply'] = $reply;
+
+    if ( $business_it_prompt && ! $device_prompt && stapleit_cora_hosted_enabled() ) {
+        $generated = stapleit_cora_hosted_model_reply( $prompt, $fallback_reply, $turn_context, $history, $page_path );
+        if ( $generated !== '' ) {
+            $result['mode']  = 'hosted-ai';
+            $result['reply'] = $generated;
+        }
+    } else {
+        $context_note = $context_label !== '' ? "\n\nCONVERSATION CONTEXT: The current subject is " . $context_label . ". Resolve short follow-up wording such as ‘that’, ‘it’ or ‘what’s included?’ against this subject unless the visitor clearly changes topic." : '';
+        $messages = array_merge(
+            array( array( 'role' => 'system', 'content' => stapleit_cora_system_prompt() . "\n\n" . stapleit_cora_relevant_knowledge( $effective_prompt, $page_path ) . $context_note ) ),
+            $history,
+            array( array( 'role' => 'user', 'content' => $prompt ) )
+        );
+        $model_allowed = stapleit_cora_model_fallback_allowed( $business_it_prompt, $turn_context );
+        $reply = ( $device_prompt || $fallback_services || ! $model_allowed ) ? '' : stapleit_cora_model_reply( $messages );
+        if ( $reply !== '' ) {
+            $result['mode']  = 'local-ai';
+            $result['reply'] = $reply;
+        }
     }
-    wp_send_json( $result );
+    stapleit_cora_send_reply( $result, $session_token, $prompt );
 }
 
 add_action( 'wp_dashboard_setup', function () {

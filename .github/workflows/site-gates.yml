@@ -132,11 +132,16 @@ jobs:
           php -l wordpress/functions.php
           php -l wordpress/cora-safety.php
           php -l wordpress/cora-knowledge.php
+          php -l wordpress/cora-provider.php
           php -l wordpress/mu-plugins/stapleit-static-routes.php
           php tests/php/cora-safety-test.php
           php tests/php/cora-knowledge-test.php
           php tests/php/cora-regression-test.php
           php tests/php/cora-training-test.php
+          php tests/php/cora-provider-test.php
+          python3 tools/build-cora-finetune.py --root . --check
+          python3 tools/check-cora-site-corpus.py
+          python3 tests/python/cora-openai-sync-test.py
           php tests/php/wordpress-hardening-test.php
 
       - name: Run content security SEO and AEO gates

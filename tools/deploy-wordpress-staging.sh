@@ -108,7 +108,7 @@ if [[ ! -f "$WORDPRESS_SOURCE/functions.php" ]]; then
   exit 1
 fi
 
-for cora_source in cora-safety.php cora-knowledge.php; do
+for cora_source in cora-safety.php cora-knowledge.php cora-provider.php; do
   if [[ ! -f "$WORDPRESS_SOURCE/$cora_source" ]]; then
     echo "Cora source not found: $WORDPRESS_SOURCE/$cora_source" >&2
     exit 1
@@ -142,6 +142,10 @@ php "$REPO/tests/php/cora-safety-test.php"
 php "$REPO/tests/php/cora-knowledge-test.php"
 php "$REPO/tests/php/cora-regression-test.php"
 php "$REPO/tests/php/cora-training-test.php"
+php "$REPO/tests/php/cora-provider-test.php"
+python3 "$REPO/tools/build-cora-finetune.py" --root "$REPO" --check
+python3 "$REPO/tools/check-cora-site-corpus.py"
+python3 "$REPO/tests/python/cora-openai-sync-test.py"
 php "$REPO/tests/php/wordpress-hardening-test.php"
 
 echo
@@ -158,6 +162,9 @@ if [[ -f "$THEME/front-page.php" && -d "$THEME/assets" ]]; then
   fi
   if [[ -f "$THEME/cora-knowledge.php" ]]; then
     theme_backup_items+=(cora-knowledge.php)
+  fi
+  if [[ -f "$THEME/cora-provider.php" ]]; then
+    theme_backup_items+=(cora-provider.php)
   fi
   tar -czf "$BACKUP_DIR/stapleit-theme-$STAMP.tar.gz" \
     -C "$THEME" "${theme_backup_items[@]}"
@@ -180,6 +187,7 @@ cp "$SOURCE/apple-touch-icon.png" "$THEME/apple-touch-icon.png"
 cp "$WORDPRESS_SOURCE/functions.php" "$THEME/functions.php"
 cp "$WORDPRESS_SOURCE/cora-safety.php" "$THEME/cora-safety.php"
 cp "$WORDPRESS_SOURCE/cora-knowledge.php" "$THEME/cora-knowledge.php"
+cp "$WORDPRESS_SOURCE/cora-provider.php" "$THEME/cora-provider.php"
 find "$THEME" -maxdepth 1 -type f -name 'static-*.php' -delete
 
 python3 "$REPO/tools/build-wordpress-templates.py" \
@@ -197,6 +205,7 @@ php -l "$THEME/404.php"
 php -l "$THEME/functions.php"
 php -l "$THEME/cora-safety.php"
 php -l "$THEME/cora-knowledge.php"
+php -l "$THEME/cora-provider.php"
 php -l "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 
 for template in "$THEME"/static-*.php; do
@@ -319,6 +328,8 @@ grep -Fq "'num_ctx' => 1280" "$THEME/functions.php"
 grep -Fq "function stapleit_cora_reply_is_safe" "$THEME/cora-safety.php"
 grep -Fq "function stapleit_cora_relevant_knowledge" "$THEME/cora-knowledge.php"
 grep -Fq "function stapleit_cora_knowledge_version" "$THEME/cora-knowledge.php"
+grep -Fq "function stapleit_cora_hosted_payload" "$THEME/cora-provider.php"
+grep -Fq "stapleit_cora_hosted_model_reply" "$THEME/functions.php"
 grep -Fq 'github_pat_' "$THEME/cora-safety.php"
 grep -Fq "'pack_server'" "$THEME/cora-knowledge.php"
 grep -Fq "_stapleit_enquiry_type" "$THEME/functions.php"

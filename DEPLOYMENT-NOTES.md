@@ -69,60 +69,32 @@ The deployment refuses to complete unless an active PHP-FPM service is found, re
 
 The deploy script removes/replaces the theme asset tree from the committed `site/assets/` source on each release. Retired assets must be removed from Git rather than preserved in verification lists.
 
-# Cora local AI
+# Cora AI architecture
 
-Cora appears on every route through the shared CSS and `app.js`. She always has a dependency-free deterministic `knowledge-guide` fallback, but genuine conversation uses Ollama on the WordPress VPS. The current 4 GB VPS uses the Apache-2.0 Qwen2.5 1.5B Q5 model (roughly 1.1 GB). Do not use the 5.3 GB 7B build on this host: the kernel can terminate its runner under memory pressure. A future 7B deployment needs materially more available RAM and must be load-tested before replacing the constrained model.
+Cora appears on every route through the shared CSS and `app.js`. The browser talks only to WordPress and never receives an AI-provider credential. WordPress owns the conversation state, commercial facts and package decisions.
 
-Install Ollama using its official Linux installer, keep the service on loopback and pull the constrained 1.5B model:
+The preferred conversational path is a hosted model configured server-side. The hosted model does **not** decide prices, package eligibility or support scope: WordPress first resolves a trusted answer/decision from `wordpress/cora-knowledge.php` and the deterministic package tools, then supplies that trusted packet to the model to express naturally. Every generated answer is re-validated before publication. A failed, slow, missing or unsafe hosted response falls back without breaking the chat.
 
-```bash
-curl -fsSL https://ollama.com/install.sh | sh
-sudo systemctl edit ollama
-```
+The current VPS keeps Qwen2.5 1.5B Q5 (roughly 1.1 GB) as a local bounded fallback only. Ollama stays on loopback and is never exposed through Nginx, Cloudflare or the firewall. Do not attempt to make the 4 GB VPS the primary reasoning host: 3B benchmarking caused heavy swap use, 4.5–17 second responses and still produced unsupported claims.
 
-Add this systemd override:
+Install/verify the local fallback using the existing `tools/install-cora-warm-service.sh` workflow. The expected listener is `127.0.0.1:11434`, never `0.0.0.0:11434`.
 
-```ini
-[Service]
-Environment="OLLAMA_HOST=127.0.0.1:11434"
-Environment="OLLAMA_KEEP_ALIVE=10m"
-Environment="OLLAMA_NUM_PARALLEL=1"
-Environment="OLLAMA_CONTEXT_LENGTH=2048"
-```
-
-Then activate and verify it:
+Hosted-provider secrets are stored outside Git. Configure them with:
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now ollama
-ollama pull qwen2.5:1.5b-instruct-q5_0
-curl --fail --silent http://127.0.0.1:11434/api/tags
-sudo ss -lntp | grep 11434
+CORA_OPENAI_API_KEY='...' sudo -E bash tools/install-cora-hosted-config.sh
 ```
 
-The `ss` result must show `127.0.0.1:11434` or equivalent loopback only, never `0.0.0.0:11434` or a public address. Do not create an Nginx, Cloudflare Tunnel or firewall route to Ollama.
+The installer writes `/etc/stapleit/cora-ai.php` as `root:www-data` mode `0640`, updates `wp-config.php` to require that server-local file, and reloads PHP-FPM. The key is never emitted to browser JavaScript. `CORA_OPENAI_MODEL` defaults to `gpt-5.6-terra`; `CORA_OPENAI_BASE_URL` defaults to `https://api.openai.com/v1`. `CORA_OPENAI_VECTOR_STORE_ID` attaches the live Staple IT website corpus through OpenAI file search. The model/base URL can be overridden only for an explicitly approved deployment.
 
-Add the model constant above the `/* That's all, stop editing! */` line in the live `wp-config.php`:
+Build the public-site knowledge snapshot from the live WordPress sitemap with `python3 tools/build-cora-site-corpus.py`. The committed corpus records source URLs/classes and excludes `/dbc/`; canonical service/company/contact pages outrank supplementary blog content. Validate it with `python3 tools/check-cora-site-corpus.py`. With an OpenAI API key available, `python3 tools/sync-cora-openai-knowledge.py` creates/updates a vector-store corpus and prints the resulting `CORA_OPENAI_VECTOR_STORE_ID`; feed that ID into `tools/install-cora-hosted-config.sh`. Runtime deterministic package/pricing/safety rules always outrank retrieved website text.
 
-```php
-define( 'STAPLEIT_OLLAMA_MODEL', 'qwen2.5:1.5b-instruct-q5_0' );
-```
+When the hosted provider is configured, successful generated turns use diagnostic mode `hosted-ai`. The local fallback uses `local-ai`; deterministic fallback uses `knowledge-guide`. These backend mode names are diagnostic only and must never appear in visitor-facing copy.
 
-If WordPress defines `WP_HTTP_BLOCK_EXTERNAL`, allow loopback HTTP explicitly or its request to Ollama will be blocked. WordPress calls only `http://127.0.0.1:11434`; the model URL and any server configuration remain hidden from the browser.
+WordPress issues a signed, opaque conversation token and keeps a maximum short conversation window in a transient for 30 minutes. This server-owned memory may contain recent user and assistant messages so Cora can remember what she said. Browser-supplied assistant/system history is never trusted; legacy browser history remains visitor-turn-only and is used only as a compatibility fallback.
 
-After deploying the current Git commit, prove the full path through WordPress:
+The supervised fine-tune source is generated by `tools/build-cora-finetune.py` into `training/cora-sft-train.jsonl` and `training/cora-sft-validation.jsonl`. It teaches Cora's UK conversational style, recovery behaviour and Staple IT vocabulary. Runtime commercial truth still comes from the curated knowledge/tools. The 933-check Cora training/evaluation corpus is separate from SFT data and remains a release gate. If an API key is available, `tools/start-cora-finetune.sh` can submit the SFT data against the configured supported base model for a benchmark; do not promote a fine-tuned model until it beats the held-out/live evaluation set.
 
-```bash
-curl --fail --silent --show-error \
-  --request POST 'https://staging.stapleitdev.co.uk/wp-admin/admin-ajax.php' \
-  --data-urlencode 'action=stapleit_cora_chat' \
-  --data-urlencode 'prompt=We have ten staff and need help with Microsoft 365 security.'
-```
-
-The JSON must contain `"ok":true`, `"mode":"local-ai"` and a useful `reply`. `"mode":"knowledge-guide"` means the website and deterministic fallback are working but WordPress did not publish a model reply; check the model constant, `systemctl status ollama`, available memory and the WordPress/PHP error log. Do not describe Cora as live local AI until this returns `local-ai`.
-
-Use the Apache-2.0 1.5B Qwen2.5 model on the current VPS. WordPress fixes the context at 2,048 tokens, limits output, uses low-temperature generation and applies deterministic safety/commercial gates before any model reply reaches the browser. The gates permit only complete published package prices, reject unapproved monetary amounts, unsupported Microsoft 365 Business Premium claims, invented contact details/SLA times/package tiers, 24/7 staffed-support claims, unsupported booking/processing/inspection capabilities, external URLs and unsafe compliance claims. Input guards intercept secret-shaped values, prompt-injection requests and active-incident wording.
-
-Browser-supplied chat history is untrusted. The client sends only a short set of prior visitor turns, and WordPress independently rejects any claimed assistant/system history, secret-bearing history or oversized history before constructing the model request. A rejected, absent, slow or invalid model response receives the explicitly labelled deterministic `knowledge-guide` fallback. No third-party AI API or browser credential is used. Cora rate-limits each connection and does not store prompts in WordPress.
+Input guards intercept secret-shaped values, prompt-injection requests and active-incident wording. Output gates reject unapproved monetary amounts, incomplete package price bases, unsupported Business Premium claims, invented contact/SLA/package tiers, 24/7 staffed-support claims, unsupported booking/processing/inspection capabilities, external URLs and unsafe compliance claims. Fixed Basic/Standard/Premium/Tailored decisions cannot be changed by a model.
 
 Planner analytics are first-party daily aggregate counters stored in the WordPress options table for 90 days. They contain only allowlisted event names and counts: no prompts, answers, IP addresses, cookies, device identifiers or contact details.

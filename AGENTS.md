@@ -34,7 +34,7 @@ For every change:
    - `bash -n tools/deploy-wordpress-staging.sh`
    - `bash -n tools/audit-vps.sh`
    - `bash -n tools/prune-theme-backups.sh`
-   - for Cora/backend changes: `php tests/php/cora-safety-test.php` and `php tests/php/cora-knowledge-test.php`
+   - for Cora/backend changes: run `php tests/php/cora-safety-test.php`, `php tests/php/cora-knowledge-test.php`, `php tests/php/cora-regression-test.php`, `php tests/php/cora-training-test.php`, `php tests/php/cora-provider-test.php` and `python3 tools/build-cora-finetune.py --check`
 8. Push only after the change is internally consistent.
 9. Verify the GitHub **Site quality gates** workflow succeeds for the pushed commit.
 10. Only then tell the user that the change is safe to deploy.
@@ -129,6 +129,10 @@ The repository gate checks are defined by:
 - `tools/build-css.py`
 - `tests/php/cora-safety-test.php`
 - `tests/php/cora-knowledge-test.php`
+- `tests/php/cora-regression-test.php`
+- `tests/php/cora-training-test.php`
+- `tests/php/cora-provider-test.php`
+- `tools/build-cora-finetune.py`, `tools/check-cora-site-corpus.py`
 
 Warnings are not to be ignored. A change must not add new unexplained warnings. Existing warnings are technical debt and should be resolved when the affected area is touched, unless explicitly documented as an approved exception.
 

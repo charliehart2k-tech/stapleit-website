@@ -95,7 +95,7 @@ $groups = array(
         'not' => array( 'Basic', 'Standard is', 'Premium is' ),
     ),
     'strategy' => array(
-        'prompts' => array( 'Can you build us an IT roadmap?', 'Can you help plan next year’s IT budget?', 'We are opening a new office and need IT planning', 'Can you help with IT due diligence for an acquisition?' ),
+        'prompts' => array( 'Can you build us an IT roadmap?', 'Can you help plan next year’s IT budget?', 'We are opening a new office and need IT planning', 'Can you help with IT due diligence for an acquisition?', 'We are buying another business and need IT due diligence', 'We are taking over another company and need technology planning' ),
         'has' => array( 'Strategy pack' ),
         'not' => array( 'Basic', 'Premium' ),
     ),

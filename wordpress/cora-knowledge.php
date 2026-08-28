@@ -248,7 +248,7 @@ function stapleit_cora_context_from_prompt( $prompt ) {
     if ( preg_match( '/\b(?:azure|virtual\s+machine|vnet)\b/i', $text ) ) return 'pack_azure';
     if ( preg_match( '/\b(?:network\s+pack|wi-?fi|firewall|access\s+point|network\s+switch|networking|site-to-site\s+vpn|remote-access\s+vpn|qos)\b/i', $text ) ) return 'pack_network';
     if ( preg_match( '/\bsecurity\s+pack\b/i', $text ) ) return 'pack_security';
-    if ( preg_match( '/\b(?:merger|acquisition|m\s*&\s*a)\b/i', $text ) && preg_match( '/\b(?:due\s+diligence|planning|it)\b/i', $text ) ) return 'pack_strategy';
+    if ( preg_match( '/\b(?:merger|acquisition|m\s*&\s*a|buy(?:ing)?|purchas(?:e|ing)|tak(?:e|ing)\s+over)\b/i', $text ) && preg_match( '/\b(?:another\s+)?(?:business|company|organisation|organization)\b|\b(?:due\s+diligence|planning)\b/i', $text ) ) return 'pack_strategy';
     if ( preg_match( '/\b(?:governance|compliance|it\s+polic(?:y|ies)|documentation|evidence|due\s+diligence)\b/i', $text ) ) return 'pack_governance';
     if ( preg_match( '/\b(?:ai\s+pack|chatgpt|copilot|claude|artificial\s+intelligence|ai\s+tools|ai\s+adoption)\b/i', $text ) ) return 'pack_ai';
     if ( preg_match( '/\b(?:strategy|roadmap|budgeting|technology\s+roadmap|merger|acquisition|office\s+move\s+planning)\b/i', $text ) ) return 'pack_strategy';
@@ -556,7 +556,7 @@ function stapleit_cora_fast_reply( $prompt, $context = '' ) {
         return 'The Azure pack covers Microsoft Azure administration, virtual machines, monitoring, maintenance, access control, backup and recovery support, and cost reviews. It is price on application because the scope depends on the Azure resources you actually run.';
     }
 
-    if ( preg_match( '/\b(?:merger|acquisition|m\s*&\s*a|new\s+office|office\s+move)\b/i', $text ) && preg_match( '/\b(?:it|planning|due\s+diligence|technology)\b/i', $text ) ) {
+    if ( preg_match( '/\b(?:merger|acquisition|m\s*&\s*a|buy(?:ing)?\s+(?:another\s+)?(?:business|company)|purchas(?:e|ing)\s+(?:another\s+)?(?:business|company)|tak(?:e|ing)\s+over\s+(?:another\s+)?(?:business|company)|new\s+office|office\s+move)\b/i', $text ) && preg_match( '/\b(?:it|planning|due\s+diligence|technology|business|company)\b/i', $text ) ) {
         return 'The Strategy pack covers IT planning for growth and major business change, including new offices, office moves, mergers and acquisitions, due diligence, supplier planning and technology roadmaps. It is price on application; implementation work may be quoted separately.';
     }
 

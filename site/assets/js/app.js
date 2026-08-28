@@ -122,6 +122,7 @@
   let conversationContext = '';
   let conversationFlow = '';
   let conversationFlowState = {};
+  let conversationToken = '';
   let suppressNextUserMessage = false;
   const tracked = new Set();
   let previousFocus = null;
@@ -272,7 +273,8 @@
         context: conversationContext,
         flow: conversationFlow,
         flow_state: JSON.stringify(conversationFlowState),
-        page: window.location.pathname
+        page: window.location.pathname,
+        conversation_token: conversationToken
       });
       const response = await fetch('/wp-admin/admin-ajax.php', {
         method: 'POST',
@@ -286,6 +288,7 @@
       }
       thinking.remove();
       conversationContext = typeof payload.context === 'string' ? payload.context : conversationContext;
+      if (typeof payload.conversation_token === 'string' && payload.conversation_token) conversationToken = payload.conversation_token;
       if (Object.prototype.hasOwnProperty.call(payload, 'flow')) {
         if (payload.flow === 'package' && payload.flow_state && typeof payload.flow_state === 'object') {
           conversationFlowState = payload.flow_state;

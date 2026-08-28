@@ -1,0 +1,6 @@
+{
+  "purpose": "Cora conversational style and behaviour; runtime knowledge remains authoritative",
+  "train_examples": 66,
+  "validation_examples": 17,
+  "source": "approved Staple IT website/service facts; separate from runtime evaluation corpus"
+}

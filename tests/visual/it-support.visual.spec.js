@@ -265,6 +265,48 @@ test('Cora leads package discovery and only asks questions that can change the r
   expect(requests[2].state.team).toBe('10');
 });
 
+test('Cora carries the server-issued conversation token between turns', async ({ page }) => {
+  const seenTokens = [];
+  const token = '0123456789abcdef0123456789abcdef.' + 'a'.repeat(64);
+  let turn = 0;
+  await page.route('**/wp-admin/admin-ajax.php', async route => {
+    const body = route.request().postData() || '';
+    if (!body.includes('action=stapleit_cora_chat')) {
+      await route.fulfill({ contentType:'application/json', body:JSON.stringify({ ok:true }) });
+      return;
+    }
+    const params = new URLSearchParams(body);
+    seenTokens.push(params.get('conversation_token') || '');
+    turn += 1;
+    await route.fulfill({
+      contentType:'application/json',
+      body:JSON.stringify({
+        ok:true,
+        mode:'hosted-ai',
+        reply:turn === 1 ? 'We can talk through the Network pack.' : 'Yes — I remember we were discussing the Network pack.',
+        context:'pack_network',
+        conversation_token:token,
+        suggestions:[]
+      })
+    });
+  });
+
+  await page.setViewportSize({ width:390, height:844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil:'networkidle' });
+  await page.getByRole('button', { name:'Chat to Cora' }).click();
+  const cora = page.getByRole('dialog', { name:'Cora' });
+  const input = cora.getByLabel('Message Cora');
+  const send = cora.getByRole('button', { name:'Send' });
+  await input.fill('Tell me about the Network pack');
+  await send.click();
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('Network pack');
+  await input.fill('What does that include?');
+  await send.click();
+  await expect(cora.locator('.cora-message--assistant').last()).toContainText('remember');
+
+  expect(seenTokens).toEqual(['', token]);
+});
+
 test('desktop Cora gives replies and suggestions enough room without horizontal clipping', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil:'networkidle' });
