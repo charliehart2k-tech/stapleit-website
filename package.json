@@ -5,6 +5,6 @@
     "test:visual": "playwright test tests/visual/it-support.visual.spec.js"
   },
   "devDependencies": {
-    "@playwright/test": "1.55.0"
+    "@playwright/test": "^1.62.1"
   }
 }
