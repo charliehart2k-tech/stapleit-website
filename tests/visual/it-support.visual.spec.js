@@ -53,8 +53,9 @@ for (const [name, width, height] of viewports) {
         '.support-standard',
         '.support-planner',
         '.support-package-finder',
-        '.support-pack-finder-stage',
-        '.support-pack-question:not([hidden])',
+        '.support-packs-intro',
+        '.support-pack-reel-shell',
+        '.support-pack-reel-item.is-active',
         '.support-package-card',
         '.support-extra-card',
         '.support-cta-panel',
@@ -623,102 +624,71 @@ test('mobile Cora tracks a keyboard-resized viewport and keeps the composer visi
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
-test('Add-on fit check adapts and suggests without a nine-question checklist', async ({ page }) => {
-  await page.route('**/wp-admin/admin-ajax.php', async route => {
-    const body = route.request().postData() || '';
-    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true }) });
-  });
-
-  await page.setViewportSize({ width: 430, height: 932 });
-  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
-  const form = page.locator('[data-pack-finder]');
-
-  await expect(form).not.toContainText(/Question \d+ of 9/i);
-  await expect(form.locator('progress')).toHaveCount(0);
-  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'focus');
-  await form.getByLabel('Security or compliance').check();
-  await expect(form.locator('[data-pack-cora-line]')).toHaveCount(0);
-  await form.getByRole('button', { name: 'Start there' }).click();
-
-  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'security');
-  await form.locator('[data-pack-question]:visible input[value="yes"]').check();
-  await form.getByRole('button', { name: 'Keep going' }).click();
-  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'governance');
-  await form.locator('[data-pack-question]:visible input[value="yes"]').check();
-
-  await expect(form.getByRole('button', { name: 'See suggestions' })).toBeEnabled();
-  await expect(form.getByRole('button', { name: 'Show suggestions now' })).toBeVisible();
-  await form.getByRole('button', { name: 'See suggestions' }).click();
-
-  await expect(form.locator('[data-pack-results]')).toBeVisible();
-  await expect(form.locator('[data-pack-results-summary]')).toContainText('Security');
-  await expect(form.locator('[data-pack-results-summary]')).toContainText('Governance & compliance');
-  await expect(form.locator('[data-pack-result="security"]')).toBeVisible();
-  await expect(form.locator('[data-pack-result="governance"]')).toBeVisible();
-  await expect(form.locator('[data-pack-result="cyber-essentials"]')).toBeHidden();
-  await expect(form.locator('[data-pack-result="server"]')).toBeHidden();
-  await expect(form.locator('#support-pack-results-title')).toHaveText('Suggestions');
-  await expect(form.locator('[data-pack-result]:visible')).toHaveCount(2);
-  await expect(form.locator('[data-pack-result]:visible').first().getByRole('link', { name: 'View pack details' })).toBeVisible();
-  await expect(page.locator('#support-packs-grid .support-extra-card:not([hidden])')).toHaveCount(0);
-  const viewAll = page.getByRole('button', { name: /Browse all 9 packs/i });
-  await expect(viewAll).toBeVisible();
-  const continuation = await viewAll.evaluate(element => ({
-    width: element.getBoundingClientRect().width,
-    parentWidth: element.parentElement?.getBoundingClientRect().width || 0
-  }));
-  expect(continuation.width).toBeGreaterThan(continuation.parentWidth - 2);
-  const pass4bGeometry = await page.evaluate(() => ({
-    sectionHeight: document.querySelector('.support-packs')?.getBoundingClientRect().height || 0,
-    resultHeight: document.querySelector('[data-pack-results]')?.getBoundingClientRect().height || 0,
-    resultCardHeights: [...document.querySelectorAll('[data-pack-result]:not([hidden])')].map(card => card.getBoundingClientRect().height),
-    overflow: document.documentElement.scrollWidth - innerWidth
-  }));
-  expect(pass4bGeometry.sectionHeight).toBeLessThanOrEqual(1250);
-  expect(pass4bGeometry.resultHeight).toBeLessThanOrEqual(650);
-  expect(Math.max(...pass4bGeometry.resultCardHeights)).toBeLessThanOrEqual(190);
-  expect(pass4bGeometry.overflow).toBeLessThanOrEqual(0);
-
-  await viewAll.click();
-  const visibleCatalogue = page.locator('#support-packs-grid .support-extra-card:not([hidden])');
-  await expect(visibleCatalogue).toHaveCount(9);
-  const catalogueCardHeights = await visibleCatalogue.evaluateAll(cards => cards.map(card => card.getBoundingClientRect().height));
-  expect(Math.max(...catalogueCardHeights)).toBeLessThanOrEqual(280);
-  await expect(form.locator('.support-pack-results-note')).toContainText('not a complete assessment');
-
-  const answeredPackTopics = await form.locator('[data-pack-question]:not([data-pack-gateway]) input:checked').count();
-  expect(answeredPackTopics).toBe(2);
-});
-
-test('Add-on fit check can stop early and leaves unasked areas unknown', async ({ page }) => {
-  await page.route('**/wp-admin/admin-ajax.php', async route => {
-    await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false }) });
-  });
-
+test('Add-on showcase stays compact, colourful and Cora-ready', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
-  const form = page.locator('[data-pack-finder]');
 
-  await form.getByLabel('Servers, cloud or network').check();
-  await form.getByRole('button', { name: 'Start there' }).click();
-  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'server');
-  await form.locator('[data-pack-question]:visible input[value="no"]').check();
-  await form.getByRole('button', { name: 'Keep going' }).click();
-  await expect(form.locator('[data-pack-question]:visible')).toHaveAttribute('data-pack-key', 'azure');
-  await form.locator('[data-pack-question]:visible input[value="no"]').check();
+  const section = page.locator('.support-packs');
+  const reel = page.locator('[data-pack-reel]');
+  const counter = page.locator('[data-pack-reel-count]');
 
-  const stop = form.getByRole('button', { name: 'Show suggestions now' });
-  await expect(stop).toBeVisible();
-  await stop.click();
+  await expect(section).toBeVisible();
+  await expect(section.getByRole('heading', { level: 2 })).toContainText('Add-ons');
+  await expect(section.getByText('We offer a variety of add-on packs')).toBeVisible();
+  await expect(section.getByRole('button', { name: 'Ask Cora which add-on fits' })).toBeVisible();
+  await expect(section.locator('[data-pack-finder]')).toHaveCount(0);
+  await expect(reel.locator('[data-pack-reel-item]')).toHaveCount(9);
+  await expect(reel.locator('[data-pack-reel-item].is-active')).toHaveCount(1);
+  await expect(counter).toHaveText('01 / 09');
+  await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(0);
+  await expect(section.getByRole('button', { name: 'View all add-ons' })).toBeVisible();
 
-  await expect(form.locator('[data-pack-results]')).toBeVisible();
-  await expect(form.locator('[data-pack-results-summary]')).toContainText('Nothing in your answers');
-  await expect(form.locator('[data-pack-results-empty]')).toBeVisible();
-  await expect(form.locator('[data-pack-result]:visible')).toHaveCount(0);
-  await expect(form.locator('[data-pack-question][data-pack-key="network"] input:checked')).toHaveCount(0);
-  await expect(form.locator('.support-pack-results-note')).toContainText('not a complete assessment');
+  const state = await page.evaluate(() => {
+    const section = document.querySelector('.support-packs');
+    const reelShell = document.querySelector('.support-pack-reel-shell');
+    const items = [...document.querySelectorAll('[data-pack-reel-item]')];
+    return {
+      sectionHeight: section?.getBoundingClientRect().height || 0,
+      reelHeight: reelShell?.getBoundingClientRect().height || 0,
+      accents: items.map(item => getComputedStyle(item).getPropertyValue('--pack-accent').trim()),
+      overflow: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+  expect(state.sectionHeight).toBeLessThanOrEqual(1050);
+  expect(state.reelHeight).toBeLessThanOrEqual(360);
+  expect(new Set(state.accents).size).toBeGreaterThanOrEqual(7);
+  expect(state.overflow).toBeLessThanOrEqual(0);
 
-  await expect(form.getByRole('button', { name: 'Cora · coming soon' })).toBeVisible();
+  await page.waitForTimeout(3200);
+  await expect(counter).not.toHaveText('01 / 09');
+  await expect(reel.locator('[data-pack-reel-item].is-active')).toHaveCount(1);
+});
+
+test('Add-on reel opens pack details and the catalogue can expand to all nine', async ({ page }) => {
+  await page.setViewportSize({ width: 430, height: 932 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const section = page.locator('.support-packs');
+  const activePack = section.locator('[data-pack-reel-item].is-active');
+  await expect(activePack).toContainText('Server pack');
+  await activePack.click();
+  await expect(page.getByRole('dialog', { name: 'Server pack' })).toBeVisible();
+  await page.locator('#support-dialog-close').click();
+  await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(9);
+  await expect(page.locator('.support-pack-catalogue-head')).toBeVisible();
+
+  const cardAccents = await page.locator('#support-packs-grid [data-pack-card]').evaluateAll(cards =>
+    cards.map(card => getComputedStyle(card).getPropertyValue('--support-card-accent').trim())
+  );
+  expect(new Set(cardAccents).size).toBeGreaterThanOrEqual(7);
+
+  await page.reload({ waitUntil: 'networkidle' });
+  const viewAll = page.getByRole('button', { name: 'View all add-ons' });
+  await expect(viewAll).toBeVisible();
+  await viewAll.click();
+  await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(9);
+  await expect(page.locator('.support-pack-catalogue-head')).toBeVisible();
+  await expect(viewAll).toBeHidden();
 });
 
 test('final services and CTA stay compact, distinct and contained', async ({ page }) => {

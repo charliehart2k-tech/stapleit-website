@@ -272,163 +272,39 @@
 </section>
 
 <section class="support-section support-packs" aria-labelledby="support-packs-title">
-<header class="support-section-heading support-section-heading--wide">
+<div class="support-packs-intro">
+<div class="support-packs-copy">
+<p class="support-packs-eyebrow">Optional specialist cover</p>
 <h2 id="support-packs-title">Add-ons, <span class="support-packs-title-accent">if you need them</span></h2>
-<p class="support-section-lead">Keep the core service simple. Add specialist coverage only where your systems or requirements genuinely need it.</p>
-</header>
-<form class="support-pack-finder" data-pack-finder novalidate>
-<noscript><p class="support-pack-finder-noscript">The guided conversation needs JavaScript, but every add-on pack remains available to browse below.</p></noscript>
-<div class="support-pack-finder-stage" data-pack-finder-stage>
-<div class="support-pack-finder-progress support-pack-finder-progress--conversation">
-<p id="support-pack-finder-count" data-pack-finder-count>Quick fit check</p>
-<span class="support-pack-conversation-pulse" aria-hidden="true"></span>
-</div>
-
-<fieldset class="support-pack-question support-pack-question--gateway" data-pack-question data-pack-gateway data-pack-key="focus">
-<legend tabindex="-1">What would you like help with?</legend>
-<div class="support-pack-choices support-pack-choices--focus">
-<label><input type="radio" name="pack-focus" value="security"><span>Security or compliance</span></label>
-<label><input type="radio" name="pack-focus" value="infrastructure"><span>Servers, cloud or network</span></label>
-<label><input type="radio" name="pack-focus" value="future"><span>AI, planning or resilience</span></label>
-<label><input type="radio" name="pack-focus" value="guide"><span>I’m not sure — guide me</span></label>
-</div>
-<button class="support-pack-free-chat" type="button" data-cora-open>Cora · coming soon</button>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="server" aria-describedby="support-pack-question-server-help">
-<legend tabindex="-1">Is there a physical Windows server at your workplace or another site?</legend>
-<p class="support-pack-question-help" id="support-pack-question-server-help">A physical server is a dedicated computer that may store files, run business software or manage logins. If you only use Microsoft 365, choose No.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-server" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-server" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-server" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-server">Explore the Server pack</a>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="azure" aria-describedby="support-pack-question-azure-help">
-<legend tabindex="-1">Does your business run any systems or virtual machines in Microsoft Azure?</legend>
-<p class="support-pack-question-help" id="support-pack-question-azure-help">Azure is Microsoft’s cloud-computing platform. Using Microsoft 365 on its own does not necessarily mean you use Azure.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-azure" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-azure" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-azure" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-azure">Explore the Azure pack</a>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="network" aria-describedby="support-pack-question-network-help">
-<legend tabindex="-1">Do you rely on business Wi-Fi across several areas, managed network switches or a dedicated firewall?</legend>
-<p class="support-pack-question-help" id="support-pack-question-network-help">This includes Wi-Fi access points—the devices that provide wireless coverage around an office—as well as equipment that connects and protects your network.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-network" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-network" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-network" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-network">Explore the Network pack</a>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="security" aria-describedby="support-pack-question-security-help">
-<legend tabindex="-1">Would you like stronger security monitoring for devices, accounts, email and web use?</legend>
-<p class="support-pack-question-help" id="support-pack-question-security-help">Think advanced threat monitoring, phishing protection and stronger controls beyond ordinary day-to-day antivirus.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-security" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-security" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-security" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-security">Explore the Security pack</a>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="governance" aria-describedby="support-pack-question-governance-help">
-<legend tabindex="-1">Do clients, insurers or auditors ask you for IT policies, evidence or security questionnaires?</legend>
-<p class="support-pack-question-help" id="support-pack-question-governance-help">This can include written policies, asset records, audit evidence, insurance forms or customer due-diligence checks.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-governance" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-governance" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-governance" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-governance">Explore the Governance &amp; compliance pack</a>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="cyber-essentials" aria-describedby="support-pack-question-cyber-essentials-help">
-<legend tabindex="-1">Are you working towards Cyber Essentials or Cyber Essentials Plus?</legend>
-<p class="support-pack-question-help" id="support-pack-question-cyber-essentials-help">This UK certification may be requested by customers, tenders or insurers. Choose Not sure if you have only heard the name.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-cyber-essentials" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-cyber-essentials" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-cyber-essentials" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-cyber-essentials">Explore the Cyber Essentials pack</a>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="ai" aria-describedby="support-pack-question-ai-help">
-<legend tabindex="-1">Are you introducing AI tools and want help using them safely?</legend>
-<p class="support-pack-question-help" id="support-pack-question-ai-help">Examples include Microsoft Copilot, ChatGPT Business and Claude Team, including how staff use them and what company data they can access.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-ai" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-ai" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-ai" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-ai">Explore the AI pack</a>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="strategy" aria-describedby="support-pack-question-strategy-help">
-<legend tabindex="-1">Would regular IT reviews, budget planning and a technology roadmap help?</legend>
-<p class="support-pack-question-help" id="support-pack-question-strategy-help">This is useful when you want to plan upgrades, growth and supplier decisions instead of only reacting when something breaks.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-strategy" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-strategy" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-strategy" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-strategy">Explore the Strategy pack</a>
-</fieldset>
-
-<fieldset class="support-pack-question" data-pack-question data-pack-key="disaster-recovery" aria-describedby="support-pack-question-disaster-recovery-help">
-<legend tabindex="-1">Do you need a tested plan for restoring systems and data after a serious outage or cyber incident?</legend>
-<p class="support-pack-question-help" id="support-pack-question-disaster-recovery-help">A recovery plan goes beyond having backups: it sets out what must come back first, who is responsible and how the process is tested.</p>
-<div class="support-pack-choices">
-<label><input type="radio" name="pack-disaster-recovery" value="yes"><span>Yes</span></label>
-<label><input type="radio" name="pack-disaster-recovery" value="no"><span>No</span></label>
-<label><input type="radio" name="pack-disaster-recovery" value="unsure"><span>Not sure</span></label>
-</div>
-<a class="support-pack-fallback-link" href="#support-pack-disaster-recovery">Explore the Disaster recovery pack</a>
-</fieldset>
-
-<div class="support-pack-finder-actions" data-pack-finder-actions>
-<button class="support-pack-finder-button support-pack-finder-button--back" type="button" data-pack-finder-back>Back</button>
-<button class="support-pack-finder-button support-pack-finder-button--suggest" type="button" data-pack-finder-suggest hidden>Show suggestions now</button>
-<button class="support-pack-finder-button support-pack-finder-button--next" type="button" data-pack-finder-next disabled>Start there</button>
+<p class="support-packs-lead">We offer a variety of add-on packs that can be added as and when your business needs them.</p>
+<p class="support-packs-explainer">Add-on packs sit alongside your core IT support package and cover specialist areas such as servers, Azure, networks, security, compliance, AI and disaster recovery. We only recommend one where it genuinely adds value.</p>
+<div class="support-package-cora support-pack-cora" data-support-addon-planner>
+<button class="support-package-cora-trigger support-pack-cora-trigger" type="button" data-cora-open>Ask Cora which add-on fits</button>
 </div>
 </div>
 
-<section class="support-pack-results" data-pack-results hidden aria-labelledby="support-pack-results-title" aria-live="polite">
-<header class="support-pack-results-header">
-<p class="support-pack-results-step">Quick fit check</p>
-<h3 id="support-pack-results-title" tabindex="-1">Suggestions</h3>
-<p data-pack-results-summary></p>
-</header>
-<div class="support-pack-results-list">
-<article class="support-pack-result" data-pack-result="server" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Server pack</h4></div><a href="#support-pack-server">View pack details</a></article>
-<article class="support-pack-result" data-pack-result="azure" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Azure pack</h4></div><a href="#support-pack-azure">View pack details</a></article>
-<article class="support-pack-result" data-pack-result="network" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Network pack</h4></div><a href="#support-pack-network">View pack details</a></article>
-<article class="support-pack-result" data-pack-result="security" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Security pack</h4></div><a href="#support-pack-security">View pack details</a></article>
-<article class="support-pack-result" data-pack-result="governance" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Governance &amp; compliance pack</h4></div><a href="#support-pack-governance">View pack details</a></article>
-<article class="support-pack-result" data-pack-result="cyber-essentials" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Cyber Essentials pack</h4></div><a href="#support-pack-cyber-essentials">View pack details</a></article>
-<article class="support-pack-result" data-pack-result="ai" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>AI pack</h4></div><a href="#support-pack-ai">View pack details</a></article>
-<article class="support-pack-result" data-pack-result="strategy" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Strategy pack</h4></div><a href="#support-pack-strategy">View pack details</a></article>
-<article class="support-pack-result" data-pack-result="disaster-recovery" hidden><div><p class="support-pack-result-status" data-pack-result-status></p><h4>Disaster recovery pack</h4></div><a href="#support-pack-disaster-recovery">View pack details</a></article>
+<aside class="support-pack-reel-shell" aria-label="Available add-on packs">
+<div class="support-pack-reel-head"><span>Available add-on packs</span><span data-pack-reel-count>01 / 09</span></div>
+<div class="support-pack-reel" data-pack-reel>
+<a class="support-pack-reel-item is-active" href="#support-pack-server" data-pack-reel-item="server"><span class="support-pack-reel-name">Server pack</span><span class="support-pack-reel-copy">Windows Server monitoring, maintenance, backup and support.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
+<a class="support-pack-reel-item" href="#support-pack-azure" data-pack-reel-item="azure"><span class="support-pack-reel-name">Azure pack</span><span class="support-pack-reel-copy">Azure virtual machines, resources, backup and cost management.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
+<a class="support-pack-reel-item" href="#support-pack-network" data-pack-reel-item="network"><span class="support-pack-reel-name">Network pack</span><span class="support-pack-reel-copy">Firewalls, switches, Wi-Fi, VPNs and connectivity management.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
+<a class="support-pack-reel-item" href="#support-pack-security" data-pack-reel-item="security"><span class="support-pack-reel-name">Security pack</span><span class="support-pack-reel-copy">Endpoint, identity, email and web security with active monitoring.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
+<a class="support-pack-reel-item" href="#support-pack-governance" data-pack-reel-item="governance"><span class="support-pack-reel-name">Governance &amp; compliance</span><span class="support-pack-reel-copy">Policies, documentation, audit evidence and insurer support.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
+<a class="support-pack-reel-item" href="#support-pack-ai" data-pack-reel-item="ai"><span class="support-pack-reel-name">AI pack</span><span class="support-pack-reel-copy">Safe AI adoption, platform setup, security and staff guidance.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
+<a class="support-pack-reel-item" href="#support-pack-cyber-essentials" data-pack-reel-item="cyber-essentials"><span class="support-pack-reel-name">Cyber Essentials</span><span class="support-pack-reel-copy">Readiness, remediation and preparation for certification.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
+<a class="support-pack-reel-item" href="#support-pack-strategy" data-pack-reel-item="strategy"><span class="support-pack-reel-name">Strategy pack</span><span class="support-pack-reel-copy">Technology roadmaps, budgeting, procurement and forward planning.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
+<a class="support-pack-reel-item" href="#support-pack-disaster-recovery" data-pack-reel-item="disaster-recovery"><span class="support-pack-reel-name">Disaster recovery</span><span class="support-pack-reel-copy">Documented recovery planning, testing and restore readiness.</span><span class="support-pack-reel-link">View pack <span aria-hidden="true">→</span></span></a>
 </div>
-<p class="support-pack-results-empty" data-pack-results-empty hidden>No add-ons suggested from these answers.</p>
-<p class="support-pack-results-note">Based only on the answers above. This is not a complete assessment or quote.</p>
-<div class="support-pack-results-actions">
-<button class="support-pack-finder-button support-pack-finder-button--back" type="button" data-pack-finder-review>Refine this</button>
-<button class="support-pack-finder-button support-pack-finder-button--next" type="button" data-cora-open data-packs-cora-chat>Cora · coming soon</button>
+<div class="support-packs-more" hidden>
+<button class="support-packs-more-btn" id="support-packs-more" type="button" aria-expanded="false"><span class="support-packs-more-action">View all add-ons <span aria-hidden="true">↓</span></span></button>
 </div>
-</section>
-</form>
-<div class="support-pack-catalogue-head" aria-labelledby="support-pack-catalogue-title">
+</aside>
+</div>
+
+<div class="support-pack-catalogue-head" aria-labelledby="support-pack-catalogue-title" hidden>
 <h3 id="support-pack-catalogue-title">All add-on packs</h3>
-<p>Prefer to browse? Every specialist pack is listed below.</p>
+<p>Choose any pack to see what it covers.</p>
 </div>
 <div class="support-catalogue-grid" id="support-packs-grid">
 <article class="support-extra-card support-card" id="support-pack-server" data-pack-card="server">
@@ -538,11 +414,6 @@
 <p class="support-pack-term"><strong>Additional infrastructure, recovery environments and major remediation work may be quoted separately.</strong></p>
 </div></details>
 </article>
-</div>
-<div class="support-packs-more" hidden>
-<button class="support-packs-more-btn" id="support-packs-more" type="button" aria-expanded="false">
-<span class="support-packs-more-action">Browse all 9 packs <span aria-hidden="true">↓</span></span>
-</button>
 </div>
 </section>
 

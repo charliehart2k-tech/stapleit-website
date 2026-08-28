@@ -207,18 +207,17 @@
 
 (() => {
   const packGrid = document.getElementById('support-packs-grid');
+  const catalogueHead = document.querySelector('.support-pack-catalogue-head');
   const moreWrap = document.querySelector('.support-packs-more');
   const moreButton = document.getElementById('support-packs-more');
   const packCards = packGrid ? [...packGrid.querySelectorAll('[data-pack-card]')] : [];
 
-  if (!packGrid || !moreWrap || !moreButton || !packCards.length) return;
+  if (!packGrid || !catalogueHead || !moreWrap || !moreButton || !packCards.length) return;
 
   moreButton.setAttribute('aria-controls', packGrid.id);
   moreButton.setAttribute('aria-expanded', 'false');
-
-  packCards.forEach(card => {
-    card.hidden = true;
-  });
+  packCards.forEach(card => { card.hidden = true; });
+  catalogueHead.hidden = true;
   moreWrap.hidden = false;
 
   const revealAllPacks = ({ focusFirst = false } = {}) => {
@@ -226,7 +225,7 @@
       card.hidden = false;
       if (card.classList.contains('motion-ready')) card.classList.add('motion-in');
     });
-
+    catalogueHead.hidden = false;
     moreButton.setAttribute('aria-expanded', 'true');
     moreWrap.hidden = true;
 
@@ -241,9 +240,17 @@
   moreButton.addEventListener('click', () => revealAllPacks({ focusFirst: true }));
 
   document.querySelectorAll('a[href^="#support-pack-"]').forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', event => {
       const target = document.querySelector(link.getAttribute('href'));
-      if (target instanceof HTMLElement && target.hidden) revealAllPacks();
+      if (!(target instanceof HTMLElement)) return;
+      if (target.hidden) revealAllPacks();
+
+      if (!link.matches('[data-pack-reel-item]')) return;
+      event.preventDefault();
+      window.requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        window.setTimeout(() => target.querySelector('summary')?.click(), 260);
+      });
     });
   });
 })();

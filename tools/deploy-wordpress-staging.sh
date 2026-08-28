@@ -274,7 +274,8 @@ grep -Fq 'Huntress endpoint protection' "$THEME/static-it-support.php"
 grep -Fq 'additional Microsoft licensing required to enable those features is charged separately' "$THEME/static-it-support.php"
 grep -Fq 'included licence quantities and service levels are confirmed in your written proposal' "$THEME/static-it-support.php"
 grep -Fq 'Every package includes day-to-day support and proactive management' "$THEME/static-it-support.php"
-grep -Fq 'data-pack-finder' "$THEME/static-it-support.php"
+grep -Fq 'data-pack-reel' "$THEME/static-it-support.php"
+grep -Fq 'Ask Cora which add-on fits' "$THEME/static-it-support.php"
 grep -Fq 'data-cora-open' "$THEME/static-it-support.php"
 grep -Fq 'supportPlannerQuestionIn' "$THEME/assets/css/it-support-extras.css"
 grep -Fq 'coraMessageIn' "$THEME/assets/css/cora.css"
@@ -343,7 +344,7 @@ grep -Fq 'source: it-support-responsive.css' "$THEME/assets/css/it-support.bundl
 grep -Fq 'source: it-support-packages.css' "$THEME/assets/css/it-support.bundle.css"
 grep -Fq 'source: it-support-packs-conversation.css' "$THEME/assets/css/it-support.bundle.css"
 grep -Fq 'id="support-pack-catalogue-title">All add-on packs</h3>' "$THEME/static-it-support.php"
-grep -Fq 'Browse all 9 packs' "$THEME/static-it-support.php"
+grep -Fq 'View all add-ons' "$THEME/static-it-support.php"
 grep -Fq '>View pack details</' "$THEME/static-it-support.php"
 for stale_copy in 'Have a quick chat with Cora' 'What made you stop here' 'Cora · start wherever feels closest' 'Browse the full catalogue' 'More specialist packs'; do
   if grep -Fq "$stale_copy" "$THEME/static-it-support.php"; then

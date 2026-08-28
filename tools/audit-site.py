@@ -499,7 +499,7 @@ def audit(root: Path) -> int:
                 if fragment in text:
                     errors.append(f"{rel}: retired package UI is still present: {fragment}")
 
-            expected_pack_finder_keys = {
+            expected_addon_keys = {
                 "server",
                 "azure",
                 "network",
@@ -510,49 +510,37 @@ def audit(root: Path) -> int:
                 "strategy",
                 "disaster-recovery",
             }
-            question_matches = re.findall(
-                r'<fieldset\b[^>]*\bdata-pack-question\b[^>]*\bdata-pack-key="([^"]+)"',
-                text,
-                re.I,
-            )
-            expected_question_keys = expected_pack_finder_keys | {"focus"}
-            if len(question_matches) != len(expected_question_keys) or set(question_matches) != expected_question_keys:
-                errors.append(
-                    f"{rel}: adaptive pack conversation must contain one focus gateway plus the nine add-on topics"
-                )
-            if len(re.findall(r'<fieldset\b[^>]*\bdata-pack-gateway\b', text, re.I)) != 1:
-                errors.append(f"{rel}: adaptive pack conversation requires exactly one gateway question")
-
-            pack_finder_patterns = {
-                "result": r'<article\b[^>]*\bdata-pack-result="([^"]+)"',
+            pack_showcase_patterns = {
+                "reel item": r'<a\b[^>]*\bdata-pack-reel-item="([^"]+)"',
                 "catalogue card": r'<article\b[^>]*\bdata-pack-card="([^"]+)"',
             }
-            for role, pattern in pack_finder_patterns.items():
+            for role, pattern in pack_showcase_patterns.items():
                 matches = re.findall(pattern, text, re.I)
-                if len(matches) != len(expected_pack_finder_keys) or set(matches) != expected_pack_finder_keys:
+                if len(matches) != len(expected_addon_keys) or set(matches) != expected_addon_keys:
                     errors.append(
-                        f"{rel}: pack finder {role} keys must map exactly to the nine add-on packs"
+                        f"{rel}: add-on {role} keys must map exactly to the nine add-on packs"
                     )
 
-            for retired_copy in ("Question 1 of 9", "nine quick questions"):
-                if retired_copy in text:
-                    errors.append(f"{rel}: fixed nine-question pack-finder copy is retired: {retired_copy}")
-            for required_marker in ("data-pack-finder-count", "data-pack-finder-suggest", "data-pack-gateway"):
+            required_addon_markers = (
+                'data-pack-reel',
+                'data-pack-reel-count',
+                'data-support-addon-planner',
+                'Ask Cora which add-on fits',
+                'View all add-ons',
+            )
+            for required_marker in required_addon_markers:
                 if required_marker not in text:
-                    errors.append(f"{rel}: adaptive Cora pack conversation marker is missing: {required_marker}")
+                    errors.append(f"{rel}: add-on showcase marker is missing: {required_marker}")
 
-            finder_start = text.find('<form class="support-pack-finder"')
-            finder_end = text.find("</form>", finder_start)
-            if finder_start < 0 or finder_end < 0:
-                errors.append(f"{rel}: guided add-on pack finder form is missing")
-            else:
-                finder_markup = text[finder_start:finder_end]
-                for answer in ("yes", "no", "unsure"):
-                    answer_count = finder_markup.count(f'value="{answer}"')
-                    if answer_count != len(expected_pack_finder_keys):
-                        errors.append(
-                            f"{rel}: pack finder requires one {answer!r} answer for every add-on topic"
-                        )
+            for retired_marker in (
+                'data-pack-finder',
+                'data-pack-question',
+                'data-pack-gateway',
+                'Quick fit check',
+                'Show suggestions now',
+            ):
+                if retired_marker in text:
+                    errors.append(f"{rel}: retired add-on questionnaire marker is still present: {retired_marker}")
 
         if parser.canonical and parser.canonical != expected_canonical(root, html):
             errors.append(f"{rel}: canonical mismatch; expected {expected_canonical(root, html)}")
