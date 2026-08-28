@@ -4366,9 +4366,9 @@ body.support-dialog-open{overflow:hidden}
   .support-pack-finder.motion-ready,
   .support-extra-card.motion-ready,
   .support-cta-panel.motion-ready{
-    opacity:1!important;
-    transform:none!important;
-    transition:none!important;
-    will-change:auto!important;
+    opacity:1;
+    transform:none;
+    transition:none;
+    will-change:auto;
   }
 }
