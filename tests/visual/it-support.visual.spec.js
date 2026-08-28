@@ -1,5 +1,23 @@
 const { test, expect } = require('@playwright/test');
 
+test.beforeEach(async ({ page }, testInfo) => {
+  if (testInfo.title === 'Cora is parked by default while the site is being finished') return;
+  await page.addInitScript(() => { window.STAPLEIT_CORA_ENABLED = true; });
+});
+
+test('Cora is parked by default while the site is being finished', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+  const trigger = page.getByRole('button', { name: 'Cora · Coming soon' });
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  const cora = page.getByRole('dialog', { name: 'Cora' });
+  await expect(cora).toBeVisible();
+  await expect(cora).toContainText('Coming soon');
+  await expect(cora).toContainText('finishing the new Staple IT website first');
+  await expect(cora.locator('textarea')).toHaveCount(0);
+  await expect(cora.getByRole('button', { name: 'Send' })).toHaveCount(0);
+});
+
 const viewports = [
   ['320x720', 320, 720],
   ['360x800', 360, 800],

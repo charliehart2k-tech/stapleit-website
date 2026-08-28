@@ -48,6 +48,89 @@
 (() => {
   if (document.querySelector('[data-cora]')) return;
 
+  if (window.STAPLEIT_CORA_ENABLED !== true) {
+    const e = (tag, className, text = '') => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text) node.textContent = text;
+      return node;
+    };
+
+    const root = e('aside', 'cora cora--paused');
+    root.dataset.cora = '';
+    root.setAttribute('aria-label', 'Cora — coming soon');
+
+    const panel = e('section', 'cora-panel');
+    panel.id = 'cora-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'false');
+    panel.setAttribute('aria-labelledby', 'cora-title');
+    panel.setAttribute('aria-hidden', 'true');
+    panel.inert = true;
+
+    const header = e('header', 'cora-header');
+    const orb = e('span', 'cora-orb cora-orb--header');
+    orb.setAttribute('aria-hidden', 'true');
+    const identity = e('div', 'cora-identity');
+    const title = e('strong', '', 'Cora');
+    title.id = 'cora-title';
+    const subtitle = e('span', '', 'Coming soon');
+    identity.append(title, subtitle);
+    const close = e('button', 'cora-close', '×');
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Close Cora');
+    header.append(orb, identity, close);
+
+    const messages = e('div', 'cora-messages');
+    messages.setAttribute('role', 'status');
+    messages.setAttribute('aria-live', 'polite');
+    messages.append(e('div', 'cora-message cora-message--assistant', 'Cora is coming soon. We’re finishing the new Staple IT website first, then we’ll bring her back online.'));
+
+    const toggle = e('button', 'cora-toggle');
+    toggle.type = 'button';
+    toggle.setAttribute('aria-controls', panel.id);
+    toggle.setAttribute('aria-expanded', 'false');
+    const toggleOrb = e('span', 'cora-orb cora-orb--toggle');
+    toggleOrb.setAttribute('aria-hidden', 'true');
+    const label = e('span', 'cora-toggle-label', 'Cora · Coming soon');
+    toggle.append(toggleOrb, label);
+
+    panel.append(header, messages);
+    root.append(panel, toggle);
+    document.body.append(root);
+
+    let previousFocus = null;
+    const setOpen = open => {
+      if (root.classList.contains('is-open') === open) return;
+      root.classList.toggle('is-open', open);
+      root.classList.toggle('is-closed', !open);
+      panel.setAttribute('aria-hidden', String(!open));
+      panel.inert = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) {
+        previousFocus = document.activeElement;
+        requestAnimationFrame(() => close.focus({ preventScroll: true }));
+      } else if (previousFocus instanceof HTMLElement) {
+        setTimeout(() => previousFocus?.focus({ preventScroll: true }), 260);
+        previousFocus = null;
+      }
+    };
+
+    root.classList.add('is-closed');
+    toggle.addEventListener('click', () => setOpen(!root.classList.contains('is-open')));
+    close.addEventListener('click', () => setOpen(false));
+    document.addEventListener('click', event => {
+      const trigger = event.target.closest('[data-cora-open]');
+      if (!trigger) return;
+      event.preventDefault();
+      setOpen(true);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && root.classList.contains('is-open')) setOpen(false);
+    });
+    return;
+  }
+
   const element = (tag, className, text = '') => {
     const node = document.createElement(tag);
     if (className) node.className = className;

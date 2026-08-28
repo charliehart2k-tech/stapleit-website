@@ -359,3 +359,21 @@
 @keyframes coraSuggestionIn{from{opacity:0;transform:translate3d(8px,0,0)}to{opacity:1;transform:none}}
 @keyframes coraThinking{0%,70%,100%{opacity:.28;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
 @keyframes coraSpin{to{transform:rotate(360deg)}}
+
+
+/* Parked Cora: keep the branded shell visible without exposing a chat composer. */
+.cora--paused .cora-panel{
+  height:auto;
+  min-height:240px;
+  max-height:min(360px,calc(100dvh - 32px));
+  grid-template-rows:auto auto;
+}
+.cora--paused .cora-messages{
+  overflow:visible;
+  padding:30px 24px 34px;
+}
+.cora--paused .cora-message{
+  max-width:100%;
+  margin:0;
+  font-size:1.02rem;
+}

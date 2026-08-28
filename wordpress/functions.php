@@ -11,6 +11,12 @@ require_once __DIR__ . '/cora-safety.php';
 require_once __DIR__ . '/cora-knowledge.php';
 require_once __DIR__ . '/cora-provider.php';
 
+/* Cora is intentionally parked while the website build is completed.
+ * Define STAPLEIT_CORA_PUBLIC_ENABLED as true in wp-config.php when it is ready to return. */
+if ( ! defined( 'STAPLEIT_CORA_PUBLIC_ENABLED' ) ) {
+    define( 'STAPLEIT_CORA_PUBLIC_ENABLED', false );
+}
+
 add_action( 'wp_enqueue_scripts', function () {
     if ( ! is_front_page() ) {
         return;
@@ -319,6 +325,9 @@ function stapleit_cora_history_from_request() {
 }
 
 function stapleit_handle_cora_chat_ajax() {
+    if ( ! STAPLEIT_CORA_PUBLIC_ENABLED ) {
+        wp_send_json( array( 'ok' => false, 'message' => 'Cora is coming soon.' ), 503 );
+    }
     $prompt = trim( sanitize_textarea_field( wp_unslash( (string) ( $_POST['prompt'] ?? '' ) ) ) );
     if ( strlen( $prompt ) < 2 || strlen( $prompt ) > 800 ) {
         wp_send_json( array( 'ok' => false, 'message' => 'Please use between 2 and 800 characters.' ), 400 );
