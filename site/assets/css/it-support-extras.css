@@ -351,7 +351,7 @@ body.support-dialog-open{overflow:hidden}
   color:var(--white);
   font-size:var(--type-card);
   line-height:1.12;
-  letter-spacing:-.014em;
+  letter-spacing:-.006em;
   overflow-wrap:break-word;
   text-wrap:balance;
 }
@@ -927,16 +927,16 @@ body.support-dialog-open{overflow:hidden}
 /* Release 4 — final services and closing chapter polish. */
 #support-services-grid{gap:14px}
 #support-services-grid .support-extra-card{
-  min-height:280px;
+  min-height:240px;
   padding:30px 28px 25px;
   border-radius:22px;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.06),
-    0 30px 84px color-mix(in srgb,var(--support-card-accent) 11%,transparent),
-    0 0 38px color-mix(in srgb,var(--support-card-accent) 5%,transparent),
+    0 26px 68px color-mix(in srgb,var(--support-card-accent) 7%,transparent),
+    0 0 30px color-mix(in srgb,var(--support-card-accent) 3%,transparent),
     0 22px 58px rgba(0,0,0,.36);
 }
-#support-services-grid .support-extra-card::before{opacity:.22}
+#support-services-grid .support-extra-card::before{opacity:.14}
 #support-services-grid .support-extra-card:nth-child(1){--support-card-accent:var(--blue-bright)}
 #support-services-grid .support-extra-card:nth-child(2){--support-card-accent:var(--solutions)}
 #support-services-grid .support-extra-card:nth-child(3){--support-card-accent:var(--support)}
@@ -958,39 +958,25 @@ body.support-dialog-open{overflow:hidden}
   }
 }
 
-.support-extras{padding-bottom:var(--space-7)}
+.support-extras{padding-block:clamp(4rem,4vw,4.75rem);border-top:1px solid rgba(255,255,255,.055)}
 .support-cta{
   position:relative;
   isolation:isolate;
-  padding-top:var(--space-6);
-  padding-bottom:var(--space-8);
+  padding-block:clamp(4rem,4vw,4.75rem);
+  border-top:1px solid rgba(255,255,255,.055);
 }
-.support-cta::before{
-  content:"";
-  position:absolute;
-  z-index:-1;
-  left:50%;
-  top:-130px;
-  width:100vw;
-  height:calc(100% + 130px);
-  transform:translateX(-50%);
-  pointer-events:none;
-  background:
-    radial-gradient(760px 360px at 46% 30%,rgba(79,133,255,.07),transparent 68%),
-    radial-gradient(700px 340px at 60% 42%,rgba(168,85,247,.055),transparent 70%),
-    radial-gradient(620px 300px at 52% 58%,rgba(34,197,94,.035),transparent 72%);
-}
+.support-cta::before{content:none}
 .support-cta-panel{
   border-color:rgba(255,255,255,.135);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.07),
     0 34px 96px rgba(0,0,0,.42),
-    0 0 64px rgba(79,133,255,.055),
-    0 0 48px rgba(168,85,247,.035);
+    0 0 52px rgba(79,133,255,.03),
+    0 0 40px rgba(168,85,247,.02);
 }
 
 @media(max-width:700px){
-  .support-extras{padding-bottom:36px}
+  .support-extras{padding-block:38px}
   #support-services-grid{gap:10px}
   #support-services-grid .support-extra-card{
     min-height:0;
@@ -1007,8 +993,7 @@ body.support-dialog-open{overflow:hidden}
   #support-services-grid .support-extra-details{padding-top:12px}
   #support-services-grid .support-extra-details summary{min-height:44px;padding:9px 13px;font-size:.84rem}
 
-  .support-cta{padding-top:28px;padding-bottom:52px}
-  .support-cta::before{top:-90px;height:calc(100% + 90px);background:radial-gradient(460px 280px at 50% 38%,rgba(79,133,255,.07),rgba(168,85,247,.035) 42%,transparent 72%)}
+  .support-cta{padding-block:48px}
   .support-cta-panel{padding:30px 18px;border-radius:20px}
   .support-cta-panel h2{font-size:clamp(1.9rem,8.6vw,2.3rem)}
   .support-cta-lead{margin-top:14px;font-size:1rem;line-height:1.55}

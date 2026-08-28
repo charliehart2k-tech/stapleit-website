@@ -523,7 +523,7 @@ def audit(root: Path) -> int:
 
             required_addon_markers = (
                 'data-pack-reel',
-                'data-pack-reel-count',
+                'support-pack-reel-features',
                 'data-support-addon-planner',
                 'Ask Cora which add-on fits',
                 'View all add-ons',
@@ -538,6 +538,8 @@ def audit(root: Path) -> int:
                 'data-pack-gateway',
                 'Quick fit check',
                 'Show suggestions now',
+                'Optional specialist cover',
+                'Available add-on packs',
             ):
                 if retired_marker in text:
                     errors.append(f"{rel}: retired add-on questionnaire marker is still present: {retired_marker}")

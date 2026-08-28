@@ -9,6 +9,14 @@ test('Cora is parked by default while the site is being finished', async ({ page
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
   const trigger = page.getByRole('button', { name: 'Cora · Coming soon' });
   await expect(trigger).toBeVisible();
+  const parkedPill = await page.evaluate(() => {
+    const toggle = document.querySelector('.cora-toggle').getBoundingClientRect();
+    const label = document.querySelector('.cora-toggle-label').getBoundingClientRect();
+    return { left: label.left - toggle.left, right: toggle.right - label.right, overflow: document.documentElement.scrollWidth - innerWidth };
+  });
+  expect(parkedPill.left).toBeGreaterThanOrEqual(28);
+  expect(parkedPill.right).toBeGreaterThanOrEqual(12);
+  expect(parkedPill.overflow).toBeLessThanOrEqual(0);
   await trigger.click();
   const cora = page.getByRole('dialog', { name: 'Cora' });
   await expect(cora).toBeVisible();
@@ -210,6 +218,46 @@ test('tablet chapter headings stay below hero scale', async ({ page }) => {
   }));
   expect(sizes.onboarding).toBeLessThanOrEqual(58);
   expect(sizes.packages).toBeLessThanOrEqual(58);
+});
+
+test('desktop typography, chapter rhythm and colour containment stay consistent', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  const state = await page.evaluate(() => {
+    const headingSelectors = ['#support-onboarding-title','#support-packages-title','#support-packs-title','#support-extras-title'];
+    const headings = headingSelectors.map(selector => {
+      const element = document.querySelector(selector);
+      const style = getComputedStyle(element);
+      return { font: Number.parseFloat(style.fontSize), tracking: Number.parseFloat(style.letterSpacing), line: Number.parseFloat(style.lineHeight) };
+    });
+    const sections = ['.support-packages','.support-packs','.support-extras','.support-cta'].map(selector => {
+      const element = document.querySelector(selector);
+      return { border: Number.parseFloat(getComputedStyle(element).borderTopWidth), top: element.getBoundingClientRect().top };
+    });
+    return {
+      headings,
+      sections,
+      onboardingBackground: getComputedStyle(document.querySelector('.support-onboarding')).backgroundImage,
+      ctaAmbient: getComputedStyle(document.querySelector('.support-cta'), '::before').content,
+      packAmbient: getComputedStyle(document.querySelector('.support-packs'), '::before').content,
+      overflow: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+
+  const fonts = state.headings.map(item => item.font);
+  expect(Math.max(...fonts) - Math.min(...fonts)).toBeLessThanOrEqual(1);
+  for (const heading of state.headings) {
+    expect(heading.font).toBeGreaterThanOrEqual(80);
+    expect(heading.font).toBeLessThanOrEqual(90);
+    expect(heading.tracking).toBeGreaterThanOrEqual(-1);
+    expect(heading.line / heading.font).toBeGreaterThanOrEqual(1.07);
+  }
+  expect(state.sections.every(section => section.border >= 1)).toBe(true);
+  expect(state.onboardingBackground).toBe('none');
+  expect(state.ctaAmbient).toBe('none');
+  expect(state.packAmbient).toBe('none');
+  expect(state.overflow).toBeLessThanOrEqual(0);
 });
 
 test('Cora does not expose backend mode labels to visitors', async ({ page }) => {
@@ -458,7 +506,8 @@ test('package discovery is visually led by Cora and tier glows stay visible', as
     expect(state.triggerRatio).toBeGreaterThanOrEqual(.99);
     expect(state.triggerHeight).toBeGreaterThanOrEqual(width <= 700 ? 72 : 88);
     expect(state.orbVisible).toBe(true);
-    expect(Math.min(...state.cardGlowOpacity)).toBeGreaterThanOrEqual(.28);
+    expect(Math.min(...state.cardGlowOpacity)).toBeGreaterThanOrEqual(.15);
+    expect(Math.max(...state.cardGlowOpacity)).toBeLessThanOrEqual(.20);
     expect(state.cardShadows.every(shadow => shadow !== 'none')).toBe(true);
     expect(state.taglines).toBe(0);
     expect(state.badges).toBe(0);
@@ -624,102 +673,105 @@ test('mobile Cora tracks a keyboard-resized viewport and keeps the composer visi
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
-test('Add-on showcase stays compact, colourful and Cora-ready', async ({ page }) => {
+test('Add-on showcase matches the package chapter and keeps the active card readable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
 
   const section = page.locator('.support-packs');
-  const reel = page.locator('[data-pack-reel]');
-  const counter = page.locator('[data-pack-reel-count]');
-
+  const reel = section.locator('[data-pack-reel]');
   await expect(section).toBeVisible();
   await expect(section.getByRole('heading', { level: 2 })).toContainText('Add-ons');
   await expect(section.getByText('We offer a variety of add-on packs')).toBeVisible();
-  await expect(section.getByRole('button', { name: 'Ask Cora which add-on fits' })).toBeVisible();
-  await expect(section.locator('[data-pack-finder]')).toHaveCount(0);
+  await expect(section.locator('.support-packs-eyebrow')).toHaveCount(0);
+  await expect(section.locator('[data-pack-reel-count]')).toHaveCount(0);
+  await expect(section.getByText('Available add-on packs')).toHaveCount(0);
   await expect(reel.locator('[data-pack-reel-item]')).toHaveCount(9);
   await expect(reel.locator('[data-pack-reel-item].is-active')).toHaveCount(1);
   await expect(reel.locator('[data-pack-reel-item].is-prev')).toHaveCount(1);
   await expect(reel.locator('[data-pack-reel-item].is-next')).toHaveCount(1);
   await expect(reel.locator('[data-pack-reel-item][aria-hidden="false"]')).toHaveCount(3);
-  await expect(counter).toHaveText('01 / 09');
+  await expect(reel.locator('[data-pack-reel-item].is-active .support-pack-reel-features span')).toHaveCount(3);
   await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(0);
   await expect(section.getByRole('button', { name: 'View all add-ons' })).toBeVisible();
 
+  const before = await reel.locator('[data-pack-reel-item].is-active').getAttribute('data-pack-reel-item');
   const state = await page.evaluate(() => {
     const section = document.querySelector('.support-packs');
     const reelShell = document.querySelector('.support-pack-reel-shell');
-    const items = [...document.querySelectorAll('[data-pack-reel-item]')];
+    const active = document.querySelector('[data-pack-reel-item].is-active');
+    const name = active.querySelector('.support-pack-reel-name');
+    const copy = active.querySelector('.support-pack-reel-copy');
     return {
-      sectionHeight: section?.getBoundingClientRect().height || 0,
-      reelHeight: reelShell?.getBoundingClientRect().height || 0,
-      accents: items.map(item => getComputedStyle(item).getPropertyValue('--pack-accent').trim()),
+      sectionHeight: section.getBoundingClientRect().height,
+      reelHeight: reelShell.getBoundingClientRect().height,
+      titleSize: Number.parseFloat(getComputedStyle(name).fontSize),
+      copySize: Number.parseFloat(getComputedStyle(copy).fontSize),
+      auraWidth: Number.parseFloat(getComputedStyle(reelShell, '::before').width),
+      sectionBackground: getComputedStyle(section).backgroundImage,
+      sectionAmbient: getComputedStyle(section, '::before').content,
       overflow: document.documentElement.scrollWidth - innerWidth
     };
   });
-  expect(state.sectionHeight).toBeLessThanOrEqual(900);
-  expect(state.reelHeight).toBeLessThanOrEqual(300);
-  expect(new Set(state.accents).size).toBeGreaterThanOrEqual(7);
+  expect(state.sectionHeight).toBeLessThanOrEqual(980);
+  expect(state.reelHeight).toBeLessThanOrEqual(330);
+  expect(state.titleSize).toBeGreaterThanOrEqual(28);
+  expect(state.copySize).toBeGreaterThanOrEqual(15);
+  expect(state.auraWidth).toBeLessThan(390);
+  expect(state.sectionBackground).toBe('none');
+  expect(state.sectionAmbient).toBe('none');
   expect(state.overflow).toBeLessThanOrEqual(0);
 
-  await page.waitForTimeout(3200);
-  await expect(counter).not.toHaveText('01 / 09');
-  await expect(reel.locator('[data-pack-reel-item].is-active')).toHaveCount(1);
-  await expect(reel.locator('[data-pack-reel-item].is-prev')).toHaveCount(1);
-  await expect(reel.locator('[data-pack-reel-item].is-next')).toHaveCount(1);
+  await page.waitForTimeout(3900);
+  const after = await reel.locator('[data-pack-reel-item].is-active').getAttribute('data-pack-reel-item');
+  expect(after).not.toBe(before);
 });
 
 
-test('desktop add-on chapter stays inside the established visual gates', async ({ page }) => {
+test('desktop add-on chapter uses the same typography and Cora geometry as packages', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
 
   const geometry = await page.evaluate(() => {
     const rect = selector => document.querySelector(selector).getBoundingClientRect();
-    const packsEl = document.querySelector('.support-packs');
-    const packs = packsEl.getBoundingClientRect();
+    const style = selector => getComputedStyle(document.querySelector(selector));
+    const packs = rect('.support-packs');
     const packages = rect('.support-packages');
-    const intro = rect('.support-packs-intro');
-    const heading = document.querySelector('#support-packs-title');
-    const reel = rect('.support-pack-reel-shell');
-    const cora = rect('.support-pack-cora-trigger');
-    const extrasHeading = rect('#support-extras-title');
+    const packHeading = style('#support-packages-title');
+    const addonHeading = style('#support-packs-title');
+    const packageCora = rect('.support-packages .support-package-cora-trigger');
+    const addonCora = rect('.support-packs .support-package-cora-trigger');
+    const active = document.querySelector('[data-pack-reel-item].is-active');
     return {
       leftDelta: Math.abs(packs.left - packages.left),
       rightDelta: Math.abs(packs.right - packages.right),
       sectionHeight: packs.height,
-      headingSize: Number.parseFloat(getComputedStyle(heading).fontSize),
-      headingHeight: heading.getBoundingClientRect().height,
-      reelWidth: reel.width,
-      reelHeight: reel.height,
-      coraWidth: cora.width,
-      coraHeight: cora.height,
-      contentToNextHeading: extrasHeading.top - intro.bottom,
-      nextSectionBorder: getComputedStyle(document.querySelector('.support-extras')).borderTopWidth,
-      sectionOverflow: getComputedStyle(packsEl).overflow,
-      sectionAmbientContent: getComputedStyle(packsEl, '::before').content,
-      deckAuraWidth: Number.parseFloat(getComputedStyle(document.querySelector('.support-pack-reel-shell'), '::before').width),
-      deckAuraMask: getComputedStyle(document.querySelector('.support-pack-reel-shell'), '::before').maskImage || getComputedStyle(document.querySelector('.support-pack-reel-shell'), '::before').webkitMaskImage,
+      headingSizeDelta: Math.abs(Number.parseFloat(packHeading.fontSize) - Number.parseFloat(addonHeading.fontSize)),
+      headingTrackingDelta: Math.abs(Number.parseFloat(packHeading.letterSpacing) - Number.parseFloat(addonHeading.letterSpacing)),
+      coraWidthDelta: Math.abs(packageCora.width - addonCora.width),
+      coraHeightDelta: Math.abs(packageCora.height - addonCora.height),
+      activeTitle: Number.parseFloat(getComputedStyle(active.querySelector('.support-pack-reel-name')).fontSize),
+      activeCopy: Number.parseFloat(getComputedStyle(active.querySelector('.support-pack-reel-copy')).fontSize),
+      features: active.querySelectorAll('.support-pack-reel-features span').length,
+      eyebrow: document.querySelectorAll('.support-packs-eyebrow').length,
+      counter: document.querySelectorAll('[data-pack-reel-count]').length,
+      nextSectionBorder: Number.parseFloat(style('.support-extras').borderTopWidth),
       overflow: document.documentElement.scrollWidth - innerWidth
     };
   });
 
   expect(geometry.leftDelta).toBeLessThanOrEqual(1);
   expect(geometry.rightDelta).toBeLessThanOrEqual(1);
-  expect(geometry.sectionHeight).toBeLessThanOrEqual(720);
-  expect(geometry.headingSize).toBeLessThanOrEqual(64.5);
-  expect(geometry.headingHeight).toBeLessThanOrEqual(145);
-  expect(geometry.reelWidth).toBeGreaterThanOrEqual(1100);
-  expect(geometry.reelHeight).toBeLessThanOrEqual(300);
-  expect(geometry.coraWidth).toBeLessThanOrEqual(320);
-  expect(geometry.coraHeight).toBeLessThanOrEqual(50);
-  expect(geometry.contentToNextHeading).toBeGreaterThanOrEqual(150);
-  expect(Number.parseFloat(geometry.nextSectionBorder)).toBeGreaterThan(0);
-  expect(geometry.sectionOverflow).toBe('visible');
-  expect(geometry.sectionAmbientContent).toBe('none');
-  expect(geometry.deckAuraWidth).toBeLessThanOrEqual(1000);
-  expect(geometry.deckAuraWidth).toBeGreaterThanOrEqual(700);
-  expect(geometry.deckAuraMask).not.toBe('none');
+  expect(geometry.sectionHeight).toBeLessThanOrEqual(940);
+  expect(geometry.headingSizeDelta).toBeLessThanOrEqual(.5);
+  expect(geometry.headingTrackingDelta).toBeLessThanOrEqual(.1);
+  expect(geometry.coraWidthDelta).toBeLessThanOrEqual(1);
+  expect(geometry.coraHeightDelta).toBeLessThanOrEqual(1);
+  expect(geometry.activeTitle).toBeGreaterThanOrEqual(40);
+  expect(geometry.activeCopy).toBeGreaterThanOrEqual(16);
+  expect(geometry.features).toBe(3);
+  expect(geometry.eyebrow).toBe(0);
+  expect(geometry.counter).toBe(0);
+  expect(geometry.nextSectionBorder).toBeGreaterThanOrEqual(1);
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
@@ -927,7 +979,7 @@ test('touch-opened dialogs do not leave package cards glowing and use the mobile
   await page.getByRole('button', { name: 'Close' }).click();
   await expect(dialog).toBeHidden();
   await expect.poll(async () => card.evaluate(element => getComputedStyle(element).transform)).toBe('none');
-  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeGreaterThanOrEqual(0.28);
-  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeLessThanOrEqual(0.31);
+  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeGreaterThanOrEqual(0.15);
+  await expect.poll(async () => card.evaluate(element => Number.parseFloat(getComputedStyle(element, '::before').opacity))).toBeLessThanOrEqual(0.20);
   await context.close();
 });

@@ -491,7 +491,9 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
 }
 
 .cora-toggle{
-  min-width:152px;
+  width:max-content;
+  min-width:0;
+  max-width:calc(100vw - 32px);
   min-height:54px;
   display:flex;
   align-items:center;
@@ -509,6 +511,8 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   transform-origin:100% 100%;
   transition:opacity 260ms ease,transform 460ms var(--cora-ease),visibility 0s linear 0s,box-shadow 360ms ease;
 }
+
+.cora-toggle-label{display:block;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .cora-toggle::after{
   content:"";

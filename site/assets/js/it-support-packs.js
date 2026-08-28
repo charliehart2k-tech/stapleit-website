@@ -1,9 +1,8 @@
 /* Horizontal add-on card deck. */
 (() => {
   const reel = document.querySelector('[data-pack-reel]');
-  const count = document.querySelector('[data-pack-reel-count]');
   const items = reel ? [...reel.querySelectorAll('[data-pack-reel-item]')] : [];
-  if (!reel || !count || items.length < 3) return;
+  if (!reel || items.length < 3) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let activeIndex = Math.max(0, items.findIndex(item => item.classList.contains('is-active')));
@@ -26,9 +25,9 @@
       item.classList.toggle('is-next', nextItem);
       const visible = active || prev || nextItem;
       item.setAttribute('aria-hidden', visible ? 'false' : 'true');
+      if (active) item.setAttribute('aria-current', 'true'); else item.removeAttribute('aria-current');
       item.tabIndex = visible ? 0 : -1;
     });
-    count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(items.length).padStart(2, '0')}`;
   };
 
   const stop = () => {
