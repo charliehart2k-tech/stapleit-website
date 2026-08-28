@@ -86,7 +86,7 @@ def clean_blocks(blocks:list[str])->list[str]:
     seen=set(); out=[]
     boilerplate={
         'Home','IT Services','About Us','Get in touch','Remote Support','The Staple Blog',
-        'Client Portal','Privacy Policy','Legal','Who We Support','Our Partners'
+        'Client Portal','Privacy Policy','Legal','Who We Support','Our Partners','Cookie icon'
     }
     for block in blocks:
         raw=re.sub(r'^#{1,3}\s+|^-\s+','',block).strip()
@@ -115,7 +115,9 @@ def main()->int:
         digest=hashlib.sha256(body.encode()).hexdigest()
         cls=source_class(url)
         first_h1=next((b[2:].strip() for b in blocks if b.startswith('# ')), '')
-        title=first_h1 or parser.title or url
+        first_heading=next((re.sub(r'^#{1,3}\s+','',b).strip() for b in blocks if re.match(r'^#{1,3}\s+',b)), '')
+        html_title='' if parser.title.strip().casefold()=='cookie icon' else parser.title
+        title=first_h1 or first_heading or html_title or url
         sections.append(f'---\nSOURCE URL: {url}\nSOURCE CLASS: {cls}\nPAGE TITLE: {title}\nCONTENT SHA256: {digest}\n---\n\n{body}\n')
         manifest.append((url,cls,title,digest,str(len(body))))
     header=(

@@ -1,14 +1,14 @@
 url	source_class	title	sha256	chars
-https://www.stapleit.co.uk/the-staple-blog/welcome-to-the-the-staple-blog/	supplementary-blog	Cookie icon	36286aea6a661a686283c301842ed7d2a3ce4e88b2967fb95d50a15c4f05a356	2154
-https://www.stapleit.co.uk/the-staple-blog/what-on-earth-is-cyber-essentials/	supplementary-blog	Cookie icon	07a2bb642653d2e0bb7c0429a66ebfb9112f7161edd02eda1625c21fc03838b8	2677
-https://www.stapleit.co.uk/the-staple-blog/why-would-i-need-an-it-support-provider/	supplementary-blog	Cookie icon	db2df8880cc641b83ffe7bbf3bff5ead5b0a58845c397d6de13cae187f449aa2	2621
-https://www.stapleit.co.uk/the-staple-blog/is-your-business-overpaying-for-licensing/	supplementary-blog	Cookie icon	b8b77ec0e8532eed3d2b4162629e666559aaf3720a97cf78cb3e7757af991e0b	1541
-https://www.stapleit.co.uk/the-staple-blog/what-is-microsoft-secure-score/	supplementary-blog	Cookie icon	a496522fb27b2b7e581ea2de2bdbcbfbbe3fc6baf1b56723923e77dddeee29ba	1272
+https://www.stapleit.co.uk/the-staple-blog/welcome-to-the-the-staple-blog/	supplementary-blog	Welcome to the The Staple Blog!	36286aea6a661a686283c301842ed7d2a3ce4e88b2967fb95d50a15c4f05a356	2154
+https://www.stapleit.co.uk/the-staple-blog/what-on-earth-is-cyber-essentials/	supplementary-blog	What on earth is Cyber Essentials?	07a2bb642653d2e0bb7c0429a66ebfb9112f7161edd02eda1625c21fc03838b8	2677
+https://www.stapleit.co.uk/the-staple-blog/why-would-i-need-an-it-support-provider/	supplementary-blog	Why would I need an IT support provider?	db2df8880cc641b83ffe7bbf3bff5ead5b0a58845c397d6de13cae187f449aa2	2621
+https://www.stapleit.co.uk/the-staple-blog/is-your-business-overpaying-for-licensing/	supplementary-blog	Is Your Business Overpaying for Licensing?	b8b77ec0e8532eed3d2b4162629e666559aaf3720a97cf78cb3e7757af991e0b	1541
+https://www.stapleit.co.uk/the-staple-blog/what-is-microsoft-secure-score/	supplementary-blog	What is Microsoft Secure Score?	a496522fb27b2b7e581ea2de2bdbcbfbbe3fc6baf1b56723923e77dddeee29ba	1272
 https://www.stapleit.co.uk/	canonical-service	Welcome to Staple IT	27763a5a3817619995a9d8a73108c1bce23448f0af358f73e803dbade1835373	5844
 https://www.stapleit.co.uk/about-us/	canonical-company	About Staple IT	9193eb767c75b5408bbc159f70bac99f6f11418c397fefae9c325799780405cc	887
-https://www.stapleit.co.uk/about-us/legal/	canonical-company	Cookie icon	c4ac368d5ccb011da8c11c57ff9449eb576e9de52d0ade2498edbf002ea2e589	5409
-https://www.stapleit.co.uk/about-us/our-partners/	canonical-company	Cookie icon	2b0c11f616f669b803b764e4681cb06a43c6ddf7588a2a7d1199f80b562e1744	2610
-https://www.stapleit.co.uk/about-us/privacy-policy/	canonical-company	Cookie icon	1523aa8e0bd1968ac08285054d902563fe6b29c4cbdaacef588750e1aef50d53	7871
+https://www.stapleit.co.uk/about-us/legal/	canonical-company	Let's get Legal!	c4ac368d5ccb011da8c11c57ff9449eb576e9de52d0ade2498edbf002ea2e589	5409
+https://www.stapleit.co.uk/about-us/our-partners/	canonical-company	The partners behind Staple IT.	2b0c11f616f669b803b764e4681cb06a43c6ddf7588a2a7d1199f80b562e1744	2610
+https://www.stapleit.co.uk/about-us/privacy-policy/	canonical-company	Grab a coffee, its the privacy policy!	1523aa8e0bd1968ac08285054d902563fe6b29c4cbdaacef588750e1aef50d53	7871
 https://www.stapleit.co.uk/about-us/who-we-support/	canonical-company	Click each card to find out more.	9dc79278d6e394dcd6e76d33f7f89800d5c97e488d705c96deb645c1bb02179d	772
 https://www.stapleit.co.uk/get-in-touch/	canonical-contact	Let's get talking!	0eb38a01ce4fca1affa0e7d7645cc90261dfd82ca6cfcdd36fbc97dd122e84eb	479
 https://www.stapleit.co.uk/get-in-touch/it-audit/	canonical-contact	Did someone say free?	78f2cf13ee8ca756fbece8eaf1c92c216f389522bf7e66f04abb437fd049a018	809
@@ -19,4 +19,4 @@ https://www.stapleit.co.uk/it-services/it-consultancy/	canonical-service	Expert 
 https://www.stapleit.co.uk/it-services/it-solutions/	canonical-service	Solutions built around your business.	95f10888c1e4223b2a9e7fa622038ee98956b4116512fe5227f2c098465ee5ba	2812
 https://www.stapleit.co.uk/it-services/it-support/	canonical-service	IT support that keeps your business moving.	e4e7b894a36102681df49bfd3fa41ced51d2b07838c5c2a822876d1c97cde7ce	5528
 https://www.stapleit.co.uk/remote-support/	public-site	Help is on the way, dear!	0ab57d6cbf5eaef2072896a7667c300f80ca2450c691c0a5b9cf6e5aae01817c	274
-https://www.stapleit.co.uk/the-staple-blog/	public-site	Cookie icon	c9a521c9d104d77df855c9e189a8d88a0e271e92916531fe02a9373d21b2db83	1468
+https://www.stapleit.co.uk/the-staple-blog/	public-site	What is Microsoft Secure Score?	c9a521c9d104d77df855c9e189a8d88a0e271e92916531fe02a9373d21b2db83	1468

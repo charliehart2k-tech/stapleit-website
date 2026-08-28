@@ -7,7 +7,7 @@ Runtime package/pricing/safety rules remain authoritative if a website snapshot 
 ---
 SOURCE URL: https://www.stapleit.co.uk/the-staple-blog/welcome-to-the-the-staple-blog/
 SOURCE CLASS: supplementary-blog
-PAGE TITLE: Cookie icon
+PAGE TITLE: Welcome to the The Staple Blog!
 CONTENT SHA256: 36286aea6a661a686283c301842ed7d2a3ce4e88b2967fb95d50a15c4f05a356
 ---
 
@@ -34,7 +34,7 @@ It's a tough question when you're balancing running a small business with giving
 ---
 SOURCE URL: https://www.stapleit.co.uk/the-staple-blog/what-on-earth-is-cyber-essentials/
 SOURCE CLASS: supplementary-blog
-PAGE TITLE: Cookie icon
+PAGE TITLE: What on earth is Cyber Essentials?
 CONTENT SHA256: 07a2bb642653d2e0bb7c0429a66ebfb9112f7161edd02eda1625c21fc03838b8
 ---
 
@@ -75,7 +75,7 @@ If you'd like to find out more or get started, get in touch with us today for a 
 ---
 SOURCE URL: https://www.stapleit.co.uk/the-staple-blog/why-would-i-need-an-it-support-provider/
 SOURCE CLASS: supplementary-blog
-PAGE TITLE: Cookie icon
+PAGE TITLE: Why would I need an IT support provider?
 CONTENT SHA256: db2df8880cc641b83ffe7bbf3bff5ead5b0a58845c397d6de13cae187f449aa2
 ---
 
@@ -112,7 +112,7 @@ Book a free IT audit with us. We'll take a look at your current setup, give you 
 ---
 SOURCE URL: https://www.stapleit.co.uk/the-staple-blog/is-your-business-overpaying-for-licensing/
 SOURCE CLASS: supplementary-blog
-PAGE TITLE: Cookie icon
+PAGE TITLE: Is Your Business Overpaying for Licensing?
 CONTENT SHA256: b8b77ec0e8532eed3d2b4162629e666559aaf3720a97cf78cb3e7757af991e0b
 ---
 
@@ -131,7 +131,7 @@ These are all really good places to start, but ultimately a thorough audit never
 ---
 SOURCE URL: https://www.stapleit.co.uk/the-staple-blog/what-is-microsoft-secure-score/
 SOURCE CLASS: supplementary-blog
-PAGE TITLE: Cookie icon
+PAGE TITLE: What is Microsoft Secure Score?
 CONTENT SHA256: a496522fb27b2b7e581ea2de2bdbcbfbbe3fc6baf1b56723923e77dddeee29ba
 ---
 
@@ -288,7 +288,7 @@ If you would like to chat with us and find out more about who we are, click the 
 ---
 SOURCE URL: https://www.stapleit.co.uk/about-us/legal/
 SOURCE CLASS: canonical-company
-PAGE TITLE: Cookie icon
+PAGE TITLE: Let's get Legal!
 CONTENT SHA256: c4ac368d5ccb011da8c11c57ff9449eb576e9de52d0ade2498edbf002ea2e589
 ---
 
@@ -365,7 +365,7 @@ These terms of use and any dispute or claim arising out of or in connection with
 ---
 SOURCE URL: https://www.stapleit.co.uk/about-us/our-partners/
 SOURCE CLASS: canonical-company
-PAGE TITLE: Cookie icon
+PAGE TITLE: The partners behind Staple IT.
 CONTENT SHA256: 2b0c11f616f669b803b764e4681cb06a43c6ddf7588a2a7d1199f80b562e1744
 ---
 
@@ -422,7 +422,7 @@ We couldn't be happier with our partners and the support they provide us with ev
 ---
 SOURCE URL: https://www.stapleit.co.uk/about-us/privacy-policy/
 SOURCE CLASS: canonical-company
-PAGE TITLE: Cookie icon
+PAGE TITLE: Grab a coffee, its the privacy policy!
 CONTENT SHA256: 1523aa8e0bd1968ac08285054d902563fe6b29c4cbdaacef588750e1aef50d53
 ---
 
@@ -985,7 +985,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla euismod condiment
 ---
 SOURCE URL: https://www.stapleit.co.uk/the-staple-blog/
 SOURCE CLASS: public-site
-PAGE TITLE: Cookie icon
+PAGE TITLE: What is Microsoft Secure Score?
 CONTENT SHA256: c9a521c9d104d77df855c9e189a8d88a0e271e92916531fe02a9373d21b2db83
 ---
 
