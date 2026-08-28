@@ -697,8 +697,9 @@ test('desktop add-on chapter stays inside the established visual gates', async (
       contentToNextHeading: extrasHeading.top - intro.bottom,
       nextSectionBorder: getComputedStyle(document.querySelector('.support-extras')).borderTopWidth,
       sectionOverflow: getComputedStyle(packsEl).overflow,
-      ambientWidth: Number.parseFloat(getComputedStyle(packsEl, '::before').width),
-      ambientMask: getComputedStyle(packsEl, '::before').maskImage || getComputedStyle(packsEl, '::before').webkitMaskImage,
+      sectionAmbientContent: getComputedStyle(packsEl, '::before').content,
+      deckAuraWidth: Number.parseFloat(getComputedStyle(document.querySelector('.support-pack-reel-shell'), '::before').width),
+      deckAuraMask: getComputedStyle(document.querySelector('.support-pack-reel-shell'), '::before').maskImage || getComputedStyle(document.querySelector('.support-pack-reel-shell'), '::before').webkitMaskImage,
       overflow: document.documentElement.scrollWidth - innerWidth
     };
   });
@@ -715,8 +716,10 @@ test('desktop add-on chapter stays inside the established visual gates', async (
   expect(geometry.contentToNextHeading).toBeGreaterThanOrEqual(150);
   expect(Number.parseFloat(geometry.nextSectionBorder)).toBeGreaterThan(0);
   expect(geometry.sectionOverflow).toBe('visible');
-  expect(geometry.ambientWidth).toBeGreaterThanOrEqual(1900);
-  expect(geometry.ambientMask).not.toBe('none');
+  expect(geometry.sectionAmbientContent).toBe('none');
+  expect(geometry.deckAuraWidth).toBeLessThanOrEqual(1000);
+  expect(geometry.deckAuraWidth).toBeGreaterThanOrEqual(700);
+  expect(geometry.deckAuraMask).not.toBe('none');
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 

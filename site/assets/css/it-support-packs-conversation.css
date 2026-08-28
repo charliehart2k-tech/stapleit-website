@@ -7,29 +7,7 @@
   padding-bottom:clamp(4.25rem,5vw,4.75rem);
 }
 .support-packs::before,
-.support-packs::after{
-  content:"";
-  position:absolute;
-  z-index:-1;
-  left:50%;
-  width:100vw;
-  pointer-events:none;
-  transform:translateX(-50%);
-  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%);
-  mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%);
-}
-.support-packs::before{
-  top:-8%;
-  bottom:-8%;
-  background:
-    radial-gradient(ellipse 38% 58% at 22% 48%,rgba(79,133,255,.10),transparent 72%),
-    radial-gradient(ellipse 38% 56% at 78% 54%,rgba(168,85,247,.085),transparent 72%);
-}
-.support-packs::after{
-  bottom:-10%;
-  height:46%;
-  background:radial-gradient(ellipse 44% 100% at 50% 100%,rgba(95,85,210,.055),transparent 74%);
-}
+.support-packs::after{content:none}
 
 .support-packs-intro{display:grid;gap:clamp(1.45rem,2vw,2rem)}
 .support-packs-copy{
@@ -108,6 +86,26 @@
   min-width:0;
   padding:0;
   overflow:visible;
+  isolation:isolate;
+}
+.support-pack-reel-shell::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:50%;
+  top:50%;
+  width:min(86%,980px);
+  height:150%;
+  pointer-events:none;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 38% 50%,rgba(79,133,255,.20) 0%,rgba(79,133,255,.075) 31%,transparent 70%),
+    radial-gradient(ellipse at 66% 52%,rgba(168,85,247,.16) 0%,rgba(168,85,247,.055) 32%,transparent 72%);
+  -webkit-mask-image:radial-gradient(ellipse 72% 74% at 50% 50%,#000 0 38%,rgba(0,0,0,.72) 55%,rgba(0,0,0,.20) 75%,transparent 100%);
+  mask-image:radial-gradient(ellipse 72% 74% at 50% 50%,#000 0 38%,rgba(0,0,0,.72) 55%,rgba(0,0,0,.20) 75%,transparent 100%);
+  filter:blur(54px) saturate(116%);
+  opacity:.34;
+  transform:translate(-50%,-50%);
 }
 .support-pack-reel-head{
   display:flex;
