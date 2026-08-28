@@ -676,7 +676,8 @@ test('desktop add-on chapter stays inside the established visual gates', async (
 
   const geometry = await page.evaluate(() => {
     const rect = selector => document.querySelector(selector).getBoundingClientRect();
-    const packs = rect('.support-packs');
+    const packsEl = document.querySelector('.support-packs');
+    const packs = packsEl.getBoundingClientRect();
     const packages = rect('.support-packages');
     const intro = rect('.support-packs-intro');
     const heading = document.querySelector('#support-packs-title');
@@ -695,6 +696,9 @@ test('desktop add-on chapter stays inside the established visual gates', async (
       coraHeight: cora.height,
       contentToNextHeading: extrasHeading.top - intro.bottom,
       nextSectionBorder: getComputedStyle(document.querySelector('.support-extras')).borderTopWidth,
+      sectionOverflow: getComputedStyle(packsEl).overflow,
+      ambientWidth: Number.parseFloat(getComputedStyle(packsEl, '::before').width),
+      ambientMask: getComputedStyle(packsEl, '::before').maskImage || getComputedStyle(packsEl, '::before').webkitMaskImage,
       overflow: document.documentElement.scrollWidth - innerWidth
     };
   });
@@ -710,6 +714,9 @@ test('desktop add-on chapter stays inside the established visual gates', async (
   expect(geometry.coraHeight).toBeLessThanOrEqual(50);
   expect(geometry.contentToNextHeading).toBeGreaterThanOrEqual(150);
   expect(Number.parseFloat(geometry.nextSectionBorder)).toBeGreaterThan(0);
+  expect(geometry.sectionOverflow).toBe('visible');
+  expect(geometry.ambientWidth).toBeGreaterThanOrEqual(1900);
+  expect(geometry.ambientMask).not.toBe('none');
   expect(geometry.overflow).toBeLessThanOrEqual(0);
 });
 
