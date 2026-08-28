@@ -179,7 +179,7 @@ test('mobile top chapters keep deliberate rhythm and standard inclusions progres
 
   expect(initial.heroHeight).toBeLessThan(1120);
   expect(initial.standardHeight).toBeLessThan(680);
-  expect(initial.onboardingHeight).toBeLessThanOrEqual(1005);
+  expect(initial.onboardingHeight).toBeLessThanOrEqual(1100);
   expect(initial.separation).toBeGreaterThanOrEqual(12);
   expect(initial.packageHeadingSize).toBeLessThanOrEqual(40);
   expect(initial.visibleItems).toBe(8);
@@ -206,6 +206,43 @@ test('mobile onboarding progress follows the reading position without generic re
   for (const step of [1, 2, 3]) {
     await onboarding.locator(`.support-step-card[data-step="${step}"]`).evaluate(element => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
     await expect(onboarding).toHaveAttribute('data-progress', String(step));
+  }
+});
+
+test('mobile chapters keep breathing room between headings, controls and cards', async ({ page }) => {
+  for (const [width, height] of [[320, 720], [390, 844], [430, 932]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+    const state = await page.evaluate(() => {
+      const rect = selector => document.querySelector(selector).getBoundingClientRect();
+      const style = selector => getComputedStyle(document.querySelector(selector));
+      const heading = style('#support-packages-title');
+      return {
+        gaps: {
+          onboarding: rect('.support-step-grid').top - rect('.support-onboarding .support-section-heading').bottom,
+          packageHeadingToCora: rect('.support-packages .support-package-cora').top - rect('.support-packages .support-section-heading').bottom,
+          packageCoraToCards: rect('[data-package-grid]').top - rect('.support-packages .support-package-cora').bottom,
+          addonHeadingToCora: rect('.support-packs .support-package-cora').top - rect('.support-packs-heading').bottom,
+          addonCoraToReel: rect('.support-pack-reel-shell').top - rect('.support-packs .support-package-cora').bottom,
+          extrasHeadingToCards: rect('#support-services-grid').top - rect('.support-extras .support-section-heading').bottom
+        },
+        cardGaps: {
+          steps: Number.parseFloat(style('.support-step-grid').gap),
+          packages: Number.parseFloat(style('.support-package-grid').gap),
+          extras: Number.parseFloat(style('#support-services-grid').gap)
+        },
+        headingLineRatio: Number.parseFloat(heading.lineHeight) / Number.parseFloat(heading.fontSize),
+        headingTracking: Number.parseFloat(heading.letterSpacing),
+        overflow: document.documentElement.scrollWidth - innerWidth
+      };
+    });
+    expect(Math.min(...Object.values(state.gaps))).toBeGreaterThanOrEqual(26);
+    expect(state.cardGaps.steps).toBeGreaterThanOrEqual(16);
+    expect(state.cardGaps.packages).toBeGreaterThanOrEqual(18);
+    expect(state.cardGaps.extras).toBeGreaterThanOrEqual(14);
+    expect(state.headingLineRatio).toBeGreaterThanOrEqual(1.1);
+    expect(state.headingTracking).toBeGreaterThanOrEqual(-0.35);
+    expect(state.overflow).toBeLessThanOrEqual(0);
   }
 });
 
@@ -828,10 +865,10 @@ test('final services and CTA stay compact, distinct and contained', async ({ pag
     };
   });
 
-  expect(mobile.extrasHeight).toBeLessThanOrEqual(1100);
+  expect(mobile.extrasHeight).toBeLessThanOrEqual(1150);
   expect(Math.max(...mobile.cardHeights)).toBeLessThanOrEqual(210);
   expect(mobile.accents).toEqual(['#4F85FF', '#F97316', '#22C55E', '#A855F7']);
-  expect(mobile.ctaHeight).toBeLessThanOrEqual(510);
+  expect(mobile.ctaHeight).toBeLessThanOrEqual(525);
   expect(mobile.panelHeight).toBeLessThanOrEqual(430);
   expect(mobile.panelShadow).not.toBe('none');
   expect(mobile.overflow).toBeLessThanOrEqual(0);

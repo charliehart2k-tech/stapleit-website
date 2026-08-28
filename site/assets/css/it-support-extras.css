@@ -976,11 +976,11 @@ body.support-dialog-open{overflow:hidden}
 }
 
 @media(max-width:700px){
-  .support-extras{padding-block:38px}
-  #support-services-grid{gap:10px}
+  .support-extras{padding-block:52px}
+  #support-services-grid{gap:14px}
   #support-services-grid .support-extra-card{
     min-height:0;
-    padding:20px 17px 17px;
+    padding:18px 17px 15px;
     border-radius:18px;
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,.055),
@@ -993,7 +993,7 @@ body.support-dialog-open{overflow:hidden}
   #support-services-grid .support-extra-details{padding-top:12px}
   #support-services-grid .support-extra-details summary{min-height:44px;padding:9px 13px;font-size:.84rem}
 
-  .support-cta{padding-block:48px}
+  .support-cta{padding-block:56px}
   .support-cta-panel{padding:30px 18px;border-radius:20px}
   .support-cta-panel h2{font-size:clamp(1.9rem,8.6vw,2.3rem)}
   .support-cta-lead{margin-top:14px;font-size:1rem;line-height:1.55}

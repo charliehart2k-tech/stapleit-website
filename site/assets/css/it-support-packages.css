@@ -86,8 +86,8 @@
   .support-package-cora-trigger:hover::after{transform:translateX(4px);color:#fff}
 }
 @media(max-width:700px){
-  .support-package-cora{margin-bottom:22px;border-radius:22px}
-  .support-package-cora::after{inset:-16px 6% -20px;filter:blur(16px);opacity:.42}
+  .support-package-cora{margin-bottom:30px;border-radius:22px}
+  .support-package-cora::after{inset:-16px 6% -20px;filter:blur(16px);opacity:.34}
   .support-package-cora-trigger{min-height:76px;gap:13px;padding:17px 18px;border-radius:22px;font-size:1rem}
   .support-package-cora-trigger::before{width:17px;height:17px}
 }
