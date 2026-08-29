@@ -274,7 +274,7 @@ test('mobile chapters keep breathing room between headings, controls and cards',
     expect(state.headingLineRatio).toBeGreaterThanOrEqual(1.1);
     expect(state.headingTracking).toBeGreaterThanOrEqual(-0.35);
     expect(state.headingSize).toBeGreaterThanOrEqual(31);
-    expect(state.headingSize).toBeLessThanOrEqual(39);
+    expect(state.headingSize).toBeLessThanOrEqual(40);
     expect(Math.min(...state.chapterMargins)).toBeGreaterThanOrEqual(48);
     expect(state.overflow).toBeLessThanOrEqual(0);
   }
@@ -844,7 +844,7 @@ test('mobile add-on deck stays single-card and fully contained', async ({ page }
     expect(state.nextOpacity).toBe(0);
     expect(state.exposedCards).toBe(1);
     expect(state.headingSize).toBeGreaterThanOrEqual(31);
-    expect(state.headingSize).toBeLessThanOrEqual(39);
+    expect(state.headingSize).toBeLessThanOrEqual(40);
     expect(state.overflow).toBeLessThanOrEqual(0);
   }
 });
@@ -1110,7 +1110,7 @@ test('touch-opened dialogs do not leave package cards glowing and use the mobile
 });
 
 
-test('mobile tactile feedback stays short, touch-only and scroll-safe', async ({ page }) => {
+test('mobile tactile feedback uses touch events, survives native scrolling and stays bounded', async ({ page }) => {
   await page.addInitScript(() => {
     window.__stapleHaptics = [];
     Object.defineProperty(Navigator.prototype, 'vibrate', {
@@ -1123,39 +1123,88 @@ test('mobile tactile feedback stays short, touch-only and scroll-safe', async ({
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  await expect(page.locator('html')).toHaveAttribute('data-haptics', 'vibration');
 
-  const target = page.locator('.support-packages .support-package-cora-trigger');
+  const dispatchTouch = async (selector, type, { id, x, y, active = true }) => {
+    await page.evaluate(({ selector, type, id, x, y, active }) => {
+      const element = document.querySelector(selector);
+      const touch = { identifier: id, clientX: x, clientY: y, pageX: x, pageY: y, screenX: x, screenY: y };
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperties(event, {
+        changedTouches: { value: [touch] },
+        touches: { value: active ? [touch] : [] },
+        targetTouches: { value: active ? [touch] : [] }
+      });
+      element.dispatchEvent(event);
+    }, { selector, type, id, x, y, active });
+  };
+
+  const selector = '.support-packages .support-package-cora-trigger';
+  const target = page.locator(selector);
   const box = await target.boundingBox();
-  const point = { clientX: box.x + box.width / 2, clientY: box.y + box.height / 2 };
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
 
-  await target.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 41, isPrimary: true, ...point });
-  await target.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 41, isPrimary: true, ...point });
+  await dispatchTouch(selector, 'touchstart', { id: 41, x, y });
+  await dispatchTouch(selector, 'touchend', { id: 41, x, y, active: false });
   await expect.poll(() => page.evaluate(() => window.__stapleHaptics.length)).toBe(1);
 
   const firstPattern = await page.evaluate(() => window.__stapleHaptics[0]);
   const segments = Array.isArray(firstPattern) ? firstPattern : [firstPattern];
-  expect(Math.max(...segments)).toBeLessThanOrEqual(32);
-  expect(segments.reduce((total, value) => total + value, 0)).toBeLessThanOrEqual(120);
+  expect(Math.max(...segments)).toBeLessThanOrEqual(45);
+  expect(segments.reduce((total, value) => total + value, 0)).toBeLessThanOrEqual(180);
 
-  await target.dispatchEvent('pointerdown', { pointerType: 'mouse', pointerId: 42, isPrimary: true, ...point });
-  await target.dispatchEvent('pointerup', { pointerType: 'mouse', pointerId: 42, isPrimary: true, ...point });
-  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(1);
-
-  await target.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 43, isPrimary: true, ...point });
-  await target.dispatchEvent('pointermove', { pointerType: 'touch', pointerId: 43, isPrimary: true, clientX: point.clientX, clientY: point.clientY + 40 });
-  await target.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 43, isPrimary: true, clientX: point.clientX, clientY: point.clientY + 40 });
-  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(1);
-
-  await page.waitForTimeout(90);
-  await page.locator('body').dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 44, isPrimary: true, clientX: 12, clientY: 500 });
-  await page.evaluate(() => scrollBy(0, 180));
+  await page.waitForTimeout(110);
+  await dispatchTouch('body', 'touchstart', { id: 44, x: 40, y: 650 });
+  await dispatchTouch('body', 'touchmove', { id: 44, x: 42, y: 560 });
   await expect.poll(() => page.evaluate(() => window.__stapleHaptics.length)).toBe(2);
-  expect(await page.evaluate(() => window.__stapleHaptics.at(-1))).toBe(7);
-  await page.locator('body').dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 44, isPrimary: true, clientX: 12, clientY: 320 });
-  await page.evaluate(() => scrollBy(0, 180));
+  expect(await page.evaluate(() => window.__stapleHaptics.at(-1))).toBe(18);
+
+  await page.waitForTimeout(110);
+  await dispatchTouch('body', 'touchmove', { id: 44, x: 44, y: 470 });
+  await expect.poll(() => page.evaluate(() => window.__stapleHaptics.length)).toBe(3);
+  expect(await page.evaluate(() => window.__stapleHaptics.at(-1))).toBe(18);
+
+  await page.waitForTimeout(110);
+  await dispatchTouch('body', 'touchmove', { id: 44, x: 150, y: 465 });
   await page.waitForTimeout(80);
-  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(2);
+  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(3);
+
+  await dispatchTouch('body', 'touchend', { id: 44, x: 44, y: 470, active: false });
+  await page.evaluate(() => scrollBy(0, 180));
+  await page.waitForTimeout(100);
+  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(3);
 });
+
+test('iOS uses a real direct-tap switch overlay and forwards the action', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Navigator.prototype, 'userAgent', {
+      configurable: true,
+      get: () => 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_6 like Mac OS X) AppleWebKit/605.1.15 Version/26.6 Mobile/15E148 Safari/604.1'
+    });
+    Object.defineProperty(Navigator.prototype, 'platform', { configurable: true, get: () => 'iPhone' });
+    Object.defineProperty(Navigator.prototype, 'maxTouchPoints', { configurable: true, get: () => 5 });
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+
+  await expect(page.locator('html')).toHaveAttribute('data-haptics', 'ios-switch');
+  const menu = page.locator('#menu-toggle');
+  const iosSwitch = menu.locator(':scope > .staple-ios-haptic-switch');
+  await expect(iosSwitch).toHaveCount(1);
+  const switchStyle = await iosSwitch.evaluate(element => {
+    const style = getComputedStyle(element);
+    return { opacity: style.opacity, position: style.position, display: style.display };
+  });
+  expect(switchStyle.opacity).toBe('0');
+  expect(switchStyle.position).toBe('absolute');
+  expect(switchStyle.display).not.toBe('none');
+  await expect(page.locator('[data-pack-reel-item].is-active .staple-ios-haptic-switch')).toHaveCount(0);
+
+  await iosSwitch.click({ force: true });
+  await expect(menu).toHaveAttribute('aria-expanded', 'true');
+});
+
 
 test('mobile motion remains compositor-first during a full-page interaction pass', async ({ page }) => {
   await page.addInitScript(() => {

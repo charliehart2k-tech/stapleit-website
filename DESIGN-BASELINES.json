@@ -1,13 +1,14 @@
 {
   "version": 1,
   "type_token_floor_px": {
-    "--type-small": 13,
-    "--type-ui": 15,
-    "--type-body": 16,
-    "--type-lead": 18,
-    "--type-card": 24.8,
-    "--type-section": 44,
-    "--type-hero": 72
+    "--type-role-small": 13,
+    "--type-role-ui": 15,
+    "--type-role-body": 16,
+    "--type-role-lead": 16,
+    "--type-role-card": 23.2,
+    "--type-role-feature": 29.6,
+    "--type-role-section": 35.2,
+    "--type-role-hero": 44
   },
   "interactive_min_height_px": {
     ".button": 44,
@@ -58,7 +59,8 @@
     "partners.css",
     "home-spacing.css",
     "typography-refinement.css",
-    "nav-rainbow.css"
+    "nav-rainbow.css",
+    "typography-system.css"
   ],
   "source_css_important_max": 902,
   "important_max_by_source": {

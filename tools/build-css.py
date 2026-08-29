@@ -42,7 +42,7 @@ SUPPORT_SHELL = [
 ]
 
 BUNDLES = {
-    "site-shell.bundle.css": SHELL,
+    "site-shell.bundle.css": SHELL + ["typography-system.css"],
     "home.bundle.css": SHELL
     + [
         "home-hero.css",
@@ -59,6 +59,7 @@ BUNDLES = {
         # WordPress previously enqueued this at wp_head after the static CSS.
         # Keep it last to preserve the approved homepage cascade exactly.
         "nav-rainbow.css",
+        "typography-system.css",
     ],
     "it-support.bundle.css": SUPPORT_SHELL
     + [
@@ -67,12 +68,13 @@ BUNDLES = {
         "it-support-packages.css",
         "it-support-packs-conversation.css",
         "it-support-responsive.css",
+        "typography-system.css",
     ],
 }
 
 # Get in Touch deliberately reuses the approved homepage contact/audit system,
 # then applies only a small route-specific composition layer.
-BUNDLES["get-in-touch.bundle.css"] = BUNDLES["home.bundle.css"] + ["get-in-touch.css"]
+BUNDLES["get-in-touch.bundle.css"] = BUNDLES["home.bundle.css"][:-1] + ["get-in-touch.css", "typography-system.css"]
 
 MAX_GZIP_BYTES = {
     "site-shell.bundle.css": 16_000,

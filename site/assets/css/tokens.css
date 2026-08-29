@@ -70,13 +70,24 @@
   /* One type system: Manrope 400 / 600 / 700 only. */
   --font-display:"Manrope","Segoe UI",Arial,sans-serif;
   --font-body:"Manrope","Segoe UI",Arial,sans-serif;
-  --type-ui:.9375rem;
-  --type-small:.8125rem;
-  --type-body:1.0625rem;
-  --type-lead:clamp(1.125rem,1.4vw,1.3rem);
-  --type-card:clamp(1.9rem,2.3vw,2.35rem);
-  --type-section:clamp(4.65rem,6.15vw,6.45rem);
-  --type-hero:clamp(4.5rem,7vw,7.2rem);
+  /* Canonical semantic type roles. All route typography resolves through these. */
+  --type-role-ui:.9375rem;
+  --type-role-small:.8125rem;
+  --type-role-body:1.0625rem;
+  --type-role-lead:clamp(1.125rem,1.35vw,1.25rem);
+  --type-role-card:clamp(1.7rem,2.2vw,2.15rem);
+  --type-role-feature:clamp(2.4rem,3.2vw,3rem);
+  --type-role-section:clamp(4rem,5.6vw,5.5rem);
+  --type-role-hero:clamp(4.5rem,6.4vw,6rem);
+
+  /* Backwards-compatible aliases. Do not create route-specific replacements. */
+  --type-ui:var(--type-role-ui);
+  --type-small:var(--type-role-small);
+  --type-body:var(--type-role-body);
+  --type-lead:var(--type-role-lead);
+  --type-card:var(--type-role-card);
+  --type-section:var(--type-role-section);
+  --type-hero:var(--type-role-hero);
 
   --focus-ring:rgba(255,255,255,.82);
   --motion-fast:140ms;
@@ -85,10 +96,22 @@
   --ease:cubic-bezier(.22,.75,.2,1);
 }
 
+@media(max-width:980px){
+  :root{
+    --type-role-hero:clamp(3.5rem,8.5vw,4.75rem);
+    --type-role-section:clamp(3rem,7vw,4rem);
+    --type-role-feature:clamp(2.1rem,5vw,2.65rem);
+    --type-role-card:clamp(1.6rem,4vw,2rem);
+  }
+}
+
 @media(max-width:700px){
   :root{
-    --type-body:1rem;
-    --type-card:clamp(1.55rem,6.4vw,1.9rem);
-    --type-section:clamp(2.75rem,11.2vw,3.45rem);
+    --type-role-hero:clamp(2.75rem,11.5vw,3.25rem);
+    --type-role-section:clamp(2.2rem,9.4vw,2.5rem);
+    --type-role-feature:clamp(1.85rem,7.6vw,1.9rem);
+    --type-role-card:clamp(1.45rem,6.5vw,1.8rem);
+    --type-role-lead:1rem;
+    --type-role-body:1rem;
   }
 }

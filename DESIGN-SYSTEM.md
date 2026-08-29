@@ -69,20 +69,18 @@ Use **Manrope throughout**, and only the loaded weights:
 
 Do not use synthetic intermediate weights such as 500 or 650. Do not introduce a second font family without an explicit design decision.
 
-Canonical type tokens live in `site/assets/css/tokens.css`:
+Canonical type roles live in `site/assets/css/tokens.css` and are enforced by the final `typography-system.css` layer on every route:
 
-- `--type-small` — small UI/supporting labels;
-- `--type-ui` — buttons, navigation and compact interface text;
-- `--type-body` — normal paragraph copy;
-- `--type-lead` — supporting chapter/hero copy;
-- `--type-card` — card headings;
-- `--type-section` — major chapter headings;
-- `--type-hero` — page-level hero headings.
+- `--type-role-small` — small UI/supporting labels;
+- `--type-role-ui` — buttons, navigation and compact interface text;
+- `--type-role-body` — normal paragraph copy;
+- `--type-role-lead` — supporting chapter/hero copy;
+- `--type-role-card` — ordinary card headings;
+- `--type-role-feature` — focal component headings such as the active add-on card;
+- `--type-role-section` — major chapter headings;
+- `--type-role-hero` — page-level hero headings.
 
-These shared semantic roles are the type system. Route aliases that duplicate
-them, such as homepage-only chapter, card-title or copy variables, are not
-permitted. Normal body copy resolves to 17px on larger screens and 16px on
-small screens; compact decision and inclusion lists must remain at least 15px.
+The legacy `--type-*` names are aliases to these canonical roles for backwards compatibility; routes must not create independent type scales. Route CSS may control composition, width, colour and emphasis, but final font size, tracking and line-height resolve by semantic role. The browser gate `tests/visual/site-typography.visual.spec.js` verifies all public routes at phone, tablet and desktop widths and rejects crushed tracking or collapsed heading line boxes. Normal body copy resolves to 17px on larger screens and 16px on small screens; compact decision and inclusion lists must remain at least 15px.
 
 Editorial rules:
 

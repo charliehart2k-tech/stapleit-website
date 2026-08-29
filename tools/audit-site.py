@@ -35,7 +35,7 @@ TYPE_TOKEN_ALIAS_RE = re.compile(
 CSS_NUMBER = r"(?:\d+(?:\.\d+)?|\.\d+)"
 CANONICAL_TOKEN_DECL_RE = re.compile(r"(?P<name>--(?:type|space)-[a-z0-9-]+)\s*:", re.I)
 TYPE_TOKEN_LITERAL_RE = re.compile(
-    rf"(?P<name>--type-(?:small|ui|body|lead|card|section|hero))\s*:\s*"
+    rf"(?P<name>--type-role-(?:small|ui|body|lead|card|feature|section|hero))\s*:\s*"
     rf"(?:clamp\(\s*)?(?P<value>{CSS_NUMBER})(?P<unit>px|rem)\b",
     re.I,
 )

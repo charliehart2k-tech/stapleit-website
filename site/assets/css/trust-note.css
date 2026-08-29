@@ -120,14 +120,14 @@
   .trust-note-card p{
     width:100%!important;
     max-width:14ch!important;
-    font-size:clamp(2.05rem,2.55vw,2.6rem)!important;
-    line-height:1.27!important;
-    letter-spacing:-.034em!important;
+    font-size:clamp(2.05rem,2.55vw,2.6rem);
+    line-height:1.27;
+    letter-spacing:-.034em;
     text-wrap:balance!important;
   }
   .trust-note-accent{
-    font-size:1.12em!important;
-    letter-spacing:-.045em!important;
+    font-size:1.12em;
+    letter-spacing:-.045em;
   }
 }
 
@@ -202,8 +202,8 @@
   .home-services-card .service-slide p{
     align-self:start!important;
     max-width:38rem!important;
-    line-height:1.62!important;
-    letter-spacing:-.012em!important;
+    line-height:1.62;
+    letter-spacing:-.012em;
   }
   .home-services-card .service-points{
     align-self:stretch!important;
@@ -214,14 +214,14 @@
     padding-block:8px!important;
   }
   .home-services-card .service-points li{
-    line-height:1.5!important;
+    line-height:1.5;
   }
   .home-services-card .service-cta{
     align-self:end!important;
     justify-self:start!important;
     min-height:54px!important;
     padding-inline:26px!important;
-    font-size:var(--type-ui)!important;
+    font-size:var(--type-ui);
   }
 }
 

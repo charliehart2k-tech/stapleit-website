@@ -41,24 +41,24 @@ body{letter-spacing:0}
 .partners-header h2,
 .audit-hero h2,
 .contact-hero h2{
-  letter-spacing:-.024em!important;
+  letter-spacing:-.024em;
 }
 
 .audience-header h2,
 .trust-sticky h2,
 .audit-hero h2,
 .contact-hero h2{
-  line-height:.98!important;
+  line-height:.98;
 }
 
 .services-header h2,
 .google-review-hero h2,
 .partners-header h2{
-  line-height:1.02!important;
+  line-height:1.02;
 }
 
 .home-hero h1{
-  line-height:1!important;
+  line-height:1;
 }
 
 .service-grid-card .service-slide h2,
@@ -67,8 +67,8 @@ body{letter-spacing:0}
 .google-review-copy h3,
 .audit-form-heading h3,
 .contact-panel h3{
-  letter-spacing:-.014em!important;
-  line-height:1.1!important;
+  letter-spacing:-.014em;
+  line-height:1.1;
 }
 
 .hero-tagline,
@@ -80,7 +80,7 @@ body{letter-spacing:0}
 .contact-row,
 .footer-panel,
 .footer-legal-bar{
-  letter-spacing:0!important;
+  letter-spacing:0;
 }
 
 .contact-panel-intro{font-size:var(--type-body)}
@@ -128,7 +128,7 @@ body{letter-spacing:0}
   .partners-header h2,
   .audit-hero h2,
   .contact-hero h2{
-    letter-spacing:-.018em!important;
+    letter-spacing:-.018em;
   }
 
   .service-grid-card .service-slide h2{min-height:0!important}

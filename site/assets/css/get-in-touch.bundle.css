@@ -73,13 +73,24 @@
   /* One type system: Manrope 400 / 600 / 700 only. */
   --font-display:"Manrope","Segoe UI",Arial,sans-serif;
   --font-body:"Manrope","Segoe UI",Arial,sans-serif;
-  --type-ui:.9375rem;
-  --type-small:.8125rem;
-  --type-body:1.0625rem;
-  --type-lead:clamp(1.125rem,1.4vw,1.3rem);
-  --type-card:clamp(1.9rem,2.3vw,2.35rem);
-  --type-section:clamp(4.65rem,6.15vw,6.45rem);
-  --type-hero:clamp(4.5rem,7vw,7.2rem);
+  /* Canonical semantic type roles. All route typography resolves through these. */
+  --type-role-ui:.9375rem;
+  --type-role-small:.8125rem;
+  --type-role-body:1.0625rem;
+  --type-role-lead:clamp(1.125rem,1.35vw,1.25rem);
+  --type-role-card:clamp(1.7rem,2.2vw,2.15rem);
+  --type-role-feature:clamp(2.4rem,3.2vw,3rem);
+  --type-role-section:clamp(4rem,5.6vw,5.5rem);
+  --type-role-hero:clamp(4.5rem,6.4vw,6rem);
+
+  /* Backwards-compatible aliases. Do not create route-specific replacements. */
+  --type-ui:var(--type-role-ui);
+  --type-small:var(--type-role-small);
+  --type-body:var(--type-role-body);
+  --type-lead:var(--type-role-lead);
+  --type-card:var(--type-role-card);
+  --type-section:var(--type-role-section);
+  --type-hero:var(--type-role-hero);
 
   --focus-ring:rgba(255,255,255,.82);
   --motion-fast:140ms;
@@ -88,11 +99,23 @@
   --ease:cubic-bezier(.22,.75,.2,1);
 }
 
+@media(max-width:980px){
+  :root{
+    --type-role-hero:clamp(3.5rem,8.5vw,4.75rem);
+    --type-role-section:clamp(3rem,7vw,4rem);
+    --type-role-feature:clamp(2.1rem,5vw,2.65rem);
+    --type-role-card:clamp(1.6rem,4vw,2rem);
+  }
+}
+
 @media(max-width:700px){
   :root{
-    --type-body:1rem;
-    --type-card:clamp(1.55rem,6.4vw,1.9rem);
-    --type-section:clamp(2.75rem,11.2vw,3.45rem);
+    --type-role-hero:clamp(2.75rem,11.5vw,3.25rem);
+    --type-role-section:clamp(2.2rem,9.4vw,2.5rem);
+    --type-role-feature:clamp(1.85rem,7.6vw,1.9rem);
+    --type-role-card:clamp(1.45rem,6.5vw,1.8rem);
+    --type-role-lead:1rem;
+    --type-role-body:1rem;
   }
 }
 
@@ -483,6 +506,27 @@ summary,
 
 @media(prefers-reduced-motion:reduce){
   .tactile-target{scale:1;translate:0 0}
+}
+
+
+/* iOS Safari direct-tap haptics. The native switch must remain rendered and
+ * receive the physical tap; opacity:0 is intentional, display:none is not. */
+.staple-ios-haptic-relative{position:relative}
+.staple-ios-haptic-host > input.staple-ios-haptic-switch{
+  position:absolute;
+  inset:0;
+  z-index:30;
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  opacity:0;
+  border:0;
+  border-radius:inherit;
+  cursor:pointer;
+  pointer-events:auto;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
 }
 
 /* source: cora.css */
@@ -1196,8 +1240,8 @@ summary,
   border-radius:18px;
   background:rgba(255,255,255,.025);
   color:#d8dde4!important;
-  font-size:14px!important;
-  line-height:1.5!important;
+  font-size:14px;
+  line-height:1.5;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 36px rgba(0,0,0,.18);
   backdrop-filter:blur(18px) saturate(125%);
   -webkit-backdrop-filter:blur(18px) saturate(125%);
@@ -1411,7 +1455,7 @@ summary,
 }
 
 @media(max-width:700px){
-  .audit-form-status{padding:14px 14px 14px 44px!important;border-radius:16px;font-size:var(--type-ui)!important}
+  .audit-form-status{padding:14px 14px 14px 44px!important;border-radius:16px;font-size:var(--type-ui)}
   .audit-form-status::before{left:14px}
   .audit-explainer-toggle{min-height:52px;padding:12px 14px;font-size:var(--type-ui)}
   .audit-explainer-copy{grid-template-columns:1fr;gap:13px;padding:0 14px 14px}
@@ -1506,8 +1550,8 @@ summary,
   .trust-sticky h2,
   .audit-hero h2,
   .contact-hero h2{
-    line-height:.92!important;
-    letter-spacing:-.052em!important;
+    line-height:.92;
+    letter-spacing:-.052em;
   }
 
   .audit-contact-shell{
@@ -1581,7 +1625,7 @@ summary,
     justify-content:center!important;
     text-align:center!important;
     white-space:normal!important;
-    line-height:1.15!important;
+    line-height:1.15;
     list-style:none;
   }
 
@@ -1613,7 +1657,7 @@ summary,
     justify-content:center!important;
     text-align:center!important;
     white-space:normal!important;
-    line-height:1.15!important;
+    line-height:1.15;
   }
 
   .mobile-menu-utility{
@@ -1635,7 +1679,7 @@ summary,
     color:#9099a5!important;
     font-family:var(--font-display)!important;
     font-weight:700!important;
-    line-height:1.15!important;
+    line-height:1.15;
     text-align:center!important;
   }
 }
@@ -1668,17 +1712,17 @@ summary,
   .home-hero{padding:18px 0 26px!important}
   .home-hero-shell{min-height:0!important;border-radius:25px!important}
   .home-hero-copy{padding:32px 19px 22px!important}
-  .home-hero h1{max-width:9ch!important;font-size:clamp(2.6rem,10.9vw,3.15rem)!important;line-height:.97!important;letter-spacing:-.043em!important}
-  .hero-tagline{max-width:none!important;margin-top:16px!important;font-size:clamp(1rem,4.35vw,1.15rem)!important;line-height:1.36!important}
+  .home-hero h1{max-width:9ch!important;font-size:clamp(2.6rem,10.9vw,3.15rem);line-height:.97;letter-spacing:-.043em}
+  .hero-tagline{max-width:none!important;margin-top:16px!important;font-size:clamp(1rem,4.35vw,1.15rem);line-height:1.36}
   .hero-actions{margin-top:20px!important}
-  .hero-actions .button{width:100%!important;min-height:48px!important;font-size:var(--type-ui)!important}
+  .hero-actions .button{width:100%!important;min-height:48px!important;font-size:var(--type-ui)}
   .status-panel{margin:0 13px 14px!important;padding:18px 17px!important;border-radius:20px!important}
-  .status-kicker{font-size:var(--type-small)!important}
-  .status-title{margin-top:10px!important;font-size:clamp(1.72rem,7.4vw,2.05rem)!important;line-height:1.03!important}
-  .status-message{margin-top:7px!important;font-size:var(--type-ui)!important}
+  .status-kicker{font-size:var(--type-small)}
+  .status-title{margin-top:10px!important;font-size:clamp(1.72rem,7.4vw,2.05rem);line-height:1.03}
+  .status-message{margin-top:7px!important;font-size:var(--type-ui)}
   .status-hours{margin-top:13px!important;padding-top:11px!important}
-  .status-hours span{font-size:.75rem!important}
-  .status-hours strong{font-size:var(--type-small)!important}
+  .status-hours span{font-size:.75rem}
+  .status-hours strong{font-size:var(--type-small)}
 
   /* Statement + services */
   .home-intro{padding:8px 0 54px!important}
@@ -1695,9 +1739,9 @@ summary,
   .home-statement-card h2{
     max-width:11ch!important;
     margin:0!important;
-    font-size:clamp(2.15rem,8.9vw,2.65rem)!important;
-    line-height:1.045!important;
-    letter-spacing:-.035em!important;
+    font-size:clamp(2.15rem,8.9vw,2.65rem);
+    line-height:1.045;
+    letter-spacing:-.035em;
     overflow-wrap:normal!important;
     word-break:normal!important;
     hyphens:none!important;
@@ -1705,27 +1749,27 @@ summary,
 
   .service-slide{padding:25px 20px 50px!important}
   .service-slide-content{display:flex!important;flex-direction:column!important;min-height:305px!important}
-  .service-slide h2{max-width:11ch!important;font-size:clamp(1.9rem,8.1vw,2.35rem)!important;line-height:1!important}
-  .service-slide p{margin-top:14px!important;line-height:1.56!important}
+  .service-slide h2{max-width:11ch!important;font-size:clamp(1.9rem,8.1vw,2.35rem);line-height:1}
+  .service-slide p{margin-top:14px!important;line-height:1.56}
   .service-points{margin-top:16px!important;gap:8px!important}
-  .service-points li{line-height:1.45!important}
-  .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;margin-top:auto!important;padding-inline:13px!important;justify-content:center!important;font-size:var(--type-ui)!important}
+  .service-points li{line-height:1.45}
+  .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;margin-top:auto!important;padding-inline:13px!important;justify-content:center!important;font-size:var(--type-ui)}
 
   /* Shared chapter heading scale */
   .audience-header h2,.trust-sticky h2,.audit-hero h2,.contact-hero h2{
-    line-height:.95!important;
-    letter-spacing:-.046em!important;
+    line-height:.95;
+    letter-spacing:-.046em;
   }
 
   /* Audience: stable vertical cards, no sideways page behaviour. */
   .audience-section{padding:66px 0 72px!important}
   .audience-header{grid-template-columns:1fr!important;gap:16px!important;padding-bottom:26px!important}
   .audience-header h2{max-width:9ch!important}
-  .audience-header>p:last-child{max-width:none!important;margin:0!important;font-size:var(--type-body)!important;line-height:1.56!important}
+  .audience-header>p:last-child{max-width:none!important;margin:0!important;font-size:var(--type-body);line-height:1.56}
   .audience-grid{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;overflow:visible!important;padding:0!important}
   .audience-item{min-height:0!important;padding:23px 20px!important;border-radius:22px!important}
-  .audience-item h3{max-width:none!important;min-height:0!important;line-height:1.06!important}
-  .audience-item p{max-width:none!important;margin-top:14px!important;line-height:1.58!important}
+  .audience-item h3{max-width:none!important;min-height:0!important;line-height:1.06}
+  .audience-item p{max-width:none!important;margin-top:14px!important;line-height:1.58}
 
   /* Trust: four clean glass cards. No horizontal strip / clipping. */
   .trust-section{padding:68px 0 74px!important;overflow:hidden!important}
@@ -1776,44 +1820,44 @@ summary,
 
   .trust-proof::after{display:none!important}
   .trust-proof::before{top:auto!important;right:-18%!important;bottom:-56%!important;left:auto!important;width:72%!important;height:140%!important;opacity:.18!important;filter:blur(34px) saturate(108%)!important;transform:none!important}
-  .trust-proof h3{max-width:none!important;margin:0!important;padding:0!important;line-height:1.06!important}
-  .trust-proof p{max-width:none!important;margin:12px 0 0!important;color:#aeb6c1!important;line-height:1.6!important}
+  .trust-proof h3{max-width:none!important;margin:0!important;padding:0!important;line-height:1.06}
+  .trust-proof p{max-width:none!important;margin:12px 0 0!important;color:#aeb6c1!important;line-height:1.6}
 
   /* Audit: explicit linear flow, no grid collisions. */
   .audit-section{padding:68px 0 58px!important}
   .audit-hero{grid-template-columns:1fr!important;gap:17px!important;padding-bottom:27px!important}
   .audit-hero h2{max-width:9.5ch!important}
-  .audit-lead{max-width:none!important;margin:0!important;line-height:1.56!important}
+  .audit-lead{max-width:none!important;margin:0!important;line-height:1.56}
   .audit-contact-shell{width:100%!important;max-width:none!important}
   .audit-form{display:block!important;padding:22px 17px!important;border-radius:22px!important}
   .audit-form-heading{display:block!important;max-width:none!important;margin:0 0 21px!important;padding:0!important}
-  .audit-form-heading h3{max-width:none!important;margin:0!important;font-size:clamp(1.95rem,8.1vw,2.35rem)!important;line-height:1!important}
+  .audit-form-heading h3{max-width:none!important;margin:0!important;font-size:clamp(1.95rem,8.1vw,2.35rem);line-height:1}
   .audit-fields{display:grid!important;grid-template-columns:1fr!important;gap:14px!important}
-  .audit-field>span{font-size:var(--type-ui)!important}
-  .audit-field input{min-height:53px!important;padding-inline:15px!important;border-radius:15px!important;font-size:16px!important}
+  .audit-field>span{font-size:var(--type-ui)}
+  .audit-field input{min-height:53px!important;padding-inline:15px!important;border-radius:15px!important;font-size:16px}
   .audit-consent{margin-top:15px!important;padding:14px!important;align-items:flex-start!important;border-radius:15px!important}
   .audit-submit{width:100%!important;min-height:51px!important;margin-top:17px!important;justify-content:center!important}
-  .audit-form-status{margin-top:14px!important;font-size:var(--type-ui)!important}
+  .audit-form-status{margin-top:14px!important;font-size:var(--type-ui)}
   .audit-explainer{width:100%!important;margin:16px 0 0!important;border-radius:17px!important}
 
   /* Contact: fixed two-line headline, then one clean panel and map. */
   .contact-section{padding:30px 0 72px!important;overflow:hidden!important}
   .contact-hero{padding-bottom:25px!important}
-  .contact-hero h2{width:100%!important;max-width:none!important;font-size:clamp(2.3rem,9.5vw,2.85rem)!important;line-height:.98!important;letter-spacing:-.043em!important}
+  .contact-hero h2{width:100%!important;max-width:none!important;font-size:clamp(2.3rem,9.5vw,2.85rem);line-height:.98;letter-spacing:-.043em}
   .contact-title-line{display:block!important;white-space:nowrap!important}
   .contact-grid{grid-template-columns:1fr!important;gap:12px!important}
   .contact-panel,.contact-map-card{border-radius:21px!important}
   .contact-panel{padding:19px!important}
-  .contact-panel h3{font-size:clamp(1.55rem,6.6vw,1.9rem)!important;line-height:1.02!important}
-  .contact-panel-intro{margin:7px 0 17px!important;font-size:var(--type-body)!important}
+  .contact-panel h3{font-size:clamp(1.55rem,6.6vw,1.9rem);line-height:1.02}
+  .contact-panel-intro{margin:7px 0 17px!important;font-size:var(--type-body)}
   .contact-list{gap:8px!important}
   .contact-row{min-height:56px!important;gap:9px!important;padding:10px 11px!important}
-  .contact-row dt{font-size:var(--type-small)!important}
-  .contact-row dd{max-width:66%!important;font-size:var(--type-ui)!important;overflow-wrap:anywhere!important}
+  .contact-row dt{font-size:var(--type-small)}
+  .contact-row dd{max-width:66%!important;font-size:var(--type-ui);overflow-wrap:anywhere!important}
   .contact-address dd{max-width:66%!important}
   .contact-map-card{grid-template-rows:260px auto!important}
   .contact-map-shell,.contact-map-shell iframe{min-height:260px!important}
-  .contact-map-footer{min-height:0!important;padding:11px 13px!important;gap:5px!important;font-size:var(--type-small)!important}
+  .contact-map-footer{min-height:0!important;padding:11px 13px!important;gap:5px!important;font-size:var(--type-small)}
 
   /* Footer */
   .site-footer{margin-top:40px!important;padding-bottom:max(14px,env(safe-area-inset-bottom))!important}
@@ -1821,7 +1865,7 @@ summary,
   .footer-brand-panel{grid-column:1/-1!important}
   .footer-nav-group:last-child{grid-column:1/-1!important}
   .footer-panel{padding:18px!important;border-radius:19px!important}
-  .footer-nav-group a{min-height:44px!important;font-size:var(--type-small)!important}
+  .footer-nav-group a{min-height:44px!important;font-size:var(--type-small)}
   .footer-logo img{width:180px!important}
   .footer-legal-bar{margin-top:10px!important;padding:15px 16px!important}
 }
@@ -1847,11 +1891,11 @@ summary,
   .home-intro-grid{grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr)!important;gap:20px!important;align-items:stretch!important}
   .home-info-card,.home-services-card{min-height:clamp(430px,29vw,520px)!important}
   .home-statement-card{display:flex!important;align-items:center!important;justify-content:flex-start!important;padding:50px 56px!important}
-  .home-statement-card h2{width:100%!important;max-width:12.2ch!important;margin:0!important;font-size:clamp(4rem,4.7vw,5.3rem)!important;line-height:1.015!important;letter-spacing:-.036em!important}
+  .home-statement-card h2{width:100%!important;max-width:12.2ch!important;margin:0!important;font-size:clamp(4rem,4.7vw,5.3rem);line-height:1.015;letter-spacing:-.036em}
   .service-slide{padding:42px 72px 42px 50px!important}
   .service-slide-content{min-height:100%!important}
-  .service-slide h2{font-size:clamp(2.85rem,3.8vw,3.9rem)!important;line-height:.97!important}
-  .service-slide p{margin-top:18px!important;line-height:1.56!important}
+  .service-slide h2{font-size:clamp(2.85rem,3.8vw,3.9rem);line-height:.97}
+  .service-slide p{margin-top:18px!important;line-height:1.56}
   .service-points{margin-top:20px!important}
   .service-cta{margin-top:28px!important;align-self:flex-start!important}
 }
@@ -1875,7 +1919,7 @@ summary,
 .trust-section,.trust-inner,.trust-intro,.trust-sticky{overflow:visible!important}
 .trust-sticky h2{max-width:none!important;margin:0!important;padding:.02em .28em .12em .03em!important;overflow:visible!important;background:none!important;background-image:none!important;background-clip:border-box!important;-webkit-background-clip:border-box!important;color:#fff!important;-webkit-text-fill-color:#fff!important;filter:none!important;animation:none!important}
 .trust-title-line{display:block!important;white-space:nowrap!important;overflow:visible!important}
-.trust-title-accent{display:block!important;width:max-content!important;max-width:none!important;margin:.08em 0 0 0!important;padding:.04em .32em .14em .04em!important;overflow:visible!important;white-space:nowrap!important;line-height:.98!important;letter-spacing:-.038em!important;color:transparent!important;background:linear-gradient(102deg,var(--brand-blue) 0%,#6f63ff 22%,var(--brand-security) 40%,var(--brand-red) 62%,var(--brand-solutions) 82%,var(--brand-blue) 100%)!important;background-size:260% 100%!important;background-position:0 50%;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;animation:goldTrustAccent 8.5s ease-in-out infinite alternate!important}
+.trust-title-accent{display:block!important;width:max-content!important;max-width:none!important;margin:.08em 0 0 0!important;padding:.04em .32em .14em .04em!important;overflow:visible!important;white-space:nowrap!important;line-height:.98;letter-spacing:-.038em;color:transparent!important;background:linear-gradient(102deg,var(--brand-blue) 0%,#6f63ff 22%,var(--brand-security) 40%,var(--brand-red) 62%,var(--brand-solutions) 82%,var(--brand-blue) 100%)!important;background-size:260% 100%!important;background-position:0 50%;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;animation:goldTrustAccent 8.5s ease-in-out infinite alternate!important}
 @keyframes goldTrustAccent{from{background-position:0% 50%}to{background-position:100% 50%}}
 
 /* White outline trust icon language. Kept dependency-free so the icons cannot
@@ -1927,14 +1971,14 @@ summary,
   .trust-proof h3::before{left:0;width:29px;height:29px}
 }
 @media(max-width:700px){
-  .trust-sticky h2{width:100%!important;max-width:none!important;margin-bottom:0!important;padding-right:.28em!important;line-height:.97!important}
+  .trust-sticky h2{width:100%!important;max-width:none!important;margin-bottom:0!important;padding-right:.28em!important;line-height:.97}
   .trust-title-line{white-space:normal!important}
   .trust-title-accent{padding-right:.34em!important}
   .trust-sticky::after{width:68px;height:68px;margin-top:20px;margin-bottom:30px}
   .trust-proof h3{padding-left:42px!important}
   .trust-proof h3::before{width:27px;height:27px;top:.02em}
   .home-statement-card{padding:32px 22px!important}
-  .home-statement-card h2{max-width:12ch!important;font-size:clamp(2.05rem,8.35vw,2.48rem)!important;line-height:1.075!important;letter-spacing:-.028em!important}
+  .home-statement-card h2{max-width:12ch!important;font-size:clamp(2.05rem,8.35vw,2.48rem);line-height:1.075;letter-spacing:-.028em}
 }
 
 /* Touch services: native horizontal drag. */
@@ -1963,7 +2007,7 @@ summary,
 .audit-form{border-radius:32px!important;overflow:hidden!important;transform:none!important}
 .audit-form:hover,.audit-form:focus-within{transform:none!important;border-radius:32px!important}
 .audit-form-heading{max-width:100%!important}
-.audit-form-heading h3{color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(3.25rem,4.25vw,4.8rem)!important;line-height:.92!important;letter-spacing:-.048em!important}
+.audit-form-heading h3{color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(3.25rem,4.25vw,4.8rem);line-height:.92;letter-spacing:-.048em}
 .audit-form-heading h3 .accent-orange{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important}
 .audit-field>span{font-weight:600!important}
 .audit-explainer{border-radius:20px!important;transform:none!important}
@@ -1974,9 +2018,9 @@ summary,
    Final text + spacing conformity. Major chapters share one scale and body
    rhythm while preserving their deliberately different compositions.
    -------------------------------------------------------------------------- */
-.audience-header h2,.trust-sticky h2,.google-review-hero h2,.audit-hero h2,.contact-hero h2{font-weight:700!important;line-height:.94!important;letter-spacing:-.048em!important}
-.audience-item h3,.trust-proof h3,.google-review-copy h3,.contact-panel h3{font-weight:700!important;line-height:1.06!important;letter-spacing:-.032em!important}
-.service-slide p,.audience-item p,.trust-proof p,.audit-lead{line-height:1.6!important}
+.audience-header h2,.trust-sticky h2,.google-review-hero h2,.audit-hero h2,.contact-hero h2{font-weight:700!important;line-height:.94;letter-spacing:-.048em}
+.audience-item h3,.trust-proof h3,.google-review-copy h3,.contact-panel h3{font-weight:700!important;line-height:1.06;letter-spacing:-.032em}
+.service-slide p,.audience-item p,.trust-proof p,.audit-lead{line-height:1.6}
 .service-points li,.audit-consent,.audit-explainer-copy,.contact-row{font-family:var(--font-body)!important}
 .service-cta,.audit-submit,.google-review-link,.contact-whatsapp{font-weight:600!important}
 .mobile-nav-group>summary::after{font-weight:600!important}
@@ -1986,7 +2030,7 @@ summary,
 .contact-section{padding-top:var(--space-7)!important;padding-bottom:112px!important}
 
 @media(max-width:700px){
-  .audience-header h2,.trust-sticky h2,.google-review-hero h2,.audit-hero h2,.contact-hero h2{line-height:.96!important}
+  .audience-header h2,.trust-sticky h2,.google-review-hero h2,.audit-hero h2,.contact-hero h2{line-height:.96}
   .audience-section,.trust-section,.google-review-section,.audit-section,.contact-section{padding-top:var(--space-7)!important;padding-bottom:var(--space-7)!important}
   .google-review-hero{grid-template-columns:1fr;gap:16px;padding-bottom:26px}
   .google-review-hero>p:last-child{margin:0;font-size:15px}
@@ -1994,7 +2038,7 @@ summary,
   .google-review-mark{width:46px;height:46px;border-radius:15px}
   .google-review-link{grid-column:1/-1;width:100%;min-height:46px;margin-top:2px}
   .audit-form{border-radius:22px!important}.audit-form:hover,.audit-form:focus-within{border-radius:22px!important}.audit-explainer{border-radius:17px!important}
-  .audit-form-heading h3{font-size:clamp(2.65rem,12vw,3.55rem)!important;line-height:.94!important}
+  .audit-form-heading h3{font-size:clamp(2.65rem,12vw,3.55rem);line-height:.94}
 }
 
 @media(prefers-reduced-motion:reduce){.home-statement-card,.home-statement-card .brand-red,.trust-title-accent,.google-review-hero,.google-review-card{animation:none!important;transition:none!important;transform:none!important;filter:none!important;opacity:1!important}}
@@ -2150,8 +2194,8 @@ summary,
 
 .service-grid-card .service-slide h2{
   max-width:14ch!important;
-  font-size:clamp(2.85rem,3.8vw,3.9rem)!important;
-  line-height:1.05!important;
+  font-size:clamp(2.85rem,3.8vw,3.9rem);
+  line-height:1.05;
   overflow:visible!important;
   padding-bottom:.06em!important;
 }
@@ -2159,7 +2203,7 @@ summary,
 .service-grid-card .service-slide p{
   max-width:35rem!important;
   margin-top:18px!important;
-  line-height:1.56!important;
+  line-height:1.56;
 }
 
 .service-grid-card .service-points{margin-top:20px!important}
@@ -2220,7 +2264,7 @@ summary,
   .service-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .service-grid-card{min-height:430px!important}
   .service-grid-card .service-slide{padding:34px 30px!important}
-  .service-grid-card .service-slide h2{font-size:clamp(2.3rem,5vw,3rem)!important}
+  .service-grid-card .service-slide h2{font-size:clamp(2.3rem,5vw,3rem)}
 }
 
 @media(max-width:700px){
@@ -2232,11 +2276,11 @@ summary,
   .service-grid-card{min-height:0!important;border-radius:22px!important}
   .service-grid-card .service-slide{padding:25px 20px!important}
   .service-grid-card .service-slide-content{min-height:305px!important}
-  .service-grid-card .service-slide h2{max-width:11ch!important;font-size:clamp(1.9rem,8.1vw,2.35rem)!important;line-height:1.08!important}
-  .service-grid-card .service-slide p{margin-top:14px!important;line-height:1.56!important}
+  .service-grid-card .service-slide h2{max-width:11ch!important;font-size:clamp(1.9rem,8.1vw,2.35rem);line-height:1.08}
+  .service-grid-card .service-slide p{margin-top:14px!important;line-height:1.56}
   .service-grid-card .service-points{margin-top:16px!important;gap:8px!important}
-  .service-grid-card .service-points li{line-height:1.45!important}
-  .service-grid-card .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;padding-inline:13px!important;justify-content:center!important;font-size:var(--type-ui)!important}
+  .service-grid-card .service-points li{line-height:1.45}
+  .service-grid-card .service-cta{width:100%!important;min-width:0!important;min-height:46px!important;padding-inline:13px!important;justify-content:center!important;font-size:var(--type-ui)}
 }
 
 /* --------------------------------------------------------------------------
@@ -2262,7 +2306,7 @@ summary,
 .google-review-hero h2,
 .audit-hero h2,
 .contact-hero h2{
-  line-height:1.02!important;
+  line-height:1.02;
   overflow:visible!important;
   padding-bottom:.08em!important;
 }
@@ -2271,7 +2315,7 @@ summary,
 
 .contact-title-line{
   display:block!important;
-  line-height:1.05!important;
+  line-height:1.05;
   overflow:visible!important;
   padding-bottom:.06em!important;
 }
@@ -2286,7 +2330,7 @@ summary,
 }
 
 .audit-form-heading h3{
-  line-height:1.04!important;
+  line-height:1.04;
   overflow:visible!important;
   padding-bottom:.07em!important;
 }
@@ -2295,7 +2339,7 @@ summary,
 .trust-proof h3,
 .google-review-copy h3,
 .contact-panel h3{
-  line-height:1.10!important;
+  line-height:1.10;
   overflow:visible!important;
   padding-bottom:.025em!important;
 }
@@ -2361,10 +2405,10 @@ summary,
   .trust-sticky h2,
   .google-review-hero h2,
   .audit-hero h2,
-  .contact-hero h2{line-height:1.05!important}
+  .contact-hero h2{line-height:1.05}
 
-  .contact-title-line{line-height:1.07!important}
-  .audit-form-heading h3{line-height:1.08!important}
+  .contact-title-line{line-height:1.07}
+  .audit-form-heading h3{line-height:1.08}
   .google-review-stars{gap:6px}
   .google-review-star{font-size:20px}
 }
@@ -2509,14 +2553,14 @@ summary,
   .trust-note-card p{
     width:100%!important;
     max-width:14ch!important;
-    font-size:clamp(2.05rem,2.55vw,2.6rem)!important;
-    line-height:1.27!important;
-    letter-spacing:-.034em!important;
+    font-size:clamp(2.05rem,2.55vw,2.6rem);
+    line-height:1.27;
+    letter-spacing:-.034em;
     text-wrap:balance!important;
   }
   .trust-note-accent{
-    font-size:1.12em!important;
-    letter-spacing:-.045em!important;
+    font-size:1.12em;
+    letter-spacing:-.045em;
   }
 }
 
@@ -2591,8 +2635,8 @@ summary,
   .home-services-card .service-slide p{
     align-self:start!important;
     max-width:38rem!important;
-    line-height:1.62!important;
-    letter-spacing:-.012em!important;
+    line-height:1.62;
+    letter-spacing:-.012em;
   }
   .home-services-card .service-points{
     align-self:stretch!important;
@@ -2603,14 +2647,14 @@ summary,
     padding-block:8px!important;
   }
   .home-services-card .service-points li{
-    line-height:1.5!important;
+    line-height:1.5;
   }
   .home-services-card .service-cta{
     align-self:end!important;
     justify-self:start!important;
     min-height:54px!important;
     padding-inline:26px!important;
-    font-size:var(--type-ui)!important;
+    font-size:var(--type-ui);
   }
 }
 
@@ -2994,33 +3038,33 @@ summary,
   .status-panel{backdrop-filter:blur(12px) saturate(116%)!important;-webkit-backdrop-filter:blur(12px) saturate(116%)!important}
 
   .services-header{gap:14px!important;padding-bottom:26px!important}
-  .services-header h2{max-width:10ch!important;font-size:clamp(2.55rem,10.8vw,3.2rem)!important;line-height:1.05!important}
-  .services-header>p{font-size:15px!important;line-height:1.58!important}
+  .services-header h2{max-width:10ch!important;font-size:clamp(2.55rem,10.8vw,3.2rem);line-height:1.05}
+  .services-header>p{font-size:15px;line-height:1.58}
   .service-card-grid{gap:12px!important}
   .service-grid-card{backdrop-filter:blur(12px) saturate(112%)!important;-webkit-backdrop-filter:blur(12px) saturate(112%)!important}
   .service-grid-card .service-slide{padding:24px 19px!important}
   .service-grid-card .service-slide-content{min-height:0!important}
-  .service-grid-card .service-slide h2{font-size:clamp(1.85rem,7.8vw,2.25rem)!important;line-height:1.08!important}
-  .service-grid-card .service-slide p{line-height:1.56!important}
-  .service-grid-card .service-points li{line-height:1.45!important}
-  .service-grid-card .service-cta{min-height:48px!important;margin-top:24px!important;font-size:var(--type-ui)!important}
+  .service-grid-card .service-slide h2{font-size:clamp(1.85rem,7.8vw,2.25rem);line-height:1.08}
+  .service-grid-card .service-slide p{line-height:1.56}
+  .service-grid-card .service-points li{line-height:1.45}
+  .service-grid-card .service-cta{min-height:48px!important;margin-top:24px!important;font-size:var(--type-ui)}
 
   .audience-item{backdrop-filter:blur(12px) saturate(110%)!important;-webkit-backdrop-filter:blur(12px) saturate(110%)!important}
 
   .google-review-hero{grid-template-columns:1fr!important;gap:16px!important;padding-bottom:26px!important}
   .google-review-hero h2{max-width:11ch!important}
-  .google-review-hero>p:last-child{max-width:none!important;margin:0!important;font-size:15px!important;line-height:1.58!important}
+  .google-review-hero>p:last-child{max-width:none!important;margin:0!important;font-size:15px;line-height:1.58}
   .google-review-card{grid-template-columns:auto minmax(0,1fr)!important;gap:14px!important;padding:18px!important;border-radius:22px!important;backdrop-filter:blur(14px) saturate(116%)!important;-webkit-backdrop-filter:blur(14px) saturate(116%)!important}
-  .google-review-mark{width:48px!important;height:48px!important;border-radius:15px!important;font-size:27px!important}
-  .google-review-copy h3{font-size:clamp(1.35rem,6vw,1.7rem)!important}
+  .google-review-mark{width:48px!important;height:48px!important;border-radius:15px!important;font-size:27px}
+  .google-review-copy h3{font-size:clamp(1.35rem,6vw,1.7rem)}
   .google-review-link{grid-column:1/-1!important;width:100%!important;min-width:0!important;min-height:48px!important}
 
   .partners-conveyor{margin-inline:0!important;padding:10px!important;border-radius:22px!important;backdrop-filter:blur(14px) saturate(112%)!important;-webkit-backdrop-filter:blur(14px) saturate(112%)!important}
   .partner-tile{width:160px!important;height:100px!important;padding:16px!important}
 
   .audit-form{padding:28px 20px!important}
-  .audit-field input{min-height:58px!important;font-size:16px!important}
-  .audit-consent{line-height:1.5!important}
+  .audit-field input{min-height:58px!important;font-size:16px}
+  .audit-consent{line-height:1.5}
   .audit-submit{min-height:50px!important}
 
   .contact-grid{gap:14px!important}
@@ -3082,24 +3126,24 @@ body{letter-spacing:0}
 .partners-header h2,
 .audit-hero h2,
 .contact-hero h2{
-  letter-spacing:-.024em!important;
+  letter-spacing:-.024em;
 }
 
 .audience-header h2,
 .trust-sticky h2,
 .audit-hero h2,
 .contact-hero h2{
-  line-height:.98!important;
+  line-height:.98;
 }
 
 .services-header h2,
 .google-review-hero h2,
 .partners-header h2{
-  line-height:1.02!important;
+  line-height:1.02;
 }
 
 .home-hero h1{
-  line-height:1!important;
+  line-height:1;
 }
 
 .service-grid-card .service-slide h2,
@@ -3108,8 +3152,8 @@ body{letter-spacing:0}
 .google-review-copy h3,
 .audit-form-heading h3,
 .contact-panel h3{
-  letter-spacing:-.014em!important;
-  line-height:1.1!important;
+  letter-spacing:-.014em;
+  line-height:1.1;
 }
 
 .hero-tagline,
@@ -3121,7 +3165,7 @@ body{letter-spacing:0}
 .contact-row,
 .footer-panel,
 .footer-legal-bar{
-  letter-spacing:0!important;
+  letter-spacing:0;
 }
 
 .contact-panel-intro{font-size:var(--type-body)}
@@ -3169,7 +3213,7 @@ body{letter-spacing:0}
   .partners-header h2,
   .audit-hero h2,
   .contact-hero h2{
-    letter-spacing:-.018em!important;
+    letter-spacing:-.018em;
   }
 
   .service-grid-card .service-slide h2{min-height:0!important}
@@ -3291,3 +3335,155 @@ body{letter-spacing:0}
 }
 @media(min-width:981px){.audit-page .audit-form-heading h2{max-width:430px}}
 @media(max-width:640px){.audit-page .audit-form-heading h2{font-size:clamp(2.15rem,10vw,3rem)}}
+
+/* source: typography-system.css */
+/* Canonical site-wide typography system.
+ * Loaded last in every route bundle. Route CSS owns composition and colour;
+ * these named roles own size, tracking and line-height. */
+body{font-size:var(--type-role-body);line-height:1.62;letter-spacing:0}
+
+/* Page / route heroes */
+.home-hero h1,
+.reset-404-inner h1,
+.reset-placeholder-inner h1,
+.support-hero-copy h1,
+.get-in-touch-page .contact-hero h1,
+.audit-page .audit-hero h1{
+  font-size:var(--type-role-hero);
+  line-height:1.02;
+  letter-spacing:-.018em;
+}
+
+/* Major chapter headings */
+.section-heading h2,
+.services-header h2,
+.audience-header h2,
+.trust-sticky h2,
+.google-review-hero h2,
+.partners-header h2,
+.audit-hero h2,
+.contact-hero h2,
+.support-section-heading h2,
+.support-onboarding .support-section-heading h2{
+  font-size:var(--type-role-section);
+  line-height:1.07;
+  letter-spacing:-.011em;
+}
+
+/* Large component / feature headings */
+.home-statement-card h2,
+.service-grid-card .service-slide h2,
+.audit-form-heading h2,
+.audit-form-heading h3,
+.audit-page .audit-form-heading h2,
+.support-standard h2,
+.support-pack-catalogue-head h3,
+.support-pack-reel-name{
+  font-size:var(--type-role-feature);
+  line-height:1.1;
+  letter-spacing:-.008em;
+}
+
+/* Cards and compact content headings */
+.audience-item h3,
+.trust-proof h3,
+.google-review-copy h3,
+.contact-panel h2,
+.contact-panel h3,
+.get-in-touch-page .contact-panel h2,
+.get-in-touch-page .contact-panel h3,
+.support-package-card h3,
+.support-step-card h3,
+.support-extra-card h3{
+  font-size:var(--type-role-card);
+  line-height:1.12;
+  letter-spacing:-.006em;
+}
+
+/* Leads/body copy get a consistent readable rhythm without overriding UI labels. */
+.section-heading>p:last-child,
+.hero-sub,
+.audit-lead,
+.support-section-lead,
+.support-hero-lead,
+.reset-404-inner p:not(.eyebrow),
+.reset-placeholder-inner p:not(.eyebrow){
+  font-size:var(--type-role-lead);
+  line-height:1.62;
+  letter-spacing:0;
+}
+
+.service-grid-card .service-slide p,
+.audience-item p,
+.trust-proof p,
+.support-step-copy p,
+.support-package-copy,
+.support-extra-summary,
+.support-pack-reel-copy{
+  letter-spacing:0;
+}
+
+/* Action typography: same optical size and no compressed tracking. */
+.button,
+.service-cta,
+.support-hero-cta,
+.support-package-cora-trigger,
+.support-packs-more-btn,
+.audit-submit,
+.contact-whatsapp{
+  font-size:var(--type-role-ui);
+  line-height:1.3;
+  letter-spacing:0;
+}
+
+@media(max-width:700px){
+  .home-hero h1,
+  .reset-404-inner h1,
+  .reset-placeholder-inner h1,
+  .support-hero-copy h1,
+  .get-in-touch-page .contact-hero h1,
+  .audit-page .audit-hero h1{
+    line-height:1.04;
+    letter-spacing:-.01em;
+  }
+
+  .section-heading h2,
+  .services-header h2,
+  .audience-header h2,
+  .trust-sticky h2,
+  .google-review-hero h2,
+  .partners-header h2,
+  .audit-hero h2,
+  .contact-hero h2,
+  .support-section-heading h2,
+  .support-onboarding .support-section-heading h2{
+    line-height:1.11;
+    letter-spacing:-.006em;
+  }
+
+  .home-statement-card h2,
+  .service-grid-card .service-slide h2,
+  .audit-form-heading h2,
+  .audit-form-heading h3,
+  .audit-page .audit-form-heading h2,
+  .support-standard h2,
+  .support-pack-catalogue-head h3,
+  .support-pack-reel-name{
+    line-height:1.12;
+    letter-spacing:-.004em;
+  }
+
+  .audience-item h3,
+  .trust-proof h3,
+  .google-review-copy h3,
+  .contact-panel h2,
+  .contact-panel h3,
+  .get-in-touch-page .contact-panel h2,
+  .get-in-touch-page .contact-panel h3,
+  .support-package-card h3,
+  .support-step-card h3,
+  .support-extra-card h3{
+    line-height:1.14;
+    letter-spacing:-.003em;
+  }
+}
