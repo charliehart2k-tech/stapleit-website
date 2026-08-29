@@ -260,7 +260,7 @@ test('mobile chapters keep breathing room between headings, controls and cards',
           extras: Number.parseFloat(style('#support-services-grid').gap)
         },
         headingLineRatio: Number.parseFloat(heading.lineHeight) / Number.parseFloat(heading.fontSize),
-        headingTracking: Number.parseFloat(heading.letterSpacing),
+        headingTracking: heading.letterSpacing === 'normal' ? 0 : Number.parseFloat(heading.letterSpacing),
         headingSize: Number.parseFloat(heading.fontSize),
         chapterMargins: ['.support-onboarding','.support-packages','.support-packs','.support-extras','.support-cta']
           .map(selector => Number.parseFloat(style(selector).marginTop)),
@@ -300,7 +300,7 @@ test('desktop typography, chapter rhythm and colour containment stay consistent'
     const headings = headingSelectors.map(selector => {
       const element = document.querySelector(selector);
       const style = getComputedStyle(element);
-      return { font: Number.parseFloat(style.fontSize), tracking: Number.parseFloat(style.letterSpacing), line: Number.parseFloat(style.lineHeight) };
+      return { font: Number.parseFloat(style.fontSize), tracking: style.letterSpacing === 'normal' ? 0 : Number.parseFloat(style.letterSpacing), line: Number.parseFloat(style.lineHeight) };
     });
     const sections = ['.support-packages','.support-packs','.support-extras','.support-cta'].map(selector => {
       const element = document.querySelector(selector);
@@ -909,7 +909,7 @@ test('desktop add-on chapter uses the same typography and Cora geometry as packa
       rightDelta: Math.abs(packs.right - packages.right),
       sectionHeight: packs.height,
       headingSizeDelta: Math.abs(Number.parseFloat(packHeading.fontSize) - Number.parseFloat(addonHeading.fontSize)),
-      headingTrackingDelta: Math.abs(Number.parseFloat(packHeading.letterSpacing) - Number.parseFloat(addonHeading.letterSpacing)),
+      headingTrackingDelta: Math.abs((packHeading.letterSpacing === 'normal' ? 0 : Number.parseFloat(packHeading.letterSpacing)) - (addonHeading.letterSpacing === 'normal' ? 0 : Number.parseFloat(addonHeading.letterSpacing))),
       coraWidthDelta: Math.abs(packageCora.width - addonCora.width),
       coraHeightDelta: Math.abs(packageCora.height - addonCora.height),
       activeTitle: Number.parseFloat(getComputedStyle(active.querySelector('.support-pack-reel-name')).fontSize),
@@ -1013,6 +1013,8 @@ test('IT Services landing page uses the four approved service cards', async ({ p
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Take your pick');
   await expect(page.locator('.it-services-pick')).toHaveText('pick');
   await expect(page.locator('.it-services-next')).toBeVisible();
+  await expect(page.locator('.it-services-next-kicker')).toHaveCount(0);
+  await expect(page.locator('.service-grid-card--solutions h2 br')).toHaveCount(1);
   await expect(page.locator('.service-grid-card')).toHaveCount(4);
   for (const href of ['/it-services/it-support/', '/it-services/it-solutions/', '/it-services/it-consultancy/', '/it-services/cybersecurity/']) {
     await expect(page.locator(`.service-grid-card a[href="${href}"]`)).toHaveCount(1);
@@ -1302,6 +1304,10 @@ test('IT Services landing page uses a full premium canvas at desktop and stays c
       gridGap: Number.parseFloat(getComputedStyle(grid).columnGap),
       nextWidth: next.width,
       pickFill: pick.webkitTextFillColor || pick.color,
+      pickAnimation: pick.animationName,
+      pickPaddingBottom: Number.parseFloat(pick.paddingBottom),
+      heroOverflow: getComputedStyle(hero).overflow,
+      heroTracking: Number.parseFloat(getComputedStyle(hero).letterSpacing),
       overflow: document.documentElement.scrollWidth - innerWidth
     };
   });
@@ -1312,6 +1318,10 @@ test('IT Services landing page uses a full premium canvas at desktop and stays c
   expect(desktop.gridGap).toBeGreaterThanOrEqual(24);
   expect(desktop.nextWidth).toBeGreaterThanOrEqual(1180);
   expect(desktop.pickFill).not.toBe('rgb(255, 255, 255)');
+  expect(desktop.pickAnimation).toContain('contactStapleShimmer');
+  expect(desktop.pickPaddingBottom).toBeGreaterThanOrEqual(8);
+  expect(desktop.heroOverflow).toBe('visible');
+  expect(desktop.heroTracking).toBeGreaterThanOrEqual(-0.5);
   expect(desktop.overflow).toBeLessThanOrEqual(0);
 
   await page.setViewportSize({ width: 390, height: 844 });

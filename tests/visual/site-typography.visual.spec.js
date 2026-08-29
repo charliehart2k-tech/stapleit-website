@@ -91,7 +91,7 @@ for (const [width, height, expected] of [
       }
       for (const heading of state.headings) {
         expect(heading.line / heading.font, `${route} heading line-height quality`).toBeGreaterThanOrEqual(.98);
-        expect(heading.track / heading.font, `${route} heading tracking quality`).toBeGreaterThanOrEqual(-.021);
+        expect(heading.track / heading.font, `${route} heading tracking quality`).toBeGreaterThanOrEqual(-.006);
       }
       expect(state.overflow, `${route} overflow`).toBeLessThanOrEqual(0);
     }

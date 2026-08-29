@@ -164,7 +164,7 @@
   .support-onboarding-cta{width:calc(100% - 20px)}
 
   .support-hero-copy{padding-inline:15px}
-  .support-standard{padding-inline:15px}
+  .support-standard{padding-inline:14px}
   .support-step-grid{padding-left:36px}
   .support-step-card::after{left:-36px}
   .support-step-content{padding:26px 18px}
