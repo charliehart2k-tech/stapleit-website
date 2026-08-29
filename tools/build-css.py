@@ -76,11 +76,16 @@ BUNDLES = {
 # then applies only a small route-specific composition layer.
 BUNDLES["get-in-touch.bundle.css"] = BUNDLES["home.bundle.css"][:-1] + ["get-in-touch.css", "typography-system.css"]
 
+# IT Services reuses the approved homepage service-card system, then applies
+# a dedicated full-page composition layer before the canonical typography pass.
+BUNDLES["it-services.bundle.css"] = BUNDLES["home.bundle.css"][:-1] + ["it-services.css", "typography-system.css"]
+
 MAX_GZIP_BYTES = {
     "site-shell.bundle.css": 16_000,
     "home.bundle.css": 45_000,
     "it-support.bundle.css": 30_000,
     "get-in-touch.bundle.css": 45_000,
+    "it-services.bundle.css": 45_000,
 }
 
 

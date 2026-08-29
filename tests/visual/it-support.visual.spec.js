@@ -1011,7 +1011,8 @@ test('IT Services landing page uses the four approved service cards', async ({ p
   await page.goto('http://127.0.0.1:4173/it-services/', { waitUntil: 'networkidle' });
   await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding this page/i);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Take your pick');
-  await expect(page.locator('.services-header-accent')).toHaveText('pick');
+  await expect(page.locator('.it-services-pick')).toHaveText('pick');
+  await expect(page.locator('.it-services-next')).toBeVisible();
   await expect(page.locator('.service-grid-card')).toHaveCount(4);
   for (const href of ['/it-services/it-support/', '/it-services/it-solutions/', '/it-services/it-consultancy/', '/it-services/cybersecurity/']) {
     await expect(page.locator(`.service-grid-card a[href="${href}"]`)).toHaveCount(1);
@@ -1280,4 +1281,49 @@ test('mobile motion remains compositor-first during a full-page interaction pass
   expect(performanceState.coraWillChange).toBe('auto');
   expect(performanceState.revealWillChange).toBe('auto');
   expect(performanceState.overflow).toBeLessThanOrEqual(0);
+});
+
+
+test('IT Services landing page uses a full premium canvas at desktop and stays contained on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto('http://127.0.0.1:4173/it-services/', { waitUntil: 'networkidle' });
+  const desktop = await page.evaluate(() => {
+    const overview = document.querySelector('.it-services-overview').getBoundingClientRect();
+    const hero = document.querySelector('#it-services-title');
+    const firstCard = document.querySelector('.service-grid-card').getBoundingClientRect();
+    const grid = document.querySelector('.service-card-grid');
+    const next = document.querySelector('.it-services-next').getBoundingClientRect();
+    const pick = getComputedStyle(document.querySelector('.it-services-pick'));
+    return {
+      overviewWidth: overview.width,
+      heroSize: Number.parseFloat(getComputedStyle(hero).fontSize),
+      firstCardWidth: firstCard.width,
+      firstCardHeight: firstCard.height,
+      gridGap: Number.parseFloat(getComputedStyle(grid).columnGap),
+      nextWidth: next.width,
+      pickFill: pick.webkitTextFillColor || pick.color,
+      overflow: document.documentElement.scrollWidth - innerWidth
+    };
+  });
+  expect(desktop.overviewWidth).toBeGreaterThanOrEqual(1180);
+  expect(desktop.heroSize).toBeGreaterThanOrEqual(91);
+  expect(desktop.firstCardWidth).toBeGreaterThanOrEqual(560);
+  expect(desktop.firstCardHeight).toBeGreaterThanOrEqual(480);
+  expect(desktop.gridGap).toBeGreaterThanOrEqual(24);
+  expect(desktop.nextWidth).toBeGreaterThanOrEqual(1180);
+  expect(desktop.pickFill).not.toBe('rgb(255, 255, 255)');
+  expect(desktop.overflow).toBeLessThanOrEqual(0);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload({ waitUntil: 'networkidle' });
+  const mobile = await page.evaluate(() => ({
+    cards: [...document.querySelectorAll('.service-grid-card')].map(card => card.getBoundingClientRect().width),
+    overview: document.querySelector('.it-services-overview').getBoundingClientRect().width,
+    overflow: document.documentElement.scrollWidth - innerWidth,
+    nextActions: getComputedStyle(document.querySelector('.it-services-next-actions')).gridTemplateColumns
+  }));
+  expect(mobile.cards).toHaveLength(4);
+  expect(mobile.cards.every(width => width <= mobile.overview + 1)).toBe(true);
+  expect(mobile.overflow).toBeLessThanOrEqual(0);
+  expect(mobile.nextActions).not.toBe('none');
 });

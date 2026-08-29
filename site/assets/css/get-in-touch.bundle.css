@@ -2077,14 +2077,14 @@ summary,
 
 .service-card-grid{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:20px!important;
+  gap:var(--service-grid-gap,20px)!important;
   align-items:stretch!important;
 }
 
 .service-grid-card{
   --service-card-glow:var(--support);
   position:relative;
-  min-height:clamp(430px,29vw,520px)!important;
+  min-height:var(--service-card-min-height,clamp(430px,29vw,520px))!important;
   height:auto!important;
   padding:0!important;
   overflow:hidden!important;
@@ -2154,7 +2154,7 @@ summary,
   min-width:0!important;
   min-height:100%!important;
   height:100%!important;
-  padding:42px 50px!important;
+  padding:var(--service-card-padding,42px 50px)!important;
   opacity:1!important;
   transform:none!important;
   pointer-events:auto!important;
@@ -2249,10 +2249,10 @@ summary,
   .services-header{grid-template-columns:1fr;gap:16px;padding-bottom:28px}
   .services-header h1,.services-header h2{max-width:10ch;line-height:1.05}
   .services-header>p{max-width:none;margin:0;font-size:15px;line-height:1.56}
-  .service-card-grid{grid-template-columns:1fr!important;gap:14px!important}
-  .service-grid-card{min-height:0!important;border-radius:22px!important}
-  .service-grid-card .service-slide{padding:25px 20px!important}
-  .service-grid-card .service-slide-content{min-height:305px!important}
+  .service-card-grid{grid-template-columns:1fr!important;gap:var(--service-grid-gap-mobile,14px)!important}
+  .service-grid-card{min-height:var(--service-card-min-height-mobile,0)!important;border-radius:22px!important}
+  .service-grid-card .service-slide{padding:var(--service-card-padding-mobile,25px 20px)!important}
+  .service-grid-card .service-slide-content{min-height:var(--service-card-content-min-height-mobile,305px)!important}
   .service-grid-card .service-slide h2{max-width:11ch!important;font-size:clamp(1.9rem,8.1vw,2.35rem);line-height:1.08}
   .service-grid-card .service-slide p{margin-top:14px!important;line-height:1.56}
   .service-grid-card .service-points{margin-top:16px!important;gap:8px!important}

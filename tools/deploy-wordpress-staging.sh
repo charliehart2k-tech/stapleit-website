@@ -452,3 +452,8 @@ echo "Homepage source of truth: $SOURCE/index.html"
 echo "Static route sources deployed: ${#STATIC_ROUTE_SOURCES[@]}"
 echo "Static route handler: $MU_PLUGINS_DIR/stapleit-static-routes.php"
 echo "WordPress form handler source: $WORDPRESS_SOURCE/functions.php"
+
+# IT Services landing route must remain complete.
+grep -Fq 'Take your <span class="it-services-pick">pick</span>' "$THEME/static-it-services.php"
+grep -Fq 'class="it-services-next"' "$THEME/static-it-services.php"
+grep -Fq 'assets/css/it-services.bundle.css' "$THEME/static-it-services.php"
