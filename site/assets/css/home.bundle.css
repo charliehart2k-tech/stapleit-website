@@ -2040,13 +2040,11 @@ summary,
   padding-bottom:48px;
 }
 
+.services-header h1,
 .services-header h2{
   max-width:10ch;
   margin:0;
-  font-size:var(--type-section);
   font-weight:700;
-  line-height:1.02;
-  letter-spacing:-.048em;
   overflow:visible;
   padding-bottom:.08em;
 }
@@ -2238,7 +2236,7 @@ summary,
 @media(min-width:701px) and (max-width:980px){
   .home-intro{padding:64px 0 72px!important}
   .services-header{grid-template-columns:1fr;gap:22px;padding-bottom:38px}
-  .services-header h2{max-width:9ch}
+  .services-header h1,.services-header h2{max-width:9ch}
   .services-header>p{max-width:42rem;margin:0}
   .service-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .service-grid-card{min-height:430px!important}
@@ -2249,7 +2247,7 @@ summary,
 @media(max-width:700px){
   .home-intro{padding:54px 0 60px!important}
   .services-header{grid-template-columns:1fr;gap:16px;padding-bottom:28px}
-  .services-header h2{max-width:9ch;font-size:var(--type-section);line-height:1.05}
+  .services-header h1,.services-header h2{max-width:10ch;line-height:1.05}
   .services-header>p{max-width:none;margin:0;font-size:15px;line-height:1.56}
   .service-card-grid{grid-template-columns:1fr!important;gap:14px!important}
   .service-grid-card{min-height:0!important;border-radius:22px!important}
@@ -3265,6 +3263,7 @@ body{font-size:var(--type-role-body);line-height:1.62;letter-spacing:0}
 
 /* Page / route heroes */
 .home-hero h1,
+.services-header h1,
 .reset-404-inner h1,
 .reset-placeholder-inner h1,
 .support-hero-copy h1,
@@ -3359,6 +3358,7 @@ body{font-size:var(--type-role-body);line-height:1.62;letter-spacing:0}
 
 @media(max-width:700px){
   .home-hero h1,
+  .services-header h1,
   .reset-404-inner h1,
   .reset-placeholder-inner h1,
   .support-hero-copy h1,

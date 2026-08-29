@@ -242,47 +242,48 @@
   .support-packages .support-package-cora,
   .support-packs .support-pack-cora{margin-bottom:36px}
 
-  /* Phone carousel: one complete card; neighbours stay hidden while swipe and autoplay remain available. */
+  /* Phone carousel: complete active card, blurred neighbour cues and explicit arrows. */
   .support-packs-heading{margin-bottom:34px}
-  .support-pack-reel-shell{padding:0 10px}
+  .support-pack-reel-shell{padding:0 6px}
   .support-pack-reel-shell::before{width:88%;height:104%;opacity:.15;filter:blur(34px)}
-  .support-pack-reel{min-height:318px;overflow:clip;touch-action:pan-y}
+  .support-pack-reel{min-height:410px;overflow:hidden;touch-action:pan-y}
   .support-pack-reel-item{
-    inset-block:8px;
-    width:calc(100% - 34px);
-    min-height:300px;
+    top:8px;
+    bottom:auto;
+    width:calc(100% - 52px);
+    min-height:390px;
     align-content:start;
     gap:15px;
-    padding:28px 22px 25px;
+    padding:28px 21px 27px;
     border-radius:21px;
   }
-  .support-pack-reel-name{font-size:clamp(1.85rem,7.8vw,2.1rem);line-height:1.08}
+  .support-pack-reel-name{font-size:clamp(1.75rem,7.4vw,2rem);line-height:1.08}
   .support-pack-reel-copy{font-size:1rem;line-height:1.58}
   .support-pack-reel-features{gap:8px}
   .support-pack-reel-features span{min-height:31px;padding:6px 9px;font-size:.76rem}
   .support-pack-reel-link{margin-top:2px;font-size:.92rem}
   .support-pack-reel-item.is-prev,
   .support-pack-reel-item.is-next{
-    left:50%;
-    right:auto;
-    width:calc(100% - 34px);
-    min-height:300px;
-    padding:28px 22px 25px;
-    opacity:0;
+    width:72%;
+    min-height:354px;
+    padding:24px 18px;
+    opacity:.24;
     pointer-events:none;
-    transform:translateX(-50%) scale(.94);
-    filter:saturate(.7) brightness(.72);
+    filter:blur(2px) saturate(.72) brightness(.62);
   }
+  .support-pack-reel-item.is-prev{left:0;right:auto;transform:translateX(-84%) scale(.92)}
+  .support-pack-reel-item.is-next{left:auto;right:0;transform:translateX(84%) scale(.92)}
   .support-pack-reel-item.is-prev .support-pack-reel-name,
-  .support-pack-reel-item.is-next .support-pack-reel-name{opacity:0}
+  .support-pack-reel-item.is-next .support-pack-reel-name{opacity:.22}
+  .support-pack-reel-arrow{display:grid}
   .support-packs .support-packs-more{margin-top:28px}
 }
 
 @media(max-width:390px){
   .support-section-heading h2,
   .support-onboarding .support-section-heading h2{font-size:clamp(1.95rem,9.1vw,2.25rem)}
-  .support-pack-reel-shell{padding-inline:6px}
-  .support-pack-reel-item,
+  .support-pack-reel-shell{padding-inline:2px}
   .support-pack-reel-item.is-prev,
-  .support-pack-reel-item.is-next{width:calc(100% - 24px);padding-inline:19px}
+  .support-pack-reel-item.is-next{padding-inline:18px}
+  .support-pack-reel-item{width:calc(100% - 46px)}
 }

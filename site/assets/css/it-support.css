@@ -450,6 +450,11 @@
   margin-inline:auto;
 }
 
+.support-copy-block{
+  display:block;
+  margin-top:.8em;
+}
+
 .support-onboarding>.support-section-heading{
   grid-template-columns:minmax(0,1.08fr) minmax(360px,.72fr);
   gap:64px;

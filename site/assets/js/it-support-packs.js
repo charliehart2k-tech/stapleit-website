@@ -3,6 +3,8 @@
   const reel = document.querySelector('[data-pack-reel]');
   const items = reel ? [...reel.querySelectorAll('[data-pack-reel-item]')] : [];
   if (!reel || items.length < 3) return;
+  const previousButton = reel.querySelector('[data-pack-reel-prev]');
+  const nextButton = reel.querySelector('[data-pack-reel-next]');
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const compactDeck = window.matchMedia('(max-width: 700px)');
@@ -65,6 +67,14 @@
     });
   });
 
+  const move = delta => {
+    render(activeIndex + delta);
+    window.StapleTactile?.snap?.(items[activeIndex]);
+    start();
+  };
+  previousButton?.addEventListener('click', () => move(-1));
+  nextButton?.addEventListener('click', () => move(1));
+
   reel.addEventListener('keydown', event => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
@@ -80,9 +90,7 @@
     const delta = event.clientX - pointerStartX;
     pointerStartX = null;
     if (Math.abs(delta) < 38) return;
-    render(activeIndex + (delta < 0 ? 1 : -1));
-    window.StapleTactile?.snap?.(items[activeIndex]);
-    start();
+    move(delta < 0 ? 1 : -1);
   });
   reel.addEventListener('pointercancel', () => { pointerStartX = null; });
   reel.addEventListener('pointerenter', () => { paused = true; stop(); });

@@ -207,7 +207,7 @@ test('mobile top chapters keep deliberate rhythm and standard inclusions progres
 
   expect(initial.heroHeight).toBeLessThan(1120);
   expect(initial.standardHeight).toBeLessThan(680);
-  expect(initial.onboardingHeight).toBeLessThanOrEqual(1380);
+  expect(initial.onboardingHeight).toBeLessThanOrEqual(1500);
   expect(initial.separation).toBeGreaterThanOrEqual(12);
   expect(initial.packageHeadingSize).toBeLessThanOrEqual(40);
   expect(initial.visibleItems).toBe(8);
@@ -790,13 +790,16 @@ test('Add-on showcase matches the package chapter and keeps the active card read
       overflow: document.documentElement.scrollWidth - innerWidth
     };
   });
-  expect(state.sectionHeight).toBeLessThanOrEqual(980);
-  expect(state.reelHeight).toBeLessThanOrEqual(330);
-  expect(state.shellHeight).toBeLessThanOrEqual(410);
+  expect(state.sectionHeight).toBeLessThanOrEqual(1120);
+  expect(state.reelHeight).toBeGreaterThanOrEqual(390);
+  expect(state.reelHeight).toBeLessThanOrEqual(420);
+  expect(state.shellHeight).toBeLessThanOrEqual(510);
   expect(state.activeLeft).toBeGreaterThanOrEqual(18);
   expect(state.activeRight).toBeLessThanOrEqual(372);
-  expect(state.prevOpacity).toBe(0);
-  expect(state.nextOpacity).toBe(0);
+  expect(state.prevOpacity).toBeGreaterThanOrEqual(0.18);
+  expect(state.prevOpacity).toBeLessThanOrEqual(0.3);
+  expect(state.nextOpacity).toBeGreaterThanOrEqual(0.18);
+  expect(state.nextOpacity).toBeLessThanOrEqual(0.3);
   expect(state.titleSize).toBeGreaterThanOrEqual(28);
   expect(state.copySize).toBeGreaterThanOrEqual(15);
   expect(state.auraWidth).toBeLessThan(390);
@@ -816,7 +819,7 @@ test('Add-on showcase matches the package chapter and keeps the active card read
 
 
 
-test('mobile add-on deck stays single-card and fully contained', async ({ page }) => {
+test('mobile add-on deck keeps one active card, blurred neighbours and visible arrows', async ({ page }) => {
   for (const [width, height] of [[320, 720], [390, 844], [430, 932]]) {
     await page.setViewportSize({ width, height });
     await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
@@ -830,25 +833,62 @@ test('mobile add-on deck stays single-card and fully contained', async ({ page }
         activeLeft: active.left,
         activeRightGap: innerWidth - active.right,
         reelHeight: reel.height,
+        activeBottomGap: reel.bottom - active.bottom,
         prevOpacity: Number.parseFloat(prev.opacity),
         nextOpacity: Number.parseFloat(next.opacity),
+        prevFilter: prev.filter,
+        nextFilter: next.filter,
         exposedCards: document.querySelectorAll('[data-pack-reel-item][aria-hidden="false"]').length,
+        arrowsVisible: [...document.querySelectorAll('.support-pack-reel-arrow')].every(element => getComputedStyle(element).display !== 'none'),
         headingSize: Number.parseFloat(heading.fontSize),
         overflow: document.documentElement.scrollWidth - innerWidth
       };
     });
     expect(state.activeLeft).toBeGreaterThanOrEqual(18);
     expect(state.activeRightGap).toBeGreaterThanOrEqual(18);
-    expect(state.reelHeight).toBeLessThanOrEqual(330);
-    expect(state.prevOpacity).toBe(0);
-    expect(state.nextOpacity).toBe(0);
+    expect(state.reelHeight).toBeGreaterThanOrEqual(390);
+    expect(state.reelHeight).toBeLessThanOrEqual(420);
+    expect(state.activeBottomGap).toBeGreaterThanOrEqual(6);
+    expect(state.prevOpacity).toBeGreaterThanOrEqual(0.18);
+    expect(state.prevOpacity).toBeLessThanOrEqual(0.3);
+    expect(state.nextOpacity).toBeGreaterThanOrEqual(0.18);
+    expect(state.nextOpacity).toBeLessThanOrEqual(0.3);
+    expect(state.prevFilter).toContain('blur');
+    expect(state.nextFilter).toContain('blur');
     expect(state.exposedCards).toBe(1);
+    expect(state.arrowsVisible).toBe(true);
     expect(state.headingSize).toBeGreaterThanOrEqual(31);
     expect(state.headingSize).toBeLessThanOrEqual(40);
     expect(state.overflow).toBeLessThanOrEqual(0);
   }
 });
 
+
+test('mobile add-on arrows cycle every pack without clipping the active card', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+  const next = page.locator('[data-pack-reel-next]');
+  await expect(next).toBeVisible();
+  const seen = new Set();
+  for (let index = 0; index < 9; index += 1) {
+    const state = await page.evaluate(() => {
+      const active = document.querySelector('[data-pack-reel-item].is-active');
+      const activeRect = active.getBoundingClientRect();
+      const reelRect = document.querySelector('.support-pack-reel').getBoundingClientRect();
+      return {
+        pack: active.dataset.packReelItem,
+        bottomGap: reelRect.bottom - activeRect.bottom,
+        linkBottomGap: reelRect.bottom - active.querySelector('.support-pack-reel-link').getBoundingClientRect().bottom
+      };
+    });
+    seen.add(state.pack);
+    expect(state.bottomGap).toBeGreaterThanOrEqual(6);
+    expect(state.linkBottomGap).toBeGreaterThanOrEqual(12);
+    await next.click();
+    await page.waitForTimeout(80);
+  }
+  expect(seen.size).toBe(9);
+});
 
 test('desktop add-on chapter uses the same typography and Cora geometry as packages', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 });
@@ -964,6 +1004,19 @@ test('final services and CTA stay compact, distinct and contained', async ({ pag
   const closingCta = page.locator('.support-cta');
   await expect(closingCta.getByRole('link', { name: 'Start your free IT audit' })).toHaveAttribute('href', '/#free-it-audit');
   await expect(closingCta.getByRole('link', { name: 'Get in touch' })).toHaveAttribute('href', '/get-in-touch/');
+});
+
+test('IT Services landing page uses the four approved service cards', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/it-services/', { waitUntil: 'networkidle' });
+  await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding this page/i);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Take your pick');
+  await expect(page.locator('.services-header-accent')).toHaveText('pick');
+  await expect(page.locator('.service-grid-card')).toHaveCount(4);
+  for (const href of ['/it-services/it-support/', '/it-services/it-solutions/', '/it-services/it-consultancy/', '/it-services/cybersecurity/']) {
+    await expect(page.locator(`.service-grid-card a[href="${href}"]`)).toHaveCount(1);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
 });
 
 test('Get in Touch is a real contact route with working audit handoff', async ({ page }) => {
