@@ -468,14 +468,14 @@ def audit(root: Path) -> int:
 
         if rel.as_posix() == "it-services/it-support/index.html":
             required_support_copy = (
-                'class="support-package-minimum">For teams of 5+',
+                'class="support-package-minimum">Recommended for teams of five or more',
                 "Requires Microsoft 365 Business Premium or equivalent licensing",
                 "LastPass password management included",
                 "Exclaimer email signature management included",
                 "Microsoft 365 Business Premium included",
                 "Huntress endpoint protection",
                 "additional Microsoft licensing required to enable those features is charged separately",
-                "included licence quantities and service levels are confirmed in your written proposal",
+                "Everything is confirmed in a written proposal and service agreement before you commit to anything",
             )
             for fragment in required_support_copy:
                 if fragment not in text:

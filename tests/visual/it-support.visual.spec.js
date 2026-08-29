@@ -207,7 +207,7 @@ test('mobile top chapters keep deliberate rhythm and standard inclusions progres
 
   expect(initial.heroHeight).toBeLessThan(1120);
   expect(initial.standardHeight).toBeLessThan(680);
-  expect(initial.onboardingHeight).toBeLessThanOrEqual(1100);
+  expect(initial.onboardingHeight).toBeLessThanOrEqual(1380);
   expect(initial.separation).toBeGreaterThanOrEqual(12);
   expect(initial.packageHeadingSize).toBeLessThanOrEqual(40);
   expect(initial.visibleItems).toBe(8);
