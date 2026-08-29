@@ -5,6 +5,7 @@
   if (!reel || items.length < 3) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const compactDeck = window.matchMedia('(max-width: 700px)');
   let activeIndex = Math.max(0, items.findIndex(item => item.classList.contains('is-active')));
   let timer = 0;
   let paused = false;
@@ -24,7 +25,7 @@
       item.classList.toggle('is-active', active);
       item.classList.toggle('is-prev', prev);
       item.classList.toggle('is-next', nextItem);
-      const visible = active || prev || nextItem;
+      const visible = active || (!compactDeck.matches && (prev || nextItem));
       item.setAttribute('aria-hidden', visible ? 'false' : 'true');
       if (active) item.setAttribute('aria-current', 'true'); else item.removeAttribute('aria-current');
       item.tabIndex = visible ? 0 : -1;
@@ -94,4 +95,5 @@
   });
   document.addEventListener('visibilitychange', start);
   reducedMotion.addEventListener?.('change', start);
+  compactDeck.addEventListener?.('change', () => render(activeIndex));
 })();

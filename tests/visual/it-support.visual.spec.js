@@ -261,6 +261,9 @@ test('mobile chapters keep breathing room between headings, controls and cards',
         },
         headingLineRatio: Number.parseFloat(heading.lineHeight) / Number.parseFloat(heading.fontSize),
         headingTracking: Number.parseFloat(heading.letterSpacing),
+        headingSize: Number.parseFloat(heading.fontSize),
+        chapterMargins: ['.support-onboarding','.support-packages','.support-packs','.support-extras','.support-cta']
+          .map(selector => Number.parseFloat(style(selector).marginTop)),
         overflow: document.documentElement.scrollWidth - innerWidth
       };
     });
@@ -270,6 +273,9 @@ test('mobile chapters keep breathing room between headings, controls and cards',
     expect(state.cardGaps.extras).toBeGreaterThanOrEqual(14);
     expect(state.headingLineRatio).toBeGreaterThanOrEqual(1.1);
     expect(state.headingTracking).toBeGreaterThanOrEqual(-0.35);
+    expect(state.headingSize).toBeGreaterThanOrEqual(31);
+    expect(state.headingSize).toBeLessThanOrEqual(39);
+    expect(Math.min(...state.chapterMargins)).toBeGreaterThanOrEqual(48);
     expect(state.overflow).toBeLessThanOrEqual(0);
   }
 });
@@ -755,7 +761,7 @@ test('Add-on showcase matches the package chapter and keeps the active card read
   await expect(reel.locator('[data-pack-reel-item].is-active')).toHaveCount(1);
   await expect(reel.locator('[data-pack-reel-item].is-prev')).toHaveCount(1);
   await expect(reel.locator('[data-pack-reel-item].is-next')).toHaveCount(1);
-  await expect(reel.locator('[data-pack-reel-item][aria-hidden="false"]')).toHaveCount(3);
+  await expect(reel.locator('[data-pack-reel-item][aria-hidden="false"]')).toHaveCount(1);
   await expect(reel.locator('[data-pack-reel-item].is-active .support-pack-reel-features span')).toHaveCount(3);
   await expect(page.locator('#support-packs-grid [data-pack-card]:not([hidden])')).toHaveCount(0);
   await expect(section.getByRole('button', { name: 'View all add-ons' })).toBeVisible();
@@ -770,7 +776,12 @@ test('Add-on showcase matches the package chapter and keeps the active card read
     const copy = active.querySelector('.support-pack-reel-copy');
     return {
       sectionHeight: section.getBoundingClientRect().height,
-      reelHeight: reelShell.getBoundingClientRect().height,
+      reelHeight: document.querySelector('.support-pack-reel').getBoundingClientRect().height,
+      shellHeight: reelShell.getBoundingClientRect().height,
+      activeLeft: active.getBoundingClientRect().left,
+      activeRight: active.getBoundingClientRect().right,
+      prevOpacity: Number.parseFloat(getComputedStyle(document.querySelector('[data-pack-reel-item].is-prev')).opacity),
+      nextOpacity: Number.parseFloat(getComputedStyle(document.querySelector('[data-pack-reel-item].is-next')).opacity),
       titleSize: Number.parseFloat(getComputedStyle(name).fontSize),
       copySize: Number.parseFloat(getComputedStyle(copy).fontSize),
       auraWidth: Number.parseFloat(getComputedStyle(reelShell, '::before').width),
@@ -781,6 +792,11 @@ test('Add-on showcase matches the package chapter and keeps the active card read
   });
   expect(state.sectionHeight).toBeLessThanOrEqual(980);
   expect(state.reelHeight).toBeLessThanOrEqual(330);
+  expect(state.shellHeight).toBeLessThanOrEqual(410);
+  expect(state.activeLeft).toBeGreaterThanOrEqual(18);
+  expect(state.activeRight).toBeLessThanOrEqual(372);
+  expect(state.prevOpacity).toBe(0);
+  expect(state.nextOpacity).toBe(0);
   expect(state.titleSize).toBeGreaterThanOrEqual(28);
   expect(state.copySize).toBeGreaterThanOrEqual(15);
   expect(state.auraWidth).toBeLessThan(390);
@@ -796,6 +812,41 @@ test('Add-on showcase matches the package chapter and keeps the active card read
   await page.waitForTimeout(3900);
   const afterVisible = await reel.locator('[data-pack-reel-item].is-active').getAttribute('data-pack-reel-item');
   expect(afterVisible).not.toBe(before);
+});
+
+
+
+test('mobile add-on deck stays single-card and fully contained', async ({ page }) => {
+  for (const [width, height] of [[320, 720], [390, 844], [430, 932]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
+    const state = await page.evaluate(() => {
+      const active = document.querySelector('[data-pack-reel-item].is-active').getBoundingClientRect();
+      const reel = document.querySelector('.support-pack-reel').getBoundingClientRect();
+      const prev = getComputedStyle(document.querySelector('[data-pack-reel-item].is-prev'));
+      const next = getComputedStyle(document.querySelector('[data-pack-reel-item].is-next'));
+      const heading = getComputedStyle(document.querySelector('#support-packs-title'));
+      return {
+        activeLeft: active.left,
+        activeRightGap: innerWidth - active.right,
+        reelHeight: reel.height,
+        prevOpacity: Number.parseFloat(prev.opacity),
+        nextOpacity: Number.parseFloat(next.opacity),
+        exposedCards: document.querySelectorAll('[data-pack-reel-item][aria-hidden="false"]').length,
+        headingSize: Number.parseFloat(heading.fontSize),
+        overflow: document.documentElement.scrollWidth - innerWidth
+      };
+    });
+    expect(state.activeLeft).toBeGreaterThanOrEqual(18);
+    expect(state.activeRightGap).toBeGreaterThanOrEqual(18);
+    expect(state.reelHeight).toBeLessThanOrEqual(330);
+    expect(state.prevOpacity).toBe(0);
+    expect(state.nextOpacity).toBe(0);
+    expect(state.exposedCards).toBe(1);
+    expect(state.headingSize).toBeGreaterThanOrEqual(31);
+    expect(state.headingSize).toBeLessThanOrEqual(39);
+    expect(state.overflow).toBeLessThanOrEqual(0);
+  }
 });
 
 
@@ -854,11 +905,13 @@ test('Add-on reel opens pack details and the catalogue can expand to all nine', 
   const section = page.locator('.support-packs');
   const activePack = section.locator('[data-pack-reel-item].is-active');
   await expect(activePack).toContainText('Server pack');
-  const nextPack = section.locator('[data-pack-reel-item].is-next');
-  await expect(nextPack).toContainText('Azure pack');
-  await nextPack.click();
+  const reel = section.locator('[data-pack-reel]');
+  const box = await reel.boundingBox();
+  await reel.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 71, isPrimary: true, clientX: box.x + box.width * .78, clientY: box.y + box.height / 2 });
+  await reel.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 71, isPrimary: true, clientX: box.x + box.width * .22, clientY: box.y + box.height / 2 });
   await expect(section.locator('[data-pack-reel-item].is-active')).toContainText('Azure pack');
-  await section.locator('[data-pack-reel-item].is-prev').click();
+  await reel.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 72, isPrimary: true, clientX: box.x + box.width * .22, clientY: box.y + box.height / 2 });
+  await reel.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 72, isPrimary: true, clientX: box.x + box.width * .78, clientY: box.y + box.height / 2 });
   await expect(section.locator('[data-pack-reel-item].is-active')).toContainText('Server pack');
   await section.locator('[data-pack-reel-item].is-active').click();
   await expect(page.getByRole('dialog', { name: 'Server pack' })).toBeVisible();
@@ -1092,6 +1145,16 @@ test('mobile tactile feedback stays short, touch-only and scroll-safe', async ({
   await target.dispatchEvent('pointermove', { pointerType: 'touch', pointerId: 43, isPrimary: true, clientX: point.clientX, clientY: point.clientY + 40 });
   await target.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 43, isPrimary: true, clientX: point.clientX, clientY: point.clientY + 40 });
   expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(1);
+
+  await page.waitForTimeout(90);
+  await page.locator('body').dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 44, isPrimary: true, clientX: 12, clientY: 500 });
+  await page.evaluate(() => scrollBy(0, 180));
+  await expect.poll(() => page.evaluate(() => window.__stapleHaptics.length)).toBe(2);
+  expect(await page.evaluate(() => window.__stapleHaptics.at(-1))).toBe(7);
+  await page.locator('body').dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 44, isPrimary: true, clientX: 12, clientY: 320 });
+  await page.evaluate(() => scrollBy(0, 180));
+  await page.waitForTimeout(80);
+  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(2);
 });
 
 test('mobile motion remains compositor-first during a full-page interaction pass', async ({ page }) => {

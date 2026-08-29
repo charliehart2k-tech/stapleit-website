@@ -21,6 +21,7 @@
   ].join(',');
   const patterns = Object.freeze({
     tick: 18,
+    scroll: 7,
     select: [18, 20, 22],
     snap: [20, 22, 30],
     panel: [18, 22, 26],
@@ -29,6 +30,9 @@
   const activePointers = new Map();
   const activeAnimations = new WeakMap();
   let lastPulseAt = 0;
+  let touchScrollActive = false;
+  let scrollDetentY = 0;
+  let lastScrollDetentAt = 0;
 
   const targetFor = node => node instanceof Element ? node.closest(targetSelector) : null;
   const typeFor = target => {
@@ -76,6 +80,9 @@
 
   document.addEventListener('pointerdown', event => {
     if (event.pointerType !== 'touch' || !event.isPrimary) return;
+    touchScrollActive = true;
+    scrollDetentY = window.scrollY;
+    lastScrollDetentAt = performance.now();
     const target = targetFor(event.target);
     if (!(target instanceof HTMLElement)) return;
     const state = { target, type: typeFor(target), x: event.clientX, y: event.clientY, moved: false };
@@ -92,6 +99,7 @@
   }, { passive: true, capture: true });
 
   document.addEventListener('pointerup', event => {
+    if (event.pointerType === 'touch' && event.isPrimary) touchScrollActive = false;
     const state = activePointers.get(event.pointerId);
     if (!state) return;
     activePointers.delete(event.pointerId);
@@ -104,11 +112,22 @@
   }, { passive: true, capture: true });
 
   document.addEventListener('pointercancel', event => {
+    if (event.pointerType === 'touch' && event.isPrimary) touchScrollActive = false;
     const state = activePointers.get(event.pointerId);
     if (!state) return;
     activePointers.delete(event.pointerId);
     cancelPress(state);
   }, { passive: true, capture: true });
+
+  window.addEventListener('scroll', () => {
+    if (!touchScrollActive || reducedMotion.matches || typeof navigator.vibrate !== 'function') return;
+    const distance = Math.abs(window.scrollY - scrollDetentY);
+    const now = performance.now();
+    if (distance < 150 || now - lastScrollDetentAt < 120) return;
+    scrollDetentY = window.scrollY;
+    lastScrollDetentAt = now;
+    pulse('scroll');
+  }, { passive: true });
 
   window.StapleTactile = Object.freeze({
     pulse,

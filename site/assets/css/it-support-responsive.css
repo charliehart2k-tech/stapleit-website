@@ -213,3 +213,76 @@
     will-change:auto;
   }
 }
+
+
+/* Mobile chapter-rhythm hard pass — mirror the homepage cadence without changing desktop. */
+@media(max-width:700px){
+  /* Separate chapters like the homepage rather than forming one continuous roll. */
+  .support-onboarding{margin-top:48px;padding:32px 0 32px}
+  .support-packages{margin-top:56px;padding:48px 0 56px}
+  .support-packs{margin-top:56px;padding:48px 0 54px}
+  .support-extras{margin-top:48px;padding:44px 0 46px}
+  .support-cta{margin-top:60px;padding:50px 0 64px}
+
+  .support-section-heading,
+  .support-onboarding>.support-section-heading{gap:18px;margin-bottom:34px}
+  .support-section-heading h2,
+  .support-onboarding .support-section-heading h2{
+    max-width:13ch;
+    font-size:clamp(2rem,8.2vw,2.4rem);
+    line-height:1.1;
+    letter-spacing:-.002em;
+  }
+  .support-section-lead,
+  .support-onboarding .support-section-lead{line-height:1.68}
+
+  .support-step-grid{gap:18px}
+  .support-package-grid{gap:20px}
+  #support-services-grid{gap:18px}
+  .support-packages .support-package-cora,
+  .support-packs .support-pack-cora{margin-bottom:36px}
+
+  /* Phone carousel: one complete card; neighbours stay hidden while swipe and autoplay remain available. */
+  .support-packs-heading{margin-bottom:34px}
+  .support-pack-reel-shell{padding:0 10px}
+  .support-pack-reel-shell::before{width:88%;height:104%;opacity:.15;filter:blur(34px)}
+  .support-pack-reel{min-height:318px;overflow:clip;touch-action:pan-y}
+  .support-pack-reel-item{
+    inset-block:8px;
+    width:calc(100% - 34px);
+    min-height:300px;
+    align-content:start;
+    gap:15px;
+    padding:28px 22px 25px;
+    border-radius:21px;
+  }
+  .support-pack-reel-name{font-size:clamp(1.85rem,7.8vw,2.1rem);line-height:1.08}
+  .support-pack-reel-copy{font-size:1rem;line-height:1.58}
+  .support-pack-reel-features{gap:8px}
+  .support-pack-reel-features span{min-height:31px;padding:6px 9px;font-size:.76rem}
+  .support-pack-reel-link{margin-top:2px;font-size:.92rem}
+  .support-pack-reel-item.is-prev,
+  .support-pack-reel-item.is-next{
+    left:50%;
+    right:auto;
+    width:calc(100% - 34px);
+    min-height:300px;
+    padding:28px 22px 25px;
+    opacity:0;
+    pointer-events:none;
+    transform:translateX(-50%) scale(.94);
+    filter:saturate(.7) brightness(.72);
+  }
+  .support-pack-reel-item.is-prev .support-pack-reel-name,
+  .support-pack-reel-item.is-next .support-pack-reel-name{opacity:0}
+  .support-packs .support-packs-more{margin-top:28px}
+}
+
+@media(max-width:390px){
+  .support-section-heading h2,
+  .support-onboarding .support-section-heading h2{font-size:clamp(1.95rem,9.1vw,2.25rem)}
+  .support-pack-reel-shell{padding-inline:6px}
+  .support-pack-reel-item,
+  .support-pack-reel-item.is-prev,
+  .support-pack-reel-item.is-next{width:calc(100% - 24px);padding-inline:19px}
+}
