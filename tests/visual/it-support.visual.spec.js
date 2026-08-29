@@ -1110,7 +1110,7 @@ test('touch-opened dialogs do not leave package cards glowing and use the mobile
 });
 
 
-test('mobile tactile feedback uses touch events, survives native scrolling and stays bounded', async ({ page }) => {
+test('mobile tactile motion stays visual-only and never calls device vibration', async ({ page }) => {
   await page.addInitScript(() => {
     window.__stapleHaptics = [];
     Object.defineProperty(Navigator.prototype, 'vibrate', {
@@ -1123,9 +1123,15 @@ test('mobile tactile feedback uses touch events, survives native scrolling and s
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
-  await expect(page.locator('html')).toHaveAttribute('data-haptics', 'vibration');
+  await expect(page.locator('html')).toHaveAttribute('data-haptics', 'visual');
 
-  const dispatchTouch = async (selector, type, { id, x, y, active = true }) => {
+  const selector = '.support-packages .support-package-cora-trigger';
+  const target = page.locator(selector);
+  const box = await target.boundingBox();
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
+
+  const dispatchTouch = async (type, { id, x, y, active = true }) => {
     await page.evaluate(({ selector, type, id, x, y, active }) => {
       const element = document.querySelector(selector);
       const touch = { identifier: id, clientX: x, clientY: y, pageX: x, pageY: y, screenX: x, screenY: y };
@@ -1139,44 +1145,17 @@ test('mobile tactile feedback uses touch events, survives native scrolling and s
     }, { selector, type, id, x, y, active });
   };
 
-  const selector = '.support-packages .support-package-cora-trigger';
-  const target = page.locator(selector);
-  const box = await target.boundingBox();
-  const x = box.x + box.width / 2;
-  const y = box.y + box.height / 2;
+  await dispatchTouch('touchstart', { id: 41, x, y });
+  await expect(target).toHaveClass(/is-tactile-pressed/);
+  await dispatchTouch('touchend', { id: 41, x, y, active: false });
+  await expect(target).not.toHaveClass(/is-tactile-pressed/);
 
-  await dispatchTouch(selector, 'touchstart', { id: 41, x, y });
-  await dispatchTouch(selector, 'touchend', { id: 41, x, y, active: false });
-  await expect.poll(() => page.evaluate(() => window.__stapleHaptics.length)).toBe(1);
-
-  const firstPattern = await page.evaluate(() => window.__stapleHaptics[0]);
-  const segments = Array.isArray(firstPattern) ? firstPattern : [firstPattern];
-  expect(Math.max(...segments)).toBeLessThanOrEqual(45);
-  expect(segments.reduce((total, value) => total + value, 0)).toBeLessThanOrEqual(180);
-
-  await page.waitForTimeout(110);
-  await dispatchTouch('body', 'touchstart', { id: 44, x: 40, y: 650 });
-  await dispatchTouch('body', 'touchmove', { id: 44, x: 42, y: 560 });
-  await expect.poll(() => page.evaluate(() => window.__stapleHaptics.length)).toBe(2);
-  expect(await page.evaluate(() => window.__stapleHaptics.at(-1))).toBe(18);
-
-  await page.waitForTimeout(110);
-  await dispatchTouch('body', 'touchmove', { id: 44, x: 44, y: 470 });
-  await expect.poll(() => page.evaluate(() => window.__stapleHaptics.length)).toBe(3);
-  expect(await page.evaluate(() => window.__stapleHaptics.at(-1))).toBe(18);
-
-  await page.waitForTimeout(110);
-  await dispatchTouch('body', 'touchmove', { id: 44, x: 150, y: 465 });
-  await page.waitForTimeout(80);
-  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(3);
-
-  await dispatchTouch('body', 'touchend', { id: 44, x: 44, y: 470, active: false });
-  await page.evaluate(() => scrollBy(0, 180));
-  await page.waitForTimeout(100);
-  expect(await page.evaluate(() => window.__stapleHaptics.length)).toBe(3);
+  await page.evaluate(() => scrollBy(0, 500));
+  await page.waitForTimeout(150);
+  expect(await page.evaluate(() => window.__stapleHaptics)).toEqual([]);
 });
 
-test('iOS uses a real direct-tap switch overlay and forwards the action', async ({ page }) => {
+test('iOS does not inject native switch haptic overlays', async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(Navigator.prototype, 'userAgent', {
       configurable: true,
@@ -1188,21 +1167,10 @@ test('iOS uses a real direct-tap switch overlay and forwards the action', async 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/it-support/', { waitUntil: 'networkidle' });
 
-  await expect(page.locator('html')).toHaveAttribute('data-haptics', 'ios-switch');
-  const menu = page.locator('#menu-toggle');
-  const iosSwitch = menu.locator(':scope > .staple-ios-haptic-switch');
-  await expect(iosSwitch).toHaveCount(1);
-  const switchStyle = await iosSwitch.evaluate(element => {
-    const style = getComputedStyle(element);
-    return { opacity: style.opacity, position: style.position, display: style.display };
-  });
-  expect(switchStyle.opacity).toBe('0');
-  expect(switchStyle.position).toBe('absolute');
-  expect(switchStyle.display).not.toBe('none');
-  await expect(page.locator('[data-pack-reel-item].is-active .staple-ios-haptic-switch')).toHaveCount(0);
-
-  await iosSwitch.click({ force: true });
-  await expect(menu).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('html')).toHaveAttribute('data-haptics', 'visual');
+  await expect(page.locator('.staple-ios-haptic-switch')).toHaveCount(0);
+  await page.locator('#menu-toggle').click();
+  await expect(page.locator('#menu-toggle')).toHaveAttribute('aria-expanded', 'true');
 });
 
 

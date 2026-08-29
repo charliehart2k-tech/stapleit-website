@@ -37,23 +37,3 @@ summary,
   .tactile-target{scale:1;translate:0 0}
 }
 
-
-/* iOS Safari direct-tap haptics. The native switch must remain rendered and
- * receive the physical tap; opacity:0 is intentional, display:none is not. */
-.staple-ios-haptic-relative{position:relative}
-.staple-ios-haptic-host > input.staple-ios-haptic-switch{
-  position:absolute;
-  inset:0;
-  z-index:30;
-  width:100%;
-  height:100%;
-  margin:0;
-  padding:0;
-  opacity:0;
-  border:0;
-  border-radius:inherit;
-  cursor:pointer;
-  pointer-events:auto;
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-}

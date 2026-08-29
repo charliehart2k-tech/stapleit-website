@@ -1,166 +1,68 @@
-/* Haptics. */
+/* Premium tactile motion: visual only. Physical vibration and iOS switch hacks
+ * are deliberately avoided so interaction stays quiet and product-like. */
 (() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const targetSelector = 'button:not(:disabled),summary,.nav-pill,.button,.service-cta,.support-hero-cta,.support-package-details>summary,.support-extra-details>summary,.support-packs-more-btn,[data-pack-reel-item],[data-cora-open],.cora-toggle,.cora-close,.audit-submit,.contact-whatsapp';
-
-  const patterns = Object.freeze({
-    tick: 35,
-    scroll: 18,
-    select: [30, 26, 32],
-    snap: [32, 28, 42],
-    panel: [30, 28, 36],
-    confirm: [32, 24, 32, 24, 45]
-  });
   const touchStates = new Map();
-  let lastPulseAt = 0;
-  let scrollTouchId = null;
-  let scrollTouchX = 0;
-  let scrollTouchY = 0;
-  let lastScrollDetentAt = 0;
-
-  const isIos = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
-    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const ios = isIos();
-  const hasVibration = () => !ios && typeof navigator.vibrate === 'function';
   const targetFor = node => node instanceof Element ? node.closest(targetSelector) : null;
-  const typeFor = target => {
-    if (target.matches('[data-pack-reel-item]')) return 'snap';
-    if (target.matches('.cora-toggle,.cora-close,[data-cora-open],.menu-toggle,.nav-details>summary,.mobile-nav-group>summary')) return 'panel';
-    if (target.matches('button[type="submit"],.audit-submit,.cora-send')) return 'confirm';
-    if (target.matches('summary,[aria-expanded]')) return 'select';
-    return 'tick';
-  };
 
-  const pulse = (type = 'tick') => {
-    if (document.hidden || reducedMotion.matches || !hasVibration()) return false;
-    const now = performance.now();
-    const minGap = type === 'scroll' ? 95 : 70;
-    if (now - lastPulseAt < minGap) return false;
-    lastPulseAt = now;
-    try {
-      return navigator.vibrate(patterns[type] ?? patterns.tick);
-    } catch {
-      return false;
-    }
-  };
-
-  const release = (target, type = 'tick') => {
+  const release = (target, strong = false) => {
     target.classList.remove('is-tactile-pressed');
     if (reducedMotion.matches || typeof target.animate !== 'function') return;
-    const strong = type === 'snap' || type === 'confirm';
     target.animate([
-      { scale: '.985', translate: '0 1px', offset: 0 },
-      { scale: strong ? '1.012' : '1.006', translate: '0 0', offset: .46 },
+      { scale: '.988', translate: '0 1px', offset: 0 },
+      { scale: strong ? '1.006' : '1.003', translate: '0 0', offset: .48 },
       { scale: '1', translate: '0 0', offset: 1 }
-    ], { duration: strong ? 310 : 260, easing: 'cubic-bezier(.16,1,.3,1)' });
+    ], { duration: strong ? 250 : 210, easing: 'cubic-bezier(.16,1,.3,1)' });
   };
 
-  const cancelPress = state => state.target?.classList.remove('is-tactile-pressed');
+  document.documentElement.dataset.haptics = 'visual';
 
   document.addEventListener('touchstart', event => {
     const touch = event.changedTouches[0];
-    if (!touch) return;
-    if (event.touches.length === 1) {
-      scrollTouchId = touch.identifier;
-      scrollTouchX = touch.clientX;
-      scrollTouchY = touch.clientY;
-      lastScrollDetentAt = 0;
-    }
     const target = targetFor(event.target);
-    if (!(target instanceof HTMLElement)) return;
-    const state = { target, type: typeFor(target), x: touch.clientX, y: touch.clientY, moved: false };
-    touchStates.set(touch.identifier, state);
+    if (!touch || !(target instanceof HTMLElement)) return;
+    touchStates.set(touch.identifier, { target, x: touch.clientX, y: touch.clientY, moved: false });
     target.classList.add('tactile-target', 'is-tactile-pressed');
   }, { passive: true, capture: true });
 
   document.addEventListener('touchmove', event => {
     for (const touch of event.changedTouches) {
       const state = touchStates.get(touch.identifier);
-      if (state && !state.moved && Math.hypot(touch.clientX - state.x, touch.clientY - state.y) >= 14) {
-        state.moved = true;
-        cancelPress(state);
-      }
-      if (touch.identifier !== scrollTouchId || event.touches.length !== 1 || reducedMotion.matches || !hasVibration()) continue;
-      const dx = Math.abs(touch.clientX - scrollTouchX);
-      const dy = Math.abs(touch.clientY - scrollTouchY);
-      const now = performance.now();
-      if (dy < 62 || dy < dx * 1.2 || now - lastScrollDetentAt < 105) continue;
-      scrollTouchX = touch.clientX;
-      scrollTouchY = touch.clientY;
-      lastScrollDetentAt = now;
-      pulse('scroll');
+      if (!state || state.moved || Math.hypot(touch.clientX - state.x, touch.clientY - state.y) < 14) continue;
+      state.moved = true;
+      state.target.classList.remove('is-tactile-pressed');
     }
   }, { passive: true, capture: true });
 
   document.addEventListener('touchend', event => {
-    if (event.touches.length === 0) scrollTouchId = null;
     for (const touch of event.changedTouches) {
       const state = touchStates.get(touch.identifier);
       if (!state) continue;
       touchStates.delete(touch.identifier);
       if (state.moved) {
-        cancelPress(state);
+        state.target.classList.remove('is-tactile-pressed');
         continue;
       }
-      if (!ios) pulse(state.type);
-      release(state.target, state.type);
+      release(state.target, state.target.matches('[data-pack-reel-item],button[type="submit"],.audit-submit,.cora-send'));
     }
   }, { passive: true, capture: true });
 
   document.addEventListener('touchcancel', event => {
-    scrollTouchId = null;
     for (const touch of event.changedTouches) {
       const state = touchStates.get(touch.identifier);
       if (!state) continue;
       touchStates.delete(touch.identifier);
-      cancelPress(state);
+      state.target.classList.remove('is-tactile-pressed');
     }
   }, { passive: true, capture: true });
 
-
-  document.addEventListener('click', event => {
-    if (ios || event.detail === 0) return;
-    const target = targetFor(event.target);
-    if (!(target instanceof HTMLElement)) return;
-    pulse(typeFor(target));
-  }, { passive: true, capture: true });
-
-  /* iOS switch haptic. */
-  const installIosSwitches = () => {
-    if (!ios) return;
-    document.documentElement.dataset.haptics = 'ios-switch';
-    document.querySelectorAll(targetSelector).forEach(element => {
-      if (!(element instanceof HTMLElement)
-        || element.matches('[data-pack-reel-item]')
-        || element.querySelector(':scope > .staple-ios-haptic-switch')) return;
-      element.classList.add('staple-ios-haptic-host');
-      if (getComputedStyle(element).position === 'static') element.classList.add('staple-ios-haptic-relative');
-      const switchEl = document.createElement('input');
-      switchEl.type = 'checkbox';
-      switchEl.setAttribute('switch', '');
-      switchEl.setAttribute('aria-hidden', 'true');
-      switchEl.tabIndex = -1;
-      switchEl.className = 'staple-ios-haptic-switch';
-      switchEl.addEventListener('click', event => {
-        event.stopPropagation();
-        window.setTimeout(() => {
-          if (!element.isConnected || element.matches(':disabled')) return;
-          element.click();
-        }, 0);
-      });
-      element.appendChild(switchEl);
-    });
-  };
-
-  if (ios) installIosSwitches();
-  else document.documentElement.dataset.haptics = hasVibration() ? 'vibration' : 'visual';
-
-  window.StapleTactile = Object.freeze({ pulse, snap(target) {
+  window.StapleTactile = Object.freeze({ snap(target) {
     if (target instanceof HTMLElement) {
       target.classList.add('tactile-target');
-      release(target, 'snap');
+      release(target, true);
     }
-    return pulse('snap');
+    return false;
   } });
 })();
 
