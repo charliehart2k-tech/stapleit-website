@@ -5,29 +5,31 @@ import { ShaderGradient, ShaderGradientCanvas } from '@shadergradient/react';
 const mount = document.querySelector('[data-shadergradient-root]');
 
 const homepageLiquidProfile = {
-  shader: 'cosmic',
+  // ShaderGradient "Universe"-style waterPlane: broad, continuous folds with
+  // black negative space rather than the noisy/crystalline cosmic shader.
+  shader: 'defaults',
   type: 'waterPlane',
-  color1: '#080018',
-  color2: '#3130e8',
-  color3: '#e65af3',
-  uSpeed: 0.075,
-  uStrength: 0.62,
-  uDensity: 0.58,
-  uFrequency: 3.8,
+  color1: '#2738ff',
+  color2: '#ff3bd4',
+  color3: '#000000',
+  uSpeed: 0.085,
+  uStrength: 2.55,
+  uDensity: 1.02,
+  uFrequency: 5.5,
   uAmplitude: 0,
-  positionX: -0.22,
-  positionY: 0.06,
+  positionX: -0.52,
+  positionY: 0.08,
   positionZ: 0,
-  rotationX: 78,
+  rotationX: 0,
   rotationY: 0,
-  rotationZ: -38,
-  cAzimuthAngle: 198,
-  cPolarAngle: 59,
-  cDistance: 3.15,
+  rotationZ: 232,
+  cAzimuthAngle: 180,
+  cPolarAngle: 116,
+  cDistance: 3.75,
   lightType: '3d',
   envPreset: 'city',
-  brightness: 0.43,
-  reflection: 0.64,
+  brightness: 0.92,
+  reflection: 0.12,
   grain: 'off'
 };
 
@@ -51,7 +53,7 @@ function SupportGradient() {
   useEffect(() => {
     if (!mount) return;
     mount.dataset.shadergradientState = reduced ? 'static' : 'active';
-    mount.dataset.shadergradientProfile = 'neon-ribbon-cosmic-waterplane';
+    mount.dataset.shadergradientProfile = 'universe-ribbon-waterplane';
   }, [reduced]);
 
   const props = useMemo(() => ({
@@ -62,7 +64,7 @@ function SupportGradient() {
     zoomOut: false,
     toggleAxis: false,
     loop: 'on',
-    loopDuration: 16
+    loopDuration: 18
   }), [reduced]);
 
   return (
