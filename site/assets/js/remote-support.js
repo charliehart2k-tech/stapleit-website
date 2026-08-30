@@ -130,28 +130,125 @@
 })();
 
 (() => {
-  const root=document.querySelector('[data-shadergradient-root]');
-  if(!root) return;
-  let requested=false;
-  const load=()=>{
-    if(requested) return;
-    requested=true;
-    const script=document.createElement('script');
-    const current=document.currentScript?.src || [...document.scripts].map(item=>item.src).find(src=>src.includes('remote-support.js')) || '/assets/js/remote-support.js';
-    const currentUrl=new URL(current,location.href);
-    const bundleUrl=new URL('remote-support-gradient.bundle.js',currentUrl);
-    const version=currentUrl.searchParams.get('v');
-    if(version) bundleUrl.searchParams.set('v',version);
-    script.src=bundleUrl.href;
-    script.async=true;
-    script.dataset.shadergradientLoader='';
-    script.onerror=()=>{root.dataset.shadergradientState='fallback';};
-    document.head.appendChild(script);
+  const canvas=document.querySelector('[data-support-liquid]');
+  if(!(canvas instanceof HTMLCanvasElement)) return;
+  const panel=canvas.closest('.support-save-panel');
+  if(!panel) return;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const gl=canvas.getContext('webgl',{alpha:false,antialias:false,depth:false,stencil:false,powerPreference:'low-power'});
+  if(!gl){canvas.dataset.liquidState='fallback';return;}
+
+  const vertex='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+  const fragment=`
+    precision mediump float;
+    uniform vec2 r;
+    uniform float t;
+
+    vec3 palette(float q){
+      vec3 navy=vec3(.012,.025,.070);
+      vec3 steel=vec3(.115,.285,.520);
+      vec3 cyan=vec3(.235,.610,.860);
+      vec3 violet=vec3(.205,.170,.390);
+      q=clamp(q,0.,1.);
+      return q<.48?mix(navy,steel,q/.48):mix(steel,mix(cyan,violet,.28),(q-.48)/.52);
+    }
+
+    vec3 sheet(vec2 p,float off,float ph,float amp,float freq,float thick,float speed,vec3 base){
+      float y=off+amp*sin(p.x*freq+ph+t*speed)
+        +amp*.23*sin(p.x*freq*2.08-ph*.7-t*speed*.54)
+        +amp*.10*sin(p.x*freq*.53+ph*1.8+t*speed*.31);
+      float slope=amp*freq*cos(p.x*freq+ph+t*speed)
+        +amp*.23*freq*2.08*cos(p.x*freq*2.08-ph*.7-t*speed*.54)
+        +amp*.10*freq*.53*cos(p.x*freq*.53+ph*1.8+t*speed*.31);
+      float cross=(p.y-y)/thick;
+      float mask=1.-smoothstep(.88,1.04,abs(cross));
+      float edge=exp(-pow((abs(cross)-.78)*5.0,2.0));
+      vec3 n=normalize(vec3(-slope,1.,.62+.22*sin(cross*2.7+t*.15)));
+      vec3 l=normalize(vec3(-.48,.78,.88));
+      vec3 v=vec3(0.,0.,1.);
+      float diffuse=.27+.73*max(dot(n,l),0.);
+      float spec=pow(max(dot(reflect(-l,n),v),0.),18.);
+      float sheen=pow(max(0.,1.-abs(cross+.16+.13*sin(p.x*2.2-t*.24))),8.);
+      float ir=.5+.5*sin(p.x*1.15+t*.12+cross*1.8+ph);
+      vec3 col=mix(base,palette(.38+.48*ir),.34);
+      col*=.38+.72*diffuse;
+      col+=vec3(.62,.80,1.0)*spec*.92;
+      col+=vec3(.22,.56,.92)*sheen*.34;
+      col+=vec3(.22,.48,.82)*edge*.14;
+      return col*mask;
+    }
+
+    void main(){
+      vec2 uv=gl_FragCoord.xy/r;
+      vec2 p=uv*2.-1.;
+      p.x*=r.x/r.y;
+      p.x+=.075*sin(p.y*1.45+t*.10)+.025*sin(p.y*3.1-t*.07);
+      p.y+=.035*sin(p.x*1.75-t*.08);
+
+      vec3 bg=vec3(.003,.007,.018);
+      float aura=exp(-dot(p-vec2(.25,.04),p-vec2(.25,.04))*.55);
+      bg+=vec3(.018,.060,.125)*aura*.55;
+
+      vec3 c=bg;
+      vec3 s1=sheet(p,-.28,.7,.29,1.28,.31,.19,vec3(.035,.115,.270));
+      vec3 s2=sheet(p,.18,2.5,.24,1.58,.25,-.15,vec3(.055,.095,.245));
+      vec3 s3=sheet(p,.03,4.6,.17,2.08,.135,.11,vec3(.075,.205,.400));
+      float m1=step(.001,length(s1)),m2=step(.001,length(s2)),m3=step(.001,length(s3));
+      c=mix(c,s1,m1*.92);
+      c=mix(c,s2,m2*.86);
+      c=mix(c,s3,m3*.72);
+
+      float glow=.018/(.055+abs(p.y-(.06+.21*sin(p.x*1.4+t*.13))));
+      c+=vec3(.055,.19,.38)*min(glow,.20);
+      float vignette=1.-smoothstep(.65,1.7,length(p));
+      c*=.58+.42*vignette;
+      c=pow(max(c,0.),vec3(.88));
+      gl_FragColor=vec4(c,1.);
+    }`;
+
+  const compile=(type,src)=>{const shader=gl.createShader(type);gl.shaderSource(shader,src);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(shader)||'compile');return shader;};
+  let program;
+  try{
+    program=gl.createProgram();
+    gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));
+    gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));
+    gl.linkProgram(program);
+    if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program)||'link');
+  }catch(error){canvas.dataset.liquidState='fallback';console.warn('Liquid ribbon shader unavailable',error);return;}
+
+  gl.useProgram(program);
+  const buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  const pos=gl.getAttribLocation(program,'a');
+  gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+  const res=gl.getUniformLocation(program,'r'),time=gl.getUniformLocation(program,'t');
+  let visible=false,raf=0,last=0;
+  const born=performance.now();
+  const resize=()=>{
+    const box=canvas.getBoundingClientRect();
+    const mobile=innerWidth<=700;
+    const dpr=Math.min(devicePixelRatio||1,mobile?1:1.15);
+    const w=Math.max(1,Math.round(box.width*dpr)),h=Math.max(1,Math.round(box.height*dpr));
+    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}
   };
-  if(!('IntersectionObserver' in window)){load();return;}
-  const observer=new IntersectionObserver(entries=>{
-    if(entries.some(entry=>entry.isIntersecting)){observer.disconnect();load();}
-  },{rootMargin:'420px 0px',threshold:0.01});
-  observer.observe(root);
+  const draw=stamp=>{
+    raf=0;
+    if(!visible&&!reduced.matches)return;
+    if(!reduced.matches&&stamp-last<33){raf=requestAnimationFrame(draw);return;}
+    last=stamp;resize();
+    gl.uniform2f(res,canvas.width,canvas.height);
+    gl.uniform1f(time,reduced.matches?5.6:(stamp-born)/1000);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+    canvas.dataset.liquidState=reduced.matches?'static':'active';
+    if(visible&&!reduced.matches)raf=requestAnimationFrame(draw);
+  };
+  const refresh=()=>{cancelAnimationFrame(raf);raf=0;if(visible||reduced.matches)raf=requestAnimationFrame(draw);};
+  new IntersectionObserver(entries=>{visible=entries[0]?.isIntersecting===true;refresh();},{rootMargin:'220px 0px',threshold:.01}).observe(panel);
+  new ResizeObserver(()=>{resize();refresh();}).observe(panel);
+  reduced.addEventListener?.('change',refresh);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0;}else refresh();},{passive:true});
+  canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();cancelAnimationFrame(raf);canvas.dataset.liquidState='fallback';},{passive:false});
+  resize();canvas.dataset.liquidState='ready';
 })();
 

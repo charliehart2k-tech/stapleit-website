@@ -3,20 +3,9 @@
   "private": true,
   "scripts": {
     "test:visual": "playwright test tests/visual",
-    "test:typography": "playwright test tests/visual/site-typography.visual.spec.js",
-    "build:shadergradient": "node tools/build-shadergradient.js"
+    "test:typography": "playwright test tests/visual/site-typography.visual.spec.js"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
-    "esbuild": "^0.25.9"
-  },
-  "dependencies": {
-    "@react-three/fiber": "^8.18.0",
-    "@shadergradient/react": "^2.4.20",
-    "camera-controls": "^3.1.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "three": "^0.185.1",
-    "three-stdlib": "^2.36.1"
+    "@playwright/test": "^1.62.1"
   }
 }
