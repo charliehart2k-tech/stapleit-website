@@ -18,9 +18,10 @@ RESOURCE_TAGS = {"link", "img", "source", "video", "audio", "iframe"}
 RUNTIME_ENDPOINTS = {"/wp-admin/admin-ajax.php"}
 WARN_ASSET_BYTES = 1_500_000
 ERROR_ASSET_BYTES = 5_000_000
+BACKUP_ARTIFACT_RE = re.compile(r"(?:\.bak(?:\.|$)|\.orig$|\.swp$|~$)", re.I)
 WARN_CSS_BYTES = 50_000
 WARN_JS_BYTES = 30_000
-VENDOR_JS_GZIP_LIMITS = {"assets/js/remote-support-gradient.bundle.js": 350_000}
+VENDOR_JS_GZIP_LIMITS = {}
 CSS_URL_RE = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.I)
 CSS_IMPORT_RE = re.compile(r"@import\s+(?:url\()?\s*['\"]([^'\"]+)['\"]", re.I)
 FONT_WEIGHT_RE = re.compile(r"font-weight\s*:\s*([1-9]00|[1-9][0-9]{2})\b", re.I)
@@ -392,6 +393,11 @@ def audit(root: Path) -> int:
     root = root.resolve()
     errors: list[str] = []
     warnings: list[str] = []
+    for artifact in sorted(path for path in root.rglob("*") if path.is_file()):
+        if BACKUP_ARTIFACT_RE.search(artifact.name):
+            errors.append(
+                f"{artifact.relative_to(root)}: backup/editor artefact must not exist in the publish tree"
+            )
     baselines = load_design_baselines(errors)
     type_token_floors = {
         str(name): float(value)

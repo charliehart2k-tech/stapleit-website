@@ -132,10 +132,6 @@ echo
 echo "=== Release gate: generated CSS bundles ==="
 python3 "$REPO/tools/build-css.py" --check
 
-echo "=== Release gate: ShaderGradient bundle ==="
-as_deploy npm --prefix "$REPO" run build:shadergradient >/dev/null
-repo_git diff --quiet -- site/assets/js/remote-support-gradient.bundle.js package.json package-lock.json || fail "ShaderGradient bundle is stale; run npm run build:shadergradient and commit the result"
-
 echo
 echo "=== Release gate: raster asset integrity ==="
 python3 "$REPO/tools/audit-assets.py" --root "$SOURCE/assets"

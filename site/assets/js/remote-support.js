@@ -130,28 +130,44 @@
 })();
 
 (() => {
-  const root=document.querySelector('[data-shadergradient-root]');
-  if(!root) return;
-  let requested=false;
-  const load=()=>{
-    if(requested) return;
-    requested=true;
-    const script=document.createElement('script');
-    const current=document.currentScript?.src || [...document.scripts].map(item=>item.src).find(src=>src.includes('remote-support.js')) || '/assets/js/remote-support.js';
-    const currentUrl=new URL(current,location.href);
-    const bundleUrl=new URL('remote-support-gradient.bundle.js',currentUrl);
-    const version=currentUrl.searchParams.get('v');
-    if(version) bundleUrl.searchParams.set('v',version);
-    script.src=bundleUrl.href;
-    script.async=true;
-    script.dataset.shadergradientLoader='';
-    script.onerror=()=>{root.dataset.shadergradientState='fallback';};
-    document.head.appendChild(script);
+  const video=document.querySelector('[data-support-save-video]');
+  if(!video) return;
+  const source=video.querySelector('source[data-src]');
+  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  let loaded=false;
+  let observer;
+
+  const play=()=>{
+    if(motion.matches) return;
+    if(!loaded && source){
+      source.src=source.dataset.src;
+      video.load();
+      loaded=true;
+    }
+    const promise=video.play();
+    if(promise && typeof promise.catch==='function') promise.catch(()=>{});
   };
-  if(!('IntersectionObserver' in window)){load();return;}
-  const observer=new IntersectionObserver(entries=>{
-    if(entries.some(entry=>entry.isIntersecting)){observer.disconnect();load();}
-  },{rootMargin:'420px 0px',threshold:0.01});
-  observer.observe(root);
+
+  const pause=()=>{
+    video.pause();
+    if(video.readyState>0) video.currentTime=0;
+  };
+
+  const watch=()=>{
+    if(observer) observer.disconnect();
+    if(motion.matches){pause();return;}
+    if(!('IntersectionObserver' in window)){play();return;}
+    observer=new IntersectionObserver(entries=>{
+      for(const entry of entries){
+        if(entry.isIntersecting) play();
+        else video.pause();
+      }
+    },{rootMargin:'180px 0px',threshold:0.01});
+    observer.observe(video);
+  };
+
+  watch();
+  if(typeof motion.addEventListener==='function') motion.addEventListener('change',watch);
+  else if(typeof motion.addListener==='function') motion.addListener(watch);
 })();
 
