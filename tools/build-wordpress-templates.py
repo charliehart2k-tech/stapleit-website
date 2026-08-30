@@ -39,6 +39,8 @@ def build(source: Path, target: Path, version: str, inject_wp_hooks: bool) -> No
         'src="assets/': f'src="{THEME_URI}/assets/',
         'href="/assets/': f'href="{THEME_URI}/assets/',
         'src="/assets/': f'src="{THEME_URI}/assets/',
+        'poster="assets/': f'poster="{THEME_URI}/assets/',
+        'poster="/assets/': f'poster="{THEME_URI}/assets/',
     }
     for old, new in replacements.items():
         html = html.replace(old, new)
