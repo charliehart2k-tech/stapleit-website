@@ -1049,6 +1049,14 @@ test('Remote Support is a real support dashboard with client portal and mobile c
     await expect(page.getByRole('link', { name: /Email support/i })).toHaveAttribute('href', 'mailto:support@stapleit.co.uk');
     await expect(page.getByRole('link', { name: /Call support/i })).toHaveAttribute('href', 'tel:+441372309707');
     await expect(page.getByRole('link', { name: /WhatsApp/i })).toHaveAttribute('href', 'https://wa.me/441372309707');
+    const whatsappMark=page.locator('.support-action-card--whatsapp .support-action-icon path');
+    await expect(whatsappMark).toHaveCount(1);
+    await expect(whatsappMark).toHaveAttribute('fill','currentColor');
+    await expect(whatsappMark).toHaveAttribute('stroke','none');
+    expect(await whatsappMark.evaluate(element=>{
+      const style=getComputedStyle(element);
+      return {fill:style.fill,stroke:style.stroke};
+    })).toEqual({fill:'rgb(34, 197, 94)',stroke:'none'});
     await expect(page.locator('.support-action-card--email .support-action-badge')).toHaveText('Fastest response');
     await expect(page.locator('.support-action-card--call .support-action-badge')).toHaveText('SELECT option 1');
     await expect(page.locator('[data-support-state]')).not.toHaveText('Checking…');
