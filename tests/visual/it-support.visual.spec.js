@@ -1061,8 +1061,8 @@ test('Remote Support is a real support dashboard with client portal and mobile c
     await page.locator('.support-save-panel').scrollIntoViewIfNeeded();
     await page.waitForTimeout(450);
     const shaderState=await shader.getAttribute('data-shadergradient-state');
-    expect(['active','static','fallback']).toContain(shaderState);
-    if(shaderState!=='fallback') await expect(shader.locator('canvas').first()).toBeVisible();
+    expect(['active','static']).toContain(shaderState);
+    await expect(shader.locator('canvas').first()).toBeVisible();
     expect(await page.locator('.support-save-panel').evaluate(el=>getComputedStyle(el).isolation)).toBe('isolate');
     const accents = await page.locator('.support-action-card').evaluateAll(cards => cards.map(card => getComputedStyle(card).getPropertyValue('--accent').trim()));
     expect(new Set(accents).size).toBe(4);

@@ -137,7 +137,12 @@
     if(requested) return;
     requested=true;
     const script=document.createElement('script');
-    script.src='/assets/js/remote-support-gradient.bundle.js';
+    const current=document.currentScript?.src || [...document.scripts].map(item=>item.src).find(src=>src.includes('remote-support.js')) || '/assets/js/remote-support.js';
+    const currentUrl=new URL(current,location.href);
+    const bundleUrl=new URL('remote-support-gradient.bundle.js',currentUrl);
+    const version=currentUrl.searchParams.get('v');
+    if(version) bundleUrl.searchParams.set('v',version);
+    script.src=bundleUrl.href;
     script.async=true;
     script.dataset.shadergradientLoader='';
     script.onerror=()=>{root.dataset.shadergradientState='fallback';};
