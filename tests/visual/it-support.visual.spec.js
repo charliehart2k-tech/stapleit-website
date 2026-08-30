@@ -1030,6 +1030,7 @@ test('IT Services landing page uses the four approved service cards', async ({ p
 });
 
 test('Remote Support is a real support dashboard with client portal and mobile containment', async ({ page }) => {
+  test.setTimeout(60000);
   for (const [width, height] of [[390, 844], [1920, 1080]]) {
     await page.setViewportSize({ width, height });
     await page.goto('http://127.0.0.1:4173/remote-support/', { waitUntil: 'networkidle' });
@@ -1056,11 +1057,16 @@ test('Remote Support is a real support dashboard with client portal and mobile c
     await expect(page.locator('.support-save-button--android')).toBeVisible();
     await expect(page.locator('.support-save-button--outlook')).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: 'Keep our contact details handy' })).toBeVisible();
-    const liquid=page.locator('[data-support-liquid]');
-    await expect(liquid).toHaveCount(1);
+    const shader=page.locator('[data-shadergradient-root]');
+    await expect(shader).toHaveCount(1);
+    await expect(page.locator('.support-save-panel video')).toHaveCount(0);
+    await expect(page.locator('[data-support-liquid]')).toHaveCount(0);
     await page.locator('.support-save-panel').scrollIntoViewIfNeeded();
-    await page.waitForTimeout(180);
-    expect(['active','static']).toContain(await liquid.getAttribute('data-liquid-state'));
+    await page.waitForTimeout(450);
+    const shaderState=await shader.getAttribute('data-shadergradient-state');
+    expect(['active','static']).toContain(shaderState);
+    await expect(shader).toHaveAttribute('data-shadergradient-profile','homepage-liquid-cosmic-waterplane');
+    await expect(shader.locator('canvas').first()).toBeVisible();
     expect(await page.locator('.support-save-panel').evaluate(el=>getComputedStyle(el).isolation)).toBe('isolate');
     const accents = await page.locator('.support-action-card').evaluateAll(cards => cards.map(card => getComputedStyle(card).getPropertyValue('--accent').trim()));
     expect(new Set(accents).size).toBe(4);
@@ -1071,11 +1077,10 @@ test('Remote Support is a real support dashboard with client portal and mobile c
   await page.goto('http://127.0.0.1:4173/remote-support/', { waitUntil: 'networkidle' });
   const animatedPanel=page.locator('.support-save-panel');
   await animatedPanel.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(260);
-  const liquidCanvas=page.locator('[data-support-liquid]');
-  expect(await liquidCanvas.getAttribute('data-liquid-state')).toBe('active');
-  const box=await animatedPanel.boundingBox();
-  expect(box).not.toBeNull();
+  await page.waitForTimeout(650);
+  const animatedShader=page.locator('[data-shadergradient-root]');
+  expect(await animatedShader.getAttribute('data-shadergradient-state')).toBe('active');
+  const box=await animatedPanel.evaluate(element=>{const rect=element.getBoundingClientRect();return{x:rect.x,y:rect.y,width:rect.width,height:rect.height};});
   const clip={x:Math.max(0,box.x),y:Math.max(0,box.y),width:Math.min(box.width,1280-Math.max(0,box.x)),height:Math.min(box.height,800-Math.max(0,box.y))};
   const firstFrame=await page.screenshot({clip,animations:'allow'});
   await page.waitForTimeout(700);
