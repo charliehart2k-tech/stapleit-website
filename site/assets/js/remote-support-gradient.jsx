@@ -7,27 +7,27 @@ const mount = document.querySelector('[data-shadergradient-root]');
 const homepageLiquidProfile = {
   shader: 'cosmic',
   type: 'waterPlane',
-  color1: '#02040b',
-  color2: '#183956',
-  color3: '#749cb8',
-  uSpeed: 0.11,
-  uStrength: 1.05,
-  uDensity: 1.15,
-  uFrequency: 5.5,
+  color1: '#080018',
+  color2: '#3130e8',
+  color3: '#e65af3',
+  uSpeed: 0.075,
+  uStrength: 0.62,
+  uDensity: 0.58,
+  uFrequency: 3.8,
   uAmplitude: 0,
-  positionX: -0.38,
-  positionY: 0.1,
+  positionX: -0.22,
+  positionY: 0.06,
   positionZ: 0,
-  rotationX: 64,
+  rotationX: 78,
   rotationY: 0,
-  rotationZ: -50,
-  cAzimuthAngle: 194,
-  cPolarAngle: 70,
-  cDistance: 2.8,
+  rotationZ: -38,
+  cAzimuthAngle: 198,
+  cPolarAngle: 59,
+  cDistance: 3.15,
   lightType: '3d',
   envPreset: 'city',
-  brightness: 0.24,
-  reflection: 0.8,
+  brightness: 0.43,
+  reflection: 0.64,
   grain: 'off'
 };
 
@@ -51,7 +51,7 @@ function SupportGradient() {
   useEffect(() => {
     if (!mount) return;
     mount.dataset.shadergradientState = reduced ? 'static' : 'active';
-    mount.dataset.shadergradientProfile = 'homepage-liquid-cosmic-waterplane';
+    mount.dataset.shadergradientProfile = 'neon-ribbon-cosmic-waterplane';
   }, [reduced]);
 
   const props = useMemo(() => ({
@@ -62,7 +62,7 @@ function SupportGradient() {
     zoomOut: false,
     toggleAxis: false,
     loop: 'on',
-    loopDuration: 12
+    loopDuration: 16
   }), [reduced]);
 
   return (
