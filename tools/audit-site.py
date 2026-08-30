@@ -5,6 +5,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 from xml.etree import ElementTree
 import argparse
+import gzip
 import json
 import re
 import sys
@@ -19,6 +20,7 @@ WARN_ASSET_BYTES = 1_500_000
 ERROR_ASSET_BYTES = 5_000_000
 WARN_CSS_BYTES = 50_000
 WARN_JS_BYTES = 30_000
+VENDOR_JS_GZIP_LIMITS = {"assets/js/remote-support-gradient.bundle.js": 350_000}
 CSS_URL_RE = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.I)
 CSS_IMPORT_RE = re.compile(r"@import\s+(?:url\()?\s*['\"]([^'\"]+)['\"]", re.I)
 FONT_WEIGHT_RE = re.compile(r"font-weight\s*:\s*([1-9]00|[1-9][0-9]{2})\b", re.I)
@@ -679,7 +681,17 @@ def audit(root: Path) -> int:
 
     for js in sorted(root.rglob("*.js")):
         rel = js.relative_to(root)
+        rel_key = rel.as_posix()
         text = js.read_text(encoding="utf-8-sig")
+        vendor_limit = VENDOR_JS_GZIP_LIMITS.get(rel_key)
+        if vendor_limit is not None:
+            compressed = len(gzip.compress(js.read_bytes(), compresslevel=9))
+            if compressed > vendor_limit:
+                errors.append(f"{rel}: lazy vendor bundle exceeds {vendor_limit // 1000} KiB gzip ceiling ({compressed // 1000} KiB)")
+            legal = Path(str(js) + ".LEGAL.txt")
+            if not legal.exists():
+                errors.append(f"{rel}: vendored bundle is missing linked licence notices")
+            continue
         if js.stat().st_size > WARN_JS_BYTES:
             warnings.append(f"{rel}: JavaScript exceeds working 30 KiB budget")
         if JS_INLINE_STYLE_RE.search(text):

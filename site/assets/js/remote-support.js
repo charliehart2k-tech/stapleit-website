@@ -129,92 +129,24 @@
   window.setInterval(update,60000);
 })();
 
-
 (() => {
-  const canvas=document.querySelector('[data-support-shader]');
-  if(!(canvas instanceof HTMLCanvasElement)) return;
-  const panel=canvas.closest('.support-save-panel');
-  if(!panel) return;
-
-  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
-  const gl=canvas.getContext('webgl',{alpha:false,antialias:false,depth:false,stencil:false,powerPreference:'low-power'});
-  if(!gl){canvas.dataset.shaderState='fallback';return;}
-
-  const vertex='attribute vec2 a_position;void main(){gl_Position=vec4(a_position,0.0,1.0);}';
-  const fragment=`
-    precision mediump float;
-    uniform vec2 u_resolution;
-    uniform float u_time;
-    float blob(vec2 p, vec2 c, float softness){vec2 d=p-c;return exp(-dot(d,d)*softness);}
-    void main(){
-      vec2 uv=gl_FragCoord.xy/u_resolution.xy;
-      vec2 p=uv*2.0-1.0;
-      p.x*=u_resolution.x/u_resolution.y;
-      float t=u_time*0.23;
-      vec2 c1=vec2(-0.72+0.34*sin(t*0.73),0.24+0.42*cos(t*0.61));
-      vec2 c2=vec2(0.62+0.31*cos(t*0.57),-0.20+0.37*sin(t*0.81));
-      vec2 c3=vec2(0.05+0.48*sin(t*0.41+1.6),0.08+0.34*cos(t*0.69+2.2));
-      float b1=blob(p,c1,2.15),b2=blob(p,c2,2.35),b3=blob(p,c3,2.00);
-      float wave=0.5+0.5*sin((p.x*1.35+p.y*1.08+sin(p.y*2.25+t)*0.42)*3.1+t*1.22);
-      float cycle=0.5+0.5*sin(t*0.27),cycle2=0.5+0.5*sin(t*0.19+2.1);
-      vec3 blue=mix(vec3(0.055,0.15,0.95),vec3(0.10,0.56,1.0),cycle2);
-      vec3 violet=mix(vec3(0.45,0.12,0.95),vec3(0.70,0.20,0.96),cycle);
-      vec3 pink=mix(vec3(0.92,0.18,0.78),vec3(1.0,0.34,0.58),cycle2);
-      vec3 cyan=mix(vec3(0.06,0.72,0.92),vec3(0.20,0.42,1.0),cycle);
-      vec3 col=vec3(0.006,0.009,0.025);
-      col+=blue*b1*0.72+violet*b2*0.62+mix(pink,cyan,cycle)*b3*0.52;
-      col+=mix(violet,pink,wave)*wave*(b1+b2+b3)*0.085;
-      float vignette=1.0-smoothstep(0.65,1.55,length(p));
-      col*=0.48+0.52*vignette;
-      col=pow(col,vec3(0.92));
-      gl_FragColor=vec4(col,1.0);
-    }`;
-
-  const shader=(type,source)=>{const item=gl.createShader(type);gl.shaderSource(item,source);gl.compileShader(item);if(!gl.getShaderParameter(item,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(item)||'Shader compile failed');return item;};
-  let program;
-  try{
-    program=gl.createProgram();
-    gl.attachShader(program,shader(gl.VERTEX_SHADER,vertex));
-    gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fragment));
-    gl.linkProgram(program);
-    if(!gl.getProgramParameter(program,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program)||'Shader link failed');
-  }catch(error){canvas.dataset.shaderState='fallback';console.warn('Support shader unavailable',error);return;}
-
-  gl.useProgram(program);
-  const buffer=gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
-  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
-  const position=gl.getAttribLocation(program,'a_position');
-  gl.enableVertexAttribArray(position);
-  gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
-  const resolution=gl.getUniformLocation(program,'u_resolution');
-  const time=gl.getUniformLocation(program,'u_time');
-  let visible=false,raf=0,lastFrame=0;
-  const start=performance.now();
-
-  const resize=()=>{
-    const rect=canvas.getBoundingClientRect();
-    const mobile=window.matchMedia('(max-width: 700px)').matches;
-    const dpr=Math.min(window.devicePixelRatio||1,mobile?1:1.2);
-    const width=Math.max(1,Math.round(rect.width*dpr)),height=Math.max(1,Math.round(rect.height*dpr));
-    if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;gl.viewport(0,0,width,height);}
+  const root=document.querySelector('[data-shadergradient-root]');
+  if(!root) return;
+  let requested=false;
+  const load=()=>{
+    if(requested) return;
+    requested=true;
+    const script=document.createElement('script');
+    script.src='/assets/js/remote-support-gradient.bundle.js';
+    script.async=true;
+    script.dataset.shadergradientLoader='';
+    script.onerror=()=>{root.dataset.shadergradientState='fallback';};
+    document.head.appendChild(script);
   };
-  const draw=stamp=>{
-    raf=0;
-    if(!visible&&!reduced.matches)return;
-    if(!reduced.matches&&stamp-lastFrame<33){raf=requestAnimationFrame(draw);return;}
-    lastFrame=stamp;resize();
-    gl.uniform2f(resolution,canvas.width,canvas.height);
-    gl.uniform1f(time,reduced.matches?7.0:(stamp-start)/1000);
-    gl.drawArrays(gl.TRIANGLES,0,6);
-    canvas.dataset.shaderState=reduced.matches?'static':'active';
-    if(visible&&!reduced.matches)raf=requestAnimationFrame(draw);
-  };
-  const refresh=()=>{cancelAnimationFrame(raf);raf=0;if(visible||reduced.matches)raf=requestAnimationFrame(draw);};
-  new IntersectionObserver(entries=>{visible=entries[0]?.isIntersecting===true;refresh();},{rootMargin:'180px 0px',threshold:0.01}).observe(panel);
-  new ResizeObserver(()=>{resize();if(visible||reduced.matches)refresh();}).observe(panel);
-  reduced.addEventListener?.('change',refresh);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0;}else refresh();},{passive:true});
-  canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();canvas.dataset.shaderState='fallback';cancelAnimationFrame(raf);},{passive:false});
-  resize();canvas.dataset.shaderState='ready';
+  if(!('IntersectionObserver' in window)){load();return;}
+  const observer=new IntersectionObserver(entries=>{
+    if(entries.some(entry=>entry.isIntersecting)){observer.disconnect();load();}
+  },{rootMargin:'420px 0px',threshold:0.01});
+  observer.observe(root);
 })();
+

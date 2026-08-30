@@ -1056,16 +1056,33 @@ test('Remote Support is a real support dashboard with client portal and mobile c
     await expect(page.locator('.support-save-button--android')).toBeVisible();
     await expect(page.locator('.support-save-button--outlook')).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: 'Keep our contact details handy' })).toBeVisible();
-    await expect(page.locator('[data-support-shader]')).toHaveCount(1);
-    const shader=page.locator('[data-support-shader]');
+    const shader=page.locator('[data-shadergradient-root]');
+    await expect(shader).toHaveCount(1);
     await page.locator('.support-save-panel').scrollIntoViewIfNeeded();
-    await page.waitForTimeout(120);
-    const shaderState=await shader.getAttribute('data-shader-state');
+    await page.waitForTimeout(450);
+    const shaderState=await shader.getAttribute('data-shadergradient-state');
     expect(['active','static','fallback']).toContain(shaderState);
+    if(shaderState!=='fallback') await expect(shader.locator('canvas').first()).toBeVisible();
     expect(await page.locator('.support-save-panel').evaluate(el=>getComputedStyle(el).isolation)).toBe('isolate');
     const accents = await page.locator('.support-action-card').evaluateAll(cards => cards.map(card => getComputedStyle(card).getPropertyValue('--accent').trim()));
     expect(new Set(accents).size).toBe(4);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
+  }
+
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('http://127.0.0.1:4173/remote-support/', { waitUntil: 'networkidle' });
+  const animatedPanel=page.locator('.support-save-panel');
+  await animatedPanel.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(650);
+  const animatedShader=page.locator('[data-shadergradient-root]');
+  if(await animatedShader.getAttribute('data-shadergradient-state')==='active') {
+    const box=await animatedPanel.boundingBox();
+    expect(box).not.toBeNull();
+    const clip={x:Math.max(0,box.x),y:Math.max(0,box.y),width:Math.min(box.width,1280-Math.max(0,box.x)),height:Math.min(box.height,800-Math.max(0,box.y))};
+    const firstFrame=await page.screenshot({clip,animations:'allow'});
+    await page.waitForTimeout(700);
+    const secondFrame=await page.screenshot({clip,animations:'allow'});
+    expect(Buffer.compare(firstFrame,secondFrame)).not.toBe(0);
   }
 
   const holidayCheck = await page.evaluate(() => {
