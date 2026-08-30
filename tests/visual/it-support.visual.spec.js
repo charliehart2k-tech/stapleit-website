@@ -1034,16 +1034,38 @@ test('Remote Support is a real support dashboard with client portal and mobile c
     await page.setViewportSize({ width, height });
     await page.goto('http://127.0.0.1:4173/remote-support/', { waitUntil: 'networkidle' });
     await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding the remote support page/i);
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Help is on the way.');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Help is on the way');
+    await expect(page.locator('.remote-support-copy h1')).toHaveCSS('color', 'rgb(249, 115, 22)');
+    await expect(page.locator('.support-status-value--ok')).toHaveCSS('color', 'rgb(74, 222, 128)');
     await expect(page.locator('.support-action-card')).toHaveCount(4);
     await expect(page.locator('.support-action-card--portal')).toHaveAttribute('href', '/client-portal/');
     await expect(page.getByRole('link', { name: /Email support/i })).toHaveAttribute('href', 'mailto:support@stapleit.co.uk');
     await expect(page.getByRole('link', { name: /Call support/i })).toHaveAttribute('href', 'tel:+441372309707');
     await expect(page.getByRole('link', { name: /WhatsApp/i })).toHaveAttribute('href', 'https://wa.me/441372309707');
+    await expect(page.locator('.support-action-card--email .support-action-badge')).toHaveText('Fastest response');
+    await expect(page.locator('.support-action-card--call .support-action-badge')).toHaveText('Option 1');
     await expect(page.locator('[data-support-state]')).not.toHaveText('Checking…');
     await expect(page.locator('.support-save-button')).toHaveCount(3);
+    await expect(page.locator('.support-save-button--iphone')).toBeVisible();
+    await expect(page.locator('.support-save-button--android')).toBeVisible();
+    await expect(page.locator('.support-save-button--outlook')).toBeVisible();
+    const accents = await page.locator('.support-action-card').evaluateAll(cards => cards.map(card => getComputedStyle(card).getPropertyValue('--accent').trim()));
+    expect(new Set(accents).size).toBe(4);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   }
+
+  const holidayCheck = await page.evaluate(() => {
+    const next = window.StapleSupportSchedule.nextOpenDate(new Date('2026-08-30T10:00:00Z'));
+    const y2027 = window.StapleSupportSchedule.bankHolidaysForYear(2027);
+    const y2028 = window.StapleSupportSchedule.bankHolidaysForYear(2028);
+    const y2031 = window.StapleSupportSchedule.bankHolidaysForYear(2031);
+    return {
+      next: next.toISOString().slice(0, 10),
+      checks: [y2027.has('2027-12-27'), y2027.has('2027-12-28'), y2028.has('2028-01-03'), y2031.has('2031-08-25')]
+    };
+  });
+  expect(holidayCheck.next).toBe('2026-09-01');
+  expect(holidayCheck.checks).toEqual([true, true, true, true]);
 });
 
 test('Get in Touch is a real contact route with working audit handoff', async ({ page }) => {

@@ -11,19 +11,20 @@ const routes = [
 const majorHeadingSelector = [
   '.section-heading h2', '.services-header h2', '.audience-header h2', '.trust-sticky h2',
   '.google-review-hero h2', '.partners-header h2', '.audit-hero h2', '.contact-hero h2',
-  '.support-section-heading h2'
+  '.support-section-heading h2', '.remote-support-section-head h2'
 ].join(',');
 
 const featureHeadingSelector = [
   '.home-statement-card h2', '.service-grid-card .service-slide h2',
   '.audit-form-heading h2', '.audit-form-heading h3', '.support-standard h2',
-  '.support-pack-catalogue-head h3', '.support-pack-reel-item.is-active .support-pack-reel-name'
+  '.support-pack-catalogue-head h3', '.support-pack-reel-item.is-active .support-pack-reel-name',
+  '.support-save-copy h2'
 ].join(',');
 
 const cardHeadingSelector = [
   '.audience-item h3', '.trust-proof h3', '.google-review-copy h3',
   '.contact-panel h2', '.contact-panel h3', '.support-package-card h3',
-  '.support-step-card h3', '.support-extra-card h3'
+  '.support-step-card h3', '.support-extra-card h3', '.support-action-copy strong'
 ].join(',');
 
 const uiSelector = [
