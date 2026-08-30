@@ -1006,6 +1006,13 @@ test('final services and CTA stay compact, distinct and contained', async ({ pag
   await expect(closingCta.getByRole('link', { name: 'Get in touch' })).toHaveAttribute('href', '/get-in-touch/');
 });
 
+test('homepage IT Solutions card keeps Solutions on its own line', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+  await expect(page.locator('.service-grid-card--solutions h2 br')).toHaveCount(1);
+  await expect(page.locator('.service-grid-card--solutions h2')).toContainText(/We do IT\s*Solutions/);
+});
+
 test('IT Services landing page uses the four approved service cards', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/it-services/', { waitUntil: 'networkidle' });
