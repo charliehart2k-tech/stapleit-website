@@ -454,20 +454,6 @@ html,body{background:#000!important}body{min-height:100vh}.reset-stage{width:var
   .reset-404-inner,.reset-placeholder-inner{padding:60px 0 52px}
 }
 
-
-/* Shared below-fold reveal contract, matching the approved homepage motion. */
-@media(prefers-reduced-motion:no-preference){
-  .motion-ready{
-    opacity:0;
-    transform:translateY(18px);
-    transition:opacity 620ms cubic-bezier(.16,1,.3,1),transform 620ms cubic-bezier(.16,1,.3,1);
-  }
-  .motion-ready.motion-in{
-    opacity:1;
-    transform:none;
-  }
-}
-
 /* source: tactile.css */
 /* Mobile tactile interaction layer.
  * Real vibration is handled in app.js where supported. These visual responses
@@ -1492,23 +1478,7 @@ summary,
 
 .contact-title-line{display:block}
 
-/* Consistent below-fold reveal language. Keep it compositor-friendly: opacity
-   and transform only, with no blur/filter pass over text while scrolling. */
-@media(prefers-reduced-motion:no-preference){
-  .motion-ready{
-    opacity:0;
-    transform:translateY(18px);
-    transition:
-      opacity var(--home-motion) var(--home-ease),
-      transform var(--home-motion) var(--home-ease);
-  }
-
-  .motion-ready.motion-in{
-    opacity:1;
-    transform:none;
-  }
-
-}
+/* Shared reveal timing is owned by motion.css for every route. */
 @keyframes trustAccentDrift{
   0%{background-position:0% 50%}
   100%{background-position:100% 50%}
@@ -1538,7 +1508,7 @@ summary,
     max-width:none!important;
   }
 
-  .audit-form{
+  .audit-form:not(.contact-form){
     display:grid!important;
     grid-template-columns:minmax(320px,.72fr) minmax(0,1.28fr)!important;
     grid-template-rows:auto auto auto auto auto!important;
@@ -1558,7 +1528,7 @@ summary,
   .audit-fields{grid-column:2!important;grid-row:1!important}
   .audit-consent{grid-column:2!important;grid-row:2!important;margin-top:0!important}
   .audit-submit{grid-column:2!important;grid-row:3!important;margin-top:0!important;justify-self:start!important}
-  .audit-form-status{grid-column:2!important;grid-row:4!important;margin-top:0!important}
+  .audit-form:not(.contact-form) .audit-form-status{grid-column:2!important;grid-row:4!important;margin-top:0!important}
   .audit-explainer{grid-column:1/-1!important;grid-row:5!important;width:100%!important;margin:10px 0 0!important}
 
   .contact-hero h2{max-width:11ch!important}
@@ -1808,7 +1778,7 @@ summary,
   .audit-hero h2{max-width:9.5ch!important}
   .audit-lead{max-width:none!important;margin:0!important;line-height:1.56}
   .audit-contact-shell{width:100%!important;max-width:none!important}
-  .audit-form{display:block!important;padding:22px 17px!important;border-radius:22px!important}
+  .audit-form:not(.contact-form){display:block!important;padding:22px 17px!important;border-radius:22px!important}
   .audit-form-heading{display:block!important;max-width:none!important;margin:0 0 21px!important;padding:0!important}
   .audit-form-heading h3{max-width:none!important;margin:0!important;font-size:clamp(1.95rem,8.1vw,2.35rem);line-height:1}
   .audit-fields{display:grid!important;grid-template-columns:1fr!important;gap:14px!important}
@@ -1816,7 +1786,7 @@ summary,
   .audit-field input{min-height:53px!important;padding-inline:15px!important;border-radius:15px!important;font-size:16px}
   .audit-consent{margin-top:15px!important;padding:14px!important;align-items:flex-start!important;border-radius:15px!important}
   .audit-submit{width:100%!important;min-height:51px!important;margin-top:17px!important;justify-content:center!important}
-  .audit-form-status{margin-top:14px!important;font-size:var(--type-ui)}
+  .audit-form:not(.contact-form) .audit-form-status{margin-top:14px!important;font-size:var(--type-ui)}
   .audit-explainer{width:100%!important;margin:16px 0 0!important;border-radius:17px!important}
 
   /* Contact: fixed two-line headline, then one clean panel and map. */
@@ -1983,8 +1953,8 @@ summary,
 .google-review-link:hover,.google-review-link:focus-visible{transform:translateY(-1px);border-color:rgba(234,179,8,.5);background:rgba(234,179,8,.07)}
 
 /* Audit geometry */
-.audit-form{border-radius:32px!important;overflow:hidden!important;transform:none!important}
-.audit-form:hover,.audit-form:focus-within{transform:none!important;border-radius:32px!important}
+.audit-form:not(.contact-form){border-radius:32px!important;overflow:hidden!important;transform:none!important}
+.audit-form:not(.contact-form):hover,.audit-form:not(.contact-form):focus-within{transform:none!important;border-radius:32px!important}
 .audit-form-heading{max-width:100%!important}
 .audit-form-heading h3{color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(3.25rem,4.25vw,4.8rem);line-height:.92;letter-spacing:-.048em}
 .audit-form-heading h3 .accent-orange{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important}
@@ -2016,7 +1986,7 @@ summary,
   .google-review-card{grid-template-columns:46px minmax(0,1fr);gap:14px;padding:18px;border-radius:21px}
   .google-review-mark{width:46px;height:46px;border-radius:15px}
   .google-review-link{grid-column:1/-1;width:100%;min-height:46px;margin-top:2px}
-  .audit-form{border-radius:22px!important}.audit-form:hover,.audit-form:focus-within{border-radius:22px!important}.audit-explainer{border-radius:17px!important}
+  .audit-form:not(.contact-form){border-radius:22px!important}.audit-form:not(.contact-form):hover,.audit-form:not(.contact-form):focus-within{border-radius:22px!important}.audit-explainer{border-radius:17px!important}
   .audit-form-heading h3{font-size:clamp(2.65rem,12vw,3.55rem);line-height:.94}
 }
 
@@ -3039,7 +3009,7 @@ summary,
   .partners-conveyor{margin-inline:0!important;padding:10px!important;border-radius:22px!important;backdrop-filter:blur(14px) saturate(112%)!important;-webkit-backdrop-filter:blur(14px) saturate(112%)!important}
   .partner-tile{width:160px!important;height:100px!important;padding:16px!important}
 
-  .audit-form{padding:28px 20px!important}
+  .audit-form:not(.contact-form){padding:28px 20px!important}
   .audit-field input{min-height:58px!important;font-size:16px}
   .audit-consent{line-height:1.5}
   .audit-submit{min-height:50px!important}
@@ -3281,16 +3251,7 @@ body{letter-spacing:0}
   -webkit-mask-image:linear-gradient(180deg,#000,transparent 72%);
 }
 .contact-page-inner{position:relative;width:var(--page);margin:0 auto}
-.contact-page-hero{display:grid;gap:13px;margin:0 0 clamp(2.5rem,5vw,4.5rem)}
-.contact-page-eyebrow{
-  margin:0;
-  color:#8e9aab;
-  font-size:var(--type-small);
-  font-weight:700;
-  letter-spacing:.13em;
-  line-height:1.2;
-  text-transform:uppercase;
-}
+.contact-page-hero{margin:0 0 clamp(2.5rem,5vw,4.5rem)}
 .contact-page-hero h1{
   max-width:11ch;
   margin:0;
@@ -3329,96 +3290,35 @@ body{letter-spacing:0}
   pointer-events:none;
 }
 .contact-form,.contact-info-panel{position:relative;z-index:2}
-.contact-form{
+.contact-form.audit-form{
+  display:block;
   padding:clamp(2rem,4.2vw,4rem);
+  border:0;
   border-right:1px solid rgba(255,255,255,.09);
+  border-radius:0;
+  box-shadow:none;
+}
+.contact-form.audit-form:hover,.contact-form.audit-form:focus-within{
+  border-color:rgba(255,255,255,.09);
+  box-shadow:none;
 }
 .contact-honeypot{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
-.contact-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px}
-.contact-field{display:grid;gap:10px;min-width:0}
-.contact-field--wide{grid-column:1/-1}
-.contact-field>span,.contact-consent{
-  color:#d9dee7;
-  font-size:var(--type-ui);
-  font-weight:600;
-  line-height:1.45;
-}
-.contact-field b,.contact-consent b{margin-left:2px;color:#6d99ff;font-weight:700}
-.contact-field input,.contact-field textarea{
-  width:100%;
-  min-width:0;
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:16px;
-  background:rgba(0,0,0,.43);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+.contact-form .contact-form-heading{max-width:none;margin:0 0 30px;padding:0}
+.contact-form .contact-form-heading h2{
+  margin:0;
   color:#fff;
-  caret-color:#79a0ff;
-  transition:border-color .18s ease,background .18s ease,box-shadow .18s ease;
+  font-size:var(--type-role-feature);
+  line-height:1.1;
+  letter-spacing:-.004em;
 }
-.contact-field input{min-height:56px;padding:0 17px}
-.contact-field textarea{min-height:190px;padding:16px 17px;line-height:1.55;resize:vertical}
-.contact-field input:hover,.contact-field textarea:hover{border-color:rgba(255,255,255,.23)}
-.contact-field input:focus-visible,.contact-field textarea:focus-visible{
-  outline:none;
-  border-color:rgba(79,133,255,.9);
-  background:rgba(4,8,17,.76);
-  box-shadow:0 0 0 4px rgba(79,133,255,.12),inset 0 1px 0 rgba(255,255,255,.05);
-}
-.contact-consent{
-  display:grid;
-  grid-template-columns:22px 1fr;
-  gap:11px;
-  align-items:start;
-  margin:24px 0 0;
-  cursor:pointer;
-}
-.contact-consent input{
-  width:20px;
-  height:20px;
-  margin:1px 0 0;
-  accent-color:#4f85ff;
-}
-.contact-required{margin:12px 0 0;color:#858f9d;font-size:var(--type-small);line-height:1.4}
-.contact-required span{color:#6d99ff}
-.contact-submit{
-  min-width:132px;
-  min-height:52px;
-  margin-top:24px;
-  padding:0 21px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:11px;
-  border:1px solid rgba(100,148,255,.74);
-  border-radius:999px;
-  background:linear-gradient(180deg,#558cff,#1d4ed8);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 16px 38px rgba(29,78,216,.25);
-  color:#fff;
-  font-size:var(--type-ui);
-  font-weight:700;
-  line-height:1.3;
-  letter-spacing:0;
-  cursor:pointer;
-  transition:transform .18s var(--ease),filter .18s ease,box-shadow .18s ease;
-}
-.contact-submit svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.contact-submit:disabled{opacity:.58;cursor:wait}
-.contact-submit:focus-visible{outline:2px solid #fff;outline-offset:3px}
-.contact-form-status{
-  position:relative;
-  margin:18px 0 0;
-  padding:13px 15px;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:14px;
-  background:rgba(255,255,255,.035);
-  color:#dbe1e9;
-  font-size:var(--type-ui);
-  line-height:1.5;
-}
-.contact-form-status[hidden]{display:none}
-.contact-form-status.is-success{border-color:rgba(34,197,94,.38);background:rgba(34,197,94,.09);color:#b9f5ca}
-.contact-form-status.is-error{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.09);color:#fecaca}
-.contact-form-status.is-sending{border-color:rgba(79,133,255,.38);background:rgba(79,133,255,.09);color:#cfddff}
+.contact-form .audit-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 18px}
+.contact-form .audit-field{min-width:0}
+.contact-form .audit-field textarea{min-height:180px}
+.contact-form .contact-consent{margin-top:22px}
+.contact-form .contact-submit{min-width:132px;margin-top:24px}
+.contact-form .contact-submit:disabled{opacity:.58;cursor:wait}
+.contact-form .contact-submit:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.contact-form .contact-form-status{margin:18px 0 0}
 .contact-info-panel{
   display:flex;
   flex-direction:column;
@@ -3474,14 +3374,13 @@ a.contact-method{transition:color .18s ease,transform .18s var(--ease)}
 .contact-method-text>span{color:#9ba5b3;font-size:var(--type-small);line-height:1.45;overflow-wrap:anywhere}
 .contact-method-arrow{color:#687384;font-size:18px;transition:transform .18s var(--ease),color .18s ease}
 @media(hover:hover){
-  .contact-submit:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 20px 44px rgba(29,78,216,.32)}
   a.contact-method:hover{color:#fff;transform:translateX(3px)}
   a.contact-method:hover .contact-method-arrow{color:#fff;transform:translate(2px,-2px)}
 }
 @media(max-width:980px){
   .contact-page-hero h1{max-width:10ch}
   .contact-surface{grid-template-columns:1fr}
-  .contact-form{border-right:0;border-bottom:1px solid rgba(255,255,255,.09)}
+  .contact-form.audit-form{border-right:0;border-bottom:1px solid rgba(255,255,255,.09)}
   .contact-info-copy p{max-width:48rem}
   .contact-methods{margin-top:12px}
 }
@@ -3491,19 +3390,23 @@ a.contact-method{transition:color .18s ease,transform .18s var(--ease)}
   .contact-page-hero{margin-bottom:2rem}
   .contact-page-hero h1{max-width:8ch;line-height:1.08;letter-spacing:-.002em}
   .contact-surface{border-radius:25px}
-  .contact-form,.contact-info-panel{padding:24px 20px}
-  .contact-fields{grid-template-columns:1fr;gap:19px}
-  .contact-field--wide{grid-column:auto}
-  .contact-field textarea{min-height:160px}
-  .contact-consent{font-size:.9rem}
-  .contact-submit{width:100%;min-height:54px}
-  .contact-info-copy h2{font-size:clamp(2rem,10vw,2.65rem)}
+  .contact-form.audit-form{padding:24px 20px}
+  .contact-info-panel{padding:24px 20px}
+  .contact-form .contact-form-heading{margin-bottom:26px}
+  .contact-form .contact-form-heading h2{font-size:var(--type-role-feature)}
+  .contact-form .audit-fields{grid-template-columns:1fr;gap:19px}
+  .contact-form .audit-field--wide{grid-column:auto}
+  .contact-form .audit-field textarea{min-height:160px}
+  .contact-form .contact-consent{font-size:.9rem}
+  .contact-form .contact-submit{width:100%;min-height:54px}
+  .contact-info-copy h2{font-size:var(--type-role-feature)}
   .contact-info-copy p{font-size:1rem}
   .contact-method{grid-template-columns:44px minmax(0,1fr) auto}
   .contact-method-icon{width:44px;height:44px}
 }
 @media(max-width:380px){
-  .contact-form,.contact-info-panel{padding:21px 17px}
+  .contact-form.audit-form{padding:21px 17px}
+  .contact-info-panel{padding:21px 17px}
   .contact-method{gap:11px}
 }
 @media(prefers-reduced-motion:reduce){
@@ -3532,11 +3435,6 @@ a.contact-method{transition:color .18s ease,transform .18s var(--ease)}
 @media(max-width:640px){
   .audit-page .audit-hero h1{font-size:clamp(3.45rem,14.5vw,5rem);line-height:.91}
   .audit-page .audit-form-heading h2{font-size:clamp(2.15rem,10vw,3rem)}
-}
-
-/* Audit/contact routes must not depend on scroll observation to expose essential content. */
-@media(prefers-reduced-motion:no-preference){
-  .get-in-touch-page .motion-ready{opacity:1;transform:none;will-change:auto}
 }
 
 /* source: typography-system.css */
@@ -3702,3 +3600,26 @@ h1,h2,h3,h4{overflow:visible;font-kerning:normal}
 .reset-placeholder-inner h2{line-height:1.16;letter-spacing:0}
 
 .support-standard-group h3{line-height:1.25;letter-spacing:0}
+
+/* source: motion.css */
+@media(prefers-reduced-motion:no-preference){
+  .motion-ready{
+    opacity:0;
+    transform:translateY(18px);
+    transition:
+      opacity 620ms cubic-bezier(.16,1,.3,1),
+      transform 620ms cubic-bezier(.16,1,.3,1);
+  }
+  .motion-ready.motion-in{
+    opacity:1;
+    transform:none;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .motion-ready{
+    opacity:1;
+    transform:none;
+    transition:none;
+    animation:none;
+  }
+}

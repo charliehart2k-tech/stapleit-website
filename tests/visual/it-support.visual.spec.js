@@ -1141,9 +1141,13 @@ test('Get in Touch preserves the original contact journey and submits a real gen
 
   for (const [width, height] of [[390, 844], [820, 1180], [1366, 768]]) {
     await page.setViewportSize({ width, height });
-    await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'domcontentloaded' });
+    await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'networkidle' });
     await expect(page.getByRole('heading', { level:1, name:'Let’s get talking!' })).toBeVisible();
+    await expect(page.locator('.contact-page-eyebrow')).toHaveCount(0);
+    await expect(page.getByRole('heading', { level:2, name:'Send us a message' })).toBeVisible();
     await expect(page.getByRole('heading', { level:2, name:'Contact us' })).toBeVisible();
+    await expect(page.locator('.contact-form')).toHaveClass(/audit-form/);
+    await expect(page.locator('.contact-form .audit-fields')).toBeVisible();
     await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding this page/i);
     await expect(page.locator('a[href="tel:+441372309707"]')).toContainText('01372 309 707');
     await expect(page.locator('a[href="mailto:hello@stapleit.co.uk"]')).toContainText('hello@stapleit.co.uk');
@@ -1153,6 +1157,14 @@ test('Get in Touch preserves the original contact journey and submits a real gen
     await expect(page.locator('main')).toContainText('Whether you have a question, need some advice or want to find out more about how Staple IT can help your business, we’d love to hear from you.');
     await expect(page.locator('main')).toContainText('We’re a small, friendly team and we promise you’ll always speak to someone who knows what they’re talking about.');
     await expect(page.locator('main')).toContainText('Fill in the form and we’ll get back to you as soon as possible.');
+
+    for (const selector of ['.contact-page-hero', '.contact-form', '.contact-info-panel']) {
+      const target = page.locator(selector);
+      await target.scrollIntoViewIfNeeded();
+      await expect(target).toHaveClass(/motion-ready/);
+      await expect(target).toHaveClass(/motion-in/);
+      await expect.poll(() => target.evaluate(element => Number.parseFloat(getComputedStyle(element).opacity))).toBeGreaterThanOrEqual(.99);
+    }
 
     const geometry = await page.evaluate(() => {
       const observed = [...document.querySelectorAll('.contact-page-hero,.contact-surface,.contact-form,.contact-info-panel')];
@@ -1173,7 +1185,7 @@ test('Get in Touch preserves the original contact journey and submits a real gen
   }
 
   await page.setViewportSize({ width:390, height:844 });
-  await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'domcontentloaded' });
+  await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'networkidle' });
   const form = page.locator('[data-enquiry-action="stapleit_contact_enquiry"]');
   await expect(form.locator('input[name="action"]')).toHaveValue('stapleit_contact_enquiry');
   await form.locator('input[name="name"]').fill('Test Visitor');
@@ -1182,9 +1194,70 @@ test('Get in Touch preserves the original contact journey and submits a real gen
   await form.locator('input[name="contact-consent"]').check();
   await form.getByRole('button', { name:'Send' }).click();
   await expect(form.locator('[data-enquiry-status]')).toContainText('received');
-  await expect(form.getByRole('button', { name:'Send' }).locator('svg')).toHaveCount(1);
+  await expect(form.getByRole('button', { name:'Send' }).locator('[data-enquiry-submit-label]')).toHaveText('Send');
+  await expect(form.getByRole('button', { name:'Send' }).locator('svg')).toHaveCount(0);
   expect(submittedBody).toContain('stapleit_contact_enquiry');
   expect(submittedBody).toContain('General IT enquiry');
+});
+
+test('page reveal motion uses one shared contract across route types and respects reduced motion', async ({ page }) => {
+  test.setTimeout(60000);
+  await page.setViewportSize({ width:1366, height:900 });
+  await page.emulateMedia({ reducedMotion:'no-preference' });
+
+  const routes = [
+    ['/', '.services-header'],
+    ['/it-services/', '.it-services-overview'],
+    ['/it-services/it-support/', '.support-step-card'],
+    ['/remote-support/', '.support-action-card'],
+    ['/get-in-touch/', '.contact-info-panel'],
+    ['/get-in-touch/it-audit/', '.audit-hero'],
+    ['/about-us/', '.reset-placeholder-inner']
+  ];
+
+  for (const [route, selector] of routes) {
+    await page.goto(`http://127.0.0.1:4173${route}`, { waitUntil:'domcontentloaded' });
+    const target = page.locator(selector).first();
+    await target.scrollIntoViewIfNeeded();
+    await expect(target).toHaveClass(/motion-ready/);
+    await expect(target).toHaveClass(/motion-in/);
+    await expect.poll(() => target.evaluate(element => Number.parseFloat(getComputedStyle(element).opacity))).toBeGreaterThanOrEqual(.99);
+    await expect.poll(() => target.evaluate(element => getComputedStyle(element).transform)).toBe('none');
+    const style = await target.evaluate(element => {
+      const computed = getComputedStyle(element);
+      return {
+        opacity: Number.parseFloat(computed.opacity),
+        transform: computed.transform,
+        transitionDuration: computed.transitionDuration,
+        transitionProperty: computed.transitionProperty
+      };
+    });
+    expect(style.opacity).toBeGreaterThanOrEqual(.99);
+    expect(style.transform).toBe('none');
+    expect(style.transitionProperty).toContain('opacity');
+    expect(style.transitionProperty).toContain('transform');
+    expect(style.transitionDuration).toContain('0.62s');
+  }
+
+  await page.emulateMedia({ reducedMotion:'reduce' });
+  for (const [route, selector] of [
+    ['/get-in-touch/', '.contact-info-panel'],
+    ['/about-us/', '.reset-placeholder-inner']
+  ]) {
+    await page.goto(`http://127.0.0.1:4173${route}`, { waitUntil:'domcontentloaded' });
+    const target = page.locator(selector).first();
+    await target.scrollIntoViewIfNeeded();
+    await expect(target).not.toHaveClass(/motion-ready/);
+    const style = await target.evaluate(element => {
+      const computed = getComputedStyle(element);
+      return {
+        opacity: Number.parseFloat(computed.opacity),
+        transform: computed.transform
+      };
+    });
+    expect(style.opacity).toBeGreaterThanOrEqual(.99);
+    expect(style.transform).toBe('none');
+  }
 });
 
 test('IT Audit is a real audit route and keeps contact fallback available', async ({ page }) => {
@@ -1197,6 +1270,15 @@ test('IT Audit is a real audit route and keeps contact fallback available', asyn
     await expect(page.locator('[data-audit-form]')).toBeVisible();
     await expect(page.locator('.contact-panel')).toBeVisible();
     await expect(page.getByRole('link', { name:'01372 309 707' })).toHaveAttribute('href', 'tel:+441372309707');
+
+    for (const selector of ['.audit-hero', '.audit-form', '.contact-hero', '.contact-panel', '.contact-map-card']) {
+      const target = page.locator(selector).first();
+      await target.scrollIntoViewIfNeeded();
+      await expect(target).toHaveClass(/motion-ready/);
+      await expect(target).toHaveClass(/motion-in/);
+      await expect.poll(() => target.evaluate(element => Number.parseFloat(getComputedStyle(element).opacity))).toBeGreaterThanOrEqual(.99);
+    }
+
     const geometry = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth - innerWidth,
       hidden: [...document.querySelectorAll('.audit-hero,.audit-form,.contact-hero,.contact-panel,.contact-map-card')].filter(element => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,

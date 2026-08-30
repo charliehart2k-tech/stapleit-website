@@ -83,6 +83,10 @@ BUNDLES["it-services.bundle.css"] = BUNDLES["home.bundle.css"][:-1] + ["it-servi
 # Remote Support uses the shared shell plus a dedicated support-dashboard layer.
 BUNDLES["remote-support.bundle.css"] = SHELL + ["remote-support.css", "typography-system.css"]
 
+# The reveal contract must win the cascade consistently on every route.
+for sources in BUNDLES.values():
+    sources.append("motion.css")
+
 MAX_GZIP_BYTES = {
     "site-shell.bundle.css": 16_000,
     "home.bundle.css": 45_000,

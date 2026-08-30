@@ -2,22 +2,21 @@
 <section class="contact-section contact-page-section" id="contact" aria-labelledby="contact-title">
 <div class="contact-page-inner">
 <header class="contact-page-hero">
-<p class="contact-page-eyebrow">Get in touch</p>
 <h1 id="contact-title">Let’s get <span>talking!</span></h1>
 </header>
 <div class="contact-surface">
-<form class="contact-form" method="post" action="/wp-admin/admin-ajax.php" data-enquiry-form data-enquiry-action="stapleit_contact_enquiry" aria-label="Contact Staple IT">
+<form class="audit-form contact-form" method="post" action="/wp-admin/admin-ajax.php" data-enquiry-form data-enquiry-action="stapleit_contact_enquiry" aria-label="Contact Staple IT">
 <input type="hidden" name="action" value="stapleit_contact_enquiry"/>
-<div class="contact-honeypot" aria-hidden="true"><label for="contact-website">Leave this field empty</label><input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off"/></div>
-<div class="contact-fields">
-<label class="contact-field" for="contact-name"><span>What is your name?<b aria-hidden="true">*</b></span><input id="contact-name" name="name" type="text" autocomplete="name" maxlength="120" required/></label>
-<label class="contact-field" for="contact-email"><span>What is your email address?<b aria-hidden="true">*</b></span><input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" required/></label>
-<label class="contact-field contact-field--wide" for="contact-requirements"><span>What would you like to talk to us about?<b aria-hidden="true">*</b></span><textarea id="contact-requirements" name="requirements" rows="7" maxlength="2000" required></textarea></label>
+<div class="audit-form-heading contact-form-heading"><h2>Send us a message</h2></div>
+<div class="audit-honeypot contact-honeypot" aria-hidden="true"><label for="contact-website">Website</label><input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off"/></div>
+<div class="audit-fields">
+<label class="audit-field" for="contact-name"><span>What is your name?</span><input id="contact-name" name="name" type="text" autocomplete="name" maxlength="120" placeholder="Your name" required/></label>
+<label class="audit-field" for="contact-email"><span>What is your email address?</span><input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@company.co.uk" required/></label>
+<label class="audit-field audit-field--wide" for="contact-requirements"><span>What would you like to talk to us about?</span><textarea id="contact-requirements" name="requirements" rows="7" maxlength="2000" placeholder="Tell us what you’re currently using, how you’re using it and what is frustrating you." required></textarea></label>
 </div>
-<label class="contact-consent"><input name="contact-consent" type="checkbox" value="yes" required/><span>Are you happy for us to contact you and store your details for the purpose of getting in touch?<b aria-hidden="true">*</b></span></label>
-<p class="contact-required"><span aria-hidden="true">*</span> Indicates required fields</p>
-<button class="contact-submit" type="submit" data-enquiry-submit><span data-enquiry-submit-label>Send</span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 12 14-7-4 14-3-5-7-2Z"/><path d="m12 14 7-9"/></svg></button>
-<p class="contact-form-status" id="contact-form-status" role="status" aria-live="polite" data-enquiry-status hidden></p>
+<label class="audit-consent contact-consent"><input name="contact-consent" type="checkbox" value="yes" required/><span>Yes, I’m happy for Staple IT to contact me about my enquiry.</span></label>
+<button class="button audit-submit contact-submit" type="submit" data-enquiry-submit><span data-enquiry-submit-label>Send</span></button>
+<p class="audit-form-status contact-form-status" id="contact-form-status" role="status" aria-live="polite" data-audit-form-status data-enquiry-status hidden></p>
 </form>
 <section class="contact-info-panel" aria-labelledby="contact-info-title">
 <div class="contact-info-copy">

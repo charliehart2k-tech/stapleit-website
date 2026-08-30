@@ -60,7 +60,8 @@
     "home-spacing.css",
     "typography-refinement.css",
     "nav-rainbow.css",
-    "typography-system.css"
+    "typography-system.css",
+    "motion.css"
   ],
   "source_css_important_max": 902,
   "important_max_by_source": {

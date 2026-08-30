@@ -119,8 +119,8 @@
 .google-review-link:hover,.google-review-link:focus-visible{transform:translateY(-1px);border-color:rgba(234,179,8,.5);background:rgba(234,179,8,.07)}
 
 /* Audit geometry */
-.audit-form{border-radius:32px!important;overflow:hidden!important;transform:none!important}
-.audit-form:hover,.audit-form:focus-within{transform:none!important;border-radius:32px!important}
+.audit-form:not(.contact-form){border-radius:32px!important;overflow:hidden!important;transform:none!important}
+.audit-form:not(.contact-form):hover,.audit-form:not(.contact-form):focus-within{transform:none!important;border-radius:32px!important}
 .audit-form-heading{max-width:100%!important}
 .audit-form-heading h3{color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(3.25rem,4.25vw,4.8rem);line-height:.92;letter-spacing:-.048em}
 .audit-form-heading h3 .accent-orange{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important}
@@ -152,7 +152,7 @@
   .google-review-card{grid-template-columns:46px minmax(0,1fr);gap:14px;padding:18px;border-radius:21px}
   .google-review-mark{width:46px;height:46px;border-radius:15px}
   .google-review-link{grid-column:1/-1;width:100%;min-height:46px;margin-top:2px}
-  .audit-form{border-radius:22px!important}.audit-form:hover,.audit-form:focus-within{border-radius:22px!important}.audit-explainer{border-radius:17px!important}
+  .audit-form:not(.contact-form){border-radius:22px!important}.audit-form:not(.contact-form):hover,.audit-form:not(.contact-form):focus-within{border-radius:22px!important}.audit-explainer{border-radius:17px!important}
   .audit-form-heading h3{font-size:clamp(2.65rem,12vw,3.55rem);line-height:.94}
 }
 

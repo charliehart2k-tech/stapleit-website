@@ -228,6 +228,7 @@ grep -Fq "assets/css/home.bundle.css?v=$VERSION" "$THEME/front-page.php"
 # Get in Touch must remain a real contact destination, never a placeholder.
 grep -Fq 'class="reset-stage get-in-touch-page"' "$THEME/static-get-in-touch.php"
 grep -Fq 'class="contact-section contact-page-section"' "$THEME/static-get-in-touch.php"
+grep -Fq 'class="audit-form contact-form"' "$THEME/static-get-in-touch.php"
 grep -Fq 'data-enquiry-action="stapleit_contact_enquiry"' "$THEME/static-get-in-touch.php"
 grep -Fq '01372 309 707' "$THEME/static-get-in-touch.php"
 grep -Fq 'hello@stapleit.co.uk' "$THEME/static-get-in-touch.php"

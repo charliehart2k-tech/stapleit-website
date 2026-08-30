@@ -150,7 +150,7 @@
   .partners-conveyor{margin-inline:0!important;padding:10px!important;border-radius:22px!important;backdrop-filter:blur(14px) saturate(112%)!important;-webkit-backdrop-filter:blur(14px) saturate(112%)!important}
   .partner-tile{width:160px!important;height:100px!important;padding:16px!important}
 
-  .audit-form{padding:28px 20px!important}
+  .audit-form:not(.contact-form){padding:28px 20px!important}
   .audit-field input{min-height:58px!important;font-size:16px}
   .audit-consent{line-height:1.5}
   .audit-submit{min-height:50px!important}
