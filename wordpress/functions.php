@@ -117,6 +117,8 @@ add_action( 'wp_ajax_nopriv_stapleit_audit', 'stapleit_handle_audit_ajax' );
 add_action( 'wp_ajax_stapleit_audit', 'stapleit_handle_audit_ajax' );
 add_action( 'wp_ajax_nopriv_stapleit_support_enquiry', 'stapleit_handle_support_enquiry_ajax' );
 add_action( 'wp_ajax_stapleit_support_enquiry', 'stapleit_handle_support_enquiry_ajax' );
+add_action( 'wp_ajax_nopriv_stapleit_contact_enquiry', 'stapleit_handle_contact_enquiry_ajax' );
+add_action( 'wp_ajax_stapleit_contact_enquiry', 'stapleit_handle_contact_enquiry_ajax' );
 add_action( 'wp_ajax_nopriv_stapleit_track_planner_event', 'stapleit_track_planner_event' );
 add_action( 'wp_ajax_stapleit_track_planner_event', 'stapleit_track_planner_event' );
 add_action( 'wp_ajax_nopriv_stapleit_cora_chat', 'stapleit_handle_cora_chat_ajax' );
@@ -520,6 +522,10 @@ function stapleit_handle_support_enquiry_ajax() {
     stapleit_handle_enquiry_ajax( 'sole_trader_support' );
 }
 
+function stapleit_handle_contact_enquiry_ajax() {
+    stapleit_handle_enquiry_ajax( 'general_contact' );
+}
+
 function stapleit_handle_enquiry_ajax( $enquiry_type ) {
     $request = new WP_REST_Request( 'POST', '/stapleit/v1/enquiry' );
     $request->set_body_params( wp_unslash( $_POST ) );
@@ -571,25 +577,46 @@ function stapleit_handle_support_enquiry_request( WP_REST_Request $request ) {
     return stapleit_handle_enquiry_request( $request, 'sole_trader_support' );
 }
 
+function stapleit_handle_contact_enquiry_request( WP_REST_Request $request ) {
+    return stapleit_handle_enquiry_request( $request, 'general_contact' );
+}
+
 function stapleit_handle_enquiry_request( WP_REST_Request $request, $enquiry_type ) {
-    $is_support = $enquiry_type === 'sole_trader_support';
-    $config     = $is_support
-        ? array(
+    $configurations = array(
+        'general_contact' => array(
+            'label'           => 'General contact',
+            'subject'         => '[Staple IT] Website contact enquiry — %s',
+            'opening'         => 'A new general contact enquiry has been submitted.',
+            'success'         => 'Thanks — your message has been received. We’ll get back to you as soon as possible.',
+            'source'          => home_url( '/get-in-touch/' ),
+            'require_details' => true,
+        ),
+        'sole_trader_support' => array(
             'label'           => 'Sole trader IT support',
             'subject'         => '[Staple IT] Sole trader support enquiry — %s',
             'opening'         => 'A new sole trader IT support enquiry has been submitted.',
             'success'         => 'Thanks — your enquiry has been received. We’ll get back to you within one working day.',
             'source'          => home_url( '/it-services/it-support/' ),
             'require_details' => true,
-        )
-        : array(
+        ),
+        'audit' => array(
             'label'           => 'Free IT audit',
             'subject'         => '[Staple IT] Free IT audit request — %s',
             'opening'         => 'A new free IT audit request has been submitted.',
             'success'         => 'Thanks — your audit request has been received. We’ll get back to you within one working day.',
             'source'          => home_url( '/' ),
             'require_details' => false,
+        ),
+    );
+    $config = $configurations[ $enquiry_type ] ?? null;
+
+    if ( ! $config ) {
+        return new WP_Error(
+            'stapleit_invalid_enquiry_type',
+            'This enquiry type is not available.',
+            array( 'status' => 400 )
         );
+    }
 
     $name         = trim( sanitize_text_field( (string) $request->get_param( 'name' ) ) );
     $email        = trim( sanitize_email( (string) $request->get_param( 'email' ) ) );

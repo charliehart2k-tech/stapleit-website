@@ -1128,56 +1128,63 @@ test('Remote Support is a real support dashboard with client portal and mobile c
   expect(holidayCheck.checks).toEqual([true, true, true, true]);
 });
 
-test('Get in Touch is a real contact route with working audit handoff', async ({ page }) => {
+test('Get in Touch preserves the original contact journey and submits a real general enquiry', async ({ page }) => {
+  let submittedBody = '';
   await page.route('**/wp-admin/admin-ajax.php', async route => {
-    const body = route.request().postData() || '';
-    if (body.includes('stapleit_audit')) {
-      await route.fulfill({ status:200, contentType:'application/json', body:JSON.stringify({ ok:true, message:'Thanks — your audit request has been received. We’ll get back to you within one working day.' }) });
+    submittedBody = route.request().postData() || '';
+    if (submittedBody.includes('stapleit_contact_enquiry')) {
+      await route.fulfill({ status:200, contentType:'application/json', body:JSON.stringify({ ok:true, message:'Thanks — your message has been received. We’ll get back to you as soon as possible.' }) });
       return;
     }
     await route.continue();
   });
 
-  for (const [width, height] of [[390, 844], [1366, 768]]) {
+  for (const [width, height] of [[390, 844], [820, 1180], [1366, 768]]) {
     await page.setViewportSize({ width, height });
     await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'domcontentloaded' });
-    await expect(page.getByRole('heading', { level:1, name:/Get in Touch/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level:1, name:'Let’s get talking!' })).toBeVisible();
+    await expect(page.getByRole('heading', { level:2, name:'Contact us' })).toBeVisible();
     await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding this page/i);
-    await expect(page.getByRole('link', { name:'01372 309 707' })).toHaveAttribute('href', 'tel:+441372309707');
-    await expect(page.getByRole('link', { name:'hello@stapleit.co.uk' })).toHaveAttribute('href', 'mailto:hello@stapleit.co.uk');
-    await expect(page.getByRole('link', { name:'Click to chat' })).toHaveAttribute('href', 'https://wa.me/441372309707');
-    await expect(page.locator('[data-contact-map-frame]')).toHaveCount(1);
-    await expect(page.locator('[data-audit-form]')).toBeVisible();
+    await expect(page.locator('a[href="tel:+441372309707"]')).toContainText('01372 309 707');
+    await expect(page.locator('a[href="mailto:hello@stapleit.co.uk"]')).toContainText('hello@stapleit.co.uk');
+    await expect(page.locator('a[href="https://wa.me/441372309707"]')).toContainText('Click to chat');
+    await expect(page.locator('[data-contact-map-frame]')).toHaveCount(0);
+    await expect(page.locator('[data-enquiry-action="stapleit_contact_enquiry"]')).toBeVisible();
+    await expect(page.locator('main')).toContainText('Whether you have a question, need some advice or want to find out more about how Staple IT can help your business, we’d love to hear from you.');
+    await expect(page.locator('main')).toContainText('We’re a small, friendly team and we promise you’ll always speak to someone who knows what they’re talking about.');
+    await expect(page.locator('main')).toContainText('Fill in the form and we’ll get back to you as soon as possible.');
 
     const geometry = await page.evaluate(() => {
-      const observed = [...document.querySelectorAll('.contact-hero,.contact-panel,.contact-map-card,.audit-hero,.audit-form')];
+      const observed = [...document.querySelectorAll('.contact-page-hero,.contact-surface,.contact-form,.contact-info-panel')];
+      const rect = document.querySelector('.contact-surface')?.getBoundingClientRect();
       return {
         h1: document.querySelectorAll('main h1').length,
         overflow: document.documentElement.scrollWidth - innerWidth,
         hiddenObserved: observed.filter(element => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
-        formRect: (() => {
-          const rect = document.querySelector('[data-audit-form]')?.getBoundingClientRect();
-          return rect ? { left:rect.left, right:rect.right, width:rect.width } : { left:0, right:0, width:0 };
-        })(),
+        surfaceRect: rect ? { left:rect.left, right:rect.right, width:rect.width } : { left:0, right:0, width:0 },
         clientWidth: document.documentElement.clientWidth
       };
     });
     expect(geometry.h1).toBe(1);
     expect(geometry.overflow).toBeLessThanOrEqual(0);
     expect(geometry.hiddenObserved).toBe(0);
-    expect(geometry.formRect.left).toBeGreaterThanOrEqual(0);
-    expect(geometry.formRect.right).toBeLessThanOrEqual(geometry.clientWidth + 1);
+    expect(geometry.surfaceRect.left).toBeGreaterThanOrEqual(0);
+    expect(geometry.surfaceRect.right).toBeLessThanOrEqual(geometry.clientWidth + 1);
   }
 
   await page.setViewportSize({ width:390, height:844 });
   await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'domcontentloaded' });
-  const form = page.locator('[data-audit-form]');
+  const form = page.locator('[data-enquiry-action="stapleit_contact_enquiry"]');
+  await expect(form.locator('input[name="action"]')).toHaveValue('stapleit_contact_enquiry');
   await form.locator('input[name="name"]').fill('Test Visitor');
   await form.locator('input[name="email"]').fill('test@example.com');
-  await form.locator('textarea[name="requirements"]').fill('General IT review');
+  await form.locator('textarea[name="requirements"]').fill('General IT enquiry');
   await form.locator('input[name="contact-consent"]').check();
-  await form.getByRole('button', { name:'Request my free IT audit' }).click();
-  await expect(form.locator('[data-audit-form-status]')).toContainText('received');
+  await form.getByRole('button', { name:'Send' }).click();
+  await expect(form.locator('[data-enquiry-status]')).toContainText('received');
+  await expect(form.getByRole('button', { name:'Send' }).locator('svg')).toHaveCount(1);
+  expect(submittedBody).toContain('stapleit_contact_enquiry');
+  expect(submittedBody).toContain('General IT enquiry');
 });
 
 test('IT Audit is a real audit route and keeps contact fallback available', async ({ page }) => {

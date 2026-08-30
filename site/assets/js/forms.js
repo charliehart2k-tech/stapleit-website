@@ -8,13 +8,29 @@
     if (!status || !(submit instanceof HTMLButtonElement)) return;
 
     const action = form.dataset.enquiryAction || 'stapleit_audit';
-    const sendingMessage = action === 'stapleit_support_enquiry'
-      ? 'Sending your enquiry…'
-      : 'Sending your request…';
-    const fallbackMessage = action === 'stapleit_support_enquiry'
-      ? 'Thanks — your enquiry has been received. We’ll get back to you within one working day.'
-      : 'Thanks — your audit request has been received. We’ll get back to you within one working day.';
-    const defaultLabel = submit.textContent;
+    const messages = {
+      stapleit_contact_enquiry: {
+        sending: 'Sending your message…',
+        success: 'Thanks — your message has been received. We’ll get back to you as soon as possible.'
+      },
+      stapleit_support_enquiry: {
+        sending: 'Sending your enquiry…',
+        success: 'Thanks — your enquiry has been received. We’ll get back to you within one working day.'
+      },
+      stapleit_audit: {
+        sending: 'Sending your request…',
+        success: 'Thanks — your audit request has been received. We’ll get back to you within one working day.'
+      }
+    };
+    const messageSet = messages[action] || messages.stapleit_audit;
+    const sendingMessage = messageSet.sending;
+    const fallbackMessage = messageSet.success;
+    const submitLabel = submit.querySelector('[data-enquiry-submit-label]');
+    const defaultLabel = submitLabel instanceof HTMLElement ? submitLabel.textContent : submit.textContent;
+    const setSubmitLabel = value => {
+      if (submitLabel instanceof HTMLElement) submitLabel.textContent = value;
+      else submit.textContent = value;
+    };
     const requirements = form.querySelector('textarea[name="requirements"]');
     if (requirements instanceof HTMLTextAreaElement) {
       const plannerSummary = sessionStorage.getItem('stapleitPlannerSummary');
@@ -35,7 +51,7 @@
       if (!form.reportValidity()) return;
 
       submit.disabled = true;
-      submit.textContent = 'Sending…';
+      setSubmitLabel('Sending…');
       form.setAttribute('aria-busy', 'true');
       setStatus('sending', sendingMessage);
 
@@ -75,7 +91,7 @@
         );
       } finally {
         submit.disabled = false;
-        submit.textContent = defaultLabel;
+        setSubmitLabel(defaultLabel);
         form.removeAttribute('aria-busy');
       }
     }, true);
