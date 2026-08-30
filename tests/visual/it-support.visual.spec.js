@@ -1035,7 +1035,13 @@ test('Remote Support is a real support dashboard with client portal and mobile c
     await page.goto('http://127.0.0.1:4173/remote-support/', { waitUntil: 'networkidle' });
     await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding the remote support page/i);
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Help is on the way');
-    await expect(page.locator('.remote-support-copy h1')).toHaveCSS('color', 'rgb(249, 115, 22)');
+    const heroGradient = await page.locator('.remote-support-copy h1').evaluate(el => {
+      const style = getComputedStyle(el);
+      return { image: style.backgroundImage, animation: style.animationName, fill: style.webkitTextFillColor || style.color };
+    });
+    expect(heroGradient.image).toContain('linear-gradient');
+    expect(heroGradient.animation).toBe('remoteSupportHeroGradient');
+    expect(['transparent', 'rgba(0, 0, 0, 0)']).toContain(heroGradient.fill);
     await expect(page.locator('.support-status-value--ok')).toHaveCSS('color', 'rgb(74, 222, 128)');
     await expect(page.locator('.support-action-card')).toHaveCount(4);
     await expect(page.locator('.support-action-card--portal')).toHaveAttribute('href', '/client-portal/');
@@ -1043,12 +1049,13 @@ test('Remote Support is a real support dashboard with client portal and mobile c
     await expect(page.getByRole('link', { name: /Call support/i })).toHaveAttribute('href', 'tel:+441372309707');
     await expect(page.getByRole('link', { name: /WhatsApp/i })).toHaveAttribute('href', 'https://wa.me/441372309707');
     await expect(page.locator('.support-action-card--email .support-action-badge')).toHaveText('Fastest response');
-    await expect(page.locator('.support-action-card--call .support-action-badge')).toHaveText('Option 1');
+    await expect(page.locator('.support-action-card--call .support-action-badge')).toHaveText('SELECT option 1');
     await expect(page.locator('[data-support-state]')).not.toHaveText('Checking…');
     await expect(page.locator('.support-save-button')).toHaveCount(3);
-    await expect(page.locator('.support-save-button--iphone')).toBeVisible();
+    await expect(page.locator('.support-save-button--iphone')).toContainText('iOS');
     await expect(page.locator('.support-save-button--android')).toBeVisible();
     await expect(page.locator('.support-save-button--outlook')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Keep our contact details handy' })).toBeVisible();
     const accents = await page.locator('.support-action-card').evaluateAll(cards => cards.map(card => getComputedStyle(card).getPropertyValue('--accent').trim()));
     expect(new Set(accents).size).toBe(4);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
