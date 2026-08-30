@@ -1056,6 +1056,13 @@ test('Remote Support is a real support dashboard with client portal and mobile c
     await expect(page.locator('.support-save-button--android')).toBeVisible();
     await expect(page.locator('.support-save-button--outlook')).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: 'Keep our contact details handy' })).toBeVisible();
+    await expect(page.locator('[data-support-shader]')).toHaveCount(1);
+    const shader=page.locator('[data-support-shader]');
+    await page.locator('.support-save-panel').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(120);
+    const shaderState=await shader.getAttribute('data-shader-state');
+    expect(['active','static','fallback']).toContain(shaderState);
+    expect(await page.locator('.support-save-panel').evaluate(el=>getComputedStyle(el).isolation)).toBe('isolate');
     const accents = await page.locator('.support-action-card').evaluateAll(cards => cards.map(card => getComputedStyle(card).getPropertyValue('--accent').trim()));
     expect(new Set(accents).size).toBe(4);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
