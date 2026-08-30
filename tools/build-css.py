@@ -80,12 +80,16 @@ BUNDLES["get-in-touch.bundle.css"] = BUNDLES["home.bundle.css"][:-1] + ["get-in-
 # a dedicated full-page composition layer before the canonical typography pass.
 BUNDLES["it-services.bundle.css"] = BUNDLES["home.bundle.css"][:-1] + ["it-services.css", "typography-system.css"]
 
+# Remote Support uses the shared shell plus a dedicated support-dashboard layer.
+BUNDLES["remote-support.bundle.css"] = SHELL + ["remote-support.css", "typography-system.css"]
+
 MAX_GZIP_BYTES = {
     "site-shell.bundle.css": 16_000,
     "home.bundle.css": 45_000,
     "it-support.bundle.css": 30_000,
     "get-in-touch.bundle.css": 45_000,
     "it-services.bundle.css": 45_000,
+    "remote-support.bundle.css": 24_000,
 }
 
 

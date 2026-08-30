@@ -1,0 +1,10 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Staple IT Support
+ORG:Staple IT
+TEL;TYPE=WORK,VOICE:+441372309707
+EMAIL;TYPE=INTERNET,WORK:support@stapleit.co.uk
+URL:https://stapleit.co.uk/remote-support/
+ADR;TYPE=WORK:;;88 Eastdean Avenue;Epsom;;KT18 7SN;United Kingdom
+NOTE:Support hours Monday-Friday, 9:00 AM-5:00 PM.
+END:VCARD

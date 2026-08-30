@@ -1029,6 +1029,23 @@ test('IT Services landing page uses the four approved service cards', async ({ p
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
 });
 
+test('Remote Support is a real support dashboard with client portal and mobile containment', async ({ page }) => {
+  for (const [width, height] of [[390, 844], [1920, 1080]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('http://127.0.0.1:4173/remote-support/', { waitUntil: 'networkidle' });
+    await expect(page.locator('main')).not.toContainText(/Page in progress|rebuilding the remote support page/i);
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Help is on the way.');
+    await expect(page.locator('.support-action-card')).toHaveCount(4);
+    await expect(page.locator('.support-action-card--portal')).toHaveAttribute('href', '/client-portal/');
+    await expect(page.getByRole('link', { name: /Email support/i })).toHaveAttribute('href', 'mailto:support@stapleit.co.uk');
+    await expect(page.getByRole('link', { name: /Call support/i })).toHaveAttribute('href', 'tel:+441372309707');
+    await expect(page.getByRole('link', { name: /WhatsApp/i })).toHaveAttribute('href', 'https://wa.me/441372309707');
+    await expect(page.locator('[data-support-state]')).not.toHaveText('Checking…');
+    await expect(page.locator('.support-save-button')).toHaveCount(3);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
+  }
+});
+
 test('Get in Touch is a real contact route with working audit handoff', async ({ page }) => {
   await page.route('**/wp-admin/admin-ajax.php', async route => {
     const body = route.request().postData() || '';
