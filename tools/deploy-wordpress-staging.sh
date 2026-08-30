@@ -20,7 +20,7 @@ fail() {
 
 as_deploy() {
   if (( EUID == 0 )); then
-    sudo -H -u deploy "$@"
+    sudo -n -u deploy "$@"
   else
     "$@"
   fi
