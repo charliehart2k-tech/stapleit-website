@@ -1169,12 +1169,29 @@ test('Get in Touch preserves the original contact journey and submits a real gen
     const geometry = await page.evaluate(() => {
       const observed = [...document.querySelectorAll('.contact-page-hero,.contact-surface,.contact-form,.contact-info-panel')];
       const rect = document.querySelector('.contact-surface')?.getBoundingClientRect();
+      const hero = document.querySelector('.contact-page-hero')?.getBoundingClientRect();
+      const formHeadingElement = document.querySelector('.contact-form-heading h2');
+      const formHeading = formHeadingElement?.getBoundingClientRect();
+      const formHeadingStyle = formHeadingElement ? getComputedStyle(formHeadingElement) : null;
+      const labelElement = document.querySelector('.contact-form .audit-field>span');
+      const bodyElement = document.querySelector('.contact-info-copy p');
+      const textarea = document.querySelector('.contact-form textarea')?.getBoundingClientRect();
+      const consent = document.querySelector('.contact-form .contact-consent')?.getBoundingClientRect();
+      const submit = document.querySelector('.contact-form .contact-submit')?.getBoundingClientRect();
+      const footer = document.querySelector('.site-footer')?.getBoundingClientRect();
       return {
         h1: document.querySelectorAll('main h1').length,
         overflow: document.documentElement.scrollWidth - innerWidth,
         hiddenObserved: observed.filter(element => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
         surfaceRect: rect ? { left:rect.left, right:rect.right, width:rect.width } : { left:0, right:0, width:0 },
-        clientWidth: document.documentElement.clientWidth
+        clientWidth: document.documentElement.clientWidth,
+        formHeadingLines: formHeading && formHeadingStyle ? formHeading.height / Number.parseFloat(formHeadingStyle.lineHeight) : 0,
+        labelSize: labelElement ? Number.parseFloat(getComputedStyle(labelElement).fontSize) : 0,
+        bodySize: bodyElement ? Number.parseFloat(getComputedStyle(bodyElement).fontSize) : 0,
+        consentGap: textarea && consent ? consent.top - textarea.bottom : 0,
+        submitGap: consent && submit ? submit.top - consent.bottom : 0,
+        heroGap: hero && rect ? rect.top - hero.bottom : 0,
+        footerGap: rect && footer ? footer.top - rect.bottom : 0
       };
     });
     expect(geometry.h1).toBe(1);
@@ -1182,6 +1199,15 @@ test('Get in Touch preserves the original contact journey and submits a real gen
     expect(geometry.hiddenObserved).toBe(0);
     expect(geometry.surfaceRect.left).toBeGreaterThanOrEqual(0);
     expect(geometry.surfaceRect.right).toBeLessThanOrEqual(geometry.clientWidth + 1);
+    expect(geometry.labelSize).toBeGreaterThanOrEqual(15);
+    expect(geometry.bodySize).toBeGreaterThanOrEqual(16);
+    expect(geometry.consentGap).toBeGreaterThanOrEqual(18);
+    expect(geometry.submitGap).toBeGreaterThanOrEqual(18);
+    expect(geometry.heroGap).toBeGreaterThanOrEqual(24);
+    expect(geometry.heroGap).toBeLessThanOrEqual(60);
+    expect(geometry.footerGap).toBeGreaterThanOrEqual(60);
+    expect(geometry.footerGap).toBeLessThanOrEqual(115);
+    if (width >= 800) expect(geometry.formHeadingLines).toBeLessThan(1.25);
   }
 
   await page.setViewportSize({ width:390, height:844 });

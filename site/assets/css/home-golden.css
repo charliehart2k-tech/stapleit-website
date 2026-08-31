@@ -121,13 +121,13 @@
 /* Audit geometry */
 .audit-form:not(.contact-form){border-radius:32px!important;overflow:hidden!important;transform:none!important}
 .audit-form:not(.contact-form):hover,.audit-form:not(.contact-form):focus-within{transform:none!important;border-radius:32px!important}
-.audit-form-heading{max-width:100%!important}
-.audit-form-heading h3{color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(3.25rem,4.25vw,4.8rem);line-height:.92;letter-spacing:-.048em}
-.audit-form-heading h3 .accent-orange{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important}
+:where(.audit-form:not(.contact-form)) .audit-form-heading{max-width:100%!important}
+:where(.audit-form:not(.contact-form)) .audit-form-heading h3{color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(3.25rem,4.25vw,4.8rem);line-height:.92;letter-spacing:-.048em}
+:where(.audit-form:not(.contact-form)) .audit-form-heading h3 .accent-orange{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important}
 .audit-field>span{font-weight:600!important}
 .audit-explainer{border-radius:20px!important;transform:none!important}
 .audit-explainer:hover,.audit-explainer:focus-within{transform:none!important}
-@media(min-width:981px){.audit-form-heading{max-width:430px!important;padding-top:0!important}}
+@media(min-width:981px){:where(.audit-form:not(.contact-form)) .audit-form-heading{max-width:430px!important;padding-top:0!important}}
 
 /* --------------------------------------------------------------------------
    Final text + spacing conformity. Major chapters share one scale and body
@@ -153,7 +153,7 @@
   .google-review-mark{width:46px;height:46px;border-radius:15px}
   .google-review-link{grid-column:1/-1;width:100%;min-height:46px;margin-top:2px}
   .audit-form:not(.contact-form){border-radius:22px!important}.audit-form:not(.contact-form):hover,.audit-form:not(.contact-form):focus-within{border-radius:22px!important}.audit-explainer{border-radius:17px!important}
-  .audit-form-heading h3{font-size:clamp(2.65rem,12vw,3.55rem);line-height:.94}
+  :where(.audit-form:not(.contact-form)) .audit-form-heading h3{font-size:clamp(2.65rem,12vw,3.55rem);line-height:.94}
 }
 
 @media(prefers-reduced-motion:reduce){.home-statement-card,.home-statement-card .brand-red,.trust-title-accent,.google-review-hero,.google-review-card{animation:none!important;transition:none!important;transform:none!important;filter:none!important;opacity:1!important}}

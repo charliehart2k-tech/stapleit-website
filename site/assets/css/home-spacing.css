@@ -151,9 +151,9 @@
   .partner-tile{width:160px!important;height:100px!important;padding:16px!important}
 
   .audit-form:not(.contact-form){padding:28px 20px!important}
-  .audit-field input{min-height:58px!important;font-size:16px}
-  .audit-consent{line-height:1.5}
-  .audit-submit{min-height:50px!important}
+  :where(.audit-form:not(.contact-form)) .audit-field input{min-height:58px!important;font-size:16px}
+  :where(.audit-form:not(.contact-form)) .audit-consent{line-height:1.5}
+  :where(.audit-form:not(.contact-form)) .audit-submit{min-height:50px!important}
 
   .contact-grid{gap:14px!important}
   .contact-panel{padding:22px 19px!important}
