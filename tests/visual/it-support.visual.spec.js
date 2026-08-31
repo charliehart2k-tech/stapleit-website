@@ -1139,7 +1139,7 @@ test('Get in Touch preserves the original contact journey and submits a real gen
     await route.continue();
   });
 
-  for (const [width, height] of [[390, 844], [820, 1180], [1366, 768]]) {
+  for (const [width, height] of [[390, 844], [820, 1180], [1366, 768], [1908, 1200]]) {
     await page.setViewportSize({ width, height });
     await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'networkidle' });
     await expect(page.getByRole('heading', { level:1, name:'Let’s get talking!' })).toBeVisible();
@@ -1171,6 +1171,9 @@ test('Get in Touch preserves the original contact journey and submits a real gen
       const observed = [...document.querySelectorAll('.contact-page-hero,.contact-surface,.contact-form,.contact-info-panel')];
       const rect = document.querySelector('.contact-surface')?.getBoundingClientRect();
       const hero = document.querySelector('.contact-page-hero')?.getBoundingClientRect();
+      const heroHeadingElement = document.querySelector('.contact-page-hero h1');
+      const heroHeading = heroHeadingElement?.getBoundingClientRect();
+      const heroHeadingStyle = heroHeadingElement ? getComputedStyle(heroHeadingElement) : null;
       const formHeadingElement = document.querySelector('.contact-form-heading h2');
       const formHeading = formHeadingElement?.getBoundingClientRect();
       const formHeadingStyle = formHeadingElement ? getComputedStyle(formHeadingElement) : null;
@@ -1186,7 +1189,11 @@ test('Get in Touch preserves the original contact journey and submits a real gen
         hiddenObserved: observed.filter(element => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
         surfaceRect: rect ? { left:rect.left, right:rect.right, width:rect.width } : { left:0, right:0, width:0 },
         clientWidth: document.documentElement.clientWidth,
+        heroHeadingLines: heroHeading && heroHeadingStyle ? heroHeading.height / Number.parseFloat(heroHeadingStyle.lineHeight) : 0,
         formHeadingLines: formHeading && formHeadingStyle ? formHeading.height / Number.parseFloat(formHeadingStyle.lineHeight) : 0,
+        surfaceHeight: rect?.height || 0,
+        formSpare: rect && submit ? rect.bottom - submit.bottom : 0,
+        infoSpare: rect && document.querySelector('.contact-methods') ? rect.bottom - document.querySelector('.contact-methods').getBoundingClientRect().bottom : 0,
         labelSize: labelElement ? Number.parseFloat(getComputedStyle(labelElement).fontSize) : 0,
         bodySize: bodyElement ? Number.parseFloat(getComputedStyle(bodyElement).fontSize) : 0,
         consentGap: textarea && consent ? consent.top - textarea.bottom : 0,
@@ -1209,6 +1216,12 @@ test('Get in Touch preserves the original contact journey and submits a real gen
     expect(geometry.footerGap).toBeGreaterThanOrEqual(60);
     expect(geometry.footerGap).toBeLessThanOrEqual(115);
     if (width >= 800) expect(geometry.formHeadingLines).toBeLessThan(1.25);
+    if (width >= 1000) {
+      expect(geometry.heroHeadingLines).toBeLessThan(1.25);
+      expect(geometry.surfaceHeight).toBeLessThanOrEqual(700);
+      expect(geometry.formSpare).toBeLessThanOrEqual(70);
+      expect(geometry.infoSpare).toBeLessThanOrEqual(70);
+    }
   }
 
   await page.setViewportSize({ width:390, height:844 });
