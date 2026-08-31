@@ -1144,6 +1144,7 @@ test('Get in Touch preserves the original contact journey and submits a real gen
     await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'networkidle' });
     await expect(page.getByRole('heading', { level:1, name:'Let’s get talking!' })).toBeVisible();
     await expect(page.locator('.contact-page-eyebrow')).toHaveCount(0);
+    await expect(page.locator('.contact-page-section.contact-section')).toHaveCount(0);
     await expect(page.getByRole('heading', { level:2, name:'Send us a message' })).toBeVisible();
     await expect(page.getByRole('heading', { level:2, name:'Contact us' })).toBeVisible();
     await expect(page.locator('.contact-form')).toHaveClass(/audit-form/);
