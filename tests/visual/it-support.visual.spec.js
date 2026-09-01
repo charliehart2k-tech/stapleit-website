@@ -1370,7 +1370,7 @@ test('video panels use the same light frosted-glass treatment', async ({ page })
         pointerEvents: computed.pointerEvents
       };
     }, pseudo);
-    expect(style.backdropFilter).toContain('blur(2px)');
+    expect(style.backdropFilter).toContain('blur(8px)');
     expect(style.pointerEvents).toBe('none');
   }
 });
