@@ -1354,6 +1354,27 @@ test('page reveal motion uses one shared contract across route types and respect
   }
 });
 
+test('video panels use the same light frosted-glass treatment', async ({ page }) => {
+  await page.setViewportSize({ width:1366, height:900 });
+  for (const [route, selector, pseudo] of [
+    ['/', '.hero-liquid-shade', null],
+    ['/remote-support/', '.support-save-panel', '::after']
+  ]) {
+    await page.goto(`http://127.0.0.1:4173${route}`, { waitUntil:'domcontentloaded' });
+    const layer = page.locator(selector).first();
+    await layer.scrollIntoViewIfNeeded();
+    const style = await layer.evaluate((element, pseudoElement) => {
+      const computed = getComputedStyle(element, pseudoElement);
+      return {
+        backdropFilter: computed.backdropFilter || computed.webkitBackdropFilter,
+        pointerEvents: computed.pointerEvents
+      };
+    }, pseudo);
+    expect(style.backdropFilter).toContain('blur(2px)');
+    expect(style.pointerEvents).toBe('none');
+  }
+});
+
 test('IT Audit is a real audit route and keeps contact fallback available', async ({ page }) => {
   for (const [width, height] of [[390, 844], [1366, 768]]) {
     await page.setViewportSize({ width, height });
