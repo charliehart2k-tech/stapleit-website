@@ -1169,7 +1169,8 @@ test('Get in Touch preserves the original contact journey and submits a real gen
 
     const geometry = await page.evaluate(() => {
       const observed = [...document.querySelectorAll('.contact-page-hero,.contact-surface,.contact-form,.contact-info-panel')];
-      const rect = document.querySelector('.contact-surface')?.getBoundingClientRect();
+      const surfaceElement = document.querySelector('.contact-surface');
+      const rect = surfaceElement?.getBoundingClientRect();
       const hero = document.querySelector('.contact-page-hero')?.getBoundingClientRect();
       const heroHeadingElement = document.querySelector('.contact-page-hero h1');
       const heroHeading = heroHeadingElement?.getBoundingClientRect();
@@ -1188,6 +1189,8 @@ test('Get in Touch preserves the original contact journey and submits a real gen
         overflow: document.documentElement.scrollWidth - innerWidth,
         hiddenObserved: observed.filter(element => Number.parseFloat(getComputedStyle(element).opacity) < .99).length,
         surfaceRect: rect ? { left:rect.left, right:rect.right, width:rect.width } : { left:0, right:0, width:0 },
+        surfaceBackground: surfaceElement ? getComputedStyle(surfaceElement).backgroundImage : '',
+        surfaceTopHighlight: surfaceElement ? getComputedStyle(surfaceElement,'::before').backgroundImage : '',
         clientWidth: document.documentElement.clientWidth,
         heroHeadingLines: heroHeading && heroHeadingStyle ? heroHeading.height / Number.parseFloat(heroHeadingStyle.lineHeight) : 0,
         formHeadingLines: formHeading && formHeadingStyle ? formHeading.height / Number.parseFloat(formHeadingStyle.lineHeight) : 0,
@@ -1207,6 +1210,8 @@ test('Get in Touch preserves the original contact journey and submits a real gen
     expect(geometry.hiddenObserved).toBe(0);
     expect(geometry.surfaceRect.left).toBeGreaterThanOrEqual(0);
     expect(geometry.surfaceRect.right).toBeLessThanOrEqual(geometry.clientWidth + 1);
+    expect(geometry.surfaceBackground).toContain('248, 40, 34');
+    expect(geometry.surfaceTopHighlight).toBe('none');
     expect(geometry.labelSize).toBeGreaterThanOrEqual(15);
     expect(geometry.bodySize).toBeGreaterThanOrEqual(16);
     expect(geometry.consentGap).toBeGreaterThanOrEqual(18);
@@ -1236,8 +1241,47 @@ test('Get in Touch preserves the original contact journey and submits a real gen
   await expect(form.locator('[data-enquiry-status]')).toContainText('received');
   await expect(form.getByRole('button', { name:'Send' }).locator('[data-enquiry-submit-label]')).toHaveText('Send');
   await expect(form.getByRole('button', { name:'Send' }).locator('svg')).toHaveCount(0);
+  const feedbackGeometry = await form.evaluate(element => {
+    const submit = element.querySelector('.contact-submit').getBoundingClientRect();
+    const status = element.querySelector('.contact-form-status').getBoundingClientRect();
+    const formRect = element.getBoundingClientRect();
+    return { gap:status.top-submit.bottom, contained:status.bottom<=formRect.bottom+1 };
+  });
+  expect(feedbackGeometry.gap).toBeGreaterThanOrEqual(16);
+  expect(feedbackGeometry.contained).toBe(true);
   expect(submittedBody).toContain('stapleit_contact_enquiry');
   expect(submittedBody).toContain('General IT enquiry');
+});
+
+
+test('Get in Touch hours use the shared England and Wales bank holiday schedule', async ({ page }) => {
+  await page.addInitScript(() => {
+    const NativeDate=Date;
+    const fixed='2026-08-31T10:30:00.000Z';
+    class FixedDate extends NativeDate {
+      constructor(...args){ super(...(args.length ? args : [fixed])); }
+      static now(){ return new NativeDate(fixed).getTime(); }
+    }
+    window.Date=FixedDate;
+  });
+  await page.goto('http://127.0.0.1:4173/get-in-touch/', { waitUntil:'networkidle' });
+
+  const hours=page.locator('[data-contact-hours]');
+  await expect(hours).toHaveAttribute('data-state','offline');
+  await expect(hours.locator('[data-contact-hours-state]')).toHaveText('Closed today');
+  await expect(hours.locator('[data-contact-hours-detail]')).toContainText('Summer bank holiday');
+  await expect(hours.locator('[data-contact-hours-detail]')).toContainText('Back Tuesday 1 September at 9:00 AM');
+  await expect(hours.locator('.contact-method-icon')).toHaveCSS('color','rgb(248, 40, 34)');
+
+  const schedule = await page.evaluate(() => {
+    const open=window.StapleSupportSchedule.statusAt(new Date('2026-09-01T10:00:00Z'));
+    return {
+      holiday:window.StapleSupportSchedule.bankHolidaysForYear(2026).get('2026-08-31'),
+      open:open.online,
+      label:open.contactState
+    };
+  });
+  expect(schedule).toEqual({holiday:'Summer bank holiday',open:true,label:'Open now'});
 });
 
 test('page reveal motion uses one shared contract across route types and respects reduced motion', async ({ page }) => {
