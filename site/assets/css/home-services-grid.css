@@ -24,9 +24,9 @@
   padding-bottom:.08em;
 }
 
-/* Exact same passing Staple-colour shimmer used by the contact heading's “you”.
-   The word stays white most of the time and the colour band travels through it. */
-.services-header-accent{
+/* Passing Staple-colour shimmer reserved for the homepage brand name.
+   The text stays white most of the time and the colour band travels through it. */
+.staple-shimmer{
   display:inline-block;
   color:#fff!important;
   background:linear-gradient(108deg,#fff 0%,#fff 38%,var(--brand-blue) 44%,var(--brand-red) 48%,var(--brand-solutions) 52%,var(--brand-support) 57%,var(--brand-security) 62%,#fff 70%,#fff 100%);
@@ -370,7 +370,7 @@
 }
 
 @media(prefers-reduced-motion:reduce){
-  .services-header-accent{
+  .staple-shimmer{
     animation:none!important;
     background:none!important;
     color:#fff!important;

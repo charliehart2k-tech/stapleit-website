@@ -1006,6 +1006,31 @@ test('final services and CTA stay compact, distinct and contained', async ({ pag
   await expect(closingCta.getByRole('link', { name: 'Get in touch' })).toHaveAttribute('href', '/get-in-touch/');
 });
 
+test('homepage moves the Staple shimmer from you to the hero brand name', async ({ page }) => {
+  await page.setViewportSize({ width:1366, height:900 });
+  await page.emulateMedia({ reducedMotion:'no-preference' });
+  await page.goto('http://127.0.0.1:4173/', { waitUntil:'domcontentloaded' });
+
+  await expect(page.locator('.services-header h2')).toHaveText('What can we do for you...');
+  await expect(page.locator('.services-header h2 .staple-shimmer')).toHaveCount(0);
+
+  const brand = page.locator('.home-hero h1 .staple-shimmer');
+  await expect(brand).toHaveText('Staple IT');
+  const animated = await brand.evaluate(element => {
+    const computed = getComputedStyle(element);
+    return {
+      animationName: computed.animationName,
+      backgroundClip: computed.backgroundClip
+    };
+  });
+  expect(animated.animationName).toContain('contactStapleShimmer');
+  expect(animated.backgroundClip).toBe('text');
+
+  await page.emulateMedia({ reducedMotion:'reduce' });
+  await page.goto('http://127.0.0.1:4173/', { waitUntil:'domcontentloaded' });
+  await expect(page.locator('.home-hero h1 .staple-shimmer')).toHaveCSS('animation-name','none');
+});
+
 test('homepage IT Solutions card keeps Solutions on its own line', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
