@@ -640,7 +640,7 @@
 (() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const elements = [...document.querySelectorAll([
+  const revealSelectors = [
     '.services-header',
     '.home-services-card',
     '.audience-header',
@@ -656,12 +656,22 @@
     '.contact-hero',
     '.contact-panel',
     '.contact-map-card',
-    '.reset-placeholder-inner',
-    '.it-services-overview',
+    '.reset-placeholder-inner > .eyebrow',
+    '.reset-placeholder-inner > h1',
+    '.reset-placeholder-inner > p',
+    '.reset-placeholder-actions',
+    '.reset-404-inner > .eyebrow',
+    '.reset-404-inner > h1',
+    '.reset-404-inner > p',
+    '.reset-404-inner > .button',
+    '.it-services-hero',
     '.it-services-next',
     '.contact-page-hero',
     '.contact-page-section .contact-form',
-    '.contact-info-panel',
+    '.contact-info-copy',
+    '.contact-method',
+    '.support-hero-copy',
+    '.support-hero-proposition',
     '.remote-support-copy',
     '.support-status-card',
     '.remote-support-section-head',
@@ -678,7 +688,9 @@
     '.support-cta-panel',
     '.footer-panel',
     '.footer-legal-bar'
-  ].join(','))].filter(element => {
+  ];
+  const candidates = [...document.querySelectorAll(revealSelectors.join(','))];
+  const elements = candidates.filter(element => {
     const supportReveal = element.matches([
       '.support-standard > h2',
       '.support-standard-group',
@@ -692,6 +704,10 @@
     ].join(','));
     return !supportReveal || window.matchMedia('(min-width:701px)').matches;
   });
+  const coveredByCandidate = block => candidates.some(target => target === block || block.contains(target));
+  const fallbackBlocks = [...document.querySelectorAll('main > section,main > article,main > div')]
+    .filter(block => !block.matches('[hidden],[aria-hidden="true"]') && !coveredByCandidate(block));
+  elements.push(...fallbackBlocks);
 
   if (!elements.length) return;
 

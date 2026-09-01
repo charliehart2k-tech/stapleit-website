@@ -1159,7 +1159,7 @@ test('Get in Touch preserves the original contact journey and submits a real gen
     await expect(page.locator('main')).toContainText('We’re a small, friendly team and we promise you’ll always speak to someone who knows what they’re talking about.');
     await expect(page.locator('main')).toContainText('Fill in the form and we’ll get back to you as soon as possible.');
 
-    for (const selector of ['.contact-page-hero', '.contact-form', '.contact-info-panel']) {
+    for (const selector of ['.contact-page-hero', '.contact-form', '.contact-info-copy', '.contact-method:first-child']) {
       const target = page.locator(selector);
       await target.scrollIntoViewIfNeeded();
       await expect(target).toHaveClass(/motion-ready/);
@@ -1285,22 +1285,34 @@ test('Get in Touch hours use the shared England and Wales bank holiday schedule'
 });
 
 test('page reveal motion uses one shared contract across route types and respects reduced motion', async ({ page }) => {
-  test.setTimeout(60000);
+  test.setTimeout(90000);
   await page.setViewportSize({ width:1366, height:900 });
   await page.emulateMedia({ reducedMotion:'no-preference' });
 
   const routes = [
-    ['/', '.services-header'],
-    ['/it-services/', '.it-services-overview'],
-    ['/it-services/it-support/', '.support-step-card'],
-    ['/remote-support/', '.support-action-card'],
-    ['/get-in-touch/', '.contact-info-panel'],
-    ['/get-in-touch/it-audit/', '.audit-hero'],
-    ['/about-us/', '.reset-placeholder-inner']
+    ['/', '.services-header', 10],
+    ['/404.html', '.reset-404-inner > h1', 4],
+    ['/about-us/', '.reset-placeholder-inner > h1', 4],
+    ['/about-us/legal/', '.reset-placeholder-inner > h1', 4],
+    ['/about-us/our-partners/', '.reset-placeholder-inner > h1', 4],
+    ['/about-us/privacy-policy/', '.reset-placeholder-inner > h1', 4],
+    ['/about-us/who-we-support/', '.reset-placeholder-inner > h1', 4],
+    ['/client-portal/', '.reset-placeholder-inner > h1', 4],
+    ['/get-in-touch/', '.contact-info-copy', 7],
+    ['/get-in-touch/it-audit/', '.audit-hero', 5],
+    ['/it-services/', '.it-services-hero', 6],
+    ['/it-services/ai-integrations/', '.reset-placeholder-inner > h1', 4],
+    ['/it-services/cybersecurity/', '.reset-placeholder-inner > h1', 4],
+    ['/it-services/it-consultancy/', '.reset-placeholder-inner > h1', 4],
+    ['/it-services/it-solutions/', '.reset-placeholder-inner > h1', 4],
+    ['/it-services/it-support/', '.support-hero-copy', 10],
+    ['/remote-support/', '.remote-support-copy', 8],
+    ['/the-staple-blog/', '.reset-placeholder-inner > h1', 4]
   ];
 
-  for (const [route, selector] of routes) {
+  for (const [route, selector, minimumMainTargets] of routes) {
     await page.goto(`http://127.0.0.1:4173${route}`, { waitUntil:'domcontentloaded' });
+    expect(await page.locator('main .motion-ready').count()).toBeGreaterThanOrEqual(minimumMainTargets);
     const target = page.locator(selector).first();
     await target.scrollIntoViewIfNeeded();
     await expect(target).toHaveClass(/motion-ready/);
@@ -1324,14 +1336,12 @@ test('page reveal motion uses one shared contract across route types and respect
   }
 
   await page.emulateMedia({ reducedMotion:'reduce' });
-  for (const [route, selector] of [
-    ['/get-in-touch/', '.contact-info-panel'],
-    ['/about-us/', '.reset-placeholder-inner']
-  ]) {
+  for (const [route, selector] of routes) {
     await page.goto(`http://127.0.0.1:4173${route}`, { waitUntil:'domcontentloaded' });
     const target = page.locator(selector).first();
     await target.scrollIntoViewIfNeeded();
     await expect(target).not.toHaveClass(/motion-ready/);
+    expect(await page.locator('main .motion-ready').count()).toBe(0);
     const style = await target.evaluate(element => {
       const computed = getComputedStyle(element);
       return {
