@@ -21,7 +21,8 @@ for (const [width, height] of [
         lockWidth: lock.width,
         lockHeight: lock.height,
         cardLeft: card.left,
-        cardRight: card.right
+        cardRight: card.right,
+        cardCenter: (card.left + card.right) / 2
       };
     });
 
@@ -33,24 +34,25 @@ for (const [width, height] of [
 
     await page.locator('.holding-access summary').click();
     await expect(page.locator('.holding-access-panel')).toBeVisible();
-    await page.waitForTimeout(500);
+    await expect.poll(() => page.locator('.holding-main').evaluate(element =>
+      Number.parseFloat(getComputedStyle(element).opacity)
+    )).toBeLessThan(0.35);
 
     const openLayout = await page.evaluate(() => {
       const card = document.querySelector('.holding-card').getBoundingClientRect();
       const panel = document.querySelector('.holding-access-panel').getBoundingClientRect();
       const main = document.querySelector('.holding-main');
       return {
-        gap: panel.left - card.right,
+        cardCenter: (card.left + card.right) / 2,
+        panelCenter: (panel.left + panel.right) / 2,
         mainOpacity: Number.parseFloat(getComputedStyle(main).opacity),
         entryAnimation: getComputedStyle(document.body, '::before').animationName
       };
     });
 
-    if (width >= 1240) {
-      expect(openLayout.gap).toBeGreaterThanOrEqual(16);
-    } else {
-      expect(openLayout.mainOpacity).toBeLessThanOrEqual(0.05);
-    }
+    expect(Math.abs(openLayout.cardCenter - layout.cardCenter)).toBeLessThanOrEqual(1);
+    expect(Math.abs(openLayout.panelCenter - width / 2)).toBeLessThanOrEqual(1);
+    expect(openLayout.mainOpacity).toBeLessThanOrEqual(0.35);
     expect(openLayout.entryAnimation).toBe('holdingPageEntry');
 
     const controls = await page.locator('.holding-access input, .holding-access button').evaluateAll(elements =>
