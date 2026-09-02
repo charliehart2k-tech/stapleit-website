@@ -140,6 +140,21 @@ body.holding-page{
   text-rendering:optimizeLegibility;
 }
 
+body.holding-page::before{
+  content:"";
+  position:fixed;
+  z-index:50;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 72% 28%,rgba(79,133,255,.38),transparent 32%),
+    linear-gradient(135deg,#123db0 0%,var(--brand-blue) 52%,var(--blue-bright) 100%);
+  box-shadow:0 24px 80px rgba(29,78,216,.42);
+  transform:translateY(0);
+  will-change:transform;
+  animation:holdingPageEntry .9s cubic-bezier(.76,0,.24,1) .08s both;
+}
+
 a{color:inherit}
 button,
 input{font:inherit}
@@ -190,6 +205,10 @@ input{font:inherit}
   width:var(--page);
   margin:auto;
   padding:var(--space-7) 0 var(--space-5);
+}
+.holding-main,
+.holding-footer{
+  transition:width .42s var(--ease),margin .42s var(--ease),opacity .24s ease,filter .24s ease;
 }
 .holding-card{
   min-height:clamp(520px,66svh,650px);
@@ -423,9 +442,9 @@ input{font:inherit}
   font-weight:700;
 }
 .holding-access-panel{
-  position:absolute;
-  top:calc(100% + var(--space-2));
-  right:0;
+  position:fixed;
+  top:calc(var(--space-4) + 62px);
+  right:var(--space-4);
   width:min(360px,calc(100vw - 32px));
   max-height:calc(100svh - 92px);
   overflow-y:auto;
@@ -436,6 +455,7 @@ input{font:inherit}
   box-shadow:0 30px 90px rgba(0,0,0,.68);
   backdrop-filter:blur(24px) saturate(128%);
   -webkit-backdrop-filter:blur(24px) saturate(128%);
+  animation:holdingAccessIn .28s var(--ease) both;
 }
 .holding-access-kicker{
   margin:0;
@@ -517,8 +537,50 @@ input{font:inherit}
 }
 .holding-footer p{margin:0}
 
+@keyframes holdingPageEntry{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(-102%)}
+}
+
+@keyframes holdingAccessIn{
+  from{opacity:0;transform:translateY(-10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes holdingAccessInCentred{
+  from{opacity:0;transform:translate(-50%,calc(-50% - 10px))}
+  to{opacity:1;transform:translate(-50%,-50%)}
+}
+
 @keyframes holdingRainbow{
   to{background-position:240% 50%}
+}
+
+@media(min-width:1240px){
+  body.holding-page:has(.holding-access[open]) .holding-main,
+  body.holding-page:has(.holding-access[open]) .holding-footer{
+    width:min(calc(100% - 456px),1220px);
+    margin-left:32px;
+    margin-right:auto;
+  }
+}
+
+@media(max-width:1239px){
+  body.holding-page:has(.holding-access[open]) .holding-main,
+  body.holding-page:has(.holding-access[open]) .holding-footer{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    filter:blur(10px);
+  }
+  .holding-access-panel{
+    top:50%;
+    right:auto;
+    left:50%;
+    width:min(420px,calc(100vw - 32px));
+    transform:translate(-50%,-50%);
+    animation-name:holdingAccessInCentred;
+  }
 }
 
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -551,7 +613,15 @@ input{font:inherit}
   .holding-support{margin:0 var(--space-4);padding:var(--space-5) 0 var(--space-6)}
   .holding-access{top:var(--space-3);right:var(--space-3)}
   .holding-access-label{display:none}
-  .holding-access-panel{padding:var(--space-4)}
+  .holding-access-panel{
+    top:calc(var(--space-3) + 62px);
+    right:var(--space-3);
+    left:var(--space-3);
+    width:auto;
+    padding:var(--space-4);
+    transform:none;
+    animation-name:holdingAccessIn;
+  }
   .holding-footer{display:grid;padding-bottom:var(--space-3)}
 }
 
@@ -561,6 +631,8 @@ input{font:inherit}
   *::after{scroll-behavior:auto;transition-duration:.01ms}
   .holding-motion{display:none}
   .holding-rainbow{animation:none;background-position:44% 50%}
+  body.holding-page::before{display:none;animation:none}
+  .holding-access-panel{animation:none}
 }
 
 @media(forced-colors:active){

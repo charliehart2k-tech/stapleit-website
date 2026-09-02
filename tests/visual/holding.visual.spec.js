@@ -33,6 +33,25 @@ for (const [width, height] of [
 
     await page.locator('.holding-access summary').click();
     await expect(page.locator('.holding-access-panel')).toBeVisible();
+    await page.waitForTimeout(500);
+
+    const openLayout = await page.evaluate(() => {
+      const card = document.querySelector('.holding-card').getBoundingClientRect();
+      const panel = document.querySelector('.holding-access-panel').getBoundingClientRect();
+      const main = document.querySelector('.holding-main');
+      return {
+        gap: panel.left - card.right,
+        mainOpacity: Number.parseFloat(getComputedStyle(main).opacity),
+        entryAnimation: getComputedStyle(document.body, '::before').animationName
+      };
+    });
+
+    if (width >= 1240) {
+      expect(openLayout.gap).toBeGreaterThanOrEqual(16);
+    } else {
+      expect(openLayout.mainOpacity).toBeLessThanOrEqual(0.05);
+    }
+    expect(openLayout.entryAnimation).toBe('holdingPageEntry');
 
     const controls = await page.locator('.holding-access input, .holding-access button').evaluateAll(elements =>
       elements.map(element => element.getBoundingClientRect().height)
@@ -52,9 +71,11 @@ test('holding page respects reduced motion', async ({ page }) => {
 
   const motion = await page.evaluate(() => ({
     videoDisplay: getComputedStyle(document.querySelector('.holding-motion')).display,
-    rainbowAnimation: getComputedStyle(document.querySelector('.holding-rainbow')).animationName
+    rainbowAnimation: getComputedStyle(document.querySelector('.holding-rainbow')).animationName,
+    entryDisplay: getComputedStyle(document.body, '::before').display
   }));
 
   expect(motion.videoDisplay).toBe('none');
   expect(motion.rainbowAnimation).toBe('none');
+  expect(motion.entryDisplay).toBe('none');
 });
