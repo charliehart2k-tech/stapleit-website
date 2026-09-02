@@ -43,6 +43,35 @@ function stapleit_holding_login_error( $state ) {
     exit;
 }
 
+/**
+ * Confirm that the current browser session may view the staging build.
+ *
+ * Authentication alone is insufficient: only users with the existing
+ * site-builder capability may pass the holding page.
+ */
+function stapleit_holding_preview_is_authorised() {
+    return is_user_logged_in() && current_user_can( 'edit_theme_options' );
+}
+
+/**
+ * Keep the WordPress REST surface behind the same staging entitlement.
+ */
+add_filter( 'rest_authentication_errors', function ( $result ) {
+    if ( null !== $result ) {
+        return $result;
+    }
+
+    if ( stapleit_holding_preview_is_authorised() ) {
+        return $result;
+    }
+
+    return new WP_Error(
+        'stapleit_staging_auth_required',
+        'Authentication is required to access the staging website.',
+        array( 'status' => 401 )
+    );
+}, 99 );
+
 add_action( 'template_redirect', function () {
     if ( is_admin() || wp_doing_ajax() ) {
         return;
@@ -120,6 +149,25 @@ add_action( 'template_redirect', function () {
         nocache_headers();
         wp_redirect( 'https://staging.stapleitdev.co.uk/', 303, 'Staple IT holding page' );
         exit;
+    }
+
+    /*
+     * The holding page is the only public front-end route on this build.
+     * Every other path is checked server-side, so changing the address cannot
+     * bypass the preview login. Static theme assets are served by Nginx and do
+     * not enter this WordPress request path.
+     */
+    if ( '/holding/' !== $path ) {
+        if ( ! stapleit_holding_preview_is_authorised() ) {
+            nocache_headers();
+            header( 'X-Robots-Tag: noindex, nofollow, noarchive', true );
+            wp_safe_redirect( '/holding/', 302, 'Staple IT staging gate' );
+            exit;
+        }
+
+        /* Never allow an authenticated staging response to enter a shared cache. */
+        nocache_headers();
+        header( 'X-Robots-Tag: noindex, nofollow, noarchive', true );
     }
 
     $routes = array(
