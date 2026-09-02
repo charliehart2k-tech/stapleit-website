@@ -89,6 +89,7 @@ STATIC_ROUTE_SOURCES=(
   "client-portal/index.html"
   "remote-support/index.html"
   "the-staple-blog/index.html"
+  "holding/index.html"
 )
 
 if [[ ! -f "$SOURCE/index.html" ]]; then
@@ -147,6 +148,7 @@ python3 "$REPO/tools/build-cora-finetune.py" --root "$REPO" --check
 python3 "$REPO/tools/check-cora-site-corpus.py"
 python3 "$REPO/tests/python/cora-openai-sync-test.py"
 php "$REPO/tests/php/wordpress-hardening-test.php"
+php "$REPO/tests/php/holding-auth-test.php"
 
 echo
 echo "Deploying Staple IT site from Git $VERSION"
@@ -165,6 +167,9 @@ if [[ -f "$THEME/front-page.php" && -d "$THEME/assets" ]]; then
   fi
   if [[ -f "$THEME/cora-provider.php" ]]; then
     theme_backup_items+=(cora-provider.php)
+  fi
+  if [[ -f "$THEME/holding-page.php" ]]; then
+    theme_backup_items+=(holding-page.php)
   fi
   tar -czf "$BACKUP_DIR/stapleit-theme-$STAMP.tar.gz" \
     -C "$THEME" "${theme_backup_items[@]}"
@@ -189,6 +194,7 @@ cp "$WORDPRESS_SOURCE/cora-safety.php" "$THEME/cora-safety.php"
 cp "$WORDPRESS_SOURCE/cora-knowledge.php" "$THEME/cora-knowledge.php"
 cp "$WORDPRESS_SOURCE/cora-provider.php" "$THEME/cora-provider.php"
 find "$THEME" -maxdepth 1 -type f -name 'static-*.php' -delete
+rm -f "$THEME/holding-page.php"
 
 python3 "$REPO/tools/build-wordpress-templates.py" \
   --source-root "$SOURCE" \
@@ -206,6 +212,7 @@ php -l "$THEME/functions.php"
 php -l "$THEME/cora-safety.php"
 php -l "$THEME/cora-knowledge.php"
 php -l "$THEME/cora-provider.php"
+php -l "$THEME/holding-page.php"
 php -l "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 
 for template in "$THEME"/static-*.php; do
@@ -219,6 +226,20 @@ done
 grep -Fq '<title>Page Not Found | Staple IT</title>' "$THEME/404.php"
 grep -Fq '<meta name="robots" content="noindex,nofollow"' "$THEME/404.php"
 grep -Fq 'class="reset-stage reset-404"' "$THEME/404.php"
+
+# Holding page remains isolated, uncached and authenticated through WordPress.
+grep -Fq 'class="holding-page"' "$THEME/holding-page.php"
+grep -Fq 'class="holding-rainbow">makeover...</span>' "$THEME/holding-page.php"
+grep -Fq "wp_nonce_field( 'stapleit_holding_login', 'holding_nonce' )" "$THEME/holding-page.php"
+grep -Fq 'action="/holding-login/"' "$THEME/holding-page.php"
+grep -Fq "assets/css/holding.bundle.css?v=$VERSION" "$THEME/holding-page.php"
+grep -Fq "assets/js/holding.js?v=$VERSION" "$THEME/holding-page.php"
+grep -Fq "assets/media/liquid-wave.mp4?v=$VERSION" "$THEME/holding-page.php"
+test -s "$THEME/assets/css/holding.bundle.css"
+grep -Fq "'/holding/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
+grep -Fq "'/holding-login/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
+grep -Fq "wp_verify_nonce" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
+grep -Fq "user_can( \$user, 'edit_theme_options' )" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 
 grep -Fq 'class="mobile-nav-group"' "$THEME/front-page.php"
 grep -Fq 'data-audit-explainer' "$THEME/front-page.php"
@@ -420,6 +441,7 @@ grep -Fq "'/get-in-touch/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 grep -Fq "'/client-portal/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 grep -Fq "'/remote-support/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 grep -Fq "'/the-staple-blog/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
+grep -Fq "'/holding/'" "$MU_PLUGINS_DIR/stapleit-static-routes.php"
 
 if grep -Fq "register_rest_route( 'stapleit/v1', '/audit'" "$THEME/functions.php"; then
   echo "Legacy public audit REST route is still registered; refusing deployment." >&2

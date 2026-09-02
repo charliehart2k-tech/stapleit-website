@@ -83,6 +83,9 @@ BUNDLES["it-services.bundle.css"] = BUNDLES["home.bundle.css"][:-1] + ["it-servi
 # Remote Support uses the shared shell plus a dedicated support-dashboard layer.
 BUNDLES["remote-support.bundle.css"] = SHELL + ["remote-support.css", "typography-system.css"]
 
+# The temporary holding page is a self-contained, full-viewport composition.
+BUNDLES["holding.bundle.css"] = ["tokens.css", "holding.css"]
+
 # The reveal contract must win the cascade consistently on every route.
 for sources in BUNDLES.values():
     sources.append("motion.css")
@@ -94,6 +97,7 @@ MAX_GZIP_BYTES = {
     "get-in-touch.bundle.css": 45_000,
     "it-services.bundle.css": 45_000,
     "remote-support.bundle.css": 24_000,
+    "holding.bundle.css": 12_000,
 }
 
 

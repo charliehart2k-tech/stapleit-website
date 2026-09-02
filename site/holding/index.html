@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#000000">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="description" content="Staple IT is refreshing its website. Business IT support continues as normal while we put the finishing touches in place.">
+<link rel="canonical" href="https://stapleit.co.uk/holding/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/holding.bundle.css">
+<title>We’re having a makeover | Staple IT</title>
+</head>
+<body class="holding-page">
+<a class="holding-skip-link" href="#holding-main">Skip to content</a>
+
+<video class="holding-motion" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+<source src="/assets/media/liquid-wave.mp4" type="video/mp4">
+</video>
+<div class="holding-shade" aria-hidden="true"></div>
+
+<details class="holding-access" id="preview-login">
+<summary aria-label="Open the private website preview login">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<rect x="5" y="10" width="14" height="11" rx="3"></rect>
+<path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"></path>
+<path d="M12 14.5v2.5"></path>
+</svg>
+<span class="holding-access-label">Private preview</span>
+</summary>
+<div class="holding-access-panel">
+<p class="holding-access-kicker">Website access</p>
+<h2>Open the private build</h2>
+<p>Use your existing Staple IT website login.</p>
+<form action="/holding-login/" method="post">
+<?php wp_nonce_field( 'stapleit_holding_login', 'holding_nonce' ); ?>
+<label for="holding-user">Username or email</label>
+<input id="holding-user" name="log" type="text" autocomplete="username" required>
+<label for="holding-password">Password</label>
+<input id="holding-password" name="pwd" type="password" autocomplete="current-password" required>
+<button type="submit">Open staging <span aria-hidden="true">↗</span></button>
+<p class="holding-login-status" data-holding-login-status hidden role="status"></p>
+</form>
+</div>
+</details>
+
+<main class="holding-main" id="holding-main">
+<section class="holding-card" aria-labelledby="holding-title">
+<div class="holding-copy">
+<img class="holding-logo" src="/assets/images/brand/staple-it-logo-transparent.webp" width="512" height="152" alt="Staple IT">
+<p class="holding-eyebrow">A sharper website is on the way</p>
+<h1 id="holding-title">We’re having a <span class="holding-rainbow">makeover...</span></h1>
+<p class="holding-intro">We’re refreshing our website and putting the finishing touches in place. The Staple IT team—and our support—are still here as normal.</p>
+<div class="holding-actions" aria-label="Contact Staple IT">
+<a class="holding-action holding-action-primary" href="mailto:hello@stapleit.co.uk">Email us <span aria-hidden="true">↗</span></a>
+<a class="holding-action" href="tel:+441372309707">01372 309 707</a>
+</div>
+</div>
+
+<aside class="holding-support" data-contact-hours aria-label="Staple IT support availability">
+<div class="holding-support-top">
+<p>Support availability</p>
+<span class="holding-status-dot" aria-hidden="true"></span>
+</div>
+<strong data-contact-hours-state>Support hours</strong>
+<span data-contact-hours-detail>Monday to Friday, 9:00 AM–5:00 PM</span>
+<div class="holding-support-rule"></div>
+<p class="holding-support-note">Existing clients can continue to contact us in the usual way.</p>
+<a href="mailto:support@stapleit.co.uk">support@stapleit.co.uk <span aria-hidden="true">↗</span></a>
+</aside>
+</section>
+</main>
+
+<footer class="holding-footer">
+<p>Hart Corporate Ltd, trading as Staple IT</p>
+<p>Business IT support in Epsom, Surrey</p>
+</footer>
+
+<script src="/assets/js/support-schedule.js" defer></script>
+<script src="/assets/js/holding.js" defer></script>
+</body>
+</html>

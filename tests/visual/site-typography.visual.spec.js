@@ -5,7 +5,7 @@ const routes = [
   '/it-services/it-consultancy/', '/it-services/cybersecurity/', '/it-services/ai-integrations/',
   '/about-us/', '/about-us/who-we-support/', '/about-us/our-partners/', '/about-us/privacy-policy/',
   '/about-us/legal/', '/get-in-touch/', '/get-in-touch/it-audit/', '/client-portal/',
-  '/remote-support/', '/the-staple-blog/', '/404.html'
+  '/remote-support/', '/the-staple-blog/', '/holding/', '/404.html'
 ];
 
 const majorHeadingSelector = [

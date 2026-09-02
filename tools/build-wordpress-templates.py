@@ -71,6 +71,7 @@ def main() -> int:
     theme_root.mkdir(parents=True, exist_ok=True)
 
     build(source_root / "index.html", theme_root / "front-page.php", args.version, True)
+    build(source_root / "holding/index.html", theme_root / "holding-page.php", args.version, False)
     build(source_root / "404.html", theme_root / "404.php", args.version, False)
     for relative_source, target_name in STATIC_PAGES:
         build(source_root / relative_source, theme_root / target_name, args.version, False)

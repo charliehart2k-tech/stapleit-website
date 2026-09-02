@@ -15,6 +15,7 @@ The site is dark, clean, premium and restrained.
 - Typography: Manrope.
 - Navigation and footer remain neutral/monochrome.
 - The Staple IT logo retains its original blue/red colours.
+- The temporary holding page is an approved exception: it reuses the liquid-wave video behind one black-glass composition, with a restrained Staple-palette fill on the word `makeover` only.
 - Brand and service colours are accents with a reason, not general decoration.
 - One component should read as one pane of glass.
 - Do not add an internal glass shelf, nested highlight bubble or inset platform inside a card/control.

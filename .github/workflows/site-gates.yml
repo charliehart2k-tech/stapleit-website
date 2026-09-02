@@ -67,8 +67,9 @@ jobs:
             --source-root site \
             --theme-root "$template_root" \
             --version ci-test
-          test "$(find "$template_root" -maxdepth 1 -type f -name '*.php' | wc -l)" -eq 18
+          test "$(find "$template_root" -maxdepth 1 -type f -name '*.php' | wc -l)" -eq 19
           grep -Fq 'assets/css/home.bundle.css?v=ci-test' "$template_root/front-page.php"
+          grep -Fq 'assets/css/holding.bundle.css?v=ci-test' "$template_root/holding-page.php"
           grep -Fq 'assets/css/it-support.bundle.css?v=ci-test' "$template_root/static-it-support.php"
           grep -Fq '<?php wp_head(); ?>' "$template_root/front-page.php"
           if rg -q 'fonts\.googleapis|fonts\.gstatic' "$template_root"; then
@@ -143,6 +144,7 @@ jobs:
           python3 tools/check-cora-site-corpus.py
           python3 tests/python/cora-openai-sync-test.py
           php tests/php/wordpress-hardening-test.php
+          php tests/php/holding-auth-test.php
 
       - name: Run content security SEO and AEO gates
         run: python3 tools/audit-site.py --root site
